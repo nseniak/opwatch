@@ -8,8 +8,8 @@ import com.untrackr.alerter.processor.common.Factory;
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ValidationError;
 import com.untrackr.alerter.processor.consumer.AlertGeneratorFactory;
-import com.untrackr.alerter.processor.consumer.GrepFactory;
-import com.untrackr.alerter.processor.consumer.JSGrepFactory;
+import com.untrackr.alerter.processor.filter.GrepFactory;
+import com.untrackr.alerter.processor.filter.JSGrepFactory;
 import com.untrackr.alerter.processor.filter.PrintFactory;
 import com.untrackr.alerter.processor.producer.StatFactory;
 import com.untrackr.alerter.processor.producer.TailFactory;
@@ -79,7 +79,7 @@ public class FactoryService implements InitializingBean {
 			if (descriptor.get("include") != null) {
 				Object fileObject = descriptor.get("include");
 				if (!(fileObject instanceof String)) {
-					throw new ValidationError("incorrect filename", path, descriptor);
+					throw new ValidationError("invalid \"include\" filename", path, descriptor);
 				}
 				String pathname = (String) fileObject;
 				JsonObject loadedDescriptor;
@@ -97,15 +97,15 @@ public class FactoryService implements InitializingBean {
 			// Other processors
 			Object typeObject = descriptor.get("processor");
 			if (typeObject == null) {
-				throw new ValidationError("missing processor name", path, descriptor);
+				throw new ValidationError("missing \"processor\" field", path, descriptor);
 			}
 			if (!(typeObject instanceof String)) {
-				throw new ValidationError("incorrect processor name", path, descriptor);
+				throw new ValidationError("incorrect \"processor\" name", path, descriptor);
 			}
 			String type = (String) typeObject;
 			Factory factory = factories.get(type);
 			if (factory == null) {
-				throw new ValidationError("unknown processor name: \"" + type + "\"", path, descriptor);
+				throw new ValidationError("unknown \"processor\" name: \"" + type + "\"", path, descriptor);
 			}
 			return factory.make(descriptor, path);
 		} catch (ValidationError validationError) {

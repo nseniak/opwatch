@@ -55,7 +55,8 @@ public class Parallel extends Processor {
 		for (Processor processor : processors) {
 			ProcessorSignature bottomSignature = signature.bottom(processor.getSignature());
 			if (bottomSignature == null) {
-				throw new ValidationError("signature of " + processor.descriptor() + " inconsistent with other parallel processors: " + processor.getSignature().describe(), path, jsonObject);
+				String message = "signature of " + processor.descriptor() + " is " + processor.getSignature().describe() + " and is inconsistent with previous processors in parallel group: " + signature.describe();
+				throw new ValidationError(message, path, jsonObject);
 			}
 			signature = bottomSignature;
 		}

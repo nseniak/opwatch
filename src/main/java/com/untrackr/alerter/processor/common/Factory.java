@@ -24,7 +24,8 @@ public abstract class Factory {
 		try {
 			return processorService.getFactoryService().getObjectMapper().convertValue(jsonObject, clazz);
 		} catch (IllegalArgumentException e) {
-			throw new ValidationError("cannot read descriptor", path, jsonObject);
+			String message = "invalid " + type() + " descriptor: " + e.getLocalizedMessage();
+			throw new ValidationError(message, path, jsonObject);
 		}
 	}
 
@@ -32,7 +33,7 @@ public abstract class Factory {
 		if (value != null) {
 			return value;
 		} else {
-			throw new ValidationError("missing field: \"" + field + "\"", path, descriptor);
+			throw new ValidationError("missing " + type() + " field: \"" + field + "\"", path, descriptor);
 		}
 	}
 
@@ -48,7 +49,7 @@ public abstract class Factory {
 		try {
 			return ApplicationUtil.substituteVariables(text);
 		} catch (UndefinedSubstitutionVariable e) {
-			throw new ValidationError("unknown variable: " + e.getName(), path, descriptor);
+			throw new ValidationError("unknown variable in " + type() + " field \"" + field + "\": " + e.getName(), path, descriptor);
 		}
 	}
 

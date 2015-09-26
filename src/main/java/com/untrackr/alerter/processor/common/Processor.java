@@ -67,7 +67,7 @@ public abstract class Processor {
 
 	public void output(Object object, Payload input) {
 		Payload payload = new Payload(processorService, this, object, input);
-		payload.getJsonObject().put("timestamp", new Date());
+		payload.getJsonObject().put("_timestamp", new Date());
 		processorService.consumeConcurrently(consumers, payload);
 	}
 
