@@ -1,7 +1,5 @@
 package com.untrackr.alerter.model.common;
 
-import sun.plugin.dom.exception.InvalidStateException;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +17,7 @@ public class JsonObject extends HashMap<String, Object> {
 			for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) object).entrySet()) {
 				Object key = entry.getKey();
 				if (!(key instanceof String)) {
-					throw new InvalidStateException("invalid Json object");
+					throw new IllegalStateException("invalid Json object");
 				}
 				copy.put((String) key, deepCopyRec(entry.getValue()));
 			}
