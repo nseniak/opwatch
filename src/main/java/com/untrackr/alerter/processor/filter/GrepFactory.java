@@ -1,11 +1,10 @@
-package com.untrackr.alerter.processor.consumer;
+package com.untrackr.alerter.processor.filter;
 
 import com.untrackr.alerter.model.common.JsonObject;
 import com.untrackr.alerter.model.descriptor.GrepDesc;
 import com.untrackr.alerter.model.descriptor.IncludePath;
 import com.untrackr.alerter.processor.common.Factory;
 import com.untrackr.alerter.processor.common.ValidationError;
-import com.untrackr.alerter.processor.filter.Grep;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.regex.Pattern;

@@ -1,4 +1,4 @@
-package com.untrackr.alerter.processor.consumer;
+package com.untrackr.alerter.processor.filter;
 
 import com.untrackr.alerter.model.common.JsonObject;
 import com.untrackr.alerter.model.descriptor.IncludePath;
