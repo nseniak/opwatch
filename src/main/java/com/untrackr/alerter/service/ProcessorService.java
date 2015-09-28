@@ -216,12 +216,11 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	public IncludePath.LoadedFile findFile(String filename, IncludePath currentPath) {
 		File file = new File(filename);
+		if (file.exists() && file.isFile()) {
+			return new IncludePath.LoadedFile(filename, file);
+		}
 		if (file.isAbsolute()) {
-			if (file.exists() && file.isFile()) {
-				return new IncludePath.LoadedFile(filename, file);
-			} else {
-				return null;
-			}
+			return null;
 		}
 		if (!currentPath.isEmpty()) {
 			IncludePath.LoadedFile last = currentPath.last();
