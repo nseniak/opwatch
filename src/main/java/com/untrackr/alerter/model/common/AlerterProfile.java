@@ -14,7 +14,9 @@ public class AlerterProfile {
 	private Integer defaultEmergencyRetry;
 	private Integer defaultEmergencyExpire;
 	private long defaultScheduledProducerPeriod;
-	private boolean noAlarms;
+	private boolean testMode;
+	private String timestampFieldName;
+	private String hostnameFieldName;
 
 	public AlerterProfile() {
 		this.fileWatchingCheckDelay = TimeUnit.SECONDS.toMillis(1);
@@ -26,7 +28,9 @@ public class AlerterProfile {
 		this.defaultEmergencyRetry = 60;
 		this.defaultEmergencyExpire = 3600;
 		this.defaultScheduledProducerPeriod = TimeUnit.MILLISECONDS.toMillis(1000);
-		this.noAlarms = ApplicationUtil.property("alerter.noAlarms", false);
+		this.testMode = ApplicationUtil.property("alerter.test", false);
+		this.timestampFieldName = "_timestamp";
+		this.hostnameFieldName = "_hostname";
 	}
 
 	public long getFileWatchingCheckDelay() {
@@ -93,12 +97,28 @@ public class AlerterProfile {
 		this.defaultScheduledProducerPeriod = defaultScheduledProducerPeriod;
 	}
 
-	public boolean isNoAlarms() {
-		return noAlarms;
+	public boolean isTestMode() {
+		return testMode;
 	}
 
-	public void setNoAlarms(boolean noAlarms) {
-		this.noAlarms = noAlarms;
+	public void setTestMode(boolean testMode) {
+		this.testMode = testMode;
+	}
+
+	public String getTimestampFieldName() {
+		return timestampFieldName;
+	}
+
+	public void setTimestampFieldName(String timestampFieldName) {
+		this.timestampFieldName = timestampFieldName;
+	}
+
+	public String getHostnameFieldName() {
+		return hostnameFieldName;
+	}
+
+	public void setHostnameFieldName(String hostnameFieldName) {
+		this.hostnameFieldName = hostnameFieldName;
 	}
 
 }

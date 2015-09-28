@@ -2,8 +2,6 @@ package com.untrackr.alerter.service;
 
 import com.untrackr.alerter.model.common.Alert;
 import com.untrackr.alerter.model.common.PushoverKey;
-import com.untrackr.alerter.processor.common.Payload;
-import com.untrackr.alerter.processor.common.Processor;
 import net.pushover.client.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +18,7 @@ public class AlertService {
 
 	public void alert(Alert alert) {
 		logger.info("Sending alert: " + alert.toString());
-		if (profileService.profile().isNoAlarms()) {
+		if (profileService.profile().isTestMode()) {
 			logger.warn("Alert not sent");
 			return;
 		}

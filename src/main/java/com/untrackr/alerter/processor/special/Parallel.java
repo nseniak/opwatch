@@ -34,7 +34,7 @@ public class Parallel extends Processor {
 
 	@Override
 	public void initialize() {
-		processorService.initializeConcurrently(processors);
+		processors.forEach(processor -> processorService.withErrorHandling(processor, null, processor::initialize));
 	}
 
 	@Override

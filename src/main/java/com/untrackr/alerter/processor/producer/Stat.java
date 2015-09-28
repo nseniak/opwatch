@@ -25,15 +25,13 @@ public class Stat extends ScheduledProducer {
 			info.setExists(true);
 			info.setSize(file.length());
 			info.setLastModified(new Date(file.lastModified()));
-			long partitionSize = file.getTotalSpace();
-			info.setPartitionSize(partitionSize);
-			long partitionAvailable = file.getFreeSpace();
-			info.setPartitionAvailable(partitionAvailable);
-			long partitionUsed = partitionSize - partitionAvailable;
-			info.setPartitionUsed(partitionUsed);
-			info.setPartitionPercentUsed(((double) partitionUsed * 100) / partitionSize);
 		}
 		return info;
+	}
+
+	@Override
+	public String identifier() {
+		return file.toString();
 	}
 
 	public static class FileInfo {
@@ -42,10 +40,6 @@ public class Stat extends ScheduledProducer {
 		private boolean exists;
 		private Long size;
 		private Date lastModified;
-		private Long partitionSize;
-		private Long partitionUsed;
-		private Long partitionAvailable;
-		private Double partitionPercentUsed;
 
 		public String getFile() {
 			return file;
@@ -77,38 +71,6 @@ public class Stat extends ScheduledProducer {
 
 		public void setLastModified(Date lastModified) {
 			this.lastModified = lastModified;
-		}
-
-		public Long getPartitionSize() {
-			return partitionSize;
-		}
-
-		public void setPartitionSize(Long partitionSize) {
-			this.partitionSize = partitionSize;
-		}
-
-		public Long getPartitionUsed() {
-			return partitionUsed;
-		}
-
-		public void setPartitionUsed(Long partitionUsed) {
-			this.partitionUsed = partitionUsed;
-		}
-
-		public Long getPartitionAvailable() {
-			return partitionAvailable;
-		}
-
-		public void setPartitionAvailable(Long partitionAvailable) {
-			this.partitionAvailable = partitionAvailable;
-		}
-
-		public Double getPartitionPercentUsed() {
-			return partitionPercentUsed;
-		}
-
-		public void setPartitionPercentUsed(Double partitionPercentUsed) {
-			this.partitionPercentUsed = partitionPercentUsed;
 		}
 
 	}

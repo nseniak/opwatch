@@ -1,12 +1,12 @@
 package com.untrackr.alerter.processor.filter;
 
 import com.untrackr.alerter.model.descriptor.IncludePath;
+import com.untrackr.alerter.processor.common.ActiveProcessor;
 import com.untrackr.alerter.processor.common.Payload;
-import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ProcessorSignature;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class Print extends Processor {
+public class Print extends ActiveProcessor {
 
 	public Print(ProcessorService processorService, IncludePath path) {
 		super(processorService, path);

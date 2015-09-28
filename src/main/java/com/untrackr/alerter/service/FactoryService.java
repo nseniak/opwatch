@@ -4,15 +4,17 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.untrackr.alerter.model.common.JsonObject;
 import com.untrackr.alerter.model.descriptor.IncludePath;
-import com.untrackr.alerter.processor.common.Factory;
+import com.untrackr.alerter.processor.common.ProcessorFactory;
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ValidationError;
 import com.untrackr.alerter.processor.consumer.AlertGeneratorFactory;
 import com.untrackr.alerter.processor.filter.GrepFactory;
 import com.untrackr.alerter.processor.filter.JSGrepFactory;
 import com.untrackr.alerter.processor.filter.PrintFactory;
+import com.untrackr.alerter.processor.producer.DfFactory;
 import com.untrackr.alerter.processor.producer.StatFactory;
 import com.untrackr.alerter.processor.producer.TailFactory;
+import com.untrackr.alerter.processor.producer.TopFactory;
 import com.untrackr.alerter.processor.special.ParallelFactory;
 import com.untrackr.alerter.processor.special.PipeFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -20,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +35,7 @@ public class FactoryService implements InitializingBean {
 	private ParallelFactory parallelFactory;
 	private PipeFactory pipeFactory;
 
-	private Map<String, Factory> factories = new HashMap<>();
+	private Map<String, ProcessorFactory> factories = new HashMap<>();
 
 	private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -47,30 +48,31 @@ public class FactoryService implements InitializingBean {
 		registerFactory(new TailFactory(processorService));
 		registerFactory(new PrintFactory(processorService));
 		registerFactory(new StatFactory(processorService));
+		registerFactory(new DfFactory(processorService));
+		registerFactory(new TopFactory(processorService));
 		registerFactory(new AlertGeneratorFactory(processorService));
 	}
 
-	private void registerFactory(Factory factory) {
-		factories.put(factory.type(), factory);
+	private void registerFactory(ProcessorFactory processorFactory) {
+		factories.put(processorFactory.type(), processorFactory);
 	}
 
-	public Processor loadProcessor(String filename) throws ValidationError {
-		IncludePath path = new IncludePath().append(filename);
-		try {
-			return makeProcessor(loadDescriptor(filename), path);
-		} catch (IOException e) {
-			throw new ValidationError(e, path);
-		}
+	public Processor loadProcessor(String filename, IncludePath path) throws ValidationError {
+		return makeProcessor(loadDescriptor(filename, path), path.append(filename));
 	}
 
-	public JsonObject loadDescriptor(String filename) throws IOException {
+	public JsonObject loadDescriptor(String filename, IncludePath path) {
 		File pathname = processorService.findInPath(filename);
 		if (pathname == null) {
-			throw new FileNotFoundException(filename);
+			throw new ValidationError("file not found: " + filename, path, null);
 		}
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
-		return mapper.readValue(pathname, JsonObject.class);
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+			return mapper.readValue(pathname, JsonObject.class);
+		} catch (IOException e) {
+			throw new ValidationError(e, path.append(filename));
+		}
 	}
 
 	public Processor makeProcessor(JsonObject descriptor, IncludePath path) throws ValidationError {
@@ -83,7 +85,7 @@ public class FactoryService implements InitializingBean {
 				}
 				String pathname = (String) fileObject;
 				JsonObject loadedDescriptor;
-				loadedDescriptor = loadDescriptor(pathname);
+				loadedDescriptor = loadDescriptor(pathname, path);
 				return makeProcessor(loadedDescriptor, path.append(pathname));
 			}
 			// Pipe
@@ -103,11 +105,11 @@ public class FactoryService implements InitializingBean {
 				throw new ValidationError("incorrect \"processor\" name", path, descriptor);
 			}
 			String type = (String) typeObject;
-			Factory factory = factories.get(type);
-			if (factory == null) {
+			ProcessorFactory processorFactory = factories.get(type);
+			if (processorFactory == null) {
 				throw new ValidationError("unknown \"processor\" name: \"" + type + "\"", path, descriptor);
 			}
-			return factory.make(descriptor, path);
+			return processorFactory.make(descriptor, path);
 		} catch (ValidationError validationError) {
 			throw validationError;
 		} catch (Throwable t) {

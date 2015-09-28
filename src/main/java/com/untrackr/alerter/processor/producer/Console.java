@@ -24,7 +24,6 @@ public class Console extends Producer {
 				while ((line = reader.readLine()) != null) {
 					lineNumber = lineNumber + 1;
 					LineObject lineObject = new LineObject();
-					lineObject.hostname = processorService.getHostName();
 					lineObject.text = line;
 					lineObject.line = lineNumber;
 					output(lineObject, null);
@@ -37,7 +36,6 @@ public class Console extends Producer {
 
 	public static class LineObject {
 
-		public String hostname;
 		public String text;
 		public int line;
 

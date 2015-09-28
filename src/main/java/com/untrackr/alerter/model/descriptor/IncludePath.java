@@ -29,7 +29,7 @@ public class IncludePath {
 		return reversePathList.getHead();
 	}
 
-	public String path() {
+	public String pathDescriptor() {
 		if (reversePathList == null) {
 			return "";
 		}

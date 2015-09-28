@@ -52,7 +52,7 @@ public class Pipe extends Processor {
 	public void initialize() {
 		for (int i = processors.size() - 1; i >= 0; i--) {
 			Processor processor = processors.get(i);
-			processorService.withErrorHandline(processor, null, processor::initialize);
+			processorService.withErrorHandling(processor, null, processor::initialize);
 		}
 	}
 

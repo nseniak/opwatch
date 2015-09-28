@@ -21,7 +21,9 @@ public class StatFactory extends ScheduledExecutorFactory {
 	public Stat make(JsonObject jsonObject, IncludePath path) throws ValidationError {
 		StatDesc descriptor = convertDescriptor(path, StatDesc.class, jsonObject);
 		String file = checkVariableSubstitution(path, jsonObject, "file", fieldValue(path, jsonObject, "file", descriptor.getFile()));
-		return new Stat(getProcessorService(), path, makeScheduledExecutor(descriptor), new java.io.File(file));
+		Stat stat = new Stat(getProcessorService(), path, makeScheduledExecutor(descriptor), new java.io.File(file));
+		initialize(stat, descriptor);
+		return stat;
 	}
 
 }

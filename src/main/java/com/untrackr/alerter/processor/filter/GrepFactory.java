@@ -3,14 +3,14 @@ package com.untrackr.alerter.processor.filter;
 import com.untrackr.alerter.model.common.JsonObject;
 import com.untrackr.alerter.model.descriptor.GrepDesc;
 import com.untrackr.alerter.model.descriptor.IncludePath;
-import com.untrackr.alerter.processor.common.Factory;
+import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
 import com.untrackr.alerter.processor.common.ValidationError;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-public class GrepFactory extends Factory {
+public class GrepFactory extends ActiveProcessorFactory {
 
 	public GrepFactory(ProcessorService processorService) {
 		super(processorService);
@@ -28,7 +28,9 @@ public class GrepFactory extends Factory {
 		String regex = fieldValue(path, jsonObject, "regex", descriptor.getRegex());
 		Pattern pattern = compilePattern(path, jsonObject, "regex", regex);
 		boolean invert = optionalFieldValue(descriptor, "invert", descriptor.getInvert(), Boolean.FALSE);
-		return new Grep(getProcessorService(), path, fieldName, pattern, invert);
+		Grep grep = new Grep(getProcessorService(), path, fieldName, pattern, invert);
+		initialize(grep, descriptor);
+		return grep;
 	}
 
 	private Pattern compilePattern(IncludePath path, JsonObject description, String field, String regex) throws ValidationError {

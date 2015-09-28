@@ -17,7 +17,7 @@ public abstract class ScheduledProducer extends Producer {
 	@Override
 	public void initialize() {
 		scheduledExecutor.schedule(() -> {
-			processorService.withErrorHandline(this, null, () -> {
+			processorService.withErrorHandling(this, null, () -> {
 				Object object = produce();
 				output(object, null);
 				count = count + 1;

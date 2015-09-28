@@ -1,5 +1,6 @@
 package com.untrackr.alerter.processor.common;
 
+import com.untrackr.alerter.model.common.JsonObject;
 import com.untrackr.alerter.model.descriptor.IncludePath;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -67,7 +68,15 @@ public abstract class Processor {
 
 	public void output(Object object, Payload input) {
 		Payload payload = new Payload(processorService, this, object, input);
-		payload.getJsonObject().put("_timestamp", new Date());
+		JsonObject jsonObject = payload.getJsonObject();
+		String timestampField = processorService.getProfileService().profile().getTimestampFieldName();
+		if (jsonObject.get(timestampField) == null) {
+			jsonObject.put(timestampField, new Date());
+		}
+		String hostnameField = processorService.getProfileService().profile().getHostnameFieldName();
+		if (jsonObject.get(hostnameField) == null) {
+			jsonObject.put(hostnameField, processorService.getHostName());
+		}
 		processorService.consumeConcurrently(consumers, payload);
 	}
 
@@ -75,9 +84,13 @@ public abstract class Processor {
 
 	public abstract void consume(Payload payload);
 
-	public String descriptor() {
+	public String type() {
 		// Default
-		return getClass().getSimpleName().toLowerCase() + "{}";
+		return getClass().getSimpleName().toLowerCase();
+	}
+
+	public String descriptor() {
+		return type() + "{}";
 	}
 
 	public ProcessorService getProcessorService() {
@@ -98,6 +111,12 @@ public abstract class Processor {
 
 	public ProcessorSignature getSignature() {
 		return signature;
+	}
+
+	public String pathDescriptor() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(path.pathDescriptor()).append(" > ").append(descriptor());
+		return builder.toString();
 	}
 
 }

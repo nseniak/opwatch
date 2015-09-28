@@ -1,10 +1,10 @@
 package com.untrackr.alerter.processor.producer;
 
 import com.untrackr.alerter.model.descriptor.ScheduledProducerDesc;
-import com.untrackr.alerter.processor.common.Factory;
+import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
 import com.untrackr.alerter.service.ProcessorService;
 
-public abstract class ScheduledExecutorFactory extends Factory {
+public abstract class ScheduledExecutorFactory extends ActiveProcessorFactory {
 
 	public ScheduledExecutorFactory(ProcessorService processorService) {
 		super(processorService);

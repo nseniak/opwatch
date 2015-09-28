@@ -8,11 +8,11 @@ import com.untrackr.alerter.service.ProcessorService;
 
 import java.io.IOException;
 
-public abstract class Factory {
+public abstract class ProcessorFactory {
 
 	protected ProcessorService processorService;
 
-	public Factory(ProcessorService processorService) {
+	public ProcessorFactory(ProcessorService processorService) {
 		this.processorService = processorService;
 	}
 
@@ -38,8 +38,8 @@ public abstract class Factory {
 	}
 
 	public <T> T optionalFieldValue(Object descriptor, String field, T value, T defaultValue) throws ValidationError {
-		if (value != null) {
-			return value;
+		if (value == null) {
+			return defaultValue;
 		} else {
 			return defaultValue;
 		}

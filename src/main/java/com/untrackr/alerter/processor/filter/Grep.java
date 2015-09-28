@@ -34,4 +34,9 @@ public class Grep extends ConditionalFilter {
 		return (match && !invert) || (!match && invert);
 	}
 
+	@Override
+	public String identifier() {
+		return pattern.pattern();
+	}
+
 }

@@ -50,17 +50,19 @@ public class Payload {
 		return list;
 	}
 
-	public String path(Processor last) {
+	public String pathDescriptor(Processor last) {
 		StringBuilder builder = new StringBuilder();
 		String lastPathName = null;
 		String delimiter = "";
 		List<Processor> producers = new ArrayList<>(inputList().stream().map(Payload::getProducer).collect(toList()));
 		producers.add(last);
 		for (Processor producer : producers) {
-			String pathName = getProducer().getPath().last();
-			if (!pathName.equals(lastPathName)) {
-				lastPathName = pathName;
-				builder.append(pathName).append(":");
+			if (!getProducer().getPath().isEmpty()) {
+				String pathName = getProducer().getPath().last();
+				if (!pathName.equals(lastPathName)) {
+					lastPathName = pathName;
+					builder.append("[").append(pathName).append("]");
+				}
 			}
 			builder.append(delimiter).append(producer.descriptor());
 			delimiter = " > ";

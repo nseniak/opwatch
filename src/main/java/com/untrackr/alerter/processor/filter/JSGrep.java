@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.untrackr.alerter.model.descriptor.IncludePath;
 import com.untrackr.alerter.processor.common.Payload;
 import com.untrackr.alerter.processor.common.RuntimeProcessorError;
-import com.untrackr.alerter.processor.filter.ConditionalFilter;
 import com.untrackr.alerter.service.ProcessorService;
 
 import javax.script.Bindings;
@@ -46,6 +45,11 @@ public class JSGrep extends ConditionalFilter {
 			}
 			throw new RuntimeProcessorError("test returned a non-boolean value: " + resultString, this, input);
 		}
+	}
+
+	@Override
+	public String identifier() {
+		return test;
 	}
 
 }

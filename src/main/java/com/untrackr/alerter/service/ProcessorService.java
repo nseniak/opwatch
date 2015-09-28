@@ -7,6 +7,7 @@ import com.untrackr.alerter.ioservice.FileTailingService;
 import com.untrackr.alerter.model.common.Alert;
 import com.untrackr.alerter.model.descriptor.IncludePath;
 import com.untrackr.alerter.processor.common.*;
+import com.untrackr.alerter.processor.consumer.AlertGenerator;
 import com.untrackr.alerter.processor.filter.Print;
 import com.untrackr.alerter.processor.producer.Console;
 import com.untrackr.alerter.processor.special.Pipe;
@@ -15,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -50,6 +53,9 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	@Autowired
 	private FileTailingService fileTailingService;
 
+	@Autowired
+	private ApplicationContext applicationContext;
+
 	private List<File> descriptorDirectories;
 
 	private String hostName;
@@ -66,11 +72,13 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		// Path
-		String path = property("ALERTER_DESCRIPTOR_PATH");
-		String[] directoryStrings = path.split(":");
 		descriptorDirectories = new ArrayList<>();
-		for (String directoryString : directoryStrings) {
-			descriptorDirectories.add(new File(directoryString));
+		String path = property("ALERTER_DESCRIPTOR_PATH", null);
+		if (path != null) {
+			String[] directoryStrings = path.split(":");
+			for (String directoryString : directoryStrings) {
+				descriptorDirectories.add(new File(directoryString));
+			}
 		}
 		// Object mapper
 		objectMapper = new ObjectMapper();
@@ -92,33 +100,43 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 
 	public void start() {
-		String[] filenames = property("ALERTER_RUNNERS").split(",");
-		List<Processor> toplevelProcessors = new ArrayList<>();
-		withErrorHandline(null, null, () -> {
-			for (String filename : filenames) {
-				IncludePath emptyPath = new IncludePath();
-				Processor processor = factoryService.loadProcessor(filename);
-				List<Processor> processors = new ArrayList<>();
+		String filename = property("ALERTER_PROCESSOR");
+		boolean error = withErrorHandling(null, null, () -> {
+			IncludePath emptyPath = new IncludePath();
+			Processor processor = factoryService.loadProcessor(filename, emptyPath);
+			if (profileService.profile().isTestMode()) {
+				List<Processor> pipeProcessors = new ArrayList<>();
 				if (processor.getSignature().getInputRequirement() == ProcessorSignature.PipeRequirement.required) {
-					processors.add(new Console(this, emptyPath));
+					logger.info("Adding \"console\" as input processor");
+					pipeProcessors.add(new Console(this, emptyPath));
 				}
-				processors.add(processor);
+				pipeProcessors.add(processor);
 				if (processor.getSignature().getOutputRequirement() == ProcessorSignature.PipeRequirement.required) {
-					processors.add(new Print(this, emptyPath));
+					logger.info("Adding \"print\" as output processor");
+					pipeProcessors.add(new Print(this, emptyPath));
 				}
-				Pipe pipe = new Pipe(this, processors, emptyPath);
-				pipe.check();
-				toplevelProcessors.add(pipe);
-				initializeConcurrently(toplevelProcessors);
+				if (pipeProcessors.size() != 1) {
+					processor = new Pipe(this, pipeProcessors, emptyPath);
+				}
 			}
+			processor.check();
+			processor.initialize();
 		});
+		if (error) {
+			logger.info("Exiting due to initialization errors");
+			SpringApplication.exit(applicationContext);
+		}
+	}
+
+	private Processor testAlertGenerator(IncludePath path) {
+		return new AlertGenerator(this, Alert.Priority.normal, "Test alert", path);
 	}
 
 	public void displayValidationError(ValidationError e) {
 		StringWriter builder = new StringWriter();
 		IncludePath path = e.getPath();
 		if ((path != null) && !path.isEmpty()) {
-			builder.append(path.path()).append(": ");
+			builder.append(path.pathDescriptor()).append(": ");
 		}
 		builder.append("error: ").append(e.getLocalizedMessage());
 		if ((e.getCause() != null) && !(e.getCause() instanceof IOException)) {
@@ -130,8 +148,9 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	public void processorAlert(Alert.Priority priority, String title, Payload payload, Processor consumer) {
 		StringBuilder builder = new StringBuilder();
+		builder.append("Hostname: ").append(getHostName()).append("\n");
+		builder.append("Alert: ").append(payload.pathDescriptor(consumer)).append("\n");
 		builder.append("Input: ").append(payload.asText()).append("\n");
-		builder.append("Processor: ").append(payload.path(consumer)).append("\n");
 		Alert alert = new Alert(priority, title, builder.toString());
 		alertService.alert(alert);
 	}
@@ -140,11 +159,13 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		StringWriter builder = new StringWriter();
 		builder.append("Error: ").append(e.getLocalizedMessage()).append("\n");
 		Payload payload = e.getPayload();
+		Processor processor = e.getProcessor();
 		if (payload != null) {
 			builder.append("Input: ").append(payload.asText()).append("\n");
+			builder.append("Path: ").append(processor.pathDescriptor());
+		} else {
+			builder.append("Processor: ").append(processor.pathDescriptor());
 		}
-		Processor processor = e.getProcessor();
-		builder.append("Processor: ").append(payload.path(processor)).append("\n");
 		if ((e.getCause() != null) && !(e.getCause() instanceof IOException)) {
 			builder.append("\nStack trace:\n");
 			e.printStackTrace(new PrintWriter(builder));
@@ -169,30 +190,38 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	public void consumeConcurrently(List<Processor> consumers, Payload payload) {
 		for (Processor consumer : consumers) {
 			runnerExecutor.execute(() -> {
-				withErrorHandline(consumer, payload, () -> consumer.consume(payload));
+				withErrorHandling(consumer, payload, () -> consumer.consume(payload));
 			});
 		}
 	}
 
-	public void initializeConcurrently(List<Processor> toplevelProcessors) {
-		// All processors are independant and could be initialized concurrently; that would require waiting for all the
-		// initialization to be terminated. For simplicity's sake, we initialize them in sequence.
-		toplevelProcessors.forEach(processor -> withErrorHandline(processor, null, processor::initialize));
-	}
-
-	public void withErrorHandline(Processor processor, Payload payload, Runnable runnable) {
+	public boolean withErrorHandling(Processor processor, Payload payload, Runnable runnable) {
+		boolean error = true;
 		try {
-			runnable.run();
-		} catch (RuntimeProcessorError e) {
-			displayRuntimeError(e);
-		} catch (ValidationError e) {
-			displayValidationError(e);
+			try {
+				runnable.run();
+				error = false;
+			} catch (RuntimeProcessorError e) {
+				displayRuntimeError(e);
+			} catch (ValidationError e) {
+				displayValidationError(e);
+			} catch (Throwable t) {
+				displayRuntimeError(new RuntimeProcessorError(t, processor, payload));
+			}
 		} catch (Throwable t) {
-			displayRuntimeError(new RuntimeProcessorError(t, processor, payload));
+			logger.error("Error while displaying error", t);
 		}
+		return error;
 	}
 
 	public File findInPath(String filename) {
+		File fileInCurrentDir = new File(filename);
+		if (fileInCurrentDir.exists() && fileInCurrentDir.isFile()) {
+			return fileInCurrentDir;
+		}
+		if (fileInCurrentDir.isAbsolute()) {
+			return null;
+		}
 		for (File directory : descriptorDirectories) {
 			File file = new File(directory, filename);
 			if (file.exists() && file.isFile()) {

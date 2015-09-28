@@ -26,9 +26,8 @@ public class AlertGenerator extends Consumer {
 		processorService.processorAlert(priority, title, payload, this);
 	}
 
-	@Override
-	public String descriptor() {
-		return "alert{}";
+	public String type() {
+		return "alert";
 	}
 
 	public Alert.Priority getPriority() {
@@ -36,6 +35,11 @@ public class AlertGenerator extends Consumer {
 	}
 
 	public String getTitle() {
+		return title;
+	}
+
+	@Override
+	public String identifier() {
 		return title;
 	}
 

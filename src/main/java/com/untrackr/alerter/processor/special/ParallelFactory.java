@@ -3,7 +3,7 @@ package com.untrackr.alerter.processor.special;
 import com.untrackr.alerter.model.descriptor.IncludePath;
 import com.untrackr.alerter.model.descriptor.ParallelDesc;
 import com.untrackr.alerter.model.common.JsonObject;
-import com.untrackr.alerter.processor.common.Factory;
+import com.untrackr.alerter.processor.common.ProcessorFactory;
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ValidationError;
 import com.untrackr.alerter.service.FactoryService;
@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ParallelFactory extends Factory {
+public class ParallelFactory extends ProcessorFactory {
 
 	public ParallelFactory(ProcessorService processorService) {
 		super(processorService);

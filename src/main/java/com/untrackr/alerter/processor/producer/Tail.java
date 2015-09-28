@@ -21,7 +21,6 @@ public class Tail extends Producer {
 		AlerterProfile profile = getProcessorService().getProfileService().profile();
 		TailedFile tailedFile = new TailedFile(profile, file, (line, lineNumber) -> {
 			LineObject lineObject = new LineObject();
-			lineObject.hostname = processorService.getHostName();
 			lineObject.file = file.getAbsolutePath();
 			lineObject.text = line;
 			lineObject.line = lineNumber;
@@ -30,9 +29,13 @@ public class Tail extends Producer {
 		getProcessorService().getFileTailingService().addTailedFile(tailedFile);
 	}
 
+	@Override
+	public String identifier() {
+		return file.toString();
+	}
+
 	public static class LineObject {
 
-		public String hostname;
 		public String file;
 		public String text;
 		public int line;
