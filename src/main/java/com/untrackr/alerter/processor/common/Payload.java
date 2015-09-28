@@ -81,16 +81,16 @@ public class Payload {
 
 	public String pathDescriptor(Processor last) {
 		StringBuilder builder = new StringBuilder();
-		String lastPathName = null;
+		String lastFilename = null;
 		String delimiter = "";
 		List<Processor> producers = new ArrayList<>(inputList().stream().map(Payload::getProducer).collect(toList()));
 		producers.add(last);
 		for (Processor producer : producers) {
 			if (!getProducer().getPath().isEmpty()) {
-				String pathName = getProducer().getPath().last();
-				if (!pathName.equals(lastPathName)) {
-					lastPathName = pathName;
-					builder.append("[").append(pathName).append("] > ");
+				String filename = getProducer().getPath().last().getFilename();
+				if (!filename.equals(lastFilename)) {
+					lastFilename = filename;
+					builder.append("[").append(filename).append("] > ");
 				}
 			}
 			builder.append(delimiter).append(producer.descriptor());

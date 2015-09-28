@@ -2,22 +2,23 @@ package com.untrackr.alerter.model.descriptor;
 
 import com.untrackr.alerter.common.SinglyLinkedList;
 
+import java.io.File;
 import java.util.StringJoiner;
 
 public class IncludePath {
 
-	private SinglyLinkedList<String> reversePathList;
+	private SinglyLinkedList<LoadedFile> reversePathList;
 
 	public IncludePath() {
 		this.reversePathList = null;
 	}
 
-	public IncludePath(SinglyLinkedList<String> reversePathList) {
+	public IncludePath(SinglyLinkedList<LoadedFile> reversePathList) {
 		this.reversePathList = reversePathList;
 	}
 
-	public IncludePath append(String pathname) {
-		SinglyLinkedList<String> extendedPath = new SinglyLinkedList<>(pathname, reversePathList);
+	public IncludePath append(LoadedFile element) {
+		SinglyLinkedList<LoadedFile> extendedPath = new SinglyLinkedList<>(element, reversePathList);
 		return new IncludePath(extendedPath);
 	}
 
@@ -25,7 +26,7 @@ public class IncludePath {
 		return reversePathList == null;
 	}
 
-	public String last() {
+	public LoadedFile last() {
 		return reversePathList.getHead();
 	}
 
@@ -34,8 +35,28 @@ public class IncludePath {
 			return "";
 		}
 		StringJoiner joiner = new StringJoiner(" > ");
-		reversePathList.reverse().forEach(joiner::add);
+		reversePathList.reverse().forEach(element -> joiner.add(element.getFilename()));
 		return joiner.toString();
+	}
+
+	public static class LoadedFile {
+
+		private String filename;
+		private File file;
+
+		public LoadedFile(String filename, File file) {
+			this.filename = filename;
+			this.file = file;
+		}
+
+		public String getFilename() {
+			return filename;
+		}
+
+		public File getFile() {
+			return file;
+		}
+
 	}
 
 }

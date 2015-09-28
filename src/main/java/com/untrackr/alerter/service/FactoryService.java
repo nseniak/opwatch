@@ -4,31 +4,34 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.untrackr.alerter.model.common.JsonObject;
 import com.untrackr.alerter.model.descriptor.IncludePath;
-import com.untrackr.alerter.processor.common.ProcessorFactory;
 import com.untrackr.alerter.processor.common.Processor;
+import com.untrackr.alerter.processor.common.ProcessorFactory;
 import com.untrackr.alerter.processor.common.ValidationError;
 import com.untrackr.alerter.processor.consumer.AlertGeneratorFactory;
 import com.untrackr.alerter.processor.filter.GrepFactory;
 import com.untrackr.alerter.processor.filter.JSGrepFactory;
-import com.untrackr.alerter.processor.filter.PrintFactory;
 import com.untrackr.alerter.processor.filter.OnceFactory;
+import com.untrackr.alerter.processor.filter.PrintFactory;
 import com.untrackr.alerter.processor.producer.DfFactory;
 import com.untrackr.alerter.processor.producer.StatFactory;
 import com.untrackr.alerter.processor.producer.TailFactory;
 import com.untrackr.alerter.processor.producer.TopFactory;
 import com.untrackr.alerter.processor.special.ParallelFactory;
 import com.untrackr.alerter.processor.special.PipeFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
 public class FactoryService implements InitializingBean {
+
+	private static final Logger logger = LoggerFactory.getLogger(FactoryService.class);
 
 	@Autowired
 	private ProcessorService processorService;
@@ -60,20 +63,22 @@ public class FactoryService implements InitializingBean {
 	}
 
 	public Processor loadProcessor(String filename, IncludePath path) throws ValidationError {
-		return makeProcessor(loadDescriptor(filename, path), path.append(filename));
-	}
-
-	public JsonObject loadDescriptor(String filename, IncludePath path) {
-		File pathname = processorService.findInPath(filename);
-		if (pathname == null) {
+		IncludePath.LoadedFile file = processorService.findFile(filename, path);
+		if (file == null) {
 			throw new ValidationError("file not found: " + filename, path, null);
 		}
+
+		return makeProcessor(loadDescriptor(file, path), path.append(file));
+	}
+
+	public JsonObject loadDescriptor(IncludePath.LoadedFile file, IncludePath path) {
 		try {
+			logger.info("Loading file: " + file.getFile().toString());
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
-			return mapper.readValue(pathname, JsonObject.class);
+			return mapper.readValue(file.getFile(), JsonObject.class);
 		} catch (IOException e) {
-			throw new ValidationError(e, path.append(filename));
+			throw new ValidationError(e, path.append(file));
 		}
 	}
 
@@ -85,10 +90,8 @@ public class FactoryService implements InitializingBean {
 				if (!(fileObject instanceof String)) {
 					throw new ValidationError("invalid \"include\" filename", path, descriptor);
 				}
-				String pathname = (String) fileObject;
-				JsonObject loadedDescriptor;
-				loadedDescriptor = loadDescriptor(pathname, path);
-				return makeProcessor(loadedDescriptor, path.append(pathname));
+				String filename = (String) fileObject;
+				return loadProcessor(filename, path);
 			}
 			// Pipe
 			if (descriptor.get("pipe") != null) {

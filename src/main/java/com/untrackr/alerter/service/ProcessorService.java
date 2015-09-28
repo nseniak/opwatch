@@ -100,7 +100,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 
 	public void start() {
-		String filename = property("ALERTER_PROCESSOR");
+		String filename = property("ALERTER_MAIN");
 		boolean error = withErrorHandling(null, null, () -> {
 			IncludePath emptyPath = new IncludePath();
 			Processor processor = factoryService.loadProcessor(filename, emptyPath);
@@ -214,18 +214,30 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		return error;
 	}
 
-	public File findInPath(String filename) {
-		File fileInCurrentDir = new File(filename);
-		if (fileInCurrentDir.exists() && fileInCurrentDir.isFile()) {
-			return fileInCurrentDir;
+	public IncludePath.LoadedFile findFile(String filename, IncludePath currentPath) {
+		File file = new File(filename);
+		if (file.isAbsolute()) {
+			if (file.exists() && file.isFile()) {
+				return new IncludePath.LoadedFile(filename, file);
+			} else {
+				return null;
+			}
 		}
-		if (fileInCurrentDir.isAbsolute()) {
-			return null;
+		if (!currentPath.isEmpty()) {
+			IncludePath.LoadedFile last = currentPath.last();
+			String lastParentDir = last.getFile().getParent();
+			if (lastParentDir == null) {
+				lastParentDir = ".";
+			}
+			File relative = new File(lastParentDir, filename);
+			if (relative.exists() && relative.isFile()) {
+				return new IncludePath.LoadedFile(filename, relative);
+			}
 		}
 		for (File directory : descriptorDirectories) {
-			File file = new File(directory, filename);
-			if (file.exists() && file.isFile()) {
-				return file;
+			File directoryFile = new File(directory, filename);
+			if (directoryFile.exists() && directoryFile.isFile()) {
+				return new IncludePath.LoadedFile(filename, directoryFile);
 			}
 		}
 		return null;

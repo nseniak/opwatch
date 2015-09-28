@@ -11,7 +11,7 @@ import static com.untrackr.alerter.common.ApplicationUtil.checkProperty;
 public class AlerterApplication {
 
 	public static void main(String[] args) throws Exception {
-		checkProperty("ALERTER_PROCESSOR");
+		checkProperty("ALERTER_MAIN");
 		ApplicationContext context = SpringApplication.run(AlerterApplication.class, args);
 		ProcessorService processorService = context.getBean(ProcessorService.class);
 		processorService.start();
