@@ -32,6 +32,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.PatternSyntaxException;
 
 import static com.untrackr.alerter.common.ApplicationUtil.environmentVariable;
 import static com.untrackr.alerter.common.ApplicationUtil.property;
@@ -139,7 +140,8 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			builder.append(path.pathDescriptor()).append(": ");
 		}
 		builder.append("error: ").append(e.getLocalizedMessage());
-		if ((e.getCause() != null) && !(e.getCause() instanceof IOException)) {
+		Throwable c = e.getCause();
+		if ((c != null) && !((c instanceof IOException)|| (c instanceof PatternSyntaxException))) {
 			builder.append("\nStack trace:\n");
 			e.printStackTrace(new PrintWriter(builder));
 		}

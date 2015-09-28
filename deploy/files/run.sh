@@ -21,7 +21,14 @@ else
 	echo "Exited"
 fi
 # Start new process
-mv ${alerter_jar_temp} ${alerter_jar}
+if [ -f "${alerter_jar_temp}" ]
+then
+	mv ${alerter_jar_temp} ${alerter_jar}
+fi
 export ALERTER_PATH=tbalerts/common
-export LOG_DIR=~/latest/logs
-nohup java -DALERTER_MAIN=tbalerts/${app_name}/main.json -jar ${alerter_jar} >> logs/alerter.log 2>&1 &
+export LOG_DIR=${HOME}/latest/logs
+nohup java \
+	-DALERTER_MAIN=tbalerts/${app_name}/main.json \
+	-DALERTER_DESCRIPTOR_PATH=tbalerts/common:tbalerts/common_app \
+	-jar ${alerter_jar} \
+	>> logs/alerter.log 2>&1 &

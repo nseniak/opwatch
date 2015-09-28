@@ -19,8 +19,10 @@ public abstract class ScheduledProducer extends Producer {
 		scheduledExecutor.schedule(() -> {
 			processorService.withErrorHandling(this, null, () -> {
 				Object object = produce();
-				outputProduced(object);
-				count = count + 1;
+				if (object != null) {
+					outputProduced(object);
+					count = count + 1;
+				}
 			});
 		});
 	}

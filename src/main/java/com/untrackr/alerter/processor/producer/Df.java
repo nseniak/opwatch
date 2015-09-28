@@ -17,22 +17,30 @@ public class Df extends ScheduledProducer {
 	}
 
 	@Override
+	public void initialize() {
+		super.initialize();
+	}
+
+	@Override
 	protected Object produce() {
 		PartitionInfo info = new PartitionInfo();
 		info.setFile(file.getAbsolutePath());
-		if (!file.exists() && !fileNotFoundErrorSignaled) {
-			fileNotFoundErrorSignaled = true;
-			throw new RuntimeProcessorError("file not found: " + file, this, null);
-		} else {
-			fileNotFoundErrorSignaled = false;
-			long partitionSize = file.getTotalSpace();
-			info.setSize(partitionSize);
-			long partitionAvailable = file.getFreeSpace();
-			info.setAvailable(partitionAvailable);
-			long partitionUsed = partitionSize - partitionAvailable;
-			info.setUsed(partitionUsed);
-			info.setPercentUsed(((double) partitionUsed * 100) / partitionSize);
+		if (!file.exists()) {
+			if (!fileNotFoundErrorSignaled) {
+				fileNotFoundErrorSignaled = true;
+				throw new RuntimeProcessorError("file not found: " + file, this, null);
+			} else {
+				return null;
+			}
 		}
+		fileNotFoundErrorSignaled = false;
+		long partitionSize = file.getTotalSpace();
+		info.setSize(partitionSize);
+		long partitionAvailable = file.getFreeSpace();
+		info.setAvailable(partitionAvailable);
+		long partitionUsed = partitionSize - partitionAvailable;
+		info.setUsed(partitionUsed);
+		info.setPercentUsed(((double) partitionUsed * 100) / partitionSize);
 		return info;
 	}
 
