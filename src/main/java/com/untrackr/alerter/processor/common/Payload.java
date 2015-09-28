@@ -5,7 +5,6 @@ import com.untrackr.alerter.model.common.JsonObject;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,10 +19,10 @@ public class Payload {
 	private Processor producer;
 	private JsonObject jsonObject;
 	private Payload input;
-	private Date timestamp;
+	private long timestamp;
 	private String hostname;
 
-	private Payload(ProcessorService processorService, Processor producer, JsonObject jsonObject, Payload input, Date timestamp, String hostname) {
+	private Payload(ProcessorService processorService, Processor producer, JsonObject jsonObject, Payload input, long timestamp, String hostname) {
 		this.processorService = processorService;
 		this.producer = producer;
 		this.jsonObject = jsonObject;
@@ -38,7 +37,7 @@ public class Payload {
 				producer,
 				makeJsonObject(processorService, object),
 				null,
-				new Date(),
+				System.currentTimeMillis(),
 				processorService.getHostName()
 		);
 	}
@@ -91,7 +90,7 @@ public class Payload {
 				String pathName = getProducer().getPath().last();
 				if (!pathName.equals(lastPathName)) {
 					lastPathName = pathName;
-					builder.append("[").append(pathName).append("]");
+					builder.append("[").append(pathName).append("] > ");
 				}
 			}
 			builder.append(delimiter).append(producer.descriptor());
@@ -120,7 +119,7 @@ public class Payload {
 		return input;
 	}
 
-	public Date getTimestamp() {
+	public long getTimestamp() {
 		return timestamp;
 	}
 

@@ -11,6 +11,7 @@ import com.untrackr.alerter.processor.consumer.AlertGeneratorFactory;
 import com.untrackr.alerter.processor.filter.GrepFactory;
 import com.untrackr.alerter.processor.filter.JSGrepFactory;
 import com.untrackr.alerter.processor.filter.PrintFactory;
+import com.untrackr.alerter.processor.filter.OnceFactory;
 import com.untrackr.alerter.processor.producer.DfFactory;
 import com.untrackr.alerter.processor.producer.StatFactory;
 import com.untrackr.alerter.processor.producer.TailFactory;
@@ -51,6 +52,7 @@ public class FactoryService implements InitializingBean {
 		registerFactory(new DfFactory(processorService));
 		registerFactory(new TopFactory(processorService));
 		registerFactory(new AlertGeneratorFactory(processorService));
+		registerFactory(new OnceFactory(processorService));
 	}
 
 	private void registerFactory(ProcessorFactory processorFactory) {
