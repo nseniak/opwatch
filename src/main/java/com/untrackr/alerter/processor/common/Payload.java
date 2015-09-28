@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.untrackr.alerter.model.common.JsonObject.deepCopy;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -57,7 +56,7 @@ public class Payload {
 
 	private static JsonObject makeJsonObject(ProcessorService processorService, Object object) {
 		if (object instanceof JsonObject) {
-			return deepCopy((JsonObject) object);
+			return (JsonObject) object;
 		} else {
 			return processorService.getObjectMapper().convertValue(object, JsonObject.class);
 		}

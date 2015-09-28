@@ -1,6 +1,7 @@
 package com.untrackr.alerter.processor.filter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.untrackr.alerter.model.common.JsonObject;
 import com.untrackr.alerter.model.descriptor.IncludePath;
 import com.untrackr.alerter.processor.common.Payload;
 import com.untrackr.alerter.processor.common.RuntimeProcessorError;
@@ -25,7 +26,9 @@ public class JSGrep extends ConditionalFilter {
 	@Override
 	public boolean conditionValue(Payload input) {
 		Bindings bindings = engine.createBindings();
-		bindings.put("input", input.getJsonObject());
+		// Copy the input because the js code might do side effects on it
+		JsonObject inputCopy = JsonObject.deepCopy(input.getJsonObject());
+		bindings.put("input", inputCopy);
 		Object result;
 		try {
 			result = engine.eval(test, bindings);

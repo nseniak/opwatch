@@ -1,6 +1,6 @@
 package com.untrackr.alerter.model.descriptor;
 
-public class GrepDesc extends ActiveProcessorDesc {
+public class GrepDesc extends ConditionalAlertGeneratorDesc {
 
 	/**
 	 * Field name. Defaults to "text".
