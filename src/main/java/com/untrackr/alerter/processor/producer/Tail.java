@@ -24,7 +24,7 @@ public class Tail extends Producer {
 			lineObject.file = file.getAbsolutePath();
 			lineObject.text = line;
 			lineObject.line = lineNumber;
-			output(lineObject, null);
+			outputProduced(lineObject);
 		});
 		getProcessorService().getFileTailingService().addTailedFile(tailedFile);
 	}

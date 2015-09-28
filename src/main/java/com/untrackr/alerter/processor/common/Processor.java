@@ -1,11 +1,9 @@
 package com.untrackr.alerter.processor.common;
 
-import com.untrackr.alerter.model.common.JsonObject;
 import com.untrackr.alerter.model.descriptor.IncludePath;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.StringJoiner;
 
@@ -66,17 +64,13 @@ public abstract class Processor {
 		}
 	}
 
-	public void output(Object object, Payload input) {
-		Payload payload = new Payload(processorService, this, object, input);
-		JsonObject jsonObject = payload.getJsonObject();
-		String timestampField = processorService.getProfileService().profile().getTimestampFieldName();
-		if (jsonObject.get(timestampField) == null) {
-			jsonObject.put(timestampField, new Date());
-		}
-		String hostnameField = processorService.getProfileService().profile().getHostnameFieldName();
-		if (jsonObject.get(hostnameField) == null) {
-			jsonObject.put(hostnameField, processorService.getHostName());
-		}
+	public void outputFiltered(Object object, Payload input) {
+		Payload payload = Payload.makeFiltered(processorService, this, object, input);
+		processorService.consumeConcurrently(consumers, payload);
+	}
+
+	public void outputProduced(Object object) {
+		Payload payload = Payload.makeRoot(processorService, this, object);
 		processorService.consumeConcurrently(consumers, payload);
 	}
 

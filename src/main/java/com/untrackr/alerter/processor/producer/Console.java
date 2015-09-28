@@ -26,7 +26,7 @@ public class Console extends Producer {
 					LineObject lineObject = new LineObject();
 					lineObject.text = line;
 					lineObject.line = lineNumber;
-					output(lineObject, null);
+					outputProduced(lineObject);
 				}
 			} catch (IOException e) {
 				throw new RuntimeException(e);

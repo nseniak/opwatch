@@ -17,7 +17,7 @@ public class Identity extends Filter {
 
 	@Override
 	public void consume(Payload input) {
-		output(input.getJsonObject(), input);
+		outputFiltered(input.getJsonObject(), input);
 	}
 
 }

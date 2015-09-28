@@ -21,7 +21,7 @@ public class Print extends ActiveProcessor {
 	@Override
 	public void consume(Payload input) {
 		System.out.println(input.asText());
-		output(input.getJsonObject(), input);
+		outputFiltered(input.getJsonObject(), input);
 	}
 
 }

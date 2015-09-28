@@ -5,6 +5,7 @@ import com.untrackr.alerter.model.common.JsonObject;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,16 +21,46 @@ public class Payload {
 	private Processor producer;
 	private JsonObject jsonObject;
 	private Payload input;
+	private Date timestamp;
+	private String hostname;
 
-	public Payload(ProcessorService processorService, Processor producer, Object object, Payload input) {
+	private Payload(ProcessorService processorService, Processor producer, JsonObject jsonObject, Payload input, Date timestamp, String hostname) {
 		this.processorService = processorService;
 		this.producer = producer;
-		if (object instanceof JsonObject) {
-			this.jsonObject = deepCopy((JsonObject) object);
-		} else {
-			this.jsonObject = processorService.getObjectMapper().convertValue(object, JsonObject.class);
-		}
+		this.jsonObject = jsonObject;
 		this.input = input;
+		this.timestamp = timestamp;
+		this.hostname = hostname;
+	}
+
+	public static Payload makeRoot(ProcessorService processorService, Processor producer, Object object) {
+		return new Payload(
+				processorService,
+				producer,
+				makeJsonObject(processorService, object),
+				null,
+				new Date(),
+				processorService.getHostName()
+		);
+	}
+
+	public static Payload makeFiltered(ProcessorService processorService, Processor producer, Object object, Payload input) {
+		return new Payload(
+				processorService,
+				producer,
+				makeJsonObject(processorService, object),
+				input,
+				input.getTimestamp(),
+				input.getHostname()
+		);
+	}
+
+	private static JsonObject makeJsonObject(ProcessorService processorService, Object object) {
+		if (object instanceof JsonObject) {
+			return deepCopy((JsonObject) object);
+		} else {
+			return processorService.getObjectMapper().convertValue(object, JsonObject.class);
+		}
 	}
 
 	public String asText() {
@@ -88,6 +119,14 @@ public class Payload {
 
 	public Payload getInput() {
 		return input;
+	}
+
+	public Date getTimestamp() {
+		return timestamp;
+	}
+
+	public String getHostname() {
+		return hostname;
 	}
 
 }
