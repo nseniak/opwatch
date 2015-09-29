@@ -41,7 +41,7 @@ public abstract class ProcessorFactory {
 		if (value == null) {
 			return defaultValue;
 		} else {
-			return defaultValue;
+			return value;
 		}
 	}
 
