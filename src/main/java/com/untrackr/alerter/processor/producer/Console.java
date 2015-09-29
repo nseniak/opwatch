@@ -16,7 +16,7 @@ public class Console extends Producer {
 
 	@Override
 	public void initialize() {
-		ThreadUtil.threadFactory("Console", true).newThread(() -> {
+		ThreadUtil.threadFactory("Console").newThread(() -> {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 			String line;
 			int lineNumber = 0;
