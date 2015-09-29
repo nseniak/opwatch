@@ -29,6 +29,7 @@ public class Alert {
 	private String message;
 	private Integer retry;
 	private Integer expire;
+	private long timestamp;
 
 	public Alert(Priority priority, String title, String message) {
 		this.priority = priority;
@@ -93,6 +94,14 @@ public class Alert {
 
 	public void setExpire(Integer expire) {
 		this.expire = expire;
+	}
+
+	public long getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(long sentOn) {
+		this.timestamp = sentOn;
 	}
 
 }

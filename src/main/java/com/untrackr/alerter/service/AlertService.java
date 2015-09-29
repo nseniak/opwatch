@@ -1,6 +1,7 @@
 package com.untrackr.alerter.service;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.EvictingQueue;
 import com.untrackr.alerter.model.common.Alert;
 import com.untrackr.alerter.model.common.PushoverKey;
 import net.pushover.client.*;
@@ -8,6 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class AlertService {
@@ -17,12 +21,36 @@ public class AlertService {
 	@Autowired
 	private ProfileService profileService;
 
+	@Autowired
+	private ProcessorService processorService;
+
+	private EvictingQueue<Alert> sentAlertQueue;
+
+	private boolean alertQueueFullErrorSignaled = false;
+
+	@PostConstruct
+	public void initializeAlertQueue() {
+		sentAlertQueue = EvictingQueue.create(profileService.profile().getMaxAlertsPerMinute());
+	}
+
 	public synchronized void alert(Alert alert) {
-		logger.info("Sending alert: " + alert.toString());
-		if (profileService.profile().isTestMode()) {
-			logger.warn("Alert not sent");
-			return;
+		alert.setTimestamp(System.currentTimeMillis());
+		sentAlertQueue.add(alert);
+		int maxPerMinute = profileService.profile().getMaxAlertsPerMinute();
+		if (sentAlertQueue.size() == maxPerMinute) {
+			long elapsed = System.currentTimeMillis() - sentAlertQueue.peek().getTimestamp();
+			if (elapsed <= TimeUnit.MINUTES.toMillis(1)) {
+				if (alertQueueFullErrorSignaled) {
+					return;
+				}
+				alertQueueFullErrorSignaled = true;
+				send("Max alerts per minute reached on " + processorService.getHostName(), "Muting for a moment.\nMaximum per minute: " + maxPerMinute, MessagePriority.NORMAL, null, null);
+				logger.warn("Max alerts per minutes reached: Alert not sent");
+				return;
+			}
 		}
+		alertQueueFullErrorSignaled = false;
+		logger.info("Sending alert: " + alert.toString());
 		MessagePriority priority = MessagePriority.EMERGENCY;
 		switch (alert.getPriority()) {
 			case low:
@@ -38,19 +66,30 @@ public class AlertService {
 				priority = MessagePriority.EMERGENCY;
 				break;
 		}
-		PushoverKey key = profileService.profile().getPushoverKey();
 		Integer retry = alert.getRetry();
 		Integer expire = alert.getExpire();
 		if (priority == MessagePriority.EMERGENCY) {
 			if (retry == null) {
 				retry = profileService.profile().getDefaultEmergencyRetry();
+			}
+			if (expire == null) {
 				expire = profileService.profile().getDefaultEmergencyExpire();
 			}
 		}
 		String message = !Strings.isNullOrEmpty(alert.getMessage()) ? alert.getMessage() : " ";
+		String title = alert.getPriority().name() + ": " + alert.getTitle();
+		send(title, message, priority, retry, expire);
+	}
+
+	private void send(String title, String message, MessagePriority priority, Integer retry, Integer expire) {
+		if (profileService.profile().isTestMode()) {
+			logger.warn("Test mode: Alert not sent");
+			return;
+		}
+		PushoverKey key = profileService.profile().getPushoverKey();
 		PushoverMessage msg = PushoverMessage.builderWithApiToken(key.getApiToken())
 				.setUserId(key.getUserId())
-				.setTitle(alert.getPriority().name() + ": " + alert.getTitle())
+				.setTitle(title)
 				.setMessage(message)
 				.setPriority(priority)
 				.setRetry(retry)

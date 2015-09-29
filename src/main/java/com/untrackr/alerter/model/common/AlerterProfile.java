@@ -15,8 +15,7 @@ public class AlerterProfile {
 	private Integer defaultEmergencyExpire;
 	private long defaultScheduledProducerPeriod;
 	private boolean testMode;
-	private String timestampFieldName;
-	private String hostnameFieldName;
+	private int maxAlertsPerMinute;
 
 	public AlerterProfile() {
 		this.fileWatchingCheckDelay = TimeUnit.SECONDS.toMillis(1);
@@ -29,8 +28,7 @@ public class AlerterProfile {
 		this.defaultEmergencyExpire = 3600;
 		this.defaultScheduledProducerPeriod = TimeUnit.MILLISECONDS.toMillis(1000);
 		this.testMode = ApplicationUtil.property("alerter.test", false);
-		this.timestampFieldName = "_timestamp";
-		this.hostnameFieldName = "_hostname";
+		this.maxAlertsPerMinute = 10;
 	}
 
 	public long getFileWatchingCheckDelay() {
@@ -105,20 +103,12 @@ public class AlerterProfile {
 		this.testMode = testMode;
 	}
 
-	public String getTimestampFieldName() {
-		return timestampFieldName;
+	public int getMaxAlertsPerMinute() {
+		return maxAlertsPerMinute;
 	}
 
-	public void setTimestampFieldName(String timestampFieldName) {
-		this.timestampFieldName = timestampFieldName;
-	}
-
-	public String getHostnameFieldName() {
-		return hostnameFieldName;
-	}
-
-	public void setHostnameFieldName(String hostnameFieldName) {
-		this.hostnameFieldName = hostnameFieldName;
+	public void setMaxAlertsPerMinute(int maxAlertsPerMinute) {
+		this.maxAlertsPerMinute = maxAlertsPerMinute;
 	}
 
 }

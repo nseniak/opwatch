@@ -126,7 +126,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			logger.info("Exiting due to initialization errors");
 			SpringApplication.exit(applicationContext);
 		} else {
-			Alert alert = new Alert(Alert.Priority.low, "Alerter running on " + getHostName(), "");
+			Alert alert = new Alert(Alert.Priority.low, "Alerter on " + getHostName() + ": OK", "");
 			alertService.alert(alert);
 		}
 	}
