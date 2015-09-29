@@ -1,6 +1,5 @@
 package com.untrackr.alerter.service;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.EvictingQueue;
 import com.untrackr.alerter.model.common.Alert;
 import com.untrackr.alerter.model.common.PushoverKey;
@@ -76,7 +75,7 @@ public class AlertService {
 				expire = profileService.profile().getDefaultEmergencyExpire();
 			}
 		}
-		String message = !Strings.isNullOrEmpty(alert.getMessage()) ? alert.getMessage() : " ";
+		String message = !alert.getMessage().trim().isEmpty() ? alert.getMessage() : "--";
 		String title = alert.getPriority().name() + ": " + alert.getTitle();
 		send(title, message, priority, retry, expire);
 	}
