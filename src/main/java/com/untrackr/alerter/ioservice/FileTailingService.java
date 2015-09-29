@@ -18,7 +18,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class FileTailingService implements InitializingBean, DisposableBean {
+public class FileTailingService implements DisposableBean {
 
 	private static final Logger logger = LoggerFactory.getLogger(FileTailingService.class);
 
@@ -51,11 +51,6 @@ public class FileTailingService implements InitializingBean, DisposableBean {
 		if (thread != null) {
 			thread.interrupt();
 		}
-	}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		ThreadUtil.safeExecutorShutdownNow(tailingThreadPoolExecutor, "FileTailingService", profileService.profile().getExecutorTerminationTimeout());
 	}
 
 	@Override
