@@ -1,6 +1,5 @@
 package com.untrackr.alerter.processor.common;
 
-import com.untrackr.alerter.model.descriptor.IncludePath;
 import com.untrackr.alerter.service.ProcessorService;
 
 public abstract class ActiveProcessor extends Processor {

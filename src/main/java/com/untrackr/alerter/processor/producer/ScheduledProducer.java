@@ -1,6 +1,6 @@
 package com.untrackr.alerter.processor.producer;
 
-import com.untrackr.alerter.model.descriptor.IncludePath;
+import com.untrackr.alerter.processor.common.IncludePath;
 import com.untrackr.alerter.processor.common.Payload;
 import com.untrackr.alerter.service.ProcessorService;
 

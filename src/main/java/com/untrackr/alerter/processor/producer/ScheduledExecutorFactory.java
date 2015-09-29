@@ -1,6 +1,6 @@
 package com.untrackr.alerter.processor.producer;
 
-import com.untrackr.alerter.model.descriptor.ScheduledProducerDesc;
+import com.untrackr.alerter.processor.common.ScheduledProducerDesc;
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -10,7 +10,7 @@ public abstract class ScheduledExecutorFactory extends ActiveProcessorFactory {
 		super(processorService);
 	}
 
-	ScheduledExecutor makeScheduledExecutor(ScheduledProducerDesc descriptor) {
+	protected ScheduledExecutor makeScheduledExecutor(ScheduledProducerDesc descriptor) {
 		long period = (descriptor.getPeriod() != null)
 				? descriptor.getPeriod()
 				: getProcessorService().getProfileService().profile().getDefaultScheduledProducerPeriod();

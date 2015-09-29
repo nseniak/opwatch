@@ -1,6 +1,5 @@
 package com.untrackr.alerter.processor.common;
 
-import com.untrackr.alerter.model.descriptor.ActiveProcessorDesc;
 import com.untrackr.alerter.service.ProcessorService;
 
 public abstract class ActiveProcessorFactory extends ProcessorFactory {

@@ -1,7 +1,6 @@
 package com.untrackr.alerter.processor.common;
 
 import com.untrackr.alerter.model.common.JsonObject;
-import com.untrackr.alerter.model.descriptor.IncludePath;
 
 public class ValidationError extends RuntimeException {
 

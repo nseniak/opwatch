@@ -3,7 +3,6 @@ package com.untrackr.alerter.processor.common;
 import com.untrackr.alerter.common.ApplicationUtil;
 import com.untrackr.alerter.common.UndefinedSubstitutionVariable;
 import com.untrackr.alerter.model.common.JsonObject;
-import com.untrackr.alerter.model.descriptor.IncludePath;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.io.IOException;
