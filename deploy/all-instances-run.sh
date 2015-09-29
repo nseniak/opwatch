@@ -11,4 +11,4 @@ for instance_name in ${instance_names}
 do
   sh instance-run.sh ${app_name} ${instance_name} || exit 1
 done
-echo "All instances running: ${instances}"
+echo "All instances running: ${instance_names}"
