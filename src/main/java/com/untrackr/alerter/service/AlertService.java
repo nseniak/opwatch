@@ -17,7 +17,7 @@ public class AlertService {
 	@Autowired
 	private ProfileService profileService;
 
-	public void alert(Alert alert) {
+	public synchronized void alert(Alert alert) {
 		logger.info("Sending alert: " + alert.toString());
 		if (profileService.profile().isTestMode()) {
 			logger.warn("Alert not sent");
