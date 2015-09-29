@@ -1,5 +1,6 @@
 package com.untrackr.alerter.service;
 
+import com.google.common.base.Strings;
 import com.untrackr.alerter.model.common.Alert;
 import com.untrackr.alerter.model.common.PushoverKey;
 import net.pushover.client.*;
@@ -46,10 +47,11 @@ public class AlertService {
 				expire = profileService.profile().getDefaultEmergencyExpire();
 			}
 		}
+		String message = !Strings.isNullOrEmpty(alert.getMessage()) ? alert.getMessage() : " ";
 		PushoverMessage msg = PushoverMessage.builderWithApiToken(key.getApiToken())
 				.setUserId(key.getUserId())
 				.setTitle(alert.getPriority().name() + ": " + alert.getTitle())
-				.setMessage(alert.getMessage())
+				.setMessage(message)
 				.setPriority(priority)
 				.setRetry(retry)
 				.setExpire(expire)
