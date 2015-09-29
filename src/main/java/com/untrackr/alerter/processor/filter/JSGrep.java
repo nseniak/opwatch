@@ -16,6 +16,7 @@ public class JSGrep extends ConditionalFilter {
 
 	private ScriptEngine engine;
 	private String test;
+	private boolean nonBooleanValueErrorSignaled = false;
 
 	public JSGrep(ProcessorService processorService, IncludePath path, String test) {
 		super(processorService, path);
@@ -40,13 +41,18 @@ public class JSGrep extends ConditionalFilter {
 		} else if (result == Boolean.FALSE) {
 			return false;
 		} else {
-			String resultString = null;
-			try {
-				resultString = processorService.getObjectMapper().writeValueAsString(result);
-			} catch (JsonProcessingException e) {
-				resultString = "<cannot convert to string>";
+			if (nonBooleanValueErrorSignaled) {
+				return false;
+			} else {
+				nonBooleanValueErrorSignaled = true;
+				String resultString = null;
+				try {
+					resultString = processorService.getObjectMapper().writeValueAsString(result);
+				} catch (JsonProcessingException e) {
+					resultString = "<cannot convert to string>";
+				}
+				throw new RuntimeProcessorError("test returned a non-boolean value: " + resultString, this, input);
 			}
-			throw new RuntimeProcessorError("test returned a non-boolean value: " + resultString, this, input);
 		}
 	}
 

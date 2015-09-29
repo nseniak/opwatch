@@ -26,11 +26,11 @@ public class Df extends ScheduledProducer {
 		PartitionInfo info = new PartitionInfo();
 		info.setFile(file.getAbsolutePath());
 		if (!file.exists()) {
-			if (!fileNotFoundErrorSignaled) {
+			if (fileNotFoundErrorSignaled) {
+				return null;
+			} else {
 				fileNotFoundErrorSignaled = true;
 				throw new RuntimeProcessorError("file not found: " + file, this, null);
-			} else {
-				return null;
 			}
 		}
 		fileNotFoundErrorSignaled = false;

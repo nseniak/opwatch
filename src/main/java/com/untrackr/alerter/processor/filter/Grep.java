@@ -12,6 +12,8 @@ public class Grep extends ConditionalFilter {
 	private String fieldName;
 	private Pattern pattern;
 	private boolean invert;
+	private boolean missingFieldErrorSignaled = false;
+	private boolean wrongFieldValueErrorSignaled = false;
 
 	public Grep(ProcessorService processorService, IncludePath path, String fieldName, Pattern pattern, boolean invert) {
 		super(processorService, path);
@@ -24,10 +26,20 @@ public class Grep extends ConditionalFilter {
 	public boolean conditionValue(Payload input) {
 		Object textValue = input.getJsonObject().get(fieldName);
 		if (textValue == null) {
-			throw new RuntimeProcessorError("field is missing: " + fieldName, this, input);
+			if (missingFieldErrorSignaled) {
+				return false;
+			} else {
+				missingFieldErrorSignaled = true;
+				throw new RuntimeProcessorError("field is missing: " + fieldName, this, input);
+			}
 		}
 		if (!(textValue instanceof String)) {
-			throw new RuntimeProcessorError("field value expected as string: " + fieldName, this, input);
+			if (wrongFieldValueErrorSignaled) {
+				return false;
+			} else {
+				wrongFieldValueErrorSignaled = true;
+				throw new RuntimeProcessorError("field value expected as string: " + fieldName, this, input);
+			}
 		}
 		String text = (String) textValue;
 		boolean match = pattern.matcher(text).find();
