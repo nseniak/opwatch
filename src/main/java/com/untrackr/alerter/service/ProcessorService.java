@@ -7,7 +7,6 @@ import com.untrackr.alerter.ioservice.FileTailingService;
 import com.untrackr.alerter.model.common.Alert;
 import com.untrackr.alerter.model.descriptor.IncludePath;
 import com.untrackr.alerter.processor.common.*;
-import com.untrackr.alerter.processor.consumer.AlertGenerator;
 import com.untrackr.alerter.processor.filter.Print;
 import com.untrackr.alerter.processor.producer.Console;
 import com.untrackr.alerter.processor.special.Pipe;
@@ -126,11 +125,10 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		if (error) {
 			logger.info("Exiting due to initialization errors");
 			SpringApplication.exit(applicationContext);
+		} else {
+			Alert alert = new Alert(Alert.Priority.low, "Alerter running on " + getHostName(), "");
+			alertService.alert(alert);
 		}
-	}
-
-	private Processor testAlertGenerator(IncludePath path) {
-		return new AlertGenerator(this, Alert.Priority.normal, "Test alert", path);
 	}
 
 	public void displayValidationError(ValidationError e) {
@@ -145,7 +143,12 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			builder.append("\nStack trace:\n");
 			e.printStackTrace(new PrintWriter(builder));
 		}
-		logger.error(builder.toString());
+		String message = builder.toString();
+		logger.error(message);
+		builder.append("\n").append("Hostname: ").append(getHostName()).append("\n");
+		message = builder.toString();
+		Alert alert = new Alert(Alert.Priority.emergency, "Alerter initialization error: " + e.getLocalizedMessage(), message);
+		alertService.alert(alert);
 	}
 
 	public void processorAlert(Alert.Priority priority, String title, Payload payload, Processor consumer) {
@@ -174,6 +177,8 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		}
 		String message = builder.toString();
 		logger.error(message);
+		builder.append("\n").append("Hostname: ").append(getHostName()).append("\n");
+		message = builder.toString();
 		Alert alert = new Alert(Alert.Priority.emergency, "Alerter error: " + e.getLocalizedMessage(), message);
 		alertService.alert(alert);
 	}
