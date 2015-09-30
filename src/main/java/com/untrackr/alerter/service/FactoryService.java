@@ -2,7 +2,7 @@ package com.untrackr.alerter.service;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.untrackr.alerter.model.common.JsonObject;
+import com.untrackr.alerter.model.common.JsonDescriptor;
 import com.untrackr.alerter.processor.common.IncludePath;
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ProcessorFactory;
@@ -12,6 +12,7 @@ import com.untrackr.alerter.processor.filter.grep.GrepFactory;
 import com.untrackr.alerter.processor.filter.jsgrep.JSGrepFactory;
 import com.untrackr.alerter.processor.filter.once.OnceFactory;
 import com.untrackr.alerter.processor.filter.print.PrintFactory;
+import com.untrackr.alerter.processor.producer.curl.CurlFactory;
 import com.untrackr.alerter.processor.producer.df.DfFactory;
 import com.untrackr.alerter.processor.producer.stat.StatFactory;
 import com.untrackr.alerter.processor.producer.tail.TailFactory;
@@ -56,6 +57,7 @@ public class FactoryService implements InitializingBean {
 		registerFactory(new TopFactory(processorService));
 		registerFactory(new AlertGeneratorFactory(processorService));
 		registerFactory(new OnceFactory(processorService));
+		registerFactory(new CurlFactory(processorService));
 	}
 
 	private void registerFactory(ProcessorFactory processorFactory) {
@@ -71,18 +73,18 @@ public class FactoryService implements InitializingBean {
 		return makeProcessor(loadDescriptor(file, path), path.append(file));
 	}
 
-	public JsonObject loadDescriptor(IncludePath.LoadedFile file, IncludePath path) {
+	public JsonDescriptor loadDescriptor(IncludePath.LoadedFile file, IncludePath path) {
 		try {
 			logger.info("Loading file: " + file.getFile().toString());
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
-			return mapper.readValue(file.getFile(), JsonObject.class);
+			return mapper.readValue(file.getFile(), JsonDescriptor.class);
 		} catch (IOException e) {
 			throw new ValidationError(e, path.append(file));
 		}
 	}
 
-	public Processor makeProcessor(JsonObject descriptor, IncludePath path) throws ValidationError {
+	public Processor makeProcessor(JsonDescriptor descriptor, IncludePath path) throws ValidationError {
 		try {
 			// Include
 			if (descriptor.get("include") != null) {

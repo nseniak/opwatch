@@ -1,7 +1,7 @@
 package com.untrackr.alerter.processor.filter.jsgrep;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.untrackr.alerter.model.common.JsonObject;
+import com.untrackr.alerter.model.common.JsonUtil;
 import com.untrackr.alerter.processor.common.IncludePath;
 import com.untrackr.alerter.processor.common.Payload;
 import com.untrackr.alerter.processor.common.RuntimeProcessorError;
@@ -29,7 +29,7 @@ public class JSGrep extends ConditionalFilter {
 	public boolean conditionValue(Payload input) {
 		Bindings bindings = engine.createBindings();
 		// Copy the input because the js code might do side effects on it
-		JsonObject inputCopy = JsonObject.deepCopy(input.getJsonObject());
+		Object inputCopy = JsonUtil.deepCopy(input.getJsonObject());
 		bindings.put("input", inputCopy);
 		Object result;
 		try {

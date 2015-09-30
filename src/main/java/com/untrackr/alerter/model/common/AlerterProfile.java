@@ -16,6 +16,8 @@ public class AlerterProfile {
 	private long defaultScheduledProducerPeriod;
 	private boolean testMode;
 	private int maxAlertsPerMinute;
+	private long defaultHttpConnectTimeout;
+	private long defaultHttpReadTimeout;
 
 	public AlerterProfile() {
 		this.fileWatchingCheckDelay = TimeUnit.SECONDS.toMillis(1);
@@ -29,6 +31,8 @@ public class AlerterProfile {
 		this.defaultScheduledProducerPeriod = TimeUnit.MILLISECONDS.toMillis(1000);
 		this.testMode = ApplicationUtil.property("alerter.test", false);
 		this.maxAlertsPerMinute = 10;
+		this.defaultHttpConnectTimeout = TimeUnit.SECONDS.toMillis(5);
+		this.defaultHttpReadTimeout = TimeUnit.SECONDS.toMillis(10);
 	}
 
 	public long getFileWatchingCheckDelay() {
@@ -109,6 +113,22 @@ public class AlerterProfile {
 
 	public void setMaxAlertsPerMinute(int maxAlertsPerMinute) {
 		this.maxAlertsPerMinute = maxAlertsPerMinute;
+	}
+
+	public long getDefaultHttpConnectTimeout() {
+		return defaultHttpConnectTimeout;
+	}
+
+	public void setDefaultHttpConnectTimeout(long defaultHttpConnectTimeout) {
+		this.defaultHttpConnectTimeout = defaultHttpConnectTimeout;
+	}
+
+	public long getDefaultHttpReadTimeout() {
+		return defaultHttpReadTimeout;
+	}
+
+	public void setDefaultHttpReadTimeout(long defaultHttpReadTimeout) {
+		this.defaultHttpReadTimeout = defaultHttpReadTimeout;
 	}
 
 }

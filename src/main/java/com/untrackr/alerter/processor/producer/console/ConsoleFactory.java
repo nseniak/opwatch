@@ -1,8 +1,8 @@
 package com.untrackr.alerter.processor.producer.console;
 
-import com.untrackr.alerter.model.common.JsonObject;
-import com.untrackr.alerter.processor.common.IncludePath;
+import com.untrackr.alerter.model.common.JsonDescriptor;
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
+import com.untrackr.alerter.processor.common.IncludePath;
 import com.untrackr.alerter.processor.common.ValidationError;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -18,8 +18,8 @@ public class ConsoleFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public Console make(JsonObject jsonObject, IncludePath path) throws ValidationError {
-		ConsoleDesc descriptor = convertDescriptor(path, ConsoleDesc.class, jsonObject);
+	public Console make(JsonDescriptor jsonDescriptor, IncludePath path) throws ValidationError {
+		ConsoleDesc descriptor = convertDescriptor(path, ConsoleDesc.class, jsonDescriptor);
 		Console console = new Console(getProcessorService(), path);
 		initialize(console, descriptor);
 		return console;

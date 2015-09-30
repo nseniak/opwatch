@@ -4,6 +4,7 @@ import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.StringJoiner;
 
 public abstract class Processor {
@@ -69,8 +70,24 @@ public abstract class Processor {
 	}
 
 	public void outputProduced(Object object) {
-		Payload payload = Payload.makeRoot(processorService, this, object);
+		Object jsonObject = (object instanceof Map) ? object : processorService.getObjectMapper().convertValue(object, Map.class);
+		Payload payload = Payload.makeRoot(processorService, this, jsonObject);
 		processorService.consumeConcurrently(consumers, payload);
+	}
+
+	public <T> T payloadFieldValue(Payload input, String fieldName, Class<T> clazz) {
+		Object jsonObject = input.getJsonObject();
+		if (!(jsonObject instanceof Map)) {
+			throw new RuntimeProcessorError("cannot get field value \"" + fieldName + "\" from non-object", this, input);
+		}
+		Object value = ((Map) jsonObject).get(fieldName);
+		if (value == null) {
+			throw new RuntimeProcessorError("mising field value \"" + fieldName + "\"", this, input);
+		}
+		if (!clazz.isAssignableFrom(value.getClass())) {
+			throw new RuntimeProcessorError("wrong type for field \"" + fieldName + "\"", this, input);
+		}
+		return (T) value;
 	}
 
 	public abstract void initialize();

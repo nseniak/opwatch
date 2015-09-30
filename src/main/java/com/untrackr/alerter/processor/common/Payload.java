@@ -1,7 +1,7 @@
 package com.untrackr.alerter.processor.common;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.untrackr.alerter.model.common.JsonObject;
+import com.untrackr.alerter.model.common.JsonMap;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.ArrayList;
@@ -17,12 +17,12 @@ public class Payload {
 
 	private ProcessorService processorService;
 	private Processor producer;
-	private JsonObject jsonObject;
+	private Object jsonObject;
 	private Payload input;
 	private long timestamp;
 	private String hostname;
 
-	private Payload(ProcessorService processorService, Processor producer, JsonObject jsonObject, Payload input, long timestamp, String hostname) {
+	private Payload(ProcessorService processorService, Processor producer, Object jsonObject, Payload input, long timestamp, String hostname) {
 		this.processorService = processorService;
 		this.producer = producer;
 		this.jsonObject = jsonObject;
@@ -35,7 +35,7 @@ public class Payload {
 		return new Payload(
 				processorService,
 				producer,
-				makeJsonObject(processorService, object),
+				object,
 				null,
 				System.currentTimeMillis(),
 				processorService.getHostName()
@@ -46,19 +46,15 @@ public class Payload {
 		return new Payload(
 				processorService,
 				producer,
-				makeJsonObject(processorService, object),
+				object,
 				input,
 				input.getTimestamp(),
 				input.getHostname()
 		);
 	}
 
-	private static JsonObject makeJsonObject(ProcessorService processorService, Object object) {
-		if (object instanceof JsonObject) {
-			return (JsonObject) object;
-		} else {
-			return processorService.getObjectMapper().convertValue(object, JsonObject.class);
-		}
+	private static JsonMap makeJsonMap(ProcessorService processorService, Object object) {
+		return processorService.getObjectMapper().convertValue(object, JsonMap.class);
 	}
 
 	public String asText() {
@@ -111,7 +107,7 @@ public class Payload {
 		return producer;
 	}
 
-	public JsonObject getJsonObject() {
+	public Object getJsonObject() {
 		return jsonObject;
 	}
 

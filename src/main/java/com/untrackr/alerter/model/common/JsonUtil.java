@@ -5,27 +5,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class JsonObject extends HashMap<String, Object> {
+public class JsonUtil {
 
-	public static JsonObject deepCopy(JsonObject object) {
-		return (JsonObject) deepCopyRec(object);
-	}
-
-	private static Object deepCopyRec(Object object) {
+	public static Object deepCopy(Object object) {
 		if (object instanceof Map) {
-			JsonObject copy = new JsonObject();
-			for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) object).entrySet()) {
+			HashMap copy = new HashMap();
+			for (Map.Entry entry : ((Map<Object, Object>) object).entrySet()) {
 				Object key = entry.getKey();
 				if (!(key instanceof String)) {
 					throw new IllegalStateException("invalid Json object");
 				}
-				copy.put((String) key, deepCopyRec(entry.getValue()));
+				copy.put(key, deepCopy(entry.getValue()));
 			}
 			return copy;
 		} else if (object instanceof List) {
 			List<Object> copy = new ArrayList<>();
 			for (Object element : (List) object) {
-				copy.add(deepCopyRec(element));
+				copy.add(deepCopy(element));
 			}
 			return copy;
 		} else {

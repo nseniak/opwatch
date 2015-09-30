@@ -1,6 +1,6 @@
 package com.untrackr.alerter.processor.producer.top;
 
-import com.untrackr.alerter.model.common.JsonObject;
+import com.untrackr.alerter.model.common.JsonDescriptor;
 import com.untrackr.alerter.processor.common.IncludePath;
 import com.untrackr.alerter.processor.common.ValidationError;
 import com.untrackr.alerter.processor.producer.ScheduledExecutorFactory;
@@ -18,9 +18,9 @@ public class TopFactory extends ScheduledExecutorFactory {
 	}
 
 	@Override
-	public Top make(JsonObject jsonObject, IncludePath path) throws ValidationError {
-		TopDesc descriptor = convertDescriptor(path, TopDesc.class, jsonObject);
-		Top top = new Top(getProcessorService(), path, makeScheduledExecutor(descriptor));
+	public Top make(JsonDescriptor jsonDescriptor, IncludePath path) throws ValidationError {
+		TopDesc descriptor = convertDescriptor(path, TopDesc.class, jsonDescriptor);
+		Top top = new Top(getProcessorService(), path, makeScheduledExecutor(path, jsonDescriptor, descriptor));
 		initialize(top, descriptor);
 		return top;
 	}

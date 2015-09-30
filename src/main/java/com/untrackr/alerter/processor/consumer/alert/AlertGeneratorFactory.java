@@ -1,9 +1,9 @@
 package com.untrackr.alerter.processor.consumer.alert;
 
 import com.untrackr.alerter.model.common.Alert;
-import com.untrackr.alerter.model.common.JsonObject;
-import com.untrackr.alerter.processor.common.IncludePath;
+import com.untrackr.alerter.model.common.JsonDescriptor;
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
+import com.untrackr.alerter.processor.common.IncludePath;
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ValidationError;
 import com.untrackr.alerter.service.ProcessorService;
@@ -20,14 +20,16 @@ public class AlertGeneratorFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public Processor make(JsonObject jsonObject, IncludePath path) throws ValidationError {
-		AlertGeneratorDesc descriptor = convertDescriptor(path, AlertGeneratorDesc.class, jsonObject);
+	public Processor make(JsonDescriptor jsonDescriptor, IncludePath path) throws ValidationError {
+		AlertGeneratorDesc descriptor = convertDescriptor(path, AlertGeneratorDesc.class, jsonDescriptor);
 		String priorityName = optionalFieldValue(descriptor, "priority", descriptor.getPriority(), "normal");
-		Alert.Priority priority = Alert.Priority.valueOf(priorityName);
-		if (priority == null) {
-			throw new ValidationError("bad alert priority: \"" + priorityName + "\"", path, jsonObject);
+		Alert.Priority priority;
+		try {
+			priority = Alert.Priority.valueOf(priorityName);
+		} catch (IllegalArgumentException e) {
+			throw new ValidationError("bad alert priority: \"" + priorityName + "\"", path, jsonDescriptor);
 		}
-		String title = fieldValue(path, jsonObject, "title", descriptor.getTitle());
+		String title = checkFieldValue(path, jsonDescriptor, "title", descriptor.getTitle());
 		AlertGenerator alertGenerator = new AlertGenerator(getProcessorService(), priority, title, path);
 		initialize(alertGenerator, descriptor);
 		return alertGenerator;

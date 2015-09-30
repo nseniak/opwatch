@@ -1,7 +1,6 @@
 package com.untrackr.alerter.processor.special.parallel;
 
-import com.untrackr.alerter.model.common.JsonObject;
-import com.untrackr.alerter.processor.common.IncludePath;
+import com.untrackr.alerter.model.common.JsonDescriptor;
 import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -50,7 +49,7 @@ public class Parallel extends Processor {
 		// Nothing to do. Producers and consumers are already connected.
 	}
 
-	public void inferSignature(JsonObject jsonObject, IncludePath path) throws ValidationError {
+	public void inferSignature(JsonDescriptor jsonObject, IncludePath path) throws ValidationError {
 		signature = new ProcessorSignature(ProcessorSignature.PipeRequirement.any, ProcessorSignature.PipeRequirement.any);
 		for (Processor processor : processors) {
 			ProcessorSignature bottomSignature = signature.bottom(processor.getSignature());

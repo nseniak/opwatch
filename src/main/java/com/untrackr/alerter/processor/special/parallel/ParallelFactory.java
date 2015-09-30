@@ -1,9 +1,9 @@
 package com.untrackr.alerter.processor.special.parallel;
 
+import com.untrackr.alerter.model.common.JsonDescriptor;
 import com.untrackr.alerter.processor.common.IncludePath;
-import com.untrackr.alerter.model.common.JsonObject;
-import com.untrackr.alerter.processor.common.ProcessorFactory;
 import com.untrackr.alerter.processor.common.Processor;
+import com.untrackr.alerter.processor.common.ProcessorFactory;
 import com.untrackr.alerter.processor.common.ValidationError;
 import com.untrackr.alerter.service.FactoryService;
 import com.untrackr.alerter.service.ProcessorService;
@@ -24,15 +24,15 @@ public class ParallelFactory extends ProcessorFactory {
 	}
 
 	@Override
-	public Parallel make(JsonObject jsonObject, IncludePath path) throws ValidationError, IOException {
-		ParallelDesc descriptor = convertDescriptor(path, ParallelDesc.class, jsonObject);
+	public Parallel make(JsonDescriptor jsonDescriptor, IncludePath path) throws ValidationError, IOException {
+		ParallelDesc descriptor = convertDescriptor(path, ParallelDesc.class, jsonDescriptor);
 		List<Processor> processors = new ArrayList<>();
 		FactoryService factoryService = getProcessorService().getFactoryService();
-		for (JsonObject parallelDesc : descriptor.getParallel()) {
+		for (JsonDescriptor parallelDesc : descriptor.getParallel()) {
 			processors.add(factoryService.makeProcessor(parallelDesc, path));
 		}
 		Parallel parallel = new Parallel(getProcessorService(), processors, path);
-		parallel.inferSignature(jsonObject, path);
+		parallel.inferSignature(jsonDescriptor, path);
 		return parallel;
 	}
 

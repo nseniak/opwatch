@@ -1,6 +1,6 @@
 package com.untrackr.alerter.processor.producer.df;
 
-import com.untrackr.alerter.model.common.JsonObject;
+import com.untrackr.alerter.model.common.JsonDescriptor;
 import com.untrackr.alerter.processor.common.IncludePath;
 import com.untrackr.alerter.processor.common.ValidationError;
 import com.untrackr.alerter.processor.producer.ScheduledExecutorFactory;
@@ -18,10 +18,10 @@ public class DfFactory extends ScheduledExecutorFactory {
 	}
 
 	@Override
-	public Df make(JsonObject jsonObject, IncludePath path) throws ValidationError {
-		DfDesc descriptor = convertDescriptor(path, DfDesc.class, jsonObject);
-		String file = checkVariableSubstitution(path, jsonObject, "file", fieldValue(path, jsonObject, "file", descriptor.getFile()));
-		Df df = new Df(getProcessorService(), path, makeScheduledExecutor(descriptor), new java.io.File(file));
+	public Df make(JsonDescriptor jsonDescriptor, IncludePath path) throws ValidationError {
+		DfDesc descriptor = convertDescriptor(path, DfDesc.class, jsonDescriptor);
+		String file = checkVariableSubstitution(path, jsonDescriptor, "file", checkFieldValue(path, jsonDescriptor, "file", descriptor.getFile()));
+		Df df = new Df(getProcessorService(), path, makeScheduledExecutor(path, jsonDescriptor, descriptor), new java.io.File(file));
 		initialize(df, descriptor);
 		return df;
 	}

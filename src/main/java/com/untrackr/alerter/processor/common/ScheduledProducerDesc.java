@@ -2,13 +2,13 @@ package com.untrackr.alerter.processor.common;
 
 public class ScheduledProducerDesc extends ActiveProcessorDesc {
 
-	private Long period;
+	private String period;
 
-	public Long getPeriod() {
+	public String getPeriod() {
 		return period;
 	}
 
-	public void setPeriod(Long period) {
+	public void setPeriod(String period) {
 		this.period = period;
 	}
 

@@ -1,18 +1,18 @@
 package com.untrackr.alerter.processor.common;
 
-import com.untrackr.alerter.model.common.JsonObject;
+import com.untrackr.alerter.model.common.JsonDescriptor;
 
 public class ValidationError extends RuntimeException {
 
 	private IncludePath path;
-	private JsonObject descriptor;
+	private JsonDescriptor descriptor;
 
 	public ValidationError(String message, IncludePath path) {
 		super(message);
 		this.path = path;
 	}
 
-	public ValidationError(String message, IncludePath path, JsonObject descriptor) {
+	public ValidationError(String message, IncludePath path, JsonDescriptor descriptor) {
 		super(message);
 		this.path = path;
 		this.descriptor = descriptor;
@@ -23,7 +23,7 @@ public class ValidationError extends RuntimeException {
 		this.path = path;
 	}
 
-	public ValidationError(Throwable cause, IncludePath path, JsonObject descriptor) {
+	public ValidationError(Throwable cause, IncludePath path, JsonDescriptor descriptor) {
 		super(cause);
 		this.path = path;
 		this.descriptor = descriptor;
@@ -33,7 +33,7 @@ public class ValidationError extends RuntimeException {
 		return path;
 	}
 
-	public JsonObject getDescriptor() {
+	public JsonDescriptor getDescriptor() {
 		return descriptor;
 	}
 
