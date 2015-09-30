@@ -39,6 +39,7 @@ public class TailedFile {
 					// Continue
 				}
 				long fileLength = file.length();
+				String canonicalPath = file.getCanonicalPath();
 				while (true) {
 					if (!file.exists()) {
 						logger.info("File deleted: " + file);
@@ -47,6 +48,11 @@ public class TailedFile {
 					if (file.length() < fileLength) {
 						// File has been truncated
 						logger.info("File truncated: " + file);
+						break;
+					}
+					if (!file.getCanonicalPath().equals(canonicalPath)) {
+						// File has been truncated
+						logger.info("File location has changed: " + file);
 						break;
 					}
 					fileLength = file.length();
