@@ -43,16 +43,19 @@ public class TailedFile {
 				while (true) {
 					if (!file.exists()) {
 						logger.info("File deleted: " + file);
+						safeClose(reader);
 						break;
 					}
 					if (file.length() < fileLength) {
 						// File has been truncated
 						logger.info("File truncated: " + file);
+						safeClose(reader);
 						break;
 					}
 					if (!file.getCanonicalPath().equals(canonicalPath)) {
 						// File has been truncated
 						logger.info("File location has changed: " + file);
+						safeClose(reader);
 						break;
 					}
 					fileLength = file.length();
@@ -68,12 +71,16 @@ public class TailedFile {
 			}
 		} finally {
 			if (reader != null) {
-				try {
-					reader.close();
-				} catch (IOException e) {
-					// Do nothing
-				}
+				safeClose(reader);
 			}
+		}
+	}
+
+	private void safeClose(FileReader reader) {
+		try {
+			reader.close();
+		} catch (IOException e) {
+			// Do nothing
 		}
 	}
 
