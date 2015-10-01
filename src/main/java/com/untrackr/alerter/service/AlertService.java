@@ -51,18 +51,23 @@ public class AlertService {
 		alertQueueFullErrorSignaled = false;
 		logger.info("Sending alert: " + alert.toString());
 		MessagePriority priority = MessagePriority.EMERGENCY;
+		String prefix = "";
 		switch (alert.getPriority()) {
 			case low:
 				priority = MessagePriority.LOW;
+				prefix = "";
 				break;
 			case normal:
 				priority = MessagePriority.NORMAL;
+				prefix = "Alert: ";
 				break;
 			case high:
 				priority = MessagePriority.HIGH;
+				prefix = "Alert(HIGH): ";
 				break;
 			case emergency:
 				priority = MessagePriority.EMERGENCY;
+				prefix = "EMERGENCY: ";
 				break;
 		}
 		Integer retry = alert.getRetry();
@@ -76,7 +81,7 @@ public class AlertService {
 			}
 		}
 		String message = !alert.getMessage().trim().isEmpty() ? alert.getMessage() : "--";
-		String title = alert.getPriority().name() + ": " + alert.getTitle();
+		String title = prefix + alert.getTitle();
 		send(title, message, priority, retry, expire);
 	}
 

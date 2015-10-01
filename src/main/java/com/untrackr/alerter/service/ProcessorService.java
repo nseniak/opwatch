@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.untrackr.alerter.common.ThreadUtil;
 import com.untrackr.alerter.ioservice.FileTailingService;
 import com.untrackr.alerter.model.common.Alert;
-import com.untrackr.alerter.processor.common.IncludePath;
 import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.processor.filter.print.Print;
 import com.untrackr.alerter.processor.producer.console.Console;
@@ -19,6 +18,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
+import javax.script.ScriptException;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -61,6 +61,9 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	private String hostName;
 
 	private ObjectMapper objectMapper;
+
+	private static final String DELIMITER = "\n--\n";
+	private static final int MAX_INPUT_LENGTH = 120;
 
 	private ThreadPoolExecutor runnerExecutor = new ThreadPoolExecutor(0, Integer.MAX_VALUE,
 			60L, TimeUnit.SECONDS, new SynchronousQueue<>(),
@@ -138,49 +141,60 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			builder.append(path.pathDescriptor()).append(": ");
 		}
 		builder.append("error: ").append(e.getLocalizedMessage());
+		logger.error(builder.toString());
+		builder.append(DELIMITER);
+		builder.append("Hostname:\n").append(getHostName()).append(DELIMITER);
 		Throwable c = e.getCause();
 		if ((c != null) && !((c instanceof IOException)|| (c instanceof PatternSyntaxException))) {
-			builder.append("\nStack trace:\n");
+			builder.append("Stack trace:\n");
 			e.printStackTrace(new PrintWriter(builder));
+			builder.append(DELIMITER);
 		}
 		String message = builder.toString();
-		logger.error(message);
-		builder.append("\n").append("Hostname: ").append(getHostName()).append("\n");
-		message = builder.toString();
 		Alert alert = new Alert(Alert.Priority.emergency, "Alerter initialization error: " + e.getLocalizedMessage(), message);
 		alertService.alert(alert);
 	}
 
 	public void processorAlert(Alert.Priority priority, String title, Payload payload, Processor consumer) {
 		StringBuilder builder = new StringBuilder();
-		builder.append("Hostname: ").append(getHostName()).append("\n");
-		builder.append("Alert: ").append(payload.pathDescriptor(consumer)).append("\n");
-		builder.append("Input: ").append(payload.asText()).append("\n");
+		builder.append("Hostname:\n").append(getHostName()).append(DELIMITER);
+		builder.append("Alert:\n").append(payload.pathDescriptor(consumer)).append(DELIMITER);
+		builder.append("Input:\n").append(truncate(payload.asText(), MAX_INPUT_LENGTH)).append(DELIMITER);
 		Alert alert = new Alert(priority, title, builder.toString());
 		alertService.alert(alert);
 	}
 
 	public void displayRuntimeError(RuntimeProcessorError e) {
 		StringWriter builder = new StringWriter();
-		builder.append("Error: ").append(e.getLocalizedMessage()).append("\n");
-		Payload payload = e.getPayload();
+		builder.append("Error:\n").append(e.getLocalizedMessage()).append(DELIMITER);
+		builder.append("Hostname:\n").append(getHostName()).append(DELIMITER);
 		Processor processor = e.getProcessor();
+		Payload payload = e.getPayload();
 		if (payload != null) {
-			builder.append("Input: ").append(payload.asText()).append("\n");
-			builder.append("Path: ").append(processor.pathDescriptor());
+			builder.append("Processor:\n").append(payload.pathDescriptor(processor)).append(DELIMITER);
+			builder.append("Input:\n").append(truncate(payload.asText(), MAX_INPUT_LENGTH)).append(DELIMITER);
 		} else {
-			builder.append("Processor: ").append(processor.pathDescriptor());
+			builder.append("Processor:\n").append(processor.pathDescriptor()).append(DELIMITER);
 		}
-		if ((e.getCause() != null) && !(e.getCause() instanceof IOException)) {
-			builder.append("\nStack trace:\n");
+		if ((e.getCause() != null) && !(e.getCause() instanceof IOException)&& !(e.getCause() instanceof ScriptException)) {
+			logger.error(builder.toString(), e);
+			builder.append("Stack trace:\n");
 			e.printStackTrace(new PrintWriter(builder));
+			builder.append(DELIMITER);
+		} else {
+			logger.error(builder.toString());
 		}
 		String message = builder.toString();
-		logger.error(message);
-		builder.append("\n").append("Hostname: ").append(getHostName()).append("\n");
-		message = builder.toString();
 		Alert alert = new Alert(Alert.Priority.emergency, "Alerter error: " + e.getLocalizedMessage(), message);
 		alertService.alert(alert);
+	}
+
+	private String truncate(String str, int length) {
+		if (str.length() <= length) {
+			return str;
+		} else {
+			return str.substring(0, Math.max(0, length - 3)) + "...";
+		}
 	}
 
 	public void infrastructureAlert(Alert.Priority priority, String title, String details, Throwable t) {
