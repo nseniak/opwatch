@@ -166,8 +166,8 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	public void displayRuntimeError(RuntimeProcessorError e) {
 		StringWriter builder = new StringWriter();
-		builder.append("Error:\n").append(e.getLocalizedMessage()).append(DELIMITER);
 		builder.append("Hostname:\n").append(getHostName()).append(DELIMITER);
+		builder.append("Error:\n").append(e.getLocalizedMessage()).append(DELIMITER);
 		Processor processor = e.getProcessor();
 		Payload payload = e.getPayload();
 		if (payload != null) {
