@@ -35,7 +35,6 @@ public class FileTailingService implements DisposableBean {
 	public void addTailedFile(TailedFile tailedFile) {
 		logger.info("Added tailed file: " + tailedFile.getFile());
 		Thread thread = ThreadUtil.threadFactory("FileWatching").newThread(() -> tailFile(tailedFile));
-		thread.setDaemon(true);
 		thread.start();
 		tailedFiles.put(tailedFile, thread);
 	}
