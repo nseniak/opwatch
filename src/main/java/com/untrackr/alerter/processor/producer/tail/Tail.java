@@ -6,13 +6,13 @@ import com.untrackr.alerter.processor.common.IncludePath;
 import com.untrackr.alerter.processor.producer.Producer;
 import com.untrackr.alerter.service.ProcessorService;
 
-import java.io.File;
+import java.nio.file.Path;
 
 public class Tail extends Producer {
 
-	private File file;
+	private Path file;
 
-	public Tail(ProcessorService processorService, IncludePath path, File file) {
+	public Tail(ProcessorService processorService, IncludePath path, Path file) {
 		super(processorService, path);
 		this.file = file;
 	}
@@ -22,7 +22,7 @@ public class Tail extends Producer {
 		AlerterProfile profile = getProcessorService().getProfileService().profile();
 		TailedFile tailedFile = new TailedFile(profile, file, (line, lineNumber) -> {
 			LineObject lineObject = new LineObject();
-			lineObject.file = file.getAbsolutePath();
+			lineObject.file = file.toAbsolutePath().toString();
 			lineObject.text = line;
 			lineObject.line = lineNumber;
 			outputProduced(lineObject);
