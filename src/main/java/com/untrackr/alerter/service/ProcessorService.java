@@ -129,7 +129,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			logger.info("Exiting due to initialization errors");
 			SpringApplication.exit(applicationContext);
 		} else {
-			Alert alert = new Alert(Alert.Priority.low, "Alerter on " + getHostName() + ": OK", "");
+			Alert alert = new Alert(Alert.Priority.low, "Alerter running on " + getHostName(), "--");
 			alertService.alert(alert);
 		}
 	}
@@ -158,7 +158,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	public void processorAlert(Alert.Priority priority, String title, Payload payload, Processor consumer) {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Hostname:\n").append(getHostName()).append(DELIMITER);
-		builder.append("Alert:\n").append(payload.pathDescriptor(consumer)).append(DELIMITER);
+		builder.append("Alert path:\n").append(payload.pathDescriptor(consumer)).append(DELIMITER);
 		builder.append("Input:\n").append(truncate(payload.asText(), MAX_INPUT_LENGTH)).append(DELIMITER);
 		Alert alert = new Alert(priority, title, builder.toString());
 		alertService.alert(alert);
