@@ -9,6 +9,7 @@ import com.untrackr.alerter.processor.common.ProcessorFactory;
 import com.untrackr.alerter.processor.common.ValidationError;
 import com.untrackr.alerter.processor.consumer.alert.AlertGeneratorFactory;
 import com.untrackr.alerter.processor.filter.grep.GrepFactory;
+import com.untrackr.alerter.processor.filter.js.JSFactory;
 import com.untrackr.alerter.processor.filter.jsgrep.JSGrepFactory;
 import com.untrackr.alerter.processor.filter.once.OnceFactory;
 import com.untrackr.alerter.processor.filter.print.PrintFactory;
@@ -50,6 +51,7 @@ public class FactoryService implements InitializingBean {
 		pipeFactory = new PipeFactory(processorService);
 		registerFactory(new GrepFactory(processorService));
 		registerFactory(new JSGrepFactory(processorService));
+		registerFactory(new JSFactory(processorService));
 		registerFactory(new TailFactory(processorService));
 		registerFactory(new PrintFactory(processorService));
 		registerFactory(new StatFactory(processorService));
