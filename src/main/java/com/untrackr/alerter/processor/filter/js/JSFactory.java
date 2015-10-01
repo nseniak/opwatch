@@ -6,6 +6,8 @@ import com.untrackr.alerter.processor.common.IncludePath;
 import com.untrackr.alerter.processor.common.ValidationError;
 import com.untrackr.alerter.service.ProcessorService;
 
+import javax.script.CompiledScript;
+
 public class JSFactory extends ActiveProcessorFactory {
 
 	public JSFactory(ProcessorService processorService) {
@@ -20,8 +22,9 @@ public class JSFactory extends ActiveProcessorFactory {
 	@Override
 	public JS make(JsonDescriptor jsonDescriptor, IncludePath path) throws ValidationError {
 		JSDesc descriptor = convertDescriptor(path, JSDesc.class, jsonDescriptor);
-		String value = checkFieldValue(path, jsonDescriptor, "value", descriptor.getValue());
-		JS js = new JS(getProcessorService(), path, value);
+		String valueSource = checkFieldValue(path, jsonDescriptor, "value", descriptor.getValue());
+		CompiledScript valueScript = compileScript(path, jsonDescriptor, "value", valueSource);
+		JS js = new JS(getProcessorService(), path, valueSource, valueScript);
 		initialize(js, descriptor);
 		return js;
 	}

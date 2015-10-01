@@ -6,6 +6,8 @@ import com.untrackr.alerter.processor.common.IncludePath;
 import com.untrackr.alerter.processor.common.ValidationError;
 import com.untrackr.alerter.service.ProcessorService;
 
+import javax.script.CompiledScript;
+
 public class JSGrepFactory extends ActiveProcessorFactory {
 
 	public JSGrepFactory(ProcessorService processorService) {
@@ -20,8 +22,9 @@ public class JSGrepFactory extends ActiveProcessorFactory {
 	@Override
 	public JSGrep make(JsonDescriptor jsonDescriptor, IncludePath path) throws ValidationError {
 		JSGrepDesc descriptor = convertDescriptor(path, JSGrepDesc.class, jsonDescriptor);
-		String test = checkFieldValue(path, jsonDescriptor, "test", descriptor.getTest());
-		JSGrep jsgrep = new JSGrep(getProcessorService(), path, test);
+		String testSource = checkFieldValue(path, jsonDescriptor, "test", descriptor.getTest());
+		CompiledScript testScript = compileScript(path, jsonDescriptor, "test", testSource);
+		JSGrep jsgrep = new JSGrep(getProcessorService(), path, testSource, testScript);
 		initialize(jsgrep, descriptor);
 		return jsgrep;
 	}

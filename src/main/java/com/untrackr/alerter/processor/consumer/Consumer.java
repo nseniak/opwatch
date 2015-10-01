@@ -12,4 +12,9 @@ public abstract class Consumer extends ActiveProcessor {
 		this.signature = ProcessorSignature.makeConsumer();
 	}
 
+	@Override
+	public void initialize() {
+		createConsumerThread();
+	}
+
 }

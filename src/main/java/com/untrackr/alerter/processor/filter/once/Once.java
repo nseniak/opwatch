@@ -10,16 +10,11 @@ import java.time.Duration;
 public class Once extends Filter {
 
 	private long delay;
-	private long lastInputTimestamp;
+	private long lastInputTimestamp = 0;
 
 	public Once(ProcessorService processorService, IncludePath path, long delay) {
 		super(processorService, path);
 		this.delay = delay;
-	}
-
-	@Override
-	public void initialize() {
-		lastInputTimestamp = 0;
 	}
 
 	@Override

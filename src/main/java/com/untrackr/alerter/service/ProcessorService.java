@@ -9,6 +9,7 @@ import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.processor.filter.print.Print;
 import com.untrackr.alerter.processor.producer.console.Console;
 import com.untrackr.alerter.processor.special.pipe.Pipe;
+import jdk.nashorn.api.scripting.NashornScriptEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -18,6 +19,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
+import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.io.File;
 import java.io.IOException;
@@ -62,15 +64,16 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	private ObjectMapper objectMapper;
 
+	private NashornScriptEngine nashorn;
+
 	private static final String DELIMITER = "\n--\n";
 	private static final int MAX_INPUT_LENGTH = 120;
 
-	private ThreadPoolExecutor runnerExecutor = new ThreadPoolExecutor(0, Integer.MAX_VALUE,
+	private ThreadPoolExecutor consumerExecutor = new ThreadPoolExecutor(0, Integer.MAX_VALUE,
 			60L, TimeUnit.SECONDS, new SynchronousQueue<>(),
-			ThreadUtil.threadFactory("Runner"));
+			ThreadUtil.threadFactory("Consumer"));
 
 	private ScheduledThreadPoolExecutor scheduledExecutor = new ScheduledThreadPoolExecutor(1, ThreadUtil.threadFactory("ScheduledTask"));
-	;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -98,6 +101,8 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 				throw new IllegalStateException("cannot determine hostname; please define environment variable ALERTER_HOSTNAME");
 			}
 		}
+		// Nashorn
+		nashorn = (NashornScriptEngine) new ScriptEngineManager().getEngineByName("nashorn");
 		logger.info("Hostname: " + hostName);
 	}
 
@@ -185,7 +190,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			logger.error(builder.toString());
 		}
 		String message = builder.toString();
-		Alert alert = new Alert(Alert.Priority.emergency, "Alerter error: " + e.getLocalizedMessage(), message);
+		Alert alert = new Alert(Alert.Priority.emergency, "Error: " + e.getLocalizedMessage(), message);
 		alertService.alert(alert);
 	}
 
@@ -197,23 +202,24 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		}
 	}
 
-	public void infrastructureAlert(Alert.Priority priority, String title, String details, Throwable t) {
-		String prefixedTitle = "Alerter error: " + title;
-		String message = details + "\n" + t.toString();
-		StackTraceElement[] stack = t.getStackTrace();
-		if (stack.length != 0) {
-			message = message + "\n" + stack[0].toString();
-		}
-		logger.error(title + ": " + details, t);
-		alertService.alert(new Alert(priority, prefixedTitle, message));
+	public void infrastructureAlert(Alert.Priority priority, String title, String details) {
+		infrastructureAlert(priority, title, details, null);
 	}
 
-	public void consumeConcurrently(List<Processor> consumers, Payload payload) {
-		for (Processor consumer : consumers) {
-			runnerExecutor.execute(() -> {
-				withErrorHandling(consumer, payload, () -> consumer.consume(payload));
-			});
+	public void infrastructureAlert(Alert.Priority priority, String title, String details, Throwable t) {
+		String prefixedTitle = "Infrastructure error: " + title;
+		StringWriter builder = new StringWriter();
+		builder.append("Hostname:\n").append(getHostName()).append(DELIMITER);
+		builder.append("Details:\n").append(details).append(DELIMITER);
+		if (t != null) {
+			logger.error(prefixedTitle + ": " + builder.toString(), t);
+			builder.append("Stack trace:\n");
+			t.printStackTrace(new PrintWriter(builder));
+			builder.append(DELIMITER);
+		} else {
+			logger.error(prefixedTitle + ": " + builder.toString());
 		}
+		alertService.alert(new Alert(priority, prefixedTitle, builder.toString()));
 	}
 
 	public boolean withErrorHandling(Processor processor, Payload payload, Runnable runnable) {
@@ -265,7 +271,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	@Override
 	public void destroy() throws Exception {
-		ThreadUtil.safeExecutorShutdownNow(runnerExecutor, "RunnerExecutor", profileService.profile().getExecutorTerminationTimeout());
+		ThreadUtil.safeExecutorShutdownNow(consumerExecutor, "ConsumerExecutor", profileService.profile().getExecutorTerminationTimeout());
 		ThreadUtil.safeExecutorShutdownNow(scheduledExecutor, "ScheduledExecutor", profileService.profile().getExecutorTerminationTimeout());
 	}
 
@@ -289,8 +295,16 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		return scheduledExecutor;
 	}
 
+	public ThreadPoolExecutor getConsumerExecutor() {
+		return consumerExecutor;
+	}
+
 	public ObjectMapper getObjectMapper() {
 		return objectMapper;
+	}
+
+	public NashornScriptEngine getNashorn() {
+		return nashorn;
 	}
 
 	public String getHostName() {

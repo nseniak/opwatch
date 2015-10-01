@@ -12,4 +12,9 @@ public abstract class Filter extends ActiveProcessor {
 		this.signature = ProcessorSignature.makeFilter();
 	}
 
+	@Override
+	public void initialize() {
+		createConsumerThread();
+	}
+
 }

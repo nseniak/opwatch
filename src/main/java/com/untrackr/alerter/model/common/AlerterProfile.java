@@ -18,6 +18,10 @@ public class AlerterProfile {
 	private int maxAlertsPerMinute;
 	private long defaultHttpConnectTimeout;
 	private long defaultHttpReadTimeout;
+	private int lineBufferSize;
+	private int inputQueueSize;
+	private long processorInputQueueTimeout;
+	private long minimumOutputDelay;
 
 	public AlerterProfile() {
 		this.fileWatchingCheckDelay = TimeUnit.SECONDS.toMillis(1);
@@ -33,6 +37,10 @@ public class AlerterProfile {
 		this.maxAlertsPerMinute = 10;
 		this.defaultHttpConnectTimeout = TimeUnit.SECONDS.toMillis(5);
 		this.defaultHttpReadTimeout = TimeUnit.SECONDS.toMillis(10);
+		this.lineBufferSize = 8192 * 100;
+		this.inputQueueSize = 100;
+		this.processorInputQueueTimeout = TimeUnit.SECONDS.toMillis(60);
+		this.minimumOutputDelay = TimeUnit.MILLISECONDS.toMillis(50);
 	}
 
 	public long getFileWatchingCheckDelay() {
@@ -131,4 +139,37 @@ public class AlerterProfile {
 		this.defaultHttpReadTimeout = defaultHttpReadTimeout;
 	}
 
+	public int getLineBufferSize() {
+		return lineBufferSize;
+	}
+
+	public void setLineBufferSize(int lineBufferSize) {
+		this.lineBufferSize = lineBufferSize;
+	}
+
+	public int getInputQueueSize() {
+		return inputQueueSize;
+	}
+
+	public void setInputQueueSize(int inputQueueSize) {
+		this.inputQueueSize = inputQueueSize;
+	}
+
+	public long getProcessorInputQueueTimeout() {
+		return processorInputQueueTimeout;
+	}
+
+	public void setProcessorInputQueueTimeout(long processorInputQueueTimeout) {
+		this.processorInputQueueTimeout = processorInputQueueTimeout;
+	}
+
+	public long getMinimumOutputDelay() {
+		return minimumOutputDelay;
+	}
+
+	public void setMinimumOutputDelay(long minimumOutputDelay) {
+		this.minimumOutputDelay = minimumOutputDelay;
+	}
+
 }
+

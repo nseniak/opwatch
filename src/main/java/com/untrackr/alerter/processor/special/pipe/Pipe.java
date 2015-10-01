@@ -30,13 +30,11 @@ public class Pipe extends Processor {
 
 	@Override
 	public void addProducer(Processor producer) {
-		super.addProducer(producer);
 		first().addProducer(producer);
 	}
 
 	@Override
 	public void addConsumer(Processor consumer) {
-		super.addConsumer(consumer);
 		last().addConsumer(consumer);
 	}
 
@@ -45,7 +43,6 @@ public class Pipe extends Processor {
 		for (Processor processor : processors) {
 			processor.check();
 		}
-		super.check();
 	}
 
 	@Override

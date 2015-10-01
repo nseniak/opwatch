@@ -8,34 +8,31 @@ import com.untrackr.alerter.processor.common.RuntimeProcessorError;
 import com.untrackr.alerter.processor.filter.ConditionalFilter;
 import com.untrackr.alerter.service.ProcessorService;
 
-import javax.script.Bindings;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import javax.script.*;
 
 public class JSGrep extends ConditionalFilter {
 
-	private ScriptEngine engine;
-	private String test;
+	private String source;
+	private CompiledScript test;
 	private boolean nonBooleanValueErrorSignaled = false;
 
-	public JSGrep(ProcessorService processorService, IncludePath path, String test) {
+	public JSGrep(ProcessorService processorService, IncludePath path, String source, CompiledScript test) {
 		super(processorService, path);
+		this.source = source;
 		this.test = test;
-		this.engine = new ScriptEngineManager().getEngineByName("nashorn");
 	}
 
 	@Override
 	public boolean conditionValue(Payload input) {
-		Bindings bindings = engine.createBindings();
+		Bindings bindings = processorService.getNashorn().createBindings();
 		// Copy the input because the js code might do side effects on it
 		Object inputCopy = JsonUtil.deepCopy(input.getJsonObject());
 		bindings.put("input", inputCopy);
 		Object result;
 		try {
-			result = engine.eval(test, bindings);
+			result = test.eval(bindings);
 		} catch (ScriptException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeProcessorError(e, this, input);
 		}
 		if (result == Boolean.TRUE) {
 			return true;
@@ -59,7 +56,7 @@ public class JSGrep extends ConditionalFilter {
 
 	@Override
 	public String identifier() {
-		return test;
+		return source;
 	}
 
 }

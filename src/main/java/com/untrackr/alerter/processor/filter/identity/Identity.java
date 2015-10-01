@@ -12,11 +12,6 @@ public class Identity extends Filter {
 	}
 
 	@Override
-	public void initialize() {
-		// Do nothing
-	}
-
-	@Override
 	public void consume(Payload input) {
 		outputFiltered(input.getJsonObject(), input);
 	}

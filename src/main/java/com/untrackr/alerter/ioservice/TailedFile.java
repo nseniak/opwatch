@@ -24,7 +24,7 @@ public class TailedFile {
 	}
 
 	public void tail() throws InterruptedException, IOException {
-		Reader reader = null;
+		BufferedReader reader = null;
 		try {
 			while (true) {
 				BasicFileAttributes currentAttributes;
@@ -36,9 +36,8 @@ public class TailedFile {
 					logger.info("File created: " + file);
 				}
 				int lineNumber = 0;
-				BufferedReader buffered = new BufferedReader(reader);
 				// Go to the tail
-				while (buffered.readLine() != null) {
+				while (reader.readLine() != null) {
 					lineNumber = lineNumber + 1;
 					// Continue
 				}
@@ -62,7 +61,7 @@ public class TailedFile {
 						break;
 					}
 					currentAttributes = attrs;
-					String line = buffered.readLine();
+					String line = reader.readLine();
 					if (line == null) {
 						// end of file, start polling
 						Thread.sleep(alerterProfile.getTailPollInterval());
@@ -95,10 +94,10 @@ public class TailedFile {
 		}
 	}
 
-	private Reader openFile(Path path) {
+	private BufferedReader openFile(Path path) {
 		try {
 			InputStream in = Files.newInputStream(path);
-			return new BufferedReader(new InputStreamReader(in));
+			return new BufferedReader(new InputStreamReader(in), alerterProfile.getLineBufferSize());
 		} catch (IOException e) {
 			return null;
 		}
@@ -110,6 +109,10 @@ public class TailedFile {
 
 	public void setFile(Path file) {
 		this.file = file;
+	}
+
+	public TailLineHandler getHandler() {
+		return handler;
 	}
 
 }

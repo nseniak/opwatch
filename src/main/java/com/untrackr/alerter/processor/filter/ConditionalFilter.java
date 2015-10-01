@@ -11,11 +11,6 @@ public abstract class ConditionalFilter extends Filter {
 	}
 
 	@Override
-	public void initialize() {
-		// Nothing to do
-	}
-
-	@Override
 	public void consume(Payload input) {
 		if (conditionValue(input)) {
 			outputFiltered(input.getJsonObject(), input);

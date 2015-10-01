@@ -18,11 +18,6 @@ public class AlertGenerator extends Consumer {
 	}
 
 	@Override
-	public void initialize() {
-		// Nothing to do
-	}
-
-	@Override
 	public void consume(Payload payload) {
 		processorService.processorAlert(priority, title, payload, this);
 	}

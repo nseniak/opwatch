@@ -17,7 +17,6 @@ public class Parallel extends Processor {
 
 	@Override
 	public void addProducer(Processor producer) {
-		producers.add(producer);
 		for (Processor processor : processors) {
 			processor.addProducer(producer);
 		}
@@ -25,7 +24,6 @@ public class Parallel extends Processor {
 
 	@Override
 	public void addConsumer(Processor consumer) {
-		consumers.add(consumer);
 		for (Processor processor : processors) {
 			processor.addConsumer(consumer);
 		}
@@ -41,7 +39,6 @@ public class Parallel extends Processor {
 		for (Processor processor : processors) {
 			processor.check();
 		}
-		super.check();
 	}
 
 	@Override
