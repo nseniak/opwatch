@@ -27,6 +27,7 @@ public class TailedFile {
 		BufferedReader reader = null;
 		try {
 			while (true) {
+				int lineNumber = 0;
 				BasicFileAttributes currentAttributes;
 				if (((currentAttributes = fileAttributes(file)) == null) || ((reader = openFile(file)) == null)) {
 					logger.info("Waiting for file: " + file);
@@ -34,12 +35,12 @@ public class TailedFile {
 						Thread.sleep(alerterProfile.getTailedFileWatchingCheckDelay());
 					}
 					logger.info("File created: " + file);
-				}
-				int lineNumber = 0;
-				// Go to the tail
-				while (reader.readLine() != null) {
-					lineNumber = lineNumber + 1;
-					// Continue
+				} else {
+					// File already exists. Go to the tail.
+					while (reader.readLine() != null) {
+						lineNumber = lineNumber + 1;
+						// Continue
+					}
 				}
 				while (true) {
 					BasicFileAttributes attrs = fileAttributes(file);
