@@ -24,7 +24,7 @@ public class TailedFile {
 	}
 
 	public void tail() throws InterruptedException, IOException {
-		BufferedReader reader = null;
+		LineReader reader = null;
 		try {
 			while (true) {
 				int lineNumber = 0;
@@ -87,7 +87,7 @@ public class TailedFile {
 		}
 	}
 
-	private void safeClose(Reader reader) {
+	private void safeClose(LineReader reader) {
 		try {
 			reader.close();
 		} catch (IOException e) {
@@ -95,10 +95,10 @@ public class TailedFile {
 		}
 	}
 
-	private BufferedReader openFile(Path path) {
+	private LineReader openFile(Path path) {
 		try {
 			InputStream in = Files.newInputStream(path);
-			return new BufferedReader(new InputStreamReader(in), alerterProfile.getLineBufferSize());
+			return new LineReader(new BufferedInputStream(in), alerterProfile.getLineBufferSize());
 		} catch (IOException e) {
 			return null;
 		}
