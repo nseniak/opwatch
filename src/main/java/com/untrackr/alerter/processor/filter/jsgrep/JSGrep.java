@@ -14,17 +14,18 @@ public class JSGrep extends ConditionalFilter {
 
 	private String source;
 	private CompiledScript test;
+	private Bindings bindings;
 	private boolean nonBooleanValueErrorSignaled = false;
 
 	public JSGrep(ProcessorService processorService, IncludePath path, String source, CompiledScript test) {
 		super(processorService, path);
 		this.source = source;
 		this.test = test;
+		this.bindings = processorService.getNashorn().createBindings();
 	}
 
 	@Override
 	public boolean conditionValue(Payload input) {
-		Bindings bindings = processorService.getNashorn().createBindings();
 		// Copy the input because the js code might do side effects on it
 		Object inputCopy = JsonUtil.deepCopy(input.getJsonObject());
 		bindings.put("input", inputCopy);
