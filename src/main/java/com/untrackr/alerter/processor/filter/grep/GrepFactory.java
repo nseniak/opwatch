@@ -23,10 +23,10 @@ public class GrepFactory extends ActiveProcessorFactory {
 	@Override
 	public Grep make(JsonDescriptor jsonDescriptor, IncludePath path) throws ValidationError {
 		GrepDesc descriptor = convertDescriptor(path, GrepDesc.class, jsonDescriptor);
-		String fieldName = optionalFieldValue(descriptor, "field", descriptor.getField(), "text");
+		String fieldName = optionalFieldValue(path, jsonDescriptor, "field", descriptor.getField(), "text");
 		String regex = checkFieldValue(path, jsonDescriptor, "regex", descriptor.getRegex());
 		Pattern pattern = compilePattern(path, jsonDescriptor, "regex", regex);
-		boolean invert = optionalFieldValue(descriptor, "invert", descriptor.getInvert(), Boolean.FALSE);
+		boolean invert = optionalFieldValue(path, jsonDescriptor, "invert", descriptor.getInvert(), Boolean.FALSE);
 		Grep grep = new Grep(getProcessorService(), path, fieldName, pattern, invert);
 		initialize(grep, descriptor);
 		return grep;

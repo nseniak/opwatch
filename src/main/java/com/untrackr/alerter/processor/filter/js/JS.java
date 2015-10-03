@@ -1,13 +1,12 @@
 package com.untrackr.alerter.processor.filter.js;
 
-import com.untrackr.alerter.model.common.JsonUtil;
 import com.untrackr.alerter.processor.common.IncludePath;
 import com.untrackr.alerter.processor.common.Payload;
-import com.untrackr.alerter.processor.common.RuntimeProcessorError;
 import com.untrackr.alerter.processor.filter.Filter;
 import com.untrackr.alerter.service.ProcessorService;
 
-import javax.script.*;
+import javax.script.Bindings;
+import javax.script.CompiledScript;
 
 public class JS extends Filter {
 
@@ -24,15 +23,7 @@ public class JS extends Filter {
 
 	@Override
 	public void consume(Payload payload) {
-		// Copy the input because the js code might do side effects on it
-		Object inputCopy = JsonUtil.deepCopy(payload.getJsonObject());
-		bindings.put("input", inputCopy);
-		Object result;
-		try {
-			result = value.eval(bindings);
-		} catch (ScriptException e) {
-			throw new RuntimeProcessorError(e, this, payload);
-		}
+		Object result = runScript(value, bindings, payload);
 		if (result != null) {
 			outputFiltered(result, payload);
 		}

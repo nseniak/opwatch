@@ -1,5 +1,6 @@
 package com.untrackr.alerter.processor.producer.df;
 
+import com.untrackr.alerter.common.ScriptObject;
 import com.untrackr.alerter.processor.common.IncludePath;
 import com.untrackr.alerter.processor.common.RuntimeProcessorError;
 import com.untrackr.alerter.processor.producer.ScheduledExecutor;
@@ -26,7 +27,7 @@ public class Df extends ScheduledProducer {
 	@Override
 	protected Object produce() {
 		PartitionInfo info = new PartitionInfo();
-		info.setFile(file.getAbsolutePath());
+		info.file = file.getAbsolutePath();
 		if (!file.exists()) {
 			if (fileNotFoundErrorSignaled) {
 				return null;
@@ -37,12 +38,12 @@ public class Df extends ScheduledProducer {
 		}
 		fileNotFoundErrorSignaled = false;
 		long partitionSize = file.getTotalSpace();
-		info.setSize(partitionSize);
+		info.size = partitionSize;
 		long partitionAvailable = file.getFreeSpace();
-		info.setAvailable(partitionAvailable);
+		info.available = partitionAvailable;
 		long partitionUsed = partitionSize - partitionAvailable;
-		info.setUsed(partitionUsed);
-		info.setPercentUsed(((double) partitionUsed * 100) / partitionSize);
+		info.used = partitionUsed;
+		info.percentUsed = ((double) partitionUsed * 100) / partitionSize;
 		return info;
 	}
 
@@ -51,7 +52,7 @@ public class Df extends ScheduledProducer {
 		return file.toString();
 	}
 
-	public static class PartitionInfo {
+	public static class PartitionInfo extends ScriptObject {
 
 		private String file;
 		private Long size;
@@ -63,40 +64,20 @@ public class Df extends ScheduledProducer {
 			return file;
 		}
 
-		public void setFile(String file) {
-			this.file = file;
-		}
-
 		public Long getSize() {
 			return size;
-		}
-
-		public void setSize(Long size) {
-			this.size = size;
 		}
 
 		public Long getUsed() {
 			return used;
 		}
 
-		public void setUsed(Long used) {
-			this.used = used;
-		}
-
 		public Long getAvailable() {
 			return available;
 		}
 
-		public void setAvailable(Long available) {
-			this.available = available;
-		}
-
 		public Double getPercentUsed() {
 			return percentUsed;
-		}
-
-		public void setPercentUsed(Double percentUsed) {
-			this.percentUsed = percentUsed;
 		}
 
 	}

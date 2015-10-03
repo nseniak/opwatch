@@ -1,6 +1,7 @@
 package com.untrackr.alerter.processor.producer.top;
 
 import com.sun.management.OperatingSystemMXBean;
+import com.untrackr.alerter.common.ScriptObject;
 import com.untrackr.alerter.processor.common.IncludePath;
 import com.untrackr.alerter.processor.producer.ScheduledExecutor;
 import com.untrackr.alerter.processor.producer.ScheduledProducer;
@@ -18,20 +19,15 @@ public class Top extends ScheduledProducer {
 	protected Object produce() {
 		TopInfo info = new TopInfo();
 		OperatingSystemMXBean osBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-		info.setLoadAverage(osBean.getSystemLoadAverage());
-		info.setTotalSwapSpace(osBean.getTotalSwapSpaceSize());
-		info.setFreeSwapSpace(osBean.getFreeSwapSpaceSize());
-		info.setTotalPhysicalMemory(osBean.getTotalPhysicalMemorySize());
-		info.setFreePhysicalMemory(osBean.getFreePhysicalMemorySize());
+		info.loadAverage = osBean.getSystemLoadAverage();
+		info.totalSwapSpace = osBean.getTotalSwapSpaceSize();
+		info.freeSwapSpace = osBean.getFreeSwapSpaceSize();
+		info.totalPhysicalMemory = osBean.getTotalPhysicalMemorySize();
+		info.freePhysicalMemory = osBean.getFreePhysicalMemorySize();
 		return info;
 	}
 
-	@Override
-	public String identifier() {
-		return null;
-	}
-
-	public static class TopInfo {
+	public static class TopInfo  extends ScriptObject {
 
 		private double loadAverage;
 		private long totalSwapSpace;
@@ -43,40 +39,20 @@ public class Top extends ScheduledProducer {
 			return loadAverage;
 		}
 
-		public void setLoadAverage(double loadAverage) {
-			this.loadAverage = loadAverage;
-		}
-
 		public long getTotalSwapSpace() {
 			return totalSwapSpace;
-		}
-
-		public void setTotalSwapSpace(long totalSwapSpace) {
-			this.totalSwapSpace = totalSwapSpace;
 		}
 
 		public long getFreeSwapSpace() {
 			return freeSwapSpace;
 		}
 
-		public void setFreeSwapSpace(long freeSwapSpace) {
-			this.freeSwapSpace = freeSwapSpace;
-		}
-
 		public long getTotalPhysicalMemory() {
 			return totalPhysicalMemory;
 		}
 
-		public void setTotalPhysicalMemory(long totalPhysicalMemory) {
-			this.totalPhysicalMemory = totalPhysicalMemory;
-		}
-
 		public long getFreePhysicalMemory() {
 			return freePhysicalMemory;
-		}
-
-		public void setFreePhysicalMemory(long freePhysicalMemory) {
-			this.freePhysicalMemory = freePhysicalMemory;
 		}
 
 	}

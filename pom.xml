@@ -18,6 +18,7 @@
 		<main.basedir>${basedir}/../..</main.basedir>
 		<guava.version>18.0</guava.version>
 		<jackson.version>2.5.0</jackson.version>
+		<apache.commons-math3.version>3.5</apache.commons-math3.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -37,6 +38,11 @@
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>2.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math3</artifactId>
+			<version>${apache.commons-math3.version}</version>
 		</dependency>
 		<!--<dependency>-->
 			<!--<groupId>org.springframework.boot</groupId>-->

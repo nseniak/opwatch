@@ -8,16 +8,19 @@ import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ProcessorFactory;
 import com.untrackr.alerter.processor.common.ValidationError;
 import com.untrackr.alerter.processor.consumer.alert.AlertGeneratorFactory;
+import com.untrackr.alerter.processor.filter.collect.CollectFactory;
 import com.untrackr.alerter.processor.filter.grep.GrepFactory;
 import com.untrackr.alerter.processor.filter.js.JSFactory;
 import com.untrackr.alerter.processor.filter.jsgrep.JSGrepFactory;
 import com.untrackr.alerter.processor.filter.once.OnceFactory;
 import com.untrackr.alerter.processor.filter.print.PrintFactory;
+import com.untrackr.alerter.processor.producer.count.CountFactory;
 import com.untrackr.alerter.processor.producer.curl.CurlFactory;
 import com.untrackr.alerter.processor.producer.df.DfFactory;
 import com.untrackr.alerter.processor.producer.stat.StatFactory;
 import com.untrackr.alerter.processor.producer.tail.TailFactory;
 import com.untrackr.alerter.processor.producer.top.TopFactory;
+import com.untrackr.alerter.processor.producer.trail.TrailFactory;
 import com.untrackr.alerter.processor.special.parallel.ParallelFactory;
 import com.untrackr.alerter.processor.special.pipe.PipeFactory;
 import org.slf4j.Logger;
@@ -52,6 +55,7 @@ public class FactoryService implements InitializingBean {
 		registerFactory(new GrepFactory(processorService));
 		registerFactory(new JSGrepFactory(processorService));
 		registerFactory(new JSFactory(processorService));
+		registerFactory(new CollectFactory(processorService));
 		registerFactory(new TailFactory(processorService));
 		registerFactory(new PrintFactory(processorService));
 		registerFactory(new StatFactory(processorService));
@@ -60,6 +64,8 @@ public class FactoryService implements InitializingBean {
 		registerFactory(new AlertGeneratorFactory(processorService));
 		registerFactory(new OnceFactory(processorService));
 		registerFactory(new CurlFactory(processorService));
+		registerFactory(new CountFactory(processorService));
+		registerFactory(new TrailFactory(processorService));
 	}
 
 	private void registerFactory(ProcessorFactory processorFactory) {

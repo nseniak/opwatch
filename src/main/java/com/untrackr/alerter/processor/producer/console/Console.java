@@ -1,5 +1,6 @@
 package com.untrackr.alerter.processor.producer.console;
 
+import com.untrackr.alerter.common.ScriptObject;
 import com.untrackr.alerter.common.ThreadUtil;
 import com.untrackr.alerter.processor.common.IncludePath;
 import com.untrackr.alerter.processor.producer.Producer;
@@ -35,10 +36,18 @@ public class Console extends Producer {
 		}).start();
 	}
 
-	public static class LineObject {
+	public static class LineObject extends ScriptObject {
 
-		public String text;
-		public int line;
+		private String text;
+		private int line;
+
+		public String getText() {
+			return text;
+		}
+
+		public int getLine() {
+			return line;
+		}
 
 	}
 

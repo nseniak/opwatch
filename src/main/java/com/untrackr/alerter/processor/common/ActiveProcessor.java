@@ -2,6 +2,9 @@ package com.untrackr.alerter.processor.common;
 
 import com.untrackr.alerter.service.ProcessorService;
 
+import javax.script.Bindings;
+import javax.script.CompiledScript;
+import javax.script.ScriptException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -80,8 +83,7 @@ public abstract class ActiveProcessor extends Processor {
 	}
 
 	public void outputProduced(Object object) {
-		Object jsonObject = (object instanceof Map) ? object : processorService.getObjectMapper().convertValue(object, Map.class);
-		Payload payload = Payload.makeRoot(processorService, this, jsonObject);
+		Payload payload = Payload.makeRoot(processorService, this, object);
 		output(consumers, payload);
 	}
 
@@ -121,6 +123,16 @@ public abstract class ActiveProcessor extends Processor {
 			throw new RuntimeProcessorError("wrong type for field \"" + fieldName + "\"", this, input);
 		}
 		return (T) value;
+	}
+
+	public Object runScript(CompiledScript value, Bindings bindings, Payload payload) {
+		// Copy the input because the js code might do side effects on it
+		bindings.put("input", payload.getJsonObject());
+		try {
+			return value.eval(bindings);
+		} catch (ScriptException e) {
+			throw new RuntimeProcessorError(e, this, payload);
+		}
 	}
 
 	public  String identifier() {

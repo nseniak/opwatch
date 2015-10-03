@@ -1,6 +1,7 @@
 package com.untrackr.alerter.processor.producer.curl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.untrackr.alerter.common.ScriptObject;
 import com.untrackr.alerter.processor.common.IncludePath;
 import com.untrackr.alerter.processor.producer.ScheduledExecutor;
 import com.untrackr.alerter.processor.producer.ScheduledProducer;
@@ -38,29 +39,29 @@ public class Curl extends ScheduledProducer {
 		factory.setReadTimeout(readTimeout);
 		RestTemplate template = new RestTemplate(factory);
 		Response result = new Response();
-		result.setUrl(uri.toString());
+		result.url = uri.toString();
 		try {
 			ResponseEntity<String> response = template.getForEntity(uri, String.class);
-			result.setStatus(response.getStatusCode().value());
+			result.status = response.getStatusCode().value();
 			MediaType contentType = response.getHeaders().getContentType();
-			result.setContentType(contentType.toString());
+			result.contentType = contentType.toString();
 			if (anyText.includes(contentType)) {
-				result.setText(response.getBody());
+				result.text = response.getBody();
 			}
 			if (MediaType.APPLICATION_JSON.includes(contentType)) {
 				try {
 					Object jsonObject = objectMapper.readValue(response.getBody(), Object.class);
-					result.setJson(jsonObject);
+					result.json = jsonObject;
 				} catch (IOException e) {
 					// Leave it to null
 				}
 			}
 		} catch (HttpStatusCodeException e) {
-			result.setStatus(e.getStatusCode().value());
-			result.setError(e.getStatusText());
+			result.status = e.getStatusCode().value();
+			result.error = e.getStatusText();
 		} catch (ResourceAccessException e) {
-			result.setStatus(-1);
-			result.setError(e.getCause().getMessage());
+			result.status = -1;
+			result.error = e.getCause().getMessage();
 		}
 		return result;
 	}
@@ -70,7 +71,7 @@ public class Curl extends ScheduledProducer {
 		return uri.toString();
 	}
 
-	public static class Response {
+	public static class Response extends ScriptObject {
 
 		private String url;
 		private int status;
@@ -83,48 +84,24 @@ public class Curl extends ScheduledProducer {
 			return url;
 		}
 
-		public void setUrl(String url) {
-			this.url = url;
-		}
-
 		public int getStatus() {
 			return status;
-		}
-
-		public void setStatus(int status) {
-			this.status = status;
 		}
 
 		public String getContentType() {
 			return contentType;
 		}
 
-		public void setContentType(String contentType) {
-			this.contentType = contentType;
-		}
-
 		public String getText() {
 			return text;
-		}
-
-		public void setText(String text) {
-			this.text = text;
 		}
 
 		public Object getJson() {
 			return json;
 		}
 
-		public void setJson(Object json) {
-			this.json = json;
-		}
-
 		public String getError() {
 			return error;
-		}
-
-		public void setError(String error) {
-			this.error = error;
 		}
 
 	}

@@ -22,7 +22,7 @@ public class AlertGeneratorFactory extends ActiveProcessorFactory {
 	@Override
 	public Processor make(JsonDescriptor jsonDescriptor, IncludePath path) throws ValidationError {
 		AlertGeneratorDesc descriptor = convertDescriptor(path, AlertGeneratorDesc.class, jsonDescriptor);
-		String priorityName = optionalFieldValue(descriptor, "priority", descriptor.getPriority(), "normal");
+		String priorityName = optionalFieldValue(path, jsonDescriptor, "priority", descriptor.getPriority(), "normal");
 		Alert.Priority priority;
 		try {
 			priority = Alert.Priority.valueOf(priorityName);

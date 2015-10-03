@@ -1,5 +1,6 @@
 package com.untrackr.alerter.processor.producer.stat;
 
+import com.untrackr.alerter.common.ScriptObject;
 import com.untrackr.alerter.processor.common.IncludePath;
 import com.untrackr.alerter.processor.producer.ScheduledExecutor;
 import com.untrackr.alerter.processor.producer.ScheduledProducer;
@@ -20,13 +21,13 @@ public class Stat extends ScheduledProducer {
 	@Override
 	protected Object produce() {
 		FileInfo info = new FileInfo();
-		info.setFile(file.getAbsolutePath());
+		info.file = file.getAbsolutePath();
 		if (!file.exists()) {
-			info.setExists(false);
+			info.exists = false;
 		} else {
-			info.setExists(true);
-			info.setSize(file.length());
-			info.setLastModified(new Date(file.lastModified()));
+			info.exists = true;
+			info.size = file.length();
+			info.lastModified = new Date(file.lastModified());
 		}
 		return info;
 	}
@@ -36,7 +37,7 @@ public class Stat extends ScheduledProducer {
 		return file.toString();
 	}
 
-	public static class FileInfo {
+	public static class FileInfo extends ScriptObject {
 
 		private String file;
 		private boolean exists;
@@ -47,32 +48,16 @@ public class Stat extends ScheduledProducer {
 			return file;
 		}
 
-		public void setFile(String file) {
-			this.file = file;
-		}
-
 		public boolean isExists() {
 			return exists;
-		}
-
-		public void setExists(boolean exists) {
-			this.exists = exists;
 		}
 
 		public Long getSize() {
 			return size;
 		}
 
-		public void setSize(Long size) {
-			this.size = size;
-		}
-
 		public Date getLastModified() {
 			return lastModified;
-		}
-
-		public void setLastModified(Date lastModified) {
-			this.lastModified = lastModified;
 		}
 
 	}

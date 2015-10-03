@@ -37,9 +37,21 @@ public class Tail extends Producer {
 
 	public static class LineObject {
 
-		public String file;
-		public String text;
-		public int line;
+		private String file;
+		private String text;
+		private int line;
+
+		public String getFile() {
+			return file;
+		}
+
+		public String getText() {
+			return text;
+		}
+
+		public int getLine() {
+			return line;
+		}
 
 	}
 

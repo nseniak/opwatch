@@ -38,7 +38,7 @@ public abstract class ProcessorFactory {
 		}
 	}
 
-	public <T> T optionalFieldValue(Object descriptor, String field, T value, T defaultValue) throws ValidationError {
+	public <T> T optionalFieldValue(IncludePath path, JsonDescriptor descriptor, String field, T value, T defaultValue) throws ValidationError {
 		if (value == null) {
 			return defaultValue;
 		} else {

@@ -2,6 +2,7 @@ package com.untrackr.alerter.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.untrackr.alerter.common.InternalScriptError;
 import com.untrackr.alerter.common.ThreadUtil;
 import com.untrackr.alerter.ioservice.FileTailingService;
 import com.untrackr.alerter.model.common.Alert;
@@ -181,7 +182,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		} else {
 			builder.append("Processor:\n").append(processor.pathDescriptor()).append(DELIMITER);
 		}
-		if ((e.getCause() != null) && !(e.getCause() instanceof IOException)&& !(e.getCause() instanceof ScriptException)) {
+		if ((e.getCause() != null) && !((e.getCause() instanceof IOException) || (e.getCause() instanceof ScriptException) || (e.getCause() instanceof InternalScriptError))) {
 			logger.error(builder.toString(), e);
 			builder.append("Stack trace:\n");
 			e.printStackTrace(new PrintWriter(builder));
