@@ -32,7 +32,7 @@ public class AlerterProfile {
 		this.tailPollInterval = TimeUnit.MILLISECONDS.toMillis(500);
 		this.defaultEmergencyRetry = 60;
 		this.defaultEmergencyExpire = 3600;
-		this.defaultScheduledProducerPeriod = TimeUnit.MILLISECONDS.toMillis(1000);
+		this.defaultScheduledProducerPeriod = TimeUnit.SECONDS.toMillis(10);
 		this.testMode = ApplicationUtil.property("alerter.test", false);
 		this.maxAlertsPerMinute = 10;
 		this.defaultHttpConnectTimeout = TimeUnit.SECONDS.toMillis(5);
