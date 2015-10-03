@@ -20,6 +20,7 @@ public class Trail extends ScheduledProducer {
 	private long duration;
 	private LinkedBlockingQueue<SeriesObject> queue;
 	private Bindings bindings;
+	private long startupTimestamp;
 
 	public Trail(ProcessorService processorService, IncludePath path, ScheduledExecutor scheduledExecutor, String source, CompiledScript value, long duration) {
 		super(processorService, path, scheduledExecutor);
@@ -35,6 +36,7 @@ public class Trail extends ScheduledProducer {
 	public void initialize() {
 		createConsumerThread();
 		super.initialize();
+		startupTimestamp = System.currentTimeMillis();
 	}
 
 	@Override
@@ -49,6 +51,9 @@ public class Trail extends ScheduledProducer {
 	@Override
 	protected Object produce() {
 		long timestamp = System.currentTimeMillis();
+		if ((timestamp - startupTimestamp) < duration) {
+			return null;
+		}
 		queue.removeIf(to -> (timestamp - to.getStamp()) > duration);
 		return new ObjectSeries(queue);
 	}
