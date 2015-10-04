@@ -14,7 +14,8 @@ public class AlerterProfile {
 	private Integer defaultEmergencyRetry;
 	private Integer defaultEmergencyExpire;
 	private long defaultScheduledProducerPeriod;
-	private boolean testMode;
+	private boolean interactive;
+	private boolean trace;
 	private int maxAlertsPerMinute;
 	private long defaultHttpConnectTimeout;
 	private long defaultHttpReadTimeout;
@@ -33,7 +34,8 @@ public class AlerterProfile {
 		this.defaultEmergencyRetry = 60;
 		this.defaultEmergencyExpire = 3600;
 		this.defaultScheduledProducerPeriod = TimeUnit.SECONDS.toMillis(10);
-		this.testMode = ApplicationUtil.property("alerter.test", false);
+		this.interactive = ApplicationUtil.property("alerter.interactive", false);
+		this.trace = ApplicationUtil.property("alerter.trace", false);
 		this.maxAlertsPerMinute = 10;
 		this.defaultHttpConnectTimeout = TimeUnit.SECONDS.toMillis(5);
 		this.defaultHttpReadTimeout = TimeUnit.SECONDS.toMillis(10);
@@ -107,12 +109,20 @@ public class AlerterProfile {
 		this.defaultScheduledProducerPeriod = defaultScheduledProducerPeriod;
 	}
 
-	public boolean isTestMode() {
-		return testMode;
+	public boolean isInteractive() {
+		return interactive;
 	}
 
-	public void setTestMode(boolean testMode) {
-		this.testMode = testMode;
+	public void setInteractive(boolean interactive) {
+		this.interactive = interactive;
+	}
+
+	public boolean isTrace() {
+		return trace;
+	}
+
+	public void setTrace(boolean trace) {
+		this.trace = trace;
 	}
 
 	public int getMaxAlertsPerMinute() {

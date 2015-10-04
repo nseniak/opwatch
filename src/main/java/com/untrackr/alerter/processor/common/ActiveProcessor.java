@@ -1,6 +1,8 @@
 package com.untrackr.alerter.processor.common;
 
 import com.untrackr.alerter.service.ProcessorService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.script.Bindings;
 import javax.script.CompiledScript;
@@ -11,6 +13,8 @@ import java.util.Map;
 import java.util.StringJoiner;
 
 public abstract class ActiveProcessor extends Processor {
+
+	private static final Logger logger = LoggerFactory.getLogger(ActiveProcessor.class);
 
 	protected List<Processor> producers = new ArrayList<>();
 	protected List<Processor> consumers = new ArrayList<>();
@@ -88,6 +92,9 @@ public abstract class ActiveProcessor extends Processor {
 	}
 
 	public void output(List<Processor> consumers, Payload payload) {
+		if (processorService.getProfileService().profile().isTrace()) {
+			logger.info("Output: " + pathDescriptor() + " ==> " + payload.asText());
+		}
 		long now = System.currentTimeMillis();
 		long elapsedSinceLastOutput = now - lastOutputTime;
 		long minElapsed = processorService.getProfileService().profile().getMinimumOutputDelay();

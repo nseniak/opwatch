@@ -86,7 +86,7 @@ public class AlertService {
 	}
 
 	private void send(String title, String message, MessagePriority priority, Integer retry, Integer expire) {
-		if (profileService.profile().isTestMode()) {
+		if (profileService.profile().isInteractive()) {
 			logger.warn("Test mode: Alert not sent");
 			return;
 		}

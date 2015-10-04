@@ -5,6 +5,7 @@ import org.apache.commons.math3.stat.regression.SimpleRegression;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class ObjectSeries extends ArrayList<SeriesObject> {
 
@@ -36,6 +37,14 @@ public class ObjectSeries extends ArrayList<SeriesObject> {
 			}
 		}
 		return stats;
+	}
+
+	public List<Object> getValues() {
+		List<Object> result = new ArrayList<>();
+		for (SeriesObject object : this) {
+			result.add(object.getValue());
+		}
+		return result;
 	}
 
 	private double number(Object object) {

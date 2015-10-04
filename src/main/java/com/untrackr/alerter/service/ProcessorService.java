@@ -113,7 +113,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		boolean error = withErrorHandling(null, null, () -> {
 			IncludePath emptyPath = new IncludePath();
 			Processor processor = factoryService.loadProcessor(filename, emptyPath);
-			if (profileService.profile().isTestMode()) {
+			if (profileService.profile().isInteractive()) {
 				List<Processor> pipeProcessors = new ArrayList<>();
 				if (processor.getSignature().getInputRequirement() == ProcessorSignature.PipeRequirement.required) {
 					logger.info("Adding \"console\" as input processor");
