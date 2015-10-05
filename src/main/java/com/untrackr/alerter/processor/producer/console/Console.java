@@ -5,9 +5,7 @@ import com.untrackr.alerter.processor.producer.Producer;
 import com.untrackr.alerter.service.ConsoleService;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class Console extends Producer {
-
-	private ConsoleService.ConsoleConsumer consoleConsumer;
+public class Console extends Producer implements ConsoleService.ConsoleLineConsumer {
 
 	public Console(ProcessorService processorService, IncludePath path) {
 		super(processorService, path);
@@ -15,13 +13,17 @@ public class Console extends Producer {
 
 	@Override
 	public void doStart() {
-		consoleConsumer = this::outputProduced;
-		processorService.getConsoleService().addConsumer(consoleConsumer);
+		processorService.getConsoleService().addConsumer(this);
 	}
 
 	@Override
 	protected void doStop() {
-		processorService.getConsoleService().removeConsumer(consoleConsumer);
+		processorService.getConsoleService().removeConsumer(this);
+	}
+
+	@Override
+	public void consume(ConsoleService.ConsoleLine line) {
+		outputProduced(line);
 	}
 
 }

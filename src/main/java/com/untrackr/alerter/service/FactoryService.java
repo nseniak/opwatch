@@ -18,6 +18,7 @@ import com.untrackr.alerter.processor.producer.console.ConsoleFactory;
 import com.untrackr.alerter.processor.producer.count.CountFactory;
 import com.untrackr.alerter.processor.producer.curl.CurlFactory;
 import com.untrackr.alerter.processor.producer.df.DfFactory;
+import com.untrackr.alerter.processor.producer.http.HttpFactory;
 import com.untrackr.alerter.processor.producer.stat.StatFactory;
 import com.untrackr.alerter.processor.producer.tail.TailFactory;
 import com.untrackr.alerter.processor.producer.top.TopFactory;
@@ -68,6 +69,7 @@ public class FactoryService implements InitializingBean {
 		registerFactory(new CurlFactory(processorService));
 		registerFactory(new CountFactory(processorService));
 		registerFactory(new TrailFactory(processorService));
+		registerFactory(new HttpFactory(processorService));
 	}
 
 	private void registerFactory(ProcessorFactory processorFactory) {

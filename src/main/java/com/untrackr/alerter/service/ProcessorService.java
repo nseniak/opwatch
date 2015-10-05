@@ -60,6 +60,9 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	private ConsoleService consoleService;
 
 	@Autowired
+	private HttpService httpService;
+
+	@Autowired
 	private ApplicationContext applicationContext;
 
 	private List<File> descriptorDirectories;
@@ -308,6 +311,10 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	public ConsoleService getConsoleService() {
 		return consoleService;
+	}
+
+	public HttpService getHttpService() {
+		return httpService;
 	}
 
 	public ScheduledThreadPoolExecutor getScheduledExecutor() {

@@ -2,6 +2,7 @@ package com.untrackr.alerter.service;
 
 import com.untrackr.alerter.common.ScriptObject;
 import com.untrackr.alerter.ioservice.LineReader;
+import com.untrackr.alerter.processor.common.ActiveProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,11 +18,11 @@ public class ConsoleService {
 	@Autowired
 	ProcessorService processorService;
 
-	private List<ConsoleConsumer> consumers = new ArrayList<>();
+	private List<ConsoleLineConsumer> consumers = new ArrayList<>();
 
 	private Future<?> consoleFuture;
 
-	public void addConsumer(ConsoleConsumer consumer) {
+	public void addConsumer(ConsoleLineConsumer consumer) {
 		synchronized (consumers) {
 			if (consumers.isEmpty()) {
 				startConsoleThread();
@@ -30,11 +31,11 @@ public class ConsoleService {
 		}
 	}
 
-	public void removeConsumer(ConsoleConsumer consumer) {
+	public void removeConsumer(ActiveProcessor consumer) {
 		synchronized (consumers) {
 			consumers.remove(consumer);
 			if (consumers.isEmpty()) {
-				startConsoleThread();
+				stopConsoleThread();
 			}
 		}
 	}
@@ -51,7 +52,7 @@ public class ConsoleService {
 				while ((line = reader.readLine()) != null) {
 					lineNumber = lineNumber + 1;
 					ConsoleLine consoleLine = new ConsoleLine(line, lineNumber);
-					for (ConsoleConsumer consumer : consumers) {
+					for (ConsoleLineConsumer consumer : consumers) {
 						consumer.consume(consoleLine);
 					}
 				}
@@ -65,12 +66,6 @@ public class ConsoleService {
 
 	private void stopConsoleThread() {
 		consoleFuture.cancel(true);
-	}
-
-	public interface ConsoleConsumer {
-
-		public void consume(ConsoleLine line);
-
 	}
 
 	public static class ConsoleLine extends ScriptObject {
@@ -90,6 +85,12 @@ public class ConsoleService {
 		public int getLine() {
 			return line;
 		}
+
+	}
+
+	public interface ConsoleLineConsumer {
+
+		public void consume(ConsoleLine line);
 
 	}
 
