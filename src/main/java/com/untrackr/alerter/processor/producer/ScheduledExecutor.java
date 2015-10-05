@@ -1,13 +1,16 @@
 package com.untrackr.alerter.processor.producer;
 
+import com.untrackr.alerter.processor.common.RuntimeProcessorError;
 import com.untrackr.alerter.service.ProcessorService;
 
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class ScheduledExecutor {
 
 	private ProcessorService processorService;
 	private long period;
+	private ScheduledFuture<?> scheduledFuture;
 
 	public ScheduledExecutor(ProcessorService processorService, long period) {
 		this.processorService = processorService;
@@ -15,7 +18,16 @@ public class ScheduledExecutor {
 	}
 
 	public void schedule(Runnable command) {
-		processorService.getScheduledExecutor().scheduleAtFixedRate(command, 0, period, TimeUnit.MILLISECONDS);
+		scheduledFuture = processorService.getScheduledExecutor().scheduleAtFixedRate(command, 0, period, TimeUnit.MILLISECONDS);
 	}
+
+	public void stop(ScheduledProducer processor) {
+		boolean stopped = scheduledFuture.cancel(true);
+		if (!stopped) {
+			throw new RuntimeProcessorError("cannot stop scheduled producer", processor, null);
+		}
+	}
+
+
 
 }

@@ -11,6 +11,7 @@ import java.nio.file.Path;
 public class Tail extends Producer {
 
 	private Path file;
+	private TailedFile tailedFile;
 
 	public Tail(ProcessorService processorService, IncludePath path, Path file) {
 		super(processorService, path);
@@ -18,9 +19,9 @@ public class Tail extends Producer {
 	}
 
 	@Override
-	public void initialize() {
+	public void doStart() {
 		AlerterProfile profile = getProcessorService().getProfileService().profile();
-		TailedFile tailedFile = new TailedFile(profile, file, (line, lineNumber) -> {
+		tailedFile = new TailedFile(profile, file, (line, lineNumber) -> {
 			LineObject lineObject = new LineObject();
 			lineObject.file = file.toAbsolutePath().toString();
 			lineObject.text = line;
@@ -28,6 +29,11 @@ public class Tail extends Producer {
 			outputProduced(lineObject);
 		});
 		getProcessorService().getFileTailingService().addTailedFile(tailedFile);
+	}
+
+	@Override
+	public void doStop() {
+		getProcessorService().getFileTailingService().removeTailedFile(tailedFile);
 	}
 
 	@Override

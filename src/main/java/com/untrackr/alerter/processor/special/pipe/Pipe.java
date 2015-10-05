@@ -46,11 +46,28 @@ public class Pipe extends Processor {
 	}
 
 	@Override
-	public void initialize() {
+	public void start() {
 		for (int i = processors.size() - 1; i >= 0; i--) {
 			Processor processor = processors.get(i);
-			processorService.withErrorHandling(processor, null, processor::initialize);
+			processorService.withErrorHandling(processor, null, processor::start);
 		}
+	}
+
+	@Override
+	public void stop() {
+		for (Processor processor : processors) {
+			processorService.withErrorHandling(processor, null, processor::stop);
+		}
+	}
+
+	@Override
+	public boolean started() {
+		return allStarted(processors);
+	}
+
+	@Override
+	public boolean stopped() {
+		return allStopped(processors);
 	}
 
 	private Processor first() {
@@ -58,7 +75,7 @@ public class Pipe extends Processor {
 	}
 
 	private Processor last() {
-		return processors.get(processors.size() -1);
+		return processors.get(processors.size() - 1);
 	}
 
 	@Override

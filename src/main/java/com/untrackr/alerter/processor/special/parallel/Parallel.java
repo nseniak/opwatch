@@ -30,8 +30,23 @@ public class Parallel extends Processor {
 	}
 
 	@Override
-	public void initialize() {
-		processors.forEach(processor -> processorService.withErrorHandling(processor, null, processor::initialize));
+	public void start() {
+		processors.forEach(processor -> processorService.withErrorHandling(processor, null, processor::start));
+	}
+
+	@Override
+	public void stop() {
+		processors.forEach(processor -> processorService.withErrorHandling(processor, null, processor::stop));
+	}
+
+	@Override
+	public boolean started() {
+		return allStarted(processors);
+	}
+
+	@Override
+	public boolean stopped() {
+		return allStopped(processors);
 	}
 
 	@Override

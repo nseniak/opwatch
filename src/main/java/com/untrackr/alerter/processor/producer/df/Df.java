@@ -20,11 +20,6 @@ public class Df extends ScheduledProducer {
 	}
 
 	@Override
-	public void initialize() {
-		super.initialize();
-	}
-
-	@Override
 	protected Object produce() {
 		PartitionInfo info = new PartitionInfo();
 		info.file = file.getAbsolutePath();

@@ -15,7 +15,7 @@ public abstract class ScheduledProducer extends Producer {
 	}
 
 	@Override
-	public void initialize() {
+	public void doStart() {
 		scheduledExecutor.schedule(() -> {
 			processorService.withErrorHandling(this, null, () -> {
 				Object object = produce();
@@ -25,6 +25,11 @@ public abstract class ScheduledProducer extends Producer {
 				}
 			});
 		});
+	}
+
+	@Override
+	public void doStop() {
+		scheduledExecutor.stop(this);
 	}
 
 	protected abstract Object produce();

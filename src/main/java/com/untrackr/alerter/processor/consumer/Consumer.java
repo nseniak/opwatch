@@ -13,8 +13,13 @@ public abstract class Consumer extends ActiveProcessor {
 	}
 
 	@Override
-	public void initialize() {
+	public void doStart() {
 		createConsumerThread();
+	}
+
+	@Override
+	public void doStop() {
+		stopConsumerThread();
 	}
 
 }

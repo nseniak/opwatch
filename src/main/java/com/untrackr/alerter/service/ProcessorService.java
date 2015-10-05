@@ -67,6 +67,8 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	private NashornScriptEngine nashorn;
 
+	private Processor mainProcessor;
+
 	private static final String DELIMITER = "\n--\n";
 	private static final int MAX_INPUT_LENGTH = 120;
 
@@ -112,27 +114,30 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		String filename = property("ALERTER_MAIN");
 		boolean error = withErrorHandling(null, null, () -> {
 			IncludePath emptyPath = new IncludePath();
-			Processor processor = factoryService.loadProcessor(filename, emptyPath);
+			mainProcessor = factoryService.loadProcessor(filename, emptyPath);
 			if (profileService.profile().isInteractive()) {
 				List<Processor> pipeProcessors = new ArrayList<>();
-				if (processor.getSignature().getInputRequirement() == ProcessorSignature.PipeRequirement.required) {
+				if (mainProcessor.getSignature().getInputRequirement() == ProcessorSignature.PipeRequirement.required) {
 					logger.info("Adding \"console\" as input processor");
 					pipeProcessors.add(new Console(this, emptyPath));
 				}
-				pipeProcessors.add(processor);
-				if (processor.getSignature().getOutputRequirement() == ProcessorSignature.PipeRequirement.required) {
+				pipeProcessors.add(mainProcessor);
+				if (mainProcessor.getSignature().getOutputRequirement() == ProcessorSignature.PipeRequirement.required) {
 					logger.info("Adding \"print\" as output processor");
 					pipeProcessors.add(new Print(this, emptyPath));
 				}
 				if (pipeProcessors.size() != 1) {
-					processor = new Pipe(this, pipeProcessors, emptyPath);
+					mainProcessor = new Pipe(this, pipeProcessors, emptyPath);
 				}
 			}
-			processor.check();
-			processor.initialize();
+			mainProcessor.check();
+			mainProcessor.start();
+			if (!mainProcessor.started()) {
+				throw new RuntimeProcessorError("cannot start main processor", mainProcessor, null);
+			}
 		});
 		if (error) {
-			logger.info("Exiting due to initialization errors");
+			logger.info("Exiting due to startup errors");
 			SpringApplication.exit(applicationContext);
 		} else {
 			Alert alert = new Alert(Alert.Priority.low, "Alerter running on " + getHostName(), "--");
@@ -151,13 +156,13 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		builder.append(DELIMITER);
 		builder.append("Hostname:\n").append(getHostName()).append(DELIMITER);
 		Throwable c = e.getCause();
-		if ((c != null) && !((c instanceof IOException)|| (c instanceof PatternSyntaxException))) {
+		if ((c != null) && !((c instanceof IOException) || (c instanceof PatternSyntaxException))) {
 			builder.append("Stack trace:\n");
 			e.printStackTrace(new PrintWriter(builder));
 			builder.append(DELIMITER);
 		}
 		String message = builder.toString();
-		Alert alert = new Alert(Alert.Priority.emergency, "Alerter initialization error: " + e.getLocalizedMessage(), message);
+		Alert alert = new Alert(Alert.Priority.emergency, "Alerter startup error: " + e.getLocalizedMessage(), message);
 		alertService.alert(alert);
 	}
 
@@ -272,6 +277,12 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	@Override
 	public void destroy() throws Exception {
+		if (mainProcessor != null) {
+			boolean error = withErrorHandling(mainProcessor, null, () -> mainProcessor.stop());
+			if (error) {
+				logger.error("Cannot stop main processor");
+			}
+		}
 		ThreadUtil.safeExecutorShutdownNow(consumerExecutor, "ConsumerExecutor", profileService.profile().getExecutorTerminationTimeout());
 		ThreadUtil.safeExecutorShutdownNow(scheduledExecutor, "ScheduledExecutor", profileService.profile().getExecutorTerminationTimeout());
 	}

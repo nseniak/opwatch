@@ -20,6 +20,7 @@ public abstract class ActiveProcessor extends Processor {
 	protected List<Processor> consumers = new ArrayList<>();
 	private long lastOutputTime = 0;
 	private String name;
+	protected boolean started;
 
 	public ActiveProcessor(ProcessorService processorService, IncludePath path) {
 		super(processorService, path);
@@ -35,6 +36,34 @@ public abstract class ActiveProcessor extends Processor {
 	public void addConsumer(Processor consumer) {
 		consumers.add(consumer);
 	}
+
+	@Override
+	public void start() {
+		doStart();
+		started = true;
+	}
+
+	protected abstract void doStart();
+
+	@Override
+	public void stop() {
+		if (started) {
+			doStop();
+			started = false;
+		}
+	}
+
+	@Override
+	public boolean started() {
+		return started;
+	}
+
+	@Override
+	public boolean stopped() {
+		return !started;
+	}
+
+	protected abstract void doStop();
 
 	public void check() throws ValidationError {
 		StringJoiner joiner = new StringJoiner(", ");
@@ -114,7 +143,14 @@ public abstract class ActiveProcessor extends Processor {
 
 	public void createConsumerThread() {
 		consumerThreadRunner = new ConsumerThreadRunner(processorService, this);
-		processorService.getConsumerExecutor().execute(consumerThreadRunner);
+		consumerThreadFuture = processorService.getConsumerExecutor().submit(consumerThreadRunner);
+	}
+
+	public void stopConsumerThread() {
+		boolean stopped = consumerThreadFuture.cancel(true);
+		if (!stopped) {
+			throw new RuntimeProcessorError("cannot stop consumer thread", this, null);
+		}
 	}
 
 	public <T> T payloadFieldValue(Payload input, String fieldName, Class<T> clazz) {
@@ -142,7 +178,7 @@ public abstract class ActiveProcessor extends Processor {
 		}
 	}
 
-	public  String identifier() {
+	public String identifier() {
 		// Default
 		return name;
 	}
