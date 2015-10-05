@@ -14,6 +14,7 @@ import com.untrackr.alerter.processor.filter.js.JSFactory;
 import com.untrackr.alerter.processor.filter.jsgrep.JSGrepFactory;
 import com.untrackr.alerter.processor.filter.once.OnceFactory;
 import com.untrackr.alerter.processor.filter.print.PrintFactory;
+import com.untrackr.alerter.processor.producer.console.ConsoleFactory;
 import com.untrackr.alerter.processor.producer.count.CountFactory;
 import com.untrackr.alerter.processor.producer.curl.CurlFactory;
 import com.untrackr.alerter.processor.producer.df.DfFactory;
@@ -52,6 +53,7 @@ public class FactoryService implements InitializingBean {
 	public void afterPropertiesSet() throws Exception {
 		parallelFactory = new ParallelFactory(processorService);
 		pipeFactory = new PipeFactory(processorService);
+		registerFactory(new ConsoleFactory(processorService));
 		registerFactory(new GrepFactory(processorService));
 		registerFactory(new JSGrepFactory(processorService));
 		registerFactory(new JSFactory(processorService));

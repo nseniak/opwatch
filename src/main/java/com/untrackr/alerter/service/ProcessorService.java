@@ -57,6 +57,9 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	private FileTailingService fileTailingService;
 
 	@Autowired
+	private ConsoleService consoleService;
+
+	@Autowired
 	private ApplicationContext applicationContext;
 
 	private List<File> descriptorDirectories;
@@ -301,6 +304,10 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	public FileTailingService getFileTailingService() {
 		return fileTailingService;
+	}
+
+	public ConsoleService getConsoleService() {
+		return consoleService;
 	}
 
 	public ScheduledThreadPoolExecutor getScheduledExecutor() {
