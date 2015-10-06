@@ -49,8 +49,11 @@ public abstract class ActiveProcessor extends Processor {
 	@Override
 	public void stop() {
 		if (started) {
-			doStop();
-			started = false;
+			try {
+				doStop();
+			} finally {
+				started = false;
+			}
 		}
 	}
 

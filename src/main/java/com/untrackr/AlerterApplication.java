@@ -14,7 +14,7 @@ public class AlerterApplication {
 		checkProperty("alerter.main");
 		ApplicationContext context = SpringApplication.run(AlerterApplication.class, args);
 		ProcessorService processorService = context.getBean(ProcessorService.class);
-		processorService.start();
+		processorService.startMainProcessor();
 	}
 
 }

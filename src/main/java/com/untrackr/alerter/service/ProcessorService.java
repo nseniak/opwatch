@@ -117,7 +117,11 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	}
 
 
-	public void start() {
+	public void startMainProcessor() {
+		if (mainProcessor != null) {
+			logger.info("Main processor already started");
+			return;
+		}
 		String filename = property("alerter.main");
 		boolean error = withErrorHandling(null, null, () -> {
 			IncludePath emptyPath = new IncludePath();
@@ -139,16 +143,34 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			}
 			mainProcessor.check();
 			mainProcessor.start();
-			if (!mainProcessor.started()) {
-				throw new RuntimeProcessorError("cannot start main processor", mainProcessor, null);
-			}
 		});
-		if (error) {
-			logger.info("Exiting due to startup errors");
-			SpringApplication.exit(applicationContext);
+		if (mainProcessor == null) {
+			logger.error("Cannot load main processor: " + filename);
+		} else if (error) {
+			logger.error("Cannot start main processor: " + filename);
+			// Stop those sub-processors that have been started
+			mainProcessor.stop();
+			mainProcessor = null;
 		} else {
+			logger.info("Started");
 			Alert alert = new Alert(Alert.Priority.low, "Alerter running on " + getHostName(), "--");
 			alertService.alert(alert);
+		}
+	}
+
+	public void stopMainProcessor() {
+		if (mainProcessor == null) {
+			logger.info("Main processor not started");
+			return;
+		}
+		try {
+			boolean error = withErrorHandling(mainProcessor, null, mainProcessor::stop);
+			if (error) {
+				logger.error("Cannot stop main processor");
+			}
+		} finally {
+			logger.info("Stopped");
+			mainProcessor = null;
 		}
 	}
 
@@ -290,14 +312,14 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		}
 	}
 
+	public void exit() {
+		SpringApplication.exit(applicationContext);
+	}
+
 	@Override
 	public void destroy() throws Exception {
-		if (mainProcessor != null) {
-			boolean error = withErrorHandling(mainProcessor, null, () -> mainProcessor.stop());
-			if (error) {
-				logger.error("Cannot stop main processor");
-			}
-		}
+		logger.info("Exiting");
+		stopMainProcessor();
 		ThreadUtil.safeExecutorShutdownNow(consumerExecutor, "ConsumerExecutor", profileService.profile().getExecutorTerminationTimeout());
 		ThreadUtil.safeExecutorShutdownNow(scheduledExecutor, "ScheduledExecutor", profileService.profile().getExecutorTerminationTimeout());
 	}
