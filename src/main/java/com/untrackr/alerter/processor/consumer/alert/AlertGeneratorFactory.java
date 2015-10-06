@@ -30,7 +30,7 @@ public class AlertGeneratorFactory extends ActiveProcessorFactory {
 			throw new ValidationError("bad alert priority: \"" + priorityName + "\"", path, jsonDescriptor);
 		}
 		String title = checkFieldValue(path, jsonDescriptor, "title", descriptor.getTitle());
-		AlertGenerator alertGenerator = new AlertGenerator(getProcessorService(), priority, title, path);
+		AlertGenerator alertGenerator = new AlertGenerator(getProcessorService(), path, title, priority);
 		initialize(alertGenerator, descriptor);
 		return alertGenerator;
 	}

@@ -1,6 +1,5 @@
 package com.untrackr.alerter.processor.filter.jsgrep;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.untrackr.alerter.processor.common.IncludePath;
 import com.untrackr.alerter.processor.common.Payload;
 import com.untrackr.alerter.processor.common.RuntimeProcessorError;
@@ -36,13 +35,7 @@ public class JSGrep extends ConditionalFilter {
 				return false;
 			} else {
 				nonBooleanValueErrorSignaled = true;
-				String resultString = null;
-				try {
-					resultString = processorService.getObjectMapper().writeValueAsString(result);
-				} catch (JsonProcessingException e) {
-					resultString = "<cannot convert to string>";
-				}
-				throw new RuntimeProcessorError("test returned a non-boolean value: " + resultString, this, input);
+				throw new RuntimeProcessorError("test returned a non-boolean value: " + processorService.valueAsString(result), this, input);
 			}
 		}
 	}

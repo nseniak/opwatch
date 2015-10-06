@@ -50,7 +50,7 @@ public class Alert {
 		return "Alert{" +
 				"priority=" + priority +
 				", title='" + title + '\'' +
-				", message='" + message + '\'' +
+				", message='" + message.replace('\n', ' ') + '\'' +
 				", retry=" + retry +
 				", expire=" + expire +
 				'}';

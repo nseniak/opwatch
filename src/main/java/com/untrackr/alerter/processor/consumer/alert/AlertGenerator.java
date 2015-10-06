@@ -11,7 +11,7 @@ public class AlertGenerator extends Consumer {
 	private Alert.Priority priority;
 	private String title;
 
-	public AlertGenerator(ProcessorService processorService, Alert.Priority priority, String title, IncludePath path) {
+	public AlertGenerator(ProcessorService processorService, IncludePath path, String title, Alert.Priority priority) {
 		super(processorService, path);
 		this.priority = priority;
 		this.title = title;

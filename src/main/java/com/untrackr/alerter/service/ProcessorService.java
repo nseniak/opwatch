@@ -1,5 +1,6 @@
 package com.untrackr.alerter.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.untrackr.alerter.common.InternalScriptError;
@@ -88,7 +89,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	public void afterPropertiesSet() throws Exception {
 		// Path
 		descriptorDirectories = new ArrayList<>();
-		String path = property("ALERTER_DESCRIPTOR_PATH", null);
+		String path = property("alerter.path", null);
 		if (path != null) {
 			String[] directoryStrings = path.split(":");
 			for (String directoryString : directoryStrings) {
@@ -117,7 +118,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 
 	public void start() {
-		String filename = property("ALERTER_MAIN");
+		String filename = property("alerter.main");
 		boolean error = withErrorHandling(null, null, () -> {
 			IncludePath emptyPath = new IncludePath();
 			mainProcessor = factoryService.loadProcessor(filename, emptyPath);
@@ -154,11 +155,9 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	public void displayValidationError(ValidationError e) {
 		StringWriter builder = new StringWriter();
 		IncludePath path = e.getPath();
-		if ((path != null) && !path.isEmpty()) {
-			builder.append(path.pathDescriptor()).append(": ");
-		}
+		String location = ((path == null) || path.isEmpty()) ? "" : path.pathDescriptor() + ": ";
+		builder.append(location);
 		builder.append("error: ").append(e.getLocalizedMessage());
-		logger.error(builder.toString());
 		builder.append(DELIMITER);
 		builder.append("Hostname:\n").append(getHostName()).append(DELIMITER);
 		Throwable c = e.getCause();
@@ -166,6 +165,11 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			builder.append("Stack trace:\n");
 			e.printStackTrace(new PrintWriter(builder));
 			builder.append(DELIMITER);
+		}
+		if (c == null) {
+			logger.error(location + e.getLocalizedMessage());
+		} else {
+			logger.error(location + e.getLocalizedMessage(), c);
 		}
 		String message = builder.toString();
 		Alert alert = new Alert(Alert.Priority.emergency, "Alerter startup error: " + e.getLocalizedMessage(), message);
@@ -187,20 +191,17 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		builder.append("Error:\n").append(e.getLocalizedMessage()).append(DELIMITER);
 		Processor processor = e.getProcessor();
 		Payload payload = e.getPayload();
+		String location = (payload == null) ? processor.pathDescriptor() : payload.pathDescriptor(processor);
+		builder.append("Processor:\n").append(location).append(DELIMITER);
 		if (payload != null) {
-			builder.append("Processor:\n").append(payload.pathDescriptor(processor)).append(DELIMITER);
 			builder.append("Input:\n").append(truncate(payload.asText(), MAX_INPUT_LENGTH)).append(DELIMITER);
-		} else {
-			builder.append("Processor:\n").append(processor.pathDescriptor()).append(DELIMITER);
 		}
 		if ((e.getCause() != null) && !((e.getCause() instanceof IOException) || (e.getCause() instanceof ScriptException) || (e.getCause() instanceof InternalScriptError))) {
-			logger.error(builder.toString(), e);
 			builder.append("Stack trace:\n");
 			e.printStackTrace(new PrintWriter(builder));
 			builder.append(DELIMITER);
-		} else {
-			logger.error(builder.toString());
 		}
+		logger.error(location + ": " + e.getLocalizedMessage(), e);
 		String message = builder.toString();
 		Alert alert = new Alert(Alert.Priority.emergency, "Error: " + e.getLocalizedMessage(), message);
 		alertService.alert(alert);
@@ -279,6 +280,14 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			}
 		}
 		return null;
+	}
+
+	public String valueAsString(Object value) {
+		try {
+			return objectMapper.writeValueAsString(value);
+		} catch (JsonProcessingException e) {
+			return "<cannot convert to string>";
+		}
 	}
 
 	@Override

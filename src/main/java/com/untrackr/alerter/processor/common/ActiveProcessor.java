@@ -1,5 +1,6 @@
 package com.untrackr.alerter.processor.common;
 
+import com.untrackr.alerter.common.RemotePayload;
 import com.untrackr.alerter.service.ProcessorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,7 +103,7 @@ public abstract class ActiveProcessor extends Processor {
 
 	@Override
 	public String descriptor() {
-		String id = identifier();
+		String id = (name != null) ? name : identifier();
 		if (id == null) {
 			return super.descriptor();
 		} else {
@@ -117,6 +118,11 @@ public abstract class ActiveProcessor extends Processor {
 
 	public void outputProduced(Object object) {
 		Payload payload = Payload.makeRoot(processorService, this, object);
+		output(consumers, payload);
+	}
+
+	public void outputReceived(RemotePayload remotePayload) {
+		Payload payload = Payload.makeRemote(processorService, this, remotePayload);
 		output(consumers, payload);
 	}
 
@@ -180,7 +186,7 @@ public abstract class ActiveProcessor extends Processor {
 
 	public String identifier() {
 		// Default
-		return name;
+		return null;
 	}
 
 	public String getName() {

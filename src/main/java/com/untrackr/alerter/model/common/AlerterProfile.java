@@ -23,6 +23,8 @@ public class AlerterProfile {
 	private int inputQueueSize;
 	private long processorInputQueueTimeout;
 	private long minimumOutputDelay;
+	private String defaultPostHostname;
+	private int defaultPostPort;
 
 	public AlerterProfile() {
 		this.fileWatchingCheckDelay = TimeUnit.SECONDS.toMillis(1);
@@ -43,6 +45,8 @@ public class AlerterProfile {
 		this.inputQueueSize = 100;
 		this.processorInputQueueTimeout = TimeUnit.SECONDS.toMillis(60);
 		this.minimumOutputDelay = TimeUnit.MILLISECONDS.toMillis(50);
+		this.defaultPostHostname = ApplicationUtil.property("alerter.post.hostname", "localhost");
+		this.defaultPostPort = ApplicationUtil.property("alerter.post.port", 28018);
 	}
 
 	public long getFileWatchingCheckDelay() {
@@ -179,6 +183,22 @@ public class AlerterProfile {
 
 	public void setMinimumOutputDelay(long minimumOutputDelay) {
 		this.minimumOutputDelay = minimumOutputDelay;
+	}
+
+	public String getDefaultPostHostname() {
+		return defaultPostHostname;
+	}
+
+	public void setDefaultPostHostname(String defaultPostHostname) {
+		this.defaultPostHostname = defaultPostHostname;
+	}
+
+	public int getDefaultPostPort() {
+		return defaultPostPort;
+	}
+
+	public void setDefaultPostPort(int defaultPostPort) {
+		this.defaultPostPort = defaultPostPort;
 	}
 
 }

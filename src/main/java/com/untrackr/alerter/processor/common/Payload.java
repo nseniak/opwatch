@@ -1,6 +1,6 @@
 package com.untrackr.alerter.processor.common;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.untrackr.alerter.common.RemotePayload;
 import com.untrackr.alerter.model.common.JsonMap;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -42,6 +42,17 @@ public class Payload {
 		);
 	}
 
+	public static Payload makeRemote(ProcessorService processorService, Processor producer, RemotePayload remotePayload) {
+		return new Payload(
+				processorService,
+				producer,
+				remotePayload.getJsonObject(),
+				null,
+				remotePayload.getTimestamp(),
+				remotePayload.getHostname()
+		);
+	}
+
 	public static Payload makeFiltered(ProcessorService processorService, Processor producer, Object object, Payload input) {
 		return new Payload(
 				processorService,
@@ -58,11 +69,7 @@ public class Payload {
 	}
 
 	public String asText() {
-		try {
-			return processorService.getObjectMapper().writeValueAsString(jsonObject);
-		} catch (JsonProcessingException e) {
-			return "<cannot convert to string>";
-		}
+		return processorService.valueAsString(jsonObject);
 	}
 
 	public List<Payload> inputList() {
