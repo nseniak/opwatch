@@ -10,6 +10,7 @@ import com.untrackr.alerter.processor.common.ValidationError;
 import com.untrackr.alerter.processor.consumer.alert.AlertGeneratorFactory;
 import com.untrackr.alerter.processor.consumer.post.PostFactory;
 import com.untrackr.alerter.processor.filter.collect.CollectFactory;
+import com.untrackr.alerter.processor.filter.sh.ShFactory;
 import com.untrackr.alerter.processor.filter.grep.GrepFactory;
 import com.untrackr.alerter.processor.filter.js.JSFactory;
 import com.untrackr.alerter.processor.filter.jsgrep.JSGrepFactory;
@@ -17,6 +18,7 @@ import com.untrackr.alerter.processor.filter.once.OnceFactory;
 import com.untrackr.alerter.processor.filter.print.PrintFactory;
 import com.untrackr.alerter.processor.producer.console.ConsoleFactory;
 import com.untrackr.alerter.processor.producer.count.CountFactory;
+import com.untrackr.alerter.processor.producer.cron.CronFactory;
 import com.untrackr.alerter.processor.producer.curl.CurlFactory;
 import com.untrackr.alerter.processor.producer.df.DfFactory;
 import com.untrackr.alerter.processor.producer.receive.ReceiveFactory;
@@ -72,6 +74,8 @@ public class FactoryService implements InitializingBean {
 		registerFactory(new TrailFactory(processorService));
 		registerFactory(new ReceiveFactory(processorService));
 		registerFactory(new PostFactory(processorService));
+		registerFactory(new CronFactory(processorService));
+		registerFactory(new ShFactory(processorService));
 	}
 
 	private void registerFactory(ProcessorFactory processorFactory) {

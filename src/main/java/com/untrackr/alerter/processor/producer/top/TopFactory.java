@@ -14,7 +14,7 @@ public class TopFactory extends ScheduledExecutorFactory {
 
 	@Override
 	public String type() {
-		return "top";
+		return "cron";
 	}
 
 	@Override

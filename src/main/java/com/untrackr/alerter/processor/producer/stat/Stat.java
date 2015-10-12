@@ -19,7 +19,7 @@ public class Stat extends ScheduledProducer {
 	}
 
 	@Override
-	protected Object produce() {
+	protected void produce() {
 		FileInfo info = new FileInfo();
 		info.file = file.getAbsolutePath();
 		if (!file.exists()) {
@@ -29,7 +29,7 @@ public class Stat extends ScheduledProducer {
 			info.size = file.length();
 			info.lastModified = new Date(file.lastModified());
 		}
-		return info;
+		outputProduced(info);
 	}
 
 	@Override

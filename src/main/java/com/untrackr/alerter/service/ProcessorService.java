@@ -128,12 +128,12 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			mainProcessor = factoryService.loadProcessor(filename, emptyPath);
 			if (profileService.profile().isInteractive()) {
 				List<Processor> pipeProcessors = new ArrayList<>();
-				if (mainProcessor.getSignature().getInputRequirement() == ProcessorSignature.PipeRequirement.required) {
+				if (mainProcessor.getSignature().getInputRequirement() != ProcessorSignature.PipeRequirement.forbidden) {
 					logger.info("Adding \"console\" as input processor");
 					pipeProcessors.add(new Console(this, emptyPath));
 				}
 				pipeProcessors.add(mainProcessor);
-				if (mainProcessor.getSignature().getOutputRequirement() == ProcessorSignature.PipeRequirement.required) {
+				if (mainProcessor.getSignature().getOutputRequirement() != ProcessorSignature.PipeRequirement.forbidden) {
 					logger.info("Adding \"print\" as output processor");
 					pipeProcessors.add(new Print(this, emptyPath));
 				}

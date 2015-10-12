@@ -16,7 +16,7 @@ public class Top extends ScheduledProducer {
 	}
 
 	@Override
-	protected Object produce() {
+	protected void produce() {
 		TopInfo info = new TopInfo();
 		OperatingSystemMXBean osBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
 		info.loadAverage = osBean.getSystemLoadAverage();
@@ -24,7 +24,7 @@ public class Top extends ScheduledProducer {
 		info.freeSwapSpace = osBean.getFreeSwapSpaceSize();
 		info.totalPhysicalMemory = osBean.getTotalPhysicalMemorySize();
 		info.freePhysicalMemory = osBean.getFreePhysicalMemorySize();
-		return info;
+		outputProduced(info);
 	}
 
 	public static class TopInfo  extends ScriptObject {

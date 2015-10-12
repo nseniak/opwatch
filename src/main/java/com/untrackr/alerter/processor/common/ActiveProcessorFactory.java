@@ -1,6 +1,8 @@
 package com.untrackr.alerter.processor.common;
 
 import com.untrackr.alerter.model.common.JsonDescriptor;
+import com.untrackr.alerter.processor.producer.CommandRunner;
+import com.untrackr.alerter.processor.producer.CommandExecutorDesc;
 import com.untrackr.alerter.service.ProcessorService;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
 
@@ -26,6 +28,12 @@ public abstract class ActiveProcessorFactory extends ProcessorFactory {
 		} catch (ScriptException e) {
 			throw new ValidationError("incorrect JavaScript code in \"" + field + "\" field: " + e.getLocalizedMessage(), path, jsonDescriptor);
 		}
+	}
+
+	protected CommandRunner makeCommandOutputProducer(IncludePath path, JsonDescriptor jsonDescriptor, CommandExecutorDesc descriptor) {
+		String command = checkVariableSubstitution(path, jsonDescriptor, "command",
+				checkFieldValue(path, jsonDescriptor, "command", descriptor.getCommand()));
+		return new CommandRunner(processorService, command);
 	}
 
 }

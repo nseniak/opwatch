@@ -53,13 +53,13 @@ public class Trail extends ScheduledProducer {
 	}
 
 	@Override
-	protected Object produce() {
+	protected void produce() {
 		long timestamp = System.currentTimeMillis();
 		if ((timestamp - startupTimestamp) < duration) {
-			return null;
+			return;
 		}
 		queue.removeIf(to -> (timestamp - to.getStamp()) > duration);
-		return new ObjectSeries(queue);
+		outputProduced(new ObjectSeries(queue));
 	}
 
 	@Override

@@ -22,6 +22,7 @@ public abstract class ActiveProcessor extends Processor {
 	private long lastOutputTime = 0;
 	private String name;
 	protected boolean started;
+	private boolean commandExecutionErrorSignaled;
 
 	public ActiveProcessor(ProcessorService processorService, IncludePath path) {
 		super(processorService, path);

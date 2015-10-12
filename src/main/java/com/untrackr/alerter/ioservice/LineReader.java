@@ -8,7 +8,7 @@ import java.io.IOException;
  * A line reader that always reads complete lines (with an end-of-line) and is interruptible -- unlike
  * BufferedReader.readLine().
  */
-public class LineReader {
+public class LineReader implements AutoCloseable {
 
 	private BufferedInputStream inputStream;
 	private int maxLineSize;
@@ -16,9 +16,10 @@ public class LineReader {
 	private boolean forceInterruptible;
 	private ByteArrayOutputStream currentLine = new ByteArrayOutputStream();
 
-	public LineReader(BufferedInputStream inputStream, int maxLineSize) {
+	public LineReader(BufferedInputStream inputStream, int maxLineSize, boolean forceInterruptible) {
 		this.inputStream = inputStream;
 		this.maxLineSize = maxLineSize;
+		this.forceInterruptible = forceInterruptible;
 	}
 
 	public String readLine() throws IOException, InterruptedException {
@@ -26,7 +27,7 @@ public class LineReader {
 		inputStream.mark(maxLineSize);
 		while (true) {
 			if (forceInterruptible) {
-				while (inputStream.available() == 0) {
+				if (inputStream.available() == 0) {
 					Thread.sleep(100);
 				}
 			}
@@ -53,14 +54,6 @@ public class LineReader {
 
 	public void close() throws IOException {
 		inputStream.close();
-	}
-
-	public boolean isForceInterruptible() {
-		return forceInterruptible;
-	}
-
-	public void setForceInterruptible(boolean forceInterruptible) {
-		this.forceInterruptible = forceInterruptible;
 	}
 
 }

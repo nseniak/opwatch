@@ -98,7 +98,7 @@ public class TailedFile {
 	private LineReader openFile(Path path) {
 		try {
 			InputStream in = Files.newInputStream(path);
-			return new LineReader(new BufferedInputStream(in), alerterProfile.getLineBufferSize());
+			return new LineReader(new BufferedInputStream(in), alerterProfile.getLineBufferSize(), false);
 		} catch (IOException e) {
 			return null;
 		}

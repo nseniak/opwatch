@@ -25,12 +25,17 @@ public class AlerterProfile {
 	private long minimumOutputDelay;
 	private String defaultPostHostname;
 	private int defaultPostPort;
+	private long cronScriptOutputCheckDelay;
+	private long cronCommandExitTimeout;
 
 	public AlerterProfile() {
 		this.fileWatchingCheckDelay = TimeUnit.SECONDS.toMillis(1);
 		this.executorTerminationTimeout = TimeUnit.SECONDS.toMillis(30);
 		// Key for Trackbuster app/Trackbuster dev group
-		this.pushoverKey = new PushoverKey("aU5Pkdp2uDPxDM2yQw9UCVg9Nz9287", "g1viaT81UbvSkZ9N2eVGSXMU56TLic");
+		this.pushoverKey = new PushoverKey(
+				ApplicationUtil.environmentVariable("PUSHOVER_API_TOKEN"),
+				ApplicationUtil.environmentVariable("PUSHOVER_USER_ID")
+		);
 		this.tailedFileWatchingCheckDelay = TimeUnit.SECONDS.toMillis(1);
 		this.tailPollInterval = TimeUnit.MILLISECONDS.toMillis(500);
 		this.defaultEmergencyRetry = 60;
@@ -47,6 +52,8 @@ public class AlerterProfile {
 		this.minimumOutputDelay = TimeUnit.MILLISECONDS.toMillis(50);
 		this.defaultPostHostname = ApplicationUtil.property("alerter.post.hostname", "localhost");
 		this.defaultPostPort = ApplicationUtil.property("alerter.post.port", 28018);
+		this.cronScriptOutputCheckDelay = TimeUnit.SECONDS.toMillis(100);
+		this.cronCommandExitTimeout = TimeUnit.MINUTES.toMillis(3);
 	}
 
 	public long getFileWatchingCheckDelay() {
@@ -199,6 +206,22 @@ public class AlerterProfile {
 
 	public void setDefaultPostPort(int defaultPostPort) {
 		this.defaultPostPort = defaultPostPort;
+	}
+
+	public long getCronScriptOutputCheckDelay() {
+		return cronScriptOutputCheckDelay;
+	}
+
+	public void setCronScriptOutputCheckDelay(long cronScriptOutputCheckDelay) {
+		this.cronScriptOutputCheckDelay = cronScriptOutputCheckDelay;
+	}
+
+	public long getCronCommandExitTimeout() {
+		return cronCommandExitTimeout;
+	}
+
+	public void setCronCommandExitTimeout(long cronCommandExitTimeout) {
+		this.cronCommandExitTimeout = cronCommandExitTimeout;
 	}
 
 }

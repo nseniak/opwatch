@@ -14,8 +14,8 @@ public class Count extends ScheduledProducer {
 	}
 
 	@Override
-	protected Object produce() {
-		return (count++);
+	protected void produce() {
+		outputProduced(count++);
 	}
 
 }

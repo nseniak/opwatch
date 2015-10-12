@@ -33,7 +33,7 @@ public class Curl extends ScheduledProducer {
 	}
 
 	@Override
-	protected Object produce() {
+	protected void produce() {
 		SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
 		factory.setConnectTimeout(connectTimeout);
 		factory.setReadTimeout(readTimeout);
@@ -63,7 +63,7 @@ public class Curl extends ScheduledProducer {
 			result.status = -1;
 			result.error = e.getCause().getMessage();
 		}
-		return result;
+		outputProduced(result);
 	}
 
 	@Override

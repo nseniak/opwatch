@@ -20,12 +20,12 @@ public class Df extends ScheduledProducer {
 	}
 
 	@Override
-	protected Object produce() {
+	protected void produce() {
 		PartitionInfo info = new PartitionInfo();
 		info.file = file.getAbsolutePath();
 		if (!file.exists()) {
 			if (fileNotFoundErrorSignaled) {
-				return null;
+				return;
 			} else {
 				fileNotFoundErrorSignaled = true;
 				throw new RuntimeProcessorError("file not found: " + file, this, null);
@@ -39,7 +39,7 @@ public class Df extends ScheduledProducer {
 		long partitionUsed = partitionSize - partitionAvailable;
 		info.used = partitionUsed;
 		info.percentUsed = ((double) partitionUsed * 100) / partitionSize;
-		return info;
+		outputProduced(info);
 	}
 
 	@Override

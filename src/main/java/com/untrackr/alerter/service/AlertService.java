@@ -55,11 +55,11 @@ public class AlertService {
 		switch (alert.getPriority()) {
 			case low:
 				priority = MessagePriority.LOW;
-				prefix = "";
+				prefix = "Info: ";
 				break;
 			case normal:
 				priority = MessagePriority.NORMAL;
-				prefix = "Alert: ";
+				prefix = "Alert(NORMAL): ";
 				break;
 			case high:
 				priority = MessagePriority.HIGH;

@@ -43,9 +43,8 @@ public class ConsoleService {
 	private void startConsoleThread() {
 		consoleFuture = processorService.getConsumerExecutor().submit(() -> {
 			int bufsize = processorService.getProfileService().profile().getLineBufferSize();
-			LineReader reader = new LineReader(new BufferedInputStream(System.in), bufsize);
+			LineReader reader = new LineReader(new BufferedInputStream(System.in), bufsize, true);
 			// Since System.in.read() is not interruptible, we force its interruptibility using polling
-			reader.setForceInterruptible(true);
 			String line;
 			int lineNumber = 0;
 			try {
