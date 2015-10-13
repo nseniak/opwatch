@@ -30,6 +30,10 @@ public class IncludePath {
 		return reversePathList.getHead();
 	}
 
+	public LoadedFile first() {
+		return reversePathList.reverse().get(0);
+	}
+
 	public String pathDescriptor() {
 		if (reversePathList == null) {
 			return "";

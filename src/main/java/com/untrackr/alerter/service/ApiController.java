@@ -33,4 +33,9 @@ public class ApiController {
 		processorService.exit();
 	}
 
+	@RequestMapping("/healthcheck")
+	public HealthcheckInfo healthcheck() {
+		return processorService.healthcheck();
+	}
+
 }

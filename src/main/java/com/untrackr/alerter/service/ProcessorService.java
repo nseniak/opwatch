@@ -76,6 +76,8 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	private Processor mainProcessor;
 
+	private boolean errors;
+
 	private static final String DELIMITER = "\n--\n";
 	private static final int MAX_INPUT_LENGTH = 120;
 
@@ -123,7 +125,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			return;
 		}
 		String filename = property("alerter.main");
-		boolean error = withErrorHandling(null, null, () -> {
+		errors = withErrorHandling(null, null, () -> {
 			IncludePath emptyPath = new IncludePath();
 			mainProcessor = factoryService.loadProcessor(filename, emptyPath);
 			if (profileService.profile().isInteractive()) {
@@ -146,7 +148,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		});
 		if (mainProcessor == null) {
 			logger.error("Cannot load main processor: " + filename);
-		} else if (error) {
+		} else if (errors) {
 			logger.error("Cannot start main processor: " + filename);
 			// Stop those sub-processors that have been started
 			mainProcessor.stop();
@@ -164,8 +166,8 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			return;
 		}
 		try {
-			boolean error = withErrorHandling(mainProcessor, null, mainProcessor::stop);
-			if (error) {
+			errors = withErrorHandling(mainProcessor, null, mainProcessor::stop);
+			if (errors) {
 				logger.error("Cannot stop main processor");
 			}
 		} finally {
@@ -322,6 +324,11 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		stopMainProcessor();
 		ThreadUtil.safeExecutorShutdownNow(consumerExecutor, "ConsumerExecutor", profileService.profile().getExecutorTerminationTimeout());
 		ThreadUtil.safeExecutorShutdownNow(scheduledExecutor, "ScheduledExecutor", profileService.profile().getExecutorTerminationTimeout());
+	}
+
+	public HealthcheckInfo healthcheck() {
+		String mainProcessorFilename = (mainProcessor == null) ? null : mainProcessor.getPath().first().getFilename();
+		return new HealthcheckInfo(hostName, mainProcessorFilename, errors);
 	}
 
 	public AlertService getAlertService() {
