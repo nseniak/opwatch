@@ -76,7 +76,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	private Processor mainProcessor;
 
-	private boolean errors;
+	private String mainProcessorFile;
 
 	private static final String DELIMITER = "\n--\n";
 	private static final int MAX_INPUT_LENGTH = 120;
@@ -120,43 +120,49 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 
 	public void startMainProcessor() {
-		if (mainProcessor != null) {
-			logger.info("Main processor already started");
-			return;
-		}
-		String filename = property("alerter.main");
-		errors = withErrorHandling(null, null, () -> {
-			IncludePath emptyPath = new IncludePath();
-			mainProcessor = factoryService.loadProcessor(filename, emptyPath);
-			if (profileService.profile().isInteractive()) {
-				List<Processor> pipeProcessors = new ArrayList<>();
-				if (mainProcessor.getSignature().getInputRequirement() != ProcessorSignature.PipeRequirement.forbidden) {
-					logger.info("Adding \"console\" as input processor");
-					pipeProcessors.add(new Console(this, emptyPath));
-				}
-				pipeProcessors.add(mainProcessor);
-				if (mainProcessor.getSignature().getOutputRequirement() != ProcessorSignature.PipeRequirement.forbidden) {
-					logger.info("Adding \"print\" as output processor");
-					pipeProcessors.add(new Print(this, emptyPath));
-				}
-				if (pipeProcessors.size() != 1) {
-					mainProcessor = new Pipe(this, pipeProcessors, emptyPath);
-				}
+		try {
+			if (mainProcessor != null) {
+				logger.info("Main processor already started");
+				return;
 			}
-			mainProcessor.check();
-			mainProcessor.start();
-		});
-		if (mainProcessor == null) {
-			logger.error("Cannot load main processor: " + filename);
-		} else if (errors) {
-			logger.error("Cannot start main processor: " + filename);
-			// Stop those sub-processors that have been started
-			mainProcessor.stop();
-			mainProcessor = null;
-		} else {
-			logger.info("Started");
-			Alert alert = new Alert(Alert.Priority.low, "Alerter running on " + getHostName(), "--");
-			alertService.alert(alert);
+			mainProcessorFile = property("alerter.main");
+			boolean error = withErrorHandling(null, null, () -> {
+				IncludePath emptyPath = new IncludePath();
+				mainProcessor = factoryService.loadProcessor(mainProcessorFile, emptyPath);
+				if (profileService.profile().isInteractive()) {
+					List<Processor> pipeProcessors = new ArrayList<>();
+					if (mainProcessor.getSignature().getInputRequirement() != ProcessorSignature.PipeRequirement.forbidden) {
+						logger.info("Adding \"console\" as input processor");
+						pipeProcessors.add(new Console(this, emptyPath));
+					}
+					pipeProcessors.add(mainProcessor);
+					if (mainProcessor.getSignature().getOutputRequirement() != ProcessorSignature.PipeRequirement.forbidden) {
+						logger.info("Adding \"print\" as output processor");
+						pipeProcessors.add(new Print(this, emptyPath));
+					}
+					if (pipeProcessors.size() != 1) {
+						mainProcessor = new Pipe(this, pipeProcessors, emptyPath);
+					}
+				}
+				mainProcessor.check();
+				mainProcessor.start();
+			});
+			if (mainProcessor == null) {
+				logger.error("Cannot load main processor: " + mainProcessorFile);
+			} else if (error) {
+				logger.error("Cannot start main processor: " + mainProcessorFile);
+				// Stop those sub-processors that have been started
+				mainProcessor.stop();
+				mainProcessor = null;
+			} else {
+				logger.info("Started");
+				Alert alert = new Alert(Alert.Priority.low, "Alerter running on " + getHostName(), "--");
+				alertService.alert(alert);
+			}
+		} catch (Throwable t) {
+			String message = "Unexpected startup error occurred";
+			logger.error(message, t);
+			infrastructureAlert(Alert.Priority.emergency, message, "--", t);
 		}
 	}
 
@@ -166,8 +172,8 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			return;
 		}
 		try {
-			errors = withErrorHandling(mainProcessor, null, mainProcessor::stop);
-			if (errors) {
+			boolean error = withErrorHandling(mainProcessor, null, mainProcessor::stop);
+			if (error) {
 				logger.error("Cannot stop main processor");
 			}
 		} finally {
@@ -327,8 +333,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	}
 
 	public HealthcheckInfo healthcheck() {
-		String mainProcessorFilename = (mainProcessor == null) ? null : mainProcessor.getPath().first().getFilename();
-		return new HealthcheckInfo(hostName, mainProcessorFilename, errors);
+		return new HealthcheckInfo(hostName, mainProcessorFile, ((mainProcessor != null) && mainProcessor.started()));
 	}
 
 	public AlertService getAlertService() {

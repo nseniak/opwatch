@@ -2,41 +2,41 @@ package com.untrackr.alerter.service;
 
 public class HealthcheckInfo {
 
-	private String hostName;
-	private String runningProcessor;
-	private boolean errors;
+	private String hostname;
+	private String main;
+	private boolean running;
 
 	private HealthcheckInfo() {
 	}
 
-	public HealthcheckInfo(String hostName, String runningProcessor, boolean errors) {
-		this.hostName = hostName;
-		this.runningProcessor = runningProcessor;
-		this.errors = errors;
+	public HealthcheckInfo(String hostname, String main, boolean running) {
+		this.hostname = hostname;
+		this.main = main;
+		this.running = running;
 	}
 
-	public String getHostName() {
-		return hostName;
+	public String getHostname() {
+		return hostname;
 	}
 
-	public void setHostName(String hostName) {
-		this.hostName = hostName;
+	public void setHostname(String hostname) {
+		this.hostname = hostname;
 	}
 
-	public String getRunningProcessor() {
-		return runningProcessor;
+	public String getMain() {
+		return main;
 	}
 
-	public void setRunningProcessor(String runningProcessor) {
-		this.runningProcessor = runningProcessor;
+	public void setMain(String main) {
+		this.main = main;
 	}
 
-	public boolean isErrors() {
-		return errors;
+	public boolean isRunning() {
+		return running;
 	}
 
-	public void setErrors(boolean errors) {
-		this.errors = errors;
+	public void setRunning(boolean running) {
+		this.running = running;
 	}
 
 }
