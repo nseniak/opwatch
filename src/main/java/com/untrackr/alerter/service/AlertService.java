@@ -4,12 +4,14 @@ import com.google.common.collect.EvictingQueue;
 import com.untrackr.alerter.model.common.Alert;
 import com.untrackr.alerter.model.common.PushoverKey;
 import net.pushover.client.*;
+import org.apache.commons.math3.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.io.StringWriter;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -26,6 +28,11 @@ public class AlertService {
 	private EvictingQueue<Alert> sentAlertQueue;
 
 	private boolean alertQueueFullErrorSignaled = false;
+
+	public static int MAX_TITLE_LENGTH = 250;
+	public static int MAX_MESSAGE_LENGTH = 1024;
+	private static final int MAX_DATA_ITEM_LENGTH = 120;
+	private static final String FIELD_DELIMITER = "\n--\n";
 
 	@PostConstruct
 	public void initializeAlertQueue() {
@@ -49,11 +56,10 @@ public class AlertService {
 			}
 		}
 		alertQueueFullErrorSignaled = false;
-		logger.info("Sending alert: " + alert.toString());
 		MessagePriority priority = MessagePriority.EMERGENCY;
 		String prefix = "";
 		switch (alert.getPriority()) {
-			case low:
+			case info:
 				priority = MessagePriority.LOW;
 				prefix = "Info: ";
 				break;
@@ -80,9 +86,35 @@ public class AlertService {
 				expire = profileService.profile().getDefaultEmergencyExpire();
 			}
 		}
-		String message = !alert.getMessage().trim().isEmpty() ? alert.getMessage() : "--";
-		String title = prefix + alert.getTitle();
+		String title = truncate(prefix + alert.getTitle(), MAX_TITLE_LENGTH);
+		logger.info("Sending alert: " + title);
+		StringWriter writer = new StringWriter();
+		if (alert.getMessage() != null) {
+			writer.append(alert.getMessage()).append(FIELD_DELIMITER);
+			logger.info("   message: " + alert.getMessage());
+		}
+		if (alert.getData() != null) {
+			for (Pair<String, String> pair : alert.getData()) {
+				String key = pair.getKey();
+				String value = pair.getValue();
+				logger.info("   " + key + ": " + value);
+				writer.append(key).append(": ").append(truncate(value, MAX_DATA_ITEM_LENGTH)).append(FIELD_DELIMITER);
+			}
+		}
+		String message = writer.toString();
+		if (message.isEmpty()) {
+			message = "--";
+		}
+		message = truncate(message, MAX_MESSAGE_LENGTH);
 		send(title, message, priority, retry, expire);
+	}
+
+	private String truncate(String str, int length) {
+		if (str.length() <= length) {
+			return str;
+		} else {
+			return str.substring(0, Math.max(0, length - 3)) + "...";
+		}
 	}
 
 	private void send(String title, String message, MessagePriority priority, Integer retry, Integer expire) {

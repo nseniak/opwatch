@@ -7,6 +7,7 @@ import com.untrackr.alerter.common.InternalScriptError;
 import com.untrackr.alerter.common.ThreadUtil;
 import com.untrackr.alerter.ioservice.FileTailingService;
 import com.untrackr.alerter.model.common.Alert;
+import com.untrackr.alerter.model.common.AlertData;
 import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.processor.filter.print.Print;
 import com.untrackr.alerter.processor.producer.console.Console;
@@ -77,9 +78,6 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	private Processor mainProcessor;
 
 	private String mainProcessorFile;
-
-	private static final String DELIMITER = "\n--\n";
-	private static final int MAX_INPUT_LENGTH = 120;
 
 	private ThreadPoolExecutor consumerExecutor = new ThreadPoolExecutor(0, Integer.MAX_VALUE,
 			60L, TimeUnit.SECONDS, new SynchronousQueue<>(),
@@ -156,7 +154,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 				mainProcessor = null;
 			} else {
 				logger.info("Started");
-				Alert alert = new Alert(Alert.Priority.low, "Alerter running on " + getHostName(), "--");
+				Alert alert = new Alert(Alert.Priority.info, "Alerter up and running on " + getHostName());
 				alertService.alert(alert);
 			}
 		} catch (Throwable t) {
@@ -183,86 +181,78 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	}
 
 	public void displayValidationError(ValidationError e) {
-		StringWriter builder = new StringWriter();
+		String title = "Alerter startup error";
+		String message = e.getLocalizedMessage();
+		AlertData data = new AlertData();
 		IncludePath path = e.getPath();
-		String location = ((path == null) || path.isEmpty()) ? "" : path.pathDescriptor() + ": ";
-		builder.append(location);
-		builder.append("error: ").append(e.getLocalizedMessage());
-		builder.append(DELIMITER);
-		builder.append("Hostname:\n").append(getHostName()).append(DELIMITER);
+		if ((path != null) && !path.isEmpty()) {
+			data.add("location", path.pathDescriptor());
+		}
+		data.add("hostname", getHostName());
 		Throwable c = e.getCause();
 		if ((c != null) && !((c instanceof IOException) || (c instanceof PatternSyntaxException))) {
-			builder.append("Stack trace:\n");
-			e.printStackTrace(new PrintWriter(builder));
-			builder.append(DELIMITER);
+			addStack(data, e);
 		}
 		if (c == null) {
-			logger.error(location + e.getLocalizedMessage());
+			logger.error(title);
 		} else {
-			logger.error(location + e.getLocalizedMessage(), c);
+			logger.error(title, c);
 		}
-		String message = builder.toString();
-		Alert alert = new Alert(Alert.Priority.emergency, "Alerter startup error: " + e.getLocalizedMessage(), message);
+		Alert alert = new Alert(Alert.Priority.emergency, title, message, data);
 		alertService.alert(alert);
 	}
 
 	public void processorAlert(Alert.Priority priority, String title, Payload payload, Processor consumer) {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Hostname:\n").append(getHostName()).append(DELIMITER);
-		builder.append("Alert path:\n").append(payload.pathDescriptor(consumer)).append(DELIMITER);
-		builder.append("Input:\n").append(truncate(payload.asText(), MAX_INPUT_LENGTH)).append(DELIMITER);
-		Alert alert = new Alert(priority, title, builder.toString());
+		AlertData data = new AlertData();
+		data.add("hostname", getHostName());
+		data.add("source", payload.pathDescriptor(consumer));
+		data.add("input", payload.asText());
+		Alert alert = new Alert(priority, title, null, data);
 		alertService.alert(alert);
 	}
 
 	public void displayRuntimeError(RuntimeProcessorError e) {
-		StringWriter builder = new StringWriter();
-		builder.append("Hostname:\n").append(getHostName()).append(DELIMITER);
-		builder.append("Error:\n").append(e.getLocalizedMessage()).append(DELIMITER);
+		String title = "Execution error";
+		String message = e.getLocalizedMessage();
+		AlertData data = new AlertData();
+		data.add("hostname", getHostName());
 		Processor processor = e.getProcessor();
 		Payload payload = e.getPayload();
 		String location = (payload == null) ? processor.pathDescriptor() : payload.pathDescriptor(processor);
-		builder.append("Processor:\n").append(location).append(DELIMITER);
+		data.add("location", location);
 		if (payload != null) {
-			builder.append("Input:\n").append(truncate(payload.asText(), MAX_INPUT_LENGTH)).append(DELIMITER);
+			data.add("input", payload.asText());
 		}
 		if ((e.getCause() != null) && !((e.getCause() instanceof IOException) || (e.getCause() instanceof ScriptException) || (e.getCause() instanceof InternalScriptError))) {
-			builder.append("Stack trace:\n");
-			e.printStackTrace(new PrintWriter(builder));
-			builder.append(DELIMITER);
+			addStack(data, e);
 		}
-		logger.error(location + ": " + e.getLocalizedMessage(), e);
-		String message = builder.toString();
-		Alert alert = new Alert(Alert.Priority.emergency, "Error: " + e.getLocalizedMessage(), message);
+		logger.error(title, e);
+		Alert alert = new Alert(Alert.Priority.emergency, title, message, data);
 		alertService.alert(alert);
-	}
-
-	private String truncate(String str, int length) {
-		if (str.length() <= length) {
-			return str;
-		} else {
-			return str.substring(0, Math.max(0, length - 3)) + "...";
-		}
 	}
 
 	public void infrastructureAlert(Alert.Priority priority, String title, String details) {
 		infrastructureAlert(priority, title, details, null);
 	}
 
-	public void infrastructureAlert(Alert.Priority priority, String title, String details, Throwable t) {
-		String prefixedTitle = "Infrastructure error: " + title;
-		StringWriter builder = new StringWriter();
-		builder.append("Hostname:\n").append(getHostName()).append(DELIMITER);
-		builder.append("Details:\n").append(details).append(DELIMITER);
+	public void infrastructureAlert(Alert.Priority priority, String message, String details, Throwable t) {
+		String title = "Internal error";
+		AlertData data = new AlertData();
+		data.add("hostname", getHostName());
+		data.add("details", details);
+		String logMessage = message + ": " + details;
 		if (t != null) {
-			logger.error(prefixedTitle + ": " + builder.toString(), t);
-			builder.append("Stack trace:\n");
-			t.printStackTrace(new PrintWriter(builder));
-			builder.append(DELIMITER);
+			addStack(data, t);
 		} else {
-			logger.error(prefixedTitle + ": " + builder.toString());
+			logger.error(logMessage);
 		}
-		alertService.alert(new Alert(priority, prefixedTitle, builder.toString()));
+		alertService.alert(new Alert(priority, title, message, data));
+	}
+
+	private void addStack(AlertData data, Throwable t) {
+		StringWriter writer = new StringWriter();
+		t.printStackTrace(new PrintWriter(writer));
+		data.add("stack", writer.toString());
 	}
 
 	public boolean withErrorHandling(Processor processor, Payload payload, Runnable runnable) {

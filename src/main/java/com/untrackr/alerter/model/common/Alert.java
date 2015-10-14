@@ -2,12 +2,9 @@ package com.untrackr.alerter.model.common;
 
 public class Alert {
 
-	public static int MAX_TITLE_LENGTH = 250;
-	public static int MAX_MESSAGE_LENGTH = 1024;
-
 	public enum Priority {
 
-		low(0),
+		info(0),
 		normal(1),
 		high(2),
 		emergency(3);
@@ -27,33 +24,20 @@ public class Alert {
 	private Priority priority;
 	private String title;
 	private String message;
+	private AlertData data;
 	private Integer retry;
 	private Integer expire;
 	private long timestamp;
 
-	public Alert(Priority priority, String title, String message) {
+	public Alert(Priority priority, String title, String message, AlertData data) {
 		this.priority = priority;
-		this.title = truncate(title, MAX_TITLE_LENGTH);
-		this.message = truncate(message, MAX_MESSAGE_LENGTH);
+		this.title = title;
+		this.message = message;
+		this.data = data;
 	}
 
-	private String truncate(String str, int maxLength) {
-		if (str.length() <= maxLength) {
-			return str;
-		} else {
-			return str.substring(0, Math.min(str.length(), maxLength));
-		}
-	}
-
-	@Override
-	public String toString() {
-		return "Alert{" +
-				"priority=" + priority +
-				", title='" + title + '\'' +
-				", message='" + message.replace('\n', ' ') + '\'' +
-				", retry=" + retry +
-				", expire=" + expire +
-				'}';
+	public Alert(Priority priority, String title) {
+		this(priority, title, null, null);
 	}
 
 	public Priority getPriority() {
@@ -102,6 +86,14 @@ public class Alert {
 
 	public void setTimestamp(long sentOn) {
 		this.timestamp = sentOn;
+	}
+
+	public AlertData getData() {
+		return data;
+	}
+
+	public void setData(AlertData data) {
+		this.data = data;
 	}
 
 }
