@@ -60,7 +60,7 @@ public class AlertService {
 		String prefix = "";
 		if (alert.isEnd()) {
 			priority = MessagePriority.LOW;
-			prefix = "End: ";
+			prefix = "End of Alert: ";
 		} else {
 			switch (alert.getPriority()) {
 				case info:
