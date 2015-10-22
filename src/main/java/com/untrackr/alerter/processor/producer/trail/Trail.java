@@ -36,6 +36,7 @@ public class Trail extends ScheduledProducer {
 	public void doStart() {
 		createConsumerThread();
 		startupTimestamp = System.currentTimeMillis();
+		super.doStart();
 	}
 
 	@Override
