@@ -8,6 +8,8 @@ import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ValidationError;
 import com.untrackr.alerter.service.ProcessorService;
 
+import javax.script.CompiledScript;
+
 public class AlertGeneratorFactory extends ActiveProcessorFactory {
 
 	public AlertGeneratorFactory(ProcessorService processorService) {
@@ -30,7 +32,10 @@ public class AlertGeneratorFactory extends ActiveProcessorFactory {
 			throw new ValidationError("bad alert priority: \"" + priorityName + "\"", path, jsonDescriptor);
 		}
 		String title = checkFieldValue(path, jsonDescriptor, "title", descriptor.getTitle());
-		AlertGenerator alertGenerator = new AlertGenerator(getProcessorService(), path, title, priority);
+		String conditionSource = optionalFieldValue(path, jsonDescriptor, "condition", descriptor.getCondition(), null);
+		CompiledScript conditionScript = (conditionSource == null) ? null : compileScript(path, jsonDescriptor, "test", conditionSource);
+		boolean toggle = optionalFieldValue(path, jsonDescriptor, "toggle", descriptor.getToggle(), false);
+		AlertGenerator alertGenerator = new AlertGenerator(getProcessorService(), path, title, priority, conditionScript, toggle);
 		initialize(alertGenerator, descriptor);
 		return alertGenerator;
 	}

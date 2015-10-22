@@ -22,6 +22,7 @@ public abstract class ActiveProcessor extends Processor {
 	private long lastOutputTime = 0;
 	private String name;
 	protected boolean started;
+	boolean nonBooleanValueErrorSignaled;
 
 	public ActiveProcessor(ProcessorService processorService, IncludePath path) {
 		super(processorService, path);
@@ -184,6 +185,22 @@ public abstract class ActiveProcessor extends Processor {
 			return value.eval(bindings);
 		} catch (ScriptException e) {
 			throw new RuntimeProcessorError(e, this, payload);
+		}
+	}
+
+	public boolean scriptBooleanValue(CompiledScript value, Bindings bindings, Payload payload) {
+		Object result = runScript(value, bindings, payload);
+		if (result == Boolean.TRUE) {
+			return true;
+		} else if (result == Boolean.FALSE) {
+			return false;
+		} else {
+			if (nonBooleanValueErrorSignaled) {
+				return false;
+			} else {
+				nonBooleanValueErrorSignaled = true;
+				throw new RuntimeProcessorError("test returned a non-boolean value: " + processorService.valueAsString(result), this, payload);
+			}
 		}
 	}
 

@@ -6,6 +6,8 @@ public class AlertGeneratorDesc extends ActiveProcessorDesc {
 
 	private String priority;
 	private String title;
+	private String condition;
+	private Boolean toggle;
 
 	public String getPriority() {
 		return priority;
@@ -21,6 +23,22 @@ public class AlertGeneratorDesc extends ActiveProcessorDesc {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public String getCondition() {
+		return condition;
+	}
+
+	public void setCondition(String condition) {
+		this.condition = condition;
+	}
+
+	public Boolean getToggle() {
+		return toggle;
+	}
+
+	public void setToggle(Boolean toggle) {
+		this.toggle = toggle;
 	}
 
 }

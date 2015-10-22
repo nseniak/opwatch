@@ -203,12 +203,23 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	}
 
 	public void processorAlert(Alert.Priority priority, String title, Payload payload, Processor consumer) {
+		Alert alert = makeAlert(priority, title, payload, consumer);
+		alertService.alert(alert);
+	}
+
+	public void processorAlertEnd(Alert.Priority priority, String title, Payload payload, Processor consumer) {
+		Alert alert = makeAlert(priority, title, payload, consumer);
+		alert.setEnd(true);
+		alertService.alert(alert);
+	}
+
+	private Alert makeAlert(Alert.Priority priority, String title, Payload payload, Processor consumer) {
 		AlertData data = new AlertData();
 		data.add("hostname", getHostName());
 		data.add("source", payload.pathDescriptor(consumer));
 		data.add("input", payload.asText());
 		Alert alert = new Alert(priority, title, null, data);
-		alertService.alert(alert);
+		return alert;
 	}
 
 	public void displayRuntimeError(RuntimeProcessorError e) {

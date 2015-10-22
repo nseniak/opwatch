@@ -58,32 +58,41 @@ public class AlertService {
 		alertQueueFullErrorSignaled = false;
 		MessagePriority priority = MessagePriority.EMERGENCY;
 		String prefix = "";
-		switch (alert.getPriority()) {
-			case info:
-				priority = MessagePriority.LOW;
-				prefix = "Info: ";
-				break;
-			case normal:
-				priority = MessagePriority.NORMAL;
-				prefix = "Alert(NORMAL): ";
-				break;
-			case high:
-				priority = MessagePriority.HIGH;
-				prefix = "Alert(HIGH): ";
-				break;
-			case emergency:
-				priority = MessagePriority.EMERGENCY;
-				prefix = "EMERGENCY: ";
-				break;
-		}
-		Integer retry = alert.getRetry();
-		Integer expire = alert.getExpire();
-		if (priority == MessagePriority.EMERGENCY) {
-			if (retry == null) {
-				retry = profileService.profile().getDefaultEmergencyRetry();
+		if (alert.isEnd()) {
+			priority = MessagePriority.LOW;
+			prefix = "End: ";
+		} else {
+			switch (alert.getPriority()) {
+				case info:
+					priority = MessagePriority.LOW;
+					prefix = "Info: ";
+					break;
+				case normal:
+					priority = MessagePriority.NORMAL;
+					prefix = "Alert(NORMAL): ";
+					break;
+				case high:
+					priority = MessagePriority.HIGH;
+					prefix = "Alert(HIGH): ";
+					break;
+				case emergency:
+					priority = MessagePriority.EMERGENCY;
+					prefix = "EMERGENCY: ";
+					break;
 			}
-			if (expire == null) {
-				expire = profileService.profile().getDefaultEmergencyExpire();
+		}
+		Integer retry = null;
+		Integer expire = null;
+		if (!alert.isEnd()) {
+			retry = alert.getRetry();
+			expire = alert.getExpire();
+			if (priority == MessagePriority.EMERGENCY) {
+				if (retry == null) {
+					retry = profileService.profile().getDefaultEmergencyRetry();
+				}
+				if (expire == null) {
+					expire = profileService.profile().getDefaultEmergencyExpire();
+				}
 			}
 		}
 		String title = truncate(prefix + alert.getTitle(), MAX_TITLE_LENGTH);

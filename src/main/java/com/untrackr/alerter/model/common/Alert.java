@@ -28,6 +28,7 @@ public class Alert {
 	private Integer retry;
 	private Integer expire;
 	private long timestamp;
+	private boolean end;
 
 	public Alert(Priority priority, String title, String message, AlertData data) {
 		this.priority = priority;
@@ -94,6 +95,14 @@ public class Alert {
 
 	public void setData(AlertData data) {
 		this.data = data;
+	}
+
+	public boolean isEnd() {
+		return end;
+	}
+
+	public void setEnd(boolean end) {
+		this.end = end;
 	}
 
 }
