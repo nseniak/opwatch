@@ -28,6 +28,16 @@ public class ApiController {
 		processorService.startMainProcessor();
 	}
 
+	@RequestMapping(value = "/trace/start", method = RequestMethod.POST)
+	public void startTrace() {
+		processorService.getProfileService().profile().setTrace(true);
+	}
+
+	@RequestMapping(value = "/trace/stop", method = RequestMethod.POST)
+	public void stopTrace() {
+		processorService.getProfileService().profile().setTrace(false);
+	}
+
 	@RequestMapping(value = "/exit", method = RequestMethod.POST)
 	public void stop() {
 		processorService.exit();
