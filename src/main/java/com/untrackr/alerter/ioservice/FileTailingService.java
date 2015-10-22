@@ -60,6 +60,8 @@ public class FileTailingService implements DisposableBean {
 	public void tailFile(TailedFile tailedFile) {
 		try {
 			tailedFile.tail();
+		} catch (InterruptedException e) {
+			// Nothing to do: the tailed is being stopped
 		} catch (Throwable t) {
 			processorService.infrastructureAlert(Alert.Priority.emergency, "Exception while tailing file", tailedFile.getFile().toString(), t);
 		}
