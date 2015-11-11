@@ -9,9 +9,13 @@ public class GrepDesc extends ConditionalAlertGeneratorDesc {
 	 */
 	private String field;
 	/**
-	 * Regex
+	 * Regex. Mutually exclusive with regexes.
 	 */
 	private String regex;
+	/**
+	 * List of regexes. Mutually exclusive with regex.
+	 */
+	private String[] regexes;
 	/**
 	 * Exclude regex. Defaults to false.
 	 */
@@ -31,6 +35,14 @@ public class GrepDesc extends ConditionalAlertGeneratorDesc {
 
 	public void setRegex(String regex) {
 		this.regex = regex;
+	}
+
+	public String[] getRegexes() {
+		return regexes;
+	}
+
+	public void setRegexes(String[] regexes) {
+		this.regexes = regexes;
 	}
 
 	public Boolean getInvert() {

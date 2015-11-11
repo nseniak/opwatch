@@ -38,7 +38,7 @@ public class Curl extends ScheduledProducer {
 		factory.setConnectTimeout(connectTimeout);
 		factory.setReadTimeout(readTimeout);
 		RestTemplate template = new RestTemplate(factory);
-		Response result = new Response();
+		Response result = new Response(processorService);
 		result.url = uri.toString();
 		try {
 			ResponseEntity<String> response = template.getForEntity(uri, String.class);
@@ -79,6 +79,10 @@ public class Curl extends ScheduledProducer {
 		private String text;
 		private Object json;
 		private String error;
+
+		public Response(ProcessorService processorService) {
+			super(processorService);
+		}
 
 		public String getUrl() {
 			return url;

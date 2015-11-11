@@ -17,7 +17,7 @@ public class Top extends ScheduledProducer {
 
 	@Override
 	protected void produce() {
-		TopInfo info = new TopInfo();
+		TopInfo info = new TopInfo(processorService);
 		OperatingSystemMXBean osBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
 		info.loadAverage = osBean.getSystemLoadAverage();
 		info.totalSwapSpace = osBean.getTotalSwapSpaceSize();
@@ -34,6 +34,10 @@ public class Top extends ScheduledProducer {
 		private long freeSwapSpace;
 		private long totalPhysicalMemory;
 		private long freePhysicalMemory;
+
+		public TopInfo(ProcessorService processorService) {
+			super(processorService);
+		}
 
 		public double getLoadAverage() {
 			return loadAverage;

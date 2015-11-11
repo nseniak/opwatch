@@ -50,7 +50,7 @@ public class ConsoleService {
 			try {
 				while ((line = reader.readLine()) != null) {
 					lineNumber = lineNumber + 1;
-					ConsoleLine consoleLine = new ConsoleLine(line, lineNumber);
+					ConsoleLine consoleLine = new ConsoleLine(processorService, line, lineNumber);
 					for (ConsoleLineConsumer consumer : consumers) {
 						consumer.consume(consoleLine);
 					}
@@ -72,7 +72,8 @@ public class ConsoleService {
 		private String text;
 		private int line;
 
-		public ConsoleLine(String text, int line) {
+		public ConsoleLine(ProcessorService processorService, String text, int line) {
+			super(processorService);
 			this.text = text;
 			this.line = line;
 		}

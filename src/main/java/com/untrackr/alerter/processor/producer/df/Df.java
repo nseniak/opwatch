@@ -21,7 +21,7 @@ public class Df extends ScheduledProducer {
 
 	@Override
 	protected void produce() {
-		PartitionInfo info = new PartitionInfo();
+		PartitionInfo info = new PartitionInfo(processorService);
 		info.file = file.getAbsolutePath();
 		if (!file.exists()) {
 			if (fileNotFoundErrorSignaled) {
@@ -54,6 +54,10 @@ public class Df extends ScheduledProducer {
 		private Long used;
 		private Long available;
 		private Double percentUsed;
+
+		public PartitionInfo(ProcessorService processorService) {
+			super(processorService);
+		}
 
 		public String getFile() {
 			return file;

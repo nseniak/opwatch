@@ -20,7 +20,7 @@ public class Stat extends ScheduledProducer {
 
 	@Override
 	protected void produce() {
-		FileInfo info = new FileInfo();
+		FileInfo info = new FileInfo(processorService);
 		info.file = file.getAbsolutePath();
 		if (!file.exists()) {
 			info.exists = false;
@@ -43,6 +43,10 @@ public class Stat extends ScheduledProducer {
 		private boolean exists;
 		private Long size;
 		private Date lastModified;
+
+		public FileInfo(ProcessorService processorService) {
+			super(processorService);
+		}
 
 		public String getFile() {
 			return file;
