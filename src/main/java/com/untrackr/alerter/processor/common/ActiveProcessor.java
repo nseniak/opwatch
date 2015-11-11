@@ -170,7 +170,7 @@ public abstract class ActiveProcessor extends Processor {
 		}
 		Object value = ((Map) jsonObject).get(fieldName);
 		if (value == null) {
-			throw new RuntimeProcessorError("mising field value \"" + fieldName + "\"", this, input);
+			throw new RuntimeProcessorError("missing field value \"" + fieldName + "\"", this, input);
 		}
 		if (!clazz.isAssignableFrom(value.getClass())) {
 			throw new RuntimeProcessorError("wrong type for field \"" + fieldName + "\"", this, input);
