@@ -8,6 +8,8 @@ import com.untrackr.alerter.service.ProcessorService;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.format.DateTimeParseException;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public abstract class ProcessorFactory {
 
@@ -68,6 +70,14 @@ public abstract class ProcessorFactory {
 			return ApplicationUtil.substituteVariables(text);
 		} catch (UndefinedSubstitutionVariable e) {
 			throw new ValidationError("unknown variable in " + type() + " field \"" + field + "\": " + e.getName(), path, descriptor);
+		}
+	}
+
+	public Pattern compilePattern(IncludePath path, JsonDescriptor description, String field, String regex) throws ValidationError {
+		try {
+			return Pattern.compile(regex);
+		} catch (PatternSyntaxException e) {
+			throw new ValidationError(e, path, description);
 		}
 	}
 

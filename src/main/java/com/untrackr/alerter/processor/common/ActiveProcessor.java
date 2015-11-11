@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import javax.script.Bindings;
 import javax.script.CompiledScript;
 import javax.script.ScriptException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -165,10 +166,18 @@ public abstract class ActiveProcessor extends Processor {
 
 	public <T> T payloadFieldValue(Payload input, String fieldName, Class<T> clazz) {
 		Object jsonObject = input.getJsonObject();
-		if (!(jsonObject instanceof Map)) {
-			throw new RuntimeProcessorError("cannot get field value \"" + fieldName + "\" from non-object", this, input);
+		Object value = null;
+		if (jsonObject instanceof Map) {
+			value = ((Map) jsonObject).get(fieldName);
+		} else {
+			try {
+				Field field = jsonObject.getClass().getDeclaredField(fieldName);
+				field.setAccessible(true);
+				value = field.get(jsonObject);
+			} catch (NoSuchFieldException | IllegalAccessException e) {
+				// Do nothing
+			}
 		}
-		Object value = ((Map) jsonObject).get(fieldName);
 		if (value == null) {
 			throw new RuntimeProcessorError("missing field value \"" + fieldName + "\"", this, input);
 		}
