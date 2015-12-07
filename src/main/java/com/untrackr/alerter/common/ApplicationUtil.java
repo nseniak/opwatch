@@ -1,7 +1,9 @@
 package com.untrackr.alerter.common;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,6 +19,12 @@ public class ApplicationUtil {
 	public static String environmentVariable(String name) {
 		checkEnvironmentVariable(name);
 		return System.getenv(name);
+	}
+
+	public static <T> T  jsonEnvironmentVariable(String name, Class<T> clazz) throws IOException {
+		String jsonString = environmentVariable(name);
+		ObjectMapper objectMapper = new ObjectMapper();
+		return objectMapper.readValue(jsonString, clazz);
 	}
 
 	public static String environmentVariable(String name, String defaultValue) {
@@ -37,6 +45,12 @@ public class ApplicationUtil {
 	public static String property(String name) {
 		checkProperty(name);
 		return System.getProperty(name);
+	}
+
+	public static <T> T objectProperty(String name, Class<T> clazz) throws IOException {
+		String jsonString = property(name);
+		ObjectMapper objectMapper = new ObjectMapper();
+		return objectMapper.readValue(jsonString, clazz);
 	}
 
 	public static String property(String name, String defaultValue) {

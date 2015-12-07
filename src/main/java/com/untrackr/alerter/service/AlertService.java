@@ -3,6 +3,7 @@ package com.untrackr.alerter.service;
 import com.google.common.collect.EvictingQueue;
 import com.untrackr.alerter.model.common.Alert;
 import com.untrackr.alerter.model.common.PushoverKey;
+import com.untrackr.alerter.model.common.PushoverSettings;
 import net.pushover.client.*;
 import org.apache.commons.math3.util.Pair;
 import org.slf4j.Logger;
@@ -28,6 +29,7 @@ public class AlertService {
 	private EvictingQueue<Alert> sentAlertQueue;
 
 	private boolean alertQueueFullErrorSignaled = false;
+	private PushoverKey pushoverKey;
 
 	public static int MAX_TITLE_LENGTH = 250;
 	public static int MAX_MESSAGE_LENGTH = 1024;
@@ -37,6 +39,14 @@ public class AlertService {
 	@PostConstruct
 	public void initializeAlertQueue() {
 		sentAlertQueue = EvictingQueue.create(profileService.profile().getMaxAlertsPerMinute());
+	}
+
+	@PostConstruct
+	public void initializePushoverKey() {
+		PushoverSettings settings = profileService.profile().getPushoverSettings();
+		String applicationName = profileService.profile().getDefaultPushoverApplication();
+		String groupName = profileService.profile().getDefaultPushoverGroup();
+		pushoverKey = settings.makeKey(applicationName, groupName);
 	}
 
 	public synchronized void alert(Alert alert) {
@@ -131,9 +141,8 @@ public class AlertService {
 			logger.warn("Test mode: Alert not sent");
 			return;
 		}
-		PushoverKey key = profileService.profile().getPushoverKey();
-		PushoverMessage msg = PushoverMessage.builderWithApiToken(key.getApiToken())
-				.setUserId(key.getUserId())
+		PushoverMessage msg = PushoverMessage.builderWithApiToken(pushoverKey.getApiToken())
+				.setUserId(pushoverKey.getUserKey())
 				.setTitle(title)
 				.setMessage(message)
 				.setPriority(priority)

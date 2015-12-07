@@ -2,13 +2,16 @@ package com.untrackr.alerter.model.common;
 
 import com.untrackr.alerter.common.ApplicationUtil;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 public class AlerterProfile {
 
 	private long fileWatchingCheckDelay;
 	private long executorTerminationTimeout;
-	private PushoverKey pushoverKey;
+	private PushoverSettings pushoverSettings;
+	private String defaultPushoverApplication;
+	private String defaultPushoverGroup;
 	private long tailedFileWatchingCheckDelay;
 	private long tailPollInterval;
 	private Integer defaultEmergencyRetry;
@@ -28,14 +31,12 @@ public class AlerterProfile {
 	private long cronScriptOutputCheckDelay;
 	private long cronCommandExitTimeout;
 
-	public AlerterProfile() {
+	public AlerterProfile() throws IOException {
 		this.fileWatchingCheckDelay = TimeUnit.SECONDS.toMillis(1);
 		this.executorTerminationTimeout = TimeUnit.SECONDS.toMillis(30);
-		// Key for Trackbuster app/Trackbuster dev group
-		this.pushoverKey = new PushoverKey(
-				ApplicationUtil.environmentVariable("PUSHOVER_API_TOKEN"),
-				ApplicationUtil.environmentVariable("PUSHOVER_USER_ID")
-		);
+		this.pushoverSettings = ApplicationUtil.jsonEnvironmentVariable("PUSHOVER_SETTINGS", PushoverSettings.class);
+		this.defaultPushoverApplication = ApplicationUtil.property("alerter.pushover.application");
+		this.defaultPushoverGroup = ApplicationUtil.property("alerter.pushover.group");
 		this.tailedFileWatchingCheckDelay = TimeUnit.SECONDS.toMillis(1);
 		this.tailPollInterval = TimeUnit.MILLISECONDS.toMillis(500);
 		this.defaultEmergencyRetry = 60;
@@ -72,12 +73,28 @@ public class AlerterProfile {
 		this.executorTerminationTimeout = executorTerminationTimeout;
 	}
 
-	public PushoverKey getPushoverKey() {
-		return pushoverKey;
+	public PushoverSettings getPushoverSettings() {
+		return pushoverSettings;
 	}
 
-	public void setPushoverKey(PushoverKey pushoverKey) {
-		this.pushoverKey = pushoverKey;
+	public void setPushoverSettings(PushoverSettings pushoverSettings) {
+		this.pushoverSettings = pushoverSettings;
+	}
+
+	public String getDefaultPushoverApplication() {
+		return defaultPushoverApplication;
+	}
+
+	public void setDefaultPushoverApplication(String defaultPushoverApplication) {
+		this.defaultPushoverApplication = defaultPushoverApplication;
+	}
+
+	public String getDefaultPushoverGroup() {
+		return defaultPushoverGroup;
+	}
+
+	public void setDefaultPushoverGroup(String defaultPushoverGroup) {
+		this.defaultPushoverGroup = defaultPushoverGroup;
 	}
 
 	public long getTailedFileWatchingCheckDelay() {

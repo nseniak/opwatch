@@ -4,6 +4,7 @@ import com.untrackr.alerter.model.common.AlerterProfile;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 
 @Service
 public class ProfileService {
@@ -11,7 +12,7 @@ public class ProfileService {
 	private AlerterProfile alerterProfile;
 
 	@PostConstruct
-	public void initAlerter() {
+	public void initAlerter() throws IOException {
 		alerterProfile = new AlerterProfile();
 	}
 
