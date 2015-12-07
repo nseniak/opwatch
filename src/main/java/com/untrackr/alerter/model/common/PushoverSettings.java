@@ -1,5 +1,8 @@
 package com.untrackr.alerter.model.common;
 
+import com.untrackr.alerter.processor.common.IncludePath;
+import com.untrackr.alerter.processor.common.ValidationError;
+
 import java.util.List;
 
 public class PushoverSettings {
@@ -12,7 +15,7 @@ public class PushoverSettings {
 		if (application == null) {
 			throw new RuntimeException("Pushover application not found: " + applicationName);
 		}
-		Group group = findGroup(groupName);
+		PushoverSettings.Group group = findGroup(groupName);
 		if (group == null) {
 			throw new RuntimeException("Pushover group not found: " + groupName);
 		}

@@ -2,6 +2,7 @@ package com.untrackr.alerter.processor.consumer.alert;
 
 import com.untrackr.alerter.model.common.Alert;
 import com.untrackr.alerter.model.common.JsonDescriptor;
+import com.untrackr.alerter.model.common.PushoverKey;
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
 import com.untrackr.alerter.processor.common.IncludePath;
 import com.untrackr.alerter.processor.common.Processor;
@@ -35,9 +36,20 @@ public class AlertGeneratorFactory extends ActiveProcessorFactory {
 		String conditionSource = optionalFieldValue(path, jsonDescriptor, "condition", descriptor.getCondition(), null);
 		CompiledScript conditionScript = (conditionSource == null) ? null : compileScript(path, jsonDescriptor, "test", conditionSource);
 		boolean toggle = optionalFieldValue(path, jsonDescriptor, "toggle", descriptor.getToggle(), false);
-		AlertGenerator alertGenerator = new AlertGenerator(getProcessorService(), path, title, priority, conditionScript, toggle);
+		String applicationName = optionalFieldValue(path, jsonDescriptor, "application", descriptor.getApplication(), processorService.profile().getDefaultPushoverApplication());
+		String groupName = optionalFieldValue(path, jsonDescriptor, "group", descriptor.getGroup(), processorService.profile().getDefaultPushoverGroup());
+		PushoverKey pushoverKey = makeKey(applicationName, groupName, jsonDescriptor, path);
+		AlertGenerator alertGenerator = new AlertGenerator(getProcessorService(), path, pushoverKey, title, priority, conditionScript, toggle) ;
 		initialize(alertGenerator, descriptor);
 		return alertGenerator;
+	}
+
+	public PushoverKey makeKey(String applicationName, String groupName, JsonDescriptor jsonDescriptor, IncludePath path) {
+		try {
+			return processorService.profile().getPushoverSettings().makeKey(applicationName, groupName);
+		} catch (Throwable t) {
+			throw new ValidationError(t, path, jsonDescriptor);
+		}
 	}
 
 }

@@ -29,16 +29,18 @@ public class Alert {
 	private Integer expire;
 	private long timestamp;
 	private boolean end;
+	private PushoverKey pushoverKey;
 
-	public Alert(Priority priority, String title, String message, AlertData data) {
+	public Alert(PushoverKey pushoverKey, Priority priority, String title, String message, AlertData data) {
+		this.pushoverKey = pushoverKey;
 		this.priority = priority;
 		this.title = title;
 		this.message = message;
 		this.data = data;
 	}
 
-	public Alert(Priority priority, String title) {
-		this(priority, title, null, null);
+	public Alert(PushoverKey pushoverKey, Priority priority, String title) {
+		this(pushoverKey, priority, title, null, null);
 	}
 
 	public Priority getPriority() {
@@ -103,6 +105,14 @@ public class Alert {
 
 	public void setEnd(boolean end) {
 		this.end = end;
+	}
+
+	public PushoverKey getPushoverKey() {
+		return pushoverKey;
+	}
+
+	public void setPushoverKey(PushoverKey pushoverKey) {
+		this.pushoverKey = pushoverKey;
 	}
 
 }

@@ -29,7 +29,7 @@ public class AlertService {
 	private EvictingQueue<Alert> sentAlertQueue;
 
 	private boolean alertQueueFullErrorSignaled = false;
-	private PushoverKey pushoverKey;
+	private PushoverKey defaultPushoverKey;
 
 	public static int MAX_TITLE_LENGTH = 250;
 	public static int MAX_MESSAGE_LENGTH = 1024;
@@ -46,12 +46,13 @@ public class AlertService {
 		PushoverSettings settings = profileService.profile().getPushoverSettings();
 		String applicationName = profileService.profile().getDefaultPushoverApplication();
 		String groupName = profileService.profile().getDefaultPushoverGroup();
-		pushoverKey = settings.makeKey(applicationName, groupName);
+		defaultPushoverKey = settings.makeKey(applicationName, groupName);
 	}
 
 	public synchronized void alert(Alert alert) {
 		alert.setTimestamp(System.currentTimeMillis());
 		sentAlertQueue.add(alert);
+		PushoverKey pushoverKey = alert.getPushoverKey();
 		int maxPerMinute = profileService.profile().getMaxAlertsPerMinute();
 		if (sentAlertQueue.size() == maxPerMinute) {
 			long elapsed = System.currentTimeMillis() - sentAlertQueue.peek().getTimestamp();
@@ -60,7 +61,7 @@ public class AlertService {
 					return;
 				}
 				alertQueueFullErrorSignaled = true;
-				send("Max alerts per minute reached on " + processorService.getHostName(), "Muting for a moment.\nMaximum per minute: " + maxPerMinute, MessagePriority.NORMAL, null, null);
+				send(pushoverKey, "Max alerts per minute reached on " + processorService.getHostName(), "Muting for a moment.\nMaximum per minute: " + maxPerMinute, MessagePriority.NORMAL, null, null);
 				logger.warn("Max alerts per minutes reached: Alert not sent");
 				return;
 			}
@@ -125,7 +126,7 @@ public class AlertService {
 			message = "--";
 		}
 		message = truncate(message, MAX_MESSAGE_LENGTH);
-		send(title, message, priority, retry, expire);
+		send(pushoverKey, title, message, priority, retry, expire);
 	}
 
 	private String truncate(String str, int length) {
@@ -136,7 +137,7 @@ public class AlertService {
 		}
 	}
 
-	private void send(String title, String message, MessagePriority priority, Integer retry, Integer expire) {
+	private void send(PushoverKey pushoverKey, String title, String message, MessagePriority priority, Integer retry, Integer expire) {
 		if (profileService.profile().isInteractive()) {
 			logger.warn("Test mode: Alert not sent");
 			return;
@@ -158,6 +159,10 @@ public class AlertService {
 		} catch (PushoverException e) {
 			logger.error("Exception while pushing to Pushover", e);
 		}
+	}
+
+	PushoverKey getDefaultPushoverKey() {
+		return defaultPushoverKey;
 	}
 
 }

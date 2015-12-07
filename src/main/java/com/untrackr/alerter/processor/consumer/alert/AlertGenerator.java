@@ -1,6 +1,7 @@
 package com.untrackr.alerter.processor.consumer.alert;
 
 import com.untrackr.alerter.model.common.Alert;
+import com.untrackr.alerter.model.common.PushoverKey;
 import com.untrackr.alerter.processor.common.IncludePath;
 import com.untrackr.alerter.processor.common.Payload;
 import com.untrackr.alerter.processor.consumer.Consumer;
@@ -17,15 +18,17 @@ public class AlertGenerator extends Consumer {
 	private boolean toggle;
 	private Bindings bindings;
 	private boolean toggleUp;
+	private PushoverKey pushoverKey;
 
 
-	public AlertGenerator(ProcessorService processorService, IncludePath path, String title, Alert.Priority priority,
-												CompiledScript condition, boolean toggle) {
+	public AlertGenerator(ProcessorService processorService, IncludePath path, PushoverKey pushoverKey, String title,
+												Alert.Priority priority, CompiledScript condition, boolean toggle) {
 		super(processorService, path);
 		this.priority = priority;
 		this.title = title;
 		this.condition = condition;
 		this.toggle = toggle;
+		this.pushoverKey = pushoverKey;
 		this.bindings = processorService.getNashorn().createBindings();
 	}
 
@@ -34,13 +37,13 @@ public class AlertGenerator extends Consumer {
 		boolean alert = (condition == null) || scriptBooleanValue(condition, bindings, payload);
 		if (!toggle) {
 			if (alert) {
-				processorService.processorAlert(priority, title, payload, this);
+				processorService.processorAlert(pushoverKey, priority, title, payload, this);
 			}
 		} else {
 			if (!toggleUp && alert) {
-				processorService.processorAlert(priority, title, payload, this);
+				processorService.processorAlert(pushoverKey, priority, title, payload, this);
 			} else if (toggleUp && !alert) {
-				processorService.processorAlertEnd(priority, title, payload, this);
+				processorService.processorAlertEnd(pushoverKey, priority, title, payload, this);
 			}
 			toggleUp = alert;
 		}

@@ -8,6 +8,8 @@ import com.untrackr.alerter.common.ThreadUtil;
 import com.untrackr.alerter.ioservice.FileTailingService;
 import com.untrackr.alerter.model.common.Alert;
 import com.untrackr.alerter.model.common.AlertData;
+import com.untrackr.alerter.model.common.AlerterProfile;
+import com.untrackr.alerter.model.common.PushoverKey;
 import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.processor.filter.print.Print;
 import com.untrackr.alerter.processor.producer.console.Console;
@@ -154,7 +156,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 				mainProcessor = null;
 			} else {
 				logger.info("Started");
-				Alert alert = new Alert(Alert.Priority.info, "Alerter up and running on " + getHostName());
+				Alert alert = new Alert(alertService.getDefaultPushoverKey(), Alert.Priority.info, "Alerter up and running on " + getHostName());
 				alertService.alert(alert);
 			}
 		} catch (Throwable t) {
@@ -198,27 +200,27 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		} else {
 			logger.error(title, c);
 		}
-		Alert alert = new Alert(Alert.Priority.emergency, title, message, data);
+		Alert alert = new Alert(alertService.getDefaultPushoverKey(), Alert.Priority.emergency, title, message, data);
 		alertService.alert(alert);
 	}
 
-	public void processorAlert(Alert.Priority priority, String title, Payload payload, Processor consumer) {
-		Alert alert = makeAlert(priority, title, payload, consumer);
+	public void processorAlert(PushoverKey pushoverKey, Alert.Priority priority, String title, Payload payload, Processor consumer) {
+		Alert alert = makeAlert(pushoverKey, priority, title, payload, consumer);
 		alertService.alert(alert);
 	}
 
-	public void processorAlertEnd(Alert.Priority priority, String title, Payload payload, Processor consumer) {
-		Alert alert = makeAlert(priority, title, payload, consumer);
+	public void processorAlertEnd(PushoverKey pushoverKey, Alert.Priority priority, String title, Payload payload, Processor consumer) {
+		Alert alert = makeAlert(pushoverKey, priority, title, payload, consumer);
 		alert.setEnd(true);
 		alertService.alert(alert);
 	}
 
-	private Alert makeAlert(Alert.Priority priority, String title, Payload payload, Processor consumer) {
+	private Alert makeAlert(PushoverKey pushoverKey, Alert.Priority priority, String title, Payload payload, Processor consumer) {
 		AlertData data = new AlertData();
 		data.add("hostname", getHostName());
 		data.add("source", payload.pathDescriptor(consumer));
 		data.add("input", payload.asText());
-		Alert alert = new Alert(priority, title, null, data);
+		Alert alert = new Alert(pushoverKey, priority, title, null, data);
 		return alert;
 	}
 
@@ -238,7 +240,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			addStack(data, e);
 		}
 		logger.error(title, e);
-		Alert alert = new Alert(Alert.Priority.emergency, title, message, data);
+		Alert alert = new Alert(alertService.getDefaultPushoverKey(), Alert.Priority.emergency, title, message, data);
 		alertService.alert(alert);
 	}
 
@@ -257,7 +259,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		} else {
 			logger.error(logMessage);
 		}
-		alertService.alert(new Alert(priority, title, message, data));
+		alertService.alert(new Alert(alertService.getDefaultPushoverKey(), priority, title, message, data));
 	}
 
 	private void addStack(AlertData data, Throwable t) {
@@ -335,6 +337,10 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	public HealthcheckInfo healthcheck() {
 		return new HealthcheckInfo(hostName, mainProcessorFile, ((mainProcessor != null) && mainProcessor.started()));
+	}
+
+	public AlerterProfile profile() {
+		return profileService.profile();
 	}
 
 	public AlertService getAlertService() {
