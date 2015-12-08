@@ -4,6 +4,7 @@ public class RuntimeProcessorError extends RuntimeException {
 
 	private Processor processor;
 	private Payload payload;
+	private boolean silent;
 
 	public RuntimeProcessorError(String message, Processor processor, Payload payload) {
 		super(message);
@@ -23,6 +24,14 @@ public class RuntimeProcessorError extends RuntimeException {
 
 	public Payload getPayload() {
 		return payload;
+	}
+
+	public boolean isSilent() {
+		return silent;
+	}
+
+	public void setSilent(boolean silent) {
+		this.silent = silent;
 	}
 
 }

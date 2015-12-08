@@ -240,8 +240,10 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			addStack(data, e);
 		}
 		logger.error(title, e);
-		Alert alert = new Alert(alertService.getDefaultPushoverKey(), Alert.Priority.emergency, title, message, data);
-		alertService.alert(alert);
+		if (!e.isSilent()) {
+			Alert alert = new Alert(alertService.getDefaultPushoverKey(), Alert.Priority.emergency, title, message, data);
+			alertService.alert(alert);
+		}
 	}
 
 	public void infrastructureAlert(Alert.Priority priority, String title, String details) {
