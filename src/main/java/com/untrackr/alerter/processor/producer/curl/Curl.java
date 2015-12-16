@@ -44,16 +44,18 @@ public class Curl extends ScheduledProducer {
 			ResponseEntity<String> response = template.getForEntity(uri, String.class);
 			result.status = response.getStatusCode().value();
 			MediaType contentType = response.getHeaders().getContentType();
-			result.contentType = contentType.toString();
-			if (anyText.includes(contentType)) {
-				result.text = response.getBody();
-			}
-			if (MediaType.APPLICATION_JSON.includes(contentType)) {
-				try {
-					Object jsonObject = objectMapper.readValue(response.getBody(), Object.class);
-					result.json = jsonObject;
-				} catch (IOException e) {
-					// Leave it to null
+			if (contentType != null) {
+				result.contentType = contentType.toString();
+				if (anyText.includes(contentType)) {
+					result.text = response.getBody();
+				}
+				if (MediaType.APPLICATION_JSON.includes(contentType)) {
+					try {
+						Object jsonObject = objectMapper.readValue(response.getBody(), Object.class);
+						result.json = jsonObject;
+					} catch (IOException e) {
+						// Leave it to null
+					}
 				}
 			}
 		} catch (HttpStatusCodeException e) {
