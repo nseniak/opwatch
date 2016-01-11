@@ -14,7 +14,9 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.URI;
+import java.net.UnknownHostException;
 
 public class Curl extends ScheduledProducer {
 
@@ -40,6 +42,16 @@ public class Curl extends ScheduledProducer {
 		RestTemplate template = new RestTemplate(factory);
 		Response result = new Response(processorService);
 		result.url = uri.toString();
+		if (result.url != null && result.url.contains("$(hostname)")) {
+			try {
+				result.url = result.url.replace("$(hostname)", InetAddress.getLocalHost().getHostName());
+			} catch (UnknownHostException e) {
+				result.status = -1;
+				result.error = e.getMessage();
+				outputProduced(result);
+				return;
+			}
+		}
 		try {
 			ResponseEntity<String> response = template.getForEntity(uri, String.class);
 			result.status = response.getStatusCode().value();
