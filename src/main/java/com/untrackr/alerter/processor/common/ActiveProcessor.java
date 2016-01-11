@@ -9,10 +9,7 @@ import javax.script.Bindings;
 import javax.script.CompiledScript;
 import javax.script.ScriptException;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.StringJoiner;
+import java.util.*;
 
 public abstract class ActiveProcessor extends Processor {
 
@@ -23,7 +20,8 @@ public abstract class ActiveProcessor extends Processor {
 	private long lastOutputTime = 0;
 	private String name;
 	protected boolean started;
-	boolean nonBooleanValueErrorSignaled;
+	private boolean nonBooleanValueErrorSignaled;
+	private Set<CompiledScript> scriptErrorSignaled;
 
 	public ActiveProcessor(ProcessorService processorService, IncludePath path) {
 		super(processorService, path);
@@ -193,7 +191,9 @@ public abstract class ActiveProcessor extends Processor {
 		try {
 			return value.eval(bindings);
 		} catch (ScriptException e) {
-			throw new RuntimeProcessorError(e, this, payload);
+			RuntimeProcessorError error = new RuntimeProcessorError(e, this, payload);
+			error.setSilent(scriptErrorSignaled.add(value));
+			throw error;
 		}
 	}
 

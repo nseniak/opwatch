@@ -3,19 +3,19 @@ package com.untrackr.alerter.model.common;
 public class PushoverKey {
 
 	private String apiToken;
-	private String userId;
+	private String userKey;
 
-	public PushoverKey(String apiToken, String userId) {
+	public PushoverKey(String apiToken, String userKey) {
 		this.apiToken = apiToken;
-		this.userId = userId;
+		this.userKey = userKey;
 	}
 
 	public String getApiToken() {
 		return apiToken;
 	}
 
-	public String getUserId() {
-		return userId;
+	public String getUserKey() {
+		return userKey;
 	}
 
 }
