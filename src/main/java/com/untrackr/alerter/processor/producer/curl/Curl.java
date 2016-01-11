@@ -13,10 +13,10 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.InetAddress;
+import java.io.InputStreamReader;
 import java.net.URI;
-import java.net.UnknownHostException;
 
 public class Curl extends ScheduledProducer {
 
@@ -44,8 +44,19 @@ public class Curl extends ScheduledProducer {
 		result.url = uri.toString();
 		if (result.url != null && result.url.contains("$(hostname)")) {
 			try {
-				result.url = result.url.replace("$(hostname)", InetAddress.getLocalHost().getHostName());
-			} catch (UnknownHostException e) {
+				ProcessBuilder ps = new ProcessBuilder("hostname");
+				ps.redirectErrorStream(true);
+				Process pr = ps.start();
+				BufferedReader in = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+				StringBuilder sb = new StringBuilder();
+				String line;
+				while ((line = in.readLine()) != null) {
+					sb.append(line);
+				}
+				pr.waitFor();
+				in.close();
+				result.url = result.url.replace("$(hostname)", sb.toString());
+			} catch (IOException | InterruptedException e) {
 				result.status = -1;
 				result.error = e.getMessage();
 				outputProduced(result);
@@ -53,7 +64,7 @@ public class Curl extends ScheduledProducer {
 			}
 		}
 		try {
-			ResponseEntity<String> response = template.getForEntity(uri, String.class);
+			ResponseEntity<String> response = template.getForEntity(result.url, String.class);
 			result.status = response.getStatusCode().value();
 			MediaType contentType = response.getHeaders().getContentType();
 			if (contentType != null) {
