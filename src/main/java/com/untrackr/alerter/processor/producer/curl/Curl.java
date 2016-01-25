@@ -13,13 +13,15 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.BufferedReader;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URI;
 
 public class Curl extends ScheduledProducer {
 
+	private final boolean insecure;
 	private URI uri;
 	private int connectTimeout;
 	private int readTimeout;
@@ -27,42 +29,42 @@ public class Curl extends ScheduledProducer {
 	private ObjectMapper objectMapper = new ObjectMapper();
 	private MediaType anyText = MediaType.valueOf("text/*");
 
-	public Curl(ProcessorService processorService, IncludePath path, ScheduledExecutor scheduledExecutor, URI uri, int connectTimeout, int readTimeout) {
+	public Curl(ProcessorService processorService,
+							IncludePath path,
+							ScheduledExecutor scheduledExecutor,
+							URI uri,
+							int connectTimeout,
+							int readTimeout,
+							boolean insecure) {
 		super(processorService, path, scheduledExecutor);
 		this.uri = uri;
 		this.connectTimeout = connectTimeout;
 		this.readTimeout = readTimeout;
+		this.insecure = insecure;
+	}
+
+	private static HostnameVerifier nullVerifier = (s, sslSession) -> true;
+
+	private SimpleClientHttpRequestFactory makeInsecureClientHttpRequestFactory() {
+		return new SimpleClientHttpRequestFactory() {
+			@Override
+			protected void prepareConnection(HttpURLConnection connection, String httpMethod) throws IOException {
+				if (connection instanceof HttpsURLConnection) {
+					((HttpsURLConnection) connection).setHostnameVerifier(nullVerifier);
+				}
+				super.prepareConnection(connection, httpMethod);
+			}
+		};
 	}
 
 	@Override
 	protected void produce() {
-		SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+		SimpleClientHttpRequestFactory factory = insecure ? makeInsecureClientHttpRequestFactory() : new SimpleClientHttpRequestFactory();
 		factory.setConnectTimeout(connectTimeout);
 		factory.setReadTimeout(readTimeout);
 		RestTemplate template = new RestTemplate(factory);
 		Response result = new Response(processorService);
 		result.url = uri.toString();
-		if (result.url != null && result.url.contains("$(hostname)")) {
-			try {
-				ProcessBuilder ps = new ProcessBuilder("hostname");
-				ps.redirectErrorStream(true);
-				Process pr = ps.start();
-				BufferedReader in = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-				StringBuilder sb = new StringBuilder();
-				String line;
-				while ((line = in.readLine()) != null) {
-					sb.append(line);
-				}
-				pr.waitFor();
-				in.close();
-				result.url = result.url.replace("$(hostname)", sb.toString());
-			} catch (IOException | InterruptedException e) {
-				result.status = -1;
-				result.error = e.getMessage();
-				outputProduced(result);
-				return;
-			}
-		}
 		try {
 			ResponseEntity<String> response = template.getForEntity(result.url, String.class);
 			result.status = response.getStatusCode().value();

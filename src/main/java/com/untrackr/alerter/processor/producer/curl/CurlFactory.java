@@ -34,8 +34,9 @@ public class CurlFactory extends ScheduledExecutorFactory {
 		long connectTimeout = optionalDurationValue(path, jsonDescriptor, "connectTimeout", descriptor.getConnectTimeout(), defaultConnectTimeout);
 		long defaultReadTimeout = processorService.getProfileService().profile().getDefaultHttpReadTimeout();
 		long readTimeout = optionalDurationValue(path, jsonDescriptor, "readTimeout", descriptor.getReadTimeout(), defaultReadTimeout);
+		boolean insecure = optionalFieldValue(path, jsonDescriptor, "insecure", descriptor.isInsecure(), false);
 		Curl curl = new Curl(getProcessorService(), path, makeScheduledExecutor(path, jsonDescriptor, descriptor), uri,
-				(int) connectTimeout, (int) readTimeout);
+				(int) connectTimeout, (int) readTimeout, insecure);
 		initialize(curl, descriptor);
 		return curl;
 	}
