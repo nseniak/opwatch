@@ -21,7 +21,7 @@ public abstract class ActiveProcessor extends Processor {
 	private String name;
 	protected boolean started;
 	private boolean nonBooleanValueErrorSignaled;
-	private Set<CompiledScript> scriptErrorSignaled;
+	private Set<CompiledScript> scriptErrorSignaled = new HashSet<>();
 
 	public ActiveProcessor(ProcessorService processorService, IncludePath path) {
 		super(processorService, path);
