@@ -1,6 +1,7 @@
 package com.untrackr.alerter.processor.filter.jstack;
 
 import com.untrackr.alerter.common.ScriptObject;
+import com.untrackr.alerter.model.common.Alert;
 import com.untrackr.alerter.processor.common.IncludePath;
 import com.untrackr.alerter.processor.common.Payload;
 import com.untrackr.alerter.processor.common.RuntimeProcessorError;
@@ -17,7 +18,7 @@ public class Jstack extends Filter {
 	private boolean errorSignaled = false;
 	private ParsingState state = new ParsingState();
 
-	private final static int MAX_EXCEPTION_LINES = 50;
+	private final static int MAX_EXCEPTION_LINES = 500;
 
 	public Jstack(ProcessorService processorService, IncludePath path, String fieldName, Pattern methodPattern) {
 		super(processorService, path);
@@ -46,50 +47,91 @@ public class Jstack extends Filter {
 	}
 
 	private static String fullyQualifiedIdentifierRegex = "(\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*\\.)+\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*";
-	private static Pattern exceptionLinePattern = Pattern.compile("^(?<name>" + fullyQualifiedIdentifierRegex + "): (?<message>.*)$");
+	private static Pattern exceptionDescription = Pattern.compile("(?<name>" + fullyQualifiedIdentifierRegex + "): (?<message>.*)$");
+	private static Pattern exceptionLinePattern = Pattern.compile("^" + exceptionDescription);
 	private static Pattern atLinePattern = Pattern.compile("^\tat (?<method>" + fullyQualifiedIdentifierRegex + ")\\((?<location>[^)]*)\\).*");
+	private static Pattern causedByPattern = Pattern.compile("^Caused by: " + exceptionDescription);
 
 	public ParsedException parseNextLine(String line) {
-		if (state.getException() != null) {
-			// We're after an exception line. Check if it's an "at" line.
-			ParsedException exception = state.getException();
-			Matcher matcher = atLinePattern.matcher(line);
-			if (!matcher.matches()) {
-				// We don't recognize an "at" line.
-				if (state.getLinesSinceException() > MAX_EXCEPTION_LINES) {
-					// Give up on finding the method and location. Return the exception as is.
-					exception.computeCombined();
-					state.reset();
-					return exception;
-				}
-				// Keep looking for an "at" line
-			} else {
-				String method = matcher.group("method");
-				String location = matcher.group("location");
-				if ((methodPattern == null) || (methodPattern.matcher(method).find())) {
-					// Found a satisfactory line in the stack. Return the exception.
-					exception.setMethod(method);
-					exception.setLocation(location);
-					exception.computeCombined();
-					state.reset();
-					return exception;
-				}
-				if (exception.getMethod() == null) {
-					// Set default value for method and location.
-					exception.setMethod(method);
-					exception.setLocation(location);
-				}
-				// Keep looking for a satisfactory line
+		ParsedException currentException = state.getException();
+		if (currentException == null) {
+			// We're outside of an exception stack trace. Look for an exception line.
+			Matcher exceptionLineMatcher = exceptionLinePattern.matcher(line);
+			if (exceptionLineMatcher.matches()) {
+				// Set current exception
+				String name = exceptionLineMatcher.group("name");
+				String message = exceptionLineMatcher.group("message");
+				ParsedException exception = new ParsedException(processorService, name, message);
+				state.setAtLineSeen(false);
+				state.setLinesSinceException(0);
+				state.setException(exception);
 			}
+			return null;
 		}
-		// Look for an exception line.
-		Matcher matcher = exceptionLinePattern.matcher(line);
-		if (matcher.matches()) {
-			String name = matcher.group("name");
-			String message = matcher.group("message");
-			ParsedException exception = new ParsedException(processorService, name, message);
-			state.setException(exception);
+		// We're inside an exception stack trace.
+		state.setLinesSinceException(state.getLinesSinceException() + 1);
+		// We're after an exception line. Check if it's an "at" line.
+		Matcher atLineMatcher = atLinePattern.matcher(line);
+		if (atLineMatcher.matches()) {
+			// We're on a at line. Use it to set the method and location.
+			state.setAtLineSeen(true);
+			String method = atLineMatcher.group("method");
+			String location = atLineMatcher.group("location");
+			if ((methodPattern == null) || (methodPattern.matcher(method).find())) {
+				// Found a satisfactory line in the stack. Return the exception.
+				currentException.setMethod(method);
+				currentException.setLocation(location);
+				currentException.computeCombined();
+				state.reset();
+				return currentException;
+			}
+			if (currentException.getMethod() == null) {
+				// Set default value for method and location.
+				currentException.setMethod(method);
+				currentException.setLocation(location);
+			}
+			return null;
 		}
+		Matcher causedByMatcher = causedByPattern.matcher(line);
+		if (causedByMatcher.matches()) {
+			// We're on a Caused by line.
+			state.setAtLineSeen(false);
+			return null;
+		}
+		if (state.isAtLineSeen()) {
+			// We've successfully parsed the exception message and at least one "at" line, and now we find a line
+			// that doesn't match a part of an exception trace. Means we've reached the end of the exception.
+			state.reset();
+			return currentException;
+		}
+		if (state.getLinesSinceException() > MAX_EXCEPTION_LINES) {
+			// This exception trace is suspiciously long. Most probably a parsing error.
+			if (currentException.getMethod() == null) {
+				// Set default value for method and location.
+				currentException.setMethod("<unknown method>");
+				currentException.setLocation("<unknown location>");
+			}
+			currentException.computeCombined();
+			processorService.infrastructureAlert(Alert.Priority.high, "Cannot parse exception trace", currentException.getCombined());
+			state.reset();
+			return currentException;
+		}
+		// We're in a multiline exception message, e.g:
+		//
+		//		com.google.api.client.googleapis.json.GoogleJsonResponseException: 500 Internal Server Error
+		//		{
+		//			"code" : 500,
+		//				"errors" : [ {
+		//			"domain" : "global",
+		//					"message" : "Backend Error",
+		//					"reason" : "backendError"
+		//		} ],
+		//			"message" : "Backend Error"
+		//		}
+		//		at com.google.api.client.googleapis.json.GoogleJsonResponseException.from(GoogleJsonResponseException.java:145) ~[google-api-client-1.20.0.jar!/:1.20.0]
+		//		at com.google.api.client.googleapis.services.json.AbstractGoogleJsonClientRequest.newExceptionOnError(AbstractGoogleJsonClientRequest.java:113) ~[google-api-client-1.20.0.jar!/:1.20.0]
+		//
+		// Keep looking for an "at" line
 		return null;
 	}
 
@@ -103,6 +145,10 @@ public class Jstack extends Filter {
 		 * Number of lines read after since the exception field was set.
 		 */
 		private int linesSinceException;
+		/**
+		 * True if at least one "at" line has been spotted since the exception line
+		 */
+		private boolean atLineSeen;
 
 		public ParsingState() {
 			reset();
@@ -111,6 +157,7 @@ public class Jstack extends Filter {
 		public void reset() {
 			this.exception = null;
 			this.linesSinceException = 0;
+			this.atLineSeen = false;
 		}
 
 		public ParsedException getException() {
@@ -127,6 +174,14 @@ public class Jstack extends Filter {
 
 		public void setLinesSinceException(int linesSinceException) {
 			this.linesSinceException = linesSinceException;
+		}
+
+		public boolean isAtLineSeen() {
+			return atLineSeen;
+		}
+
+		public void setAtLineSeen(boolean atLineSeen) {
+			this.atLineSeen = atLineSeen;
 		}
 
 	}
