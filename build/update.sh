@@ -5,7 +5,5 @@ src_jar_name="alerter-${version}.jar"
 src_jar_file=../target/${src_jar_name}
 target_jar_name="alerter.jar"
 
-gsutil cp ${src_jar_file} gs://trackbuster-prod/builds/${target_jar_name} || exit 1
-gsutil cp ${src_jar_file} gs://trackbuster-dev/builds/${target_jar_name} || exit 1
 gsutil cp ${src_jar_file} gs://senders-deployment/prod/builds/${target_jar_name} || exit 1
 echo "Jar file ${src_jar_name} successfully uploaded as ${target_jar_name}"
