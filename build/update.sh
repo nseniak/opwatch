@@ -1,3 +1,4 @@
+git pull origin master
 (cd ..;mvn install) || exit 1
 version="1.0-SNAPSHOT"
 src_jar_name="alerter-${version}.jar"
