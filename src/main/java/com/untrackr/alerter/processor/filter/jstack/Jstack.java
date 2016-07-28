@@ -46,7 +46,7 @@ public class Jstack extends Filter {
 		}
 	}
 
-	private static String fullyQualifiedIdentifierRegex = "(\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*\\.)+\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*";
+	private static String fullyQualifiedIdentifierRegex = "(\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*\\.)+\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*(\\.<init>)?";
 	private static Pattern exceptionDescription = Pattern.compile("(?<name>" + fullyQualifiedIdentifierRegex + "): (?<message>.*)$");
 	private static Pattern exceptionLinePattern = Pattern.compile("^" + exceptionDescription);
 	private static Pattern atLinePattern = Pattern.compile("^\tat (?<method>" + fullyQualifiedIdentifierRegex + ")\\((?<location>[^)]*)\\).*");
