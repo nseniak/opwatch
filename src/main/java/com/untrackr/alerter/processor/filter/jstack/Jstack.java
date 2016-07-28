@@ -101,6 +101,7 @@ public class Jstack extends Filter {
 		if (state.isAtLineSeen()) {
 			// We've successfully parsed the exception message and at least one "at" line, and now we find a line
 			// that doesn't match a part of an exception trace. Means we've reached the end of the exception.
+			currentException.computeCombined();
 			state.reset();
 			return currentException;
 		}
