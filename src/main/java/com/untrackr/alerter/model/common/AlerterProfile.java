@@ -38,7 +38,7 @@ public class AlerterProfile {
 		this.defaultPushoverApplication = ApplicationUtil.property("alerter.pushover.application");
 		this.defaultPushoverGroup = ApplicationUtil.property("alerter.pushover.group");
 		this.tailedFileWatchingCheckDelay = TimeUnit.SECONDS.toMillis(1);
-		this.tailPollInterval = TimeUnit.MILLISECONDS.toMillis(500);
+		this.tailPollInterval = TimeUnit.MILLISECONDS.toMillis(100);
 		this.defaultEmergencyRetry = 60;
 		this.defaultEmergencyExpire = 3600;
 		this.defaultScheduledProducerPeriod = TimeUnit.SECONDS.toMillis(10);
@@ -50,7 +50,7 @@ public class AlerterProfile {
 		this.lineBufferSize = 8192 * 100;
 		this.inputQueueSize = 100;
 		this.processorInputQueueTimeout = TimeUnit.SECONDS.toMillis(60);
-		this.minimumOutputDelay = TimeUnit.MILLISECONDS.toMillis(50);
+		this.minimumOutputDelay = TimeUnit.MILLISECONDS.toMillis(0);
 		this.defaultPostHostname = ApplicationUtil.property("alerter.post.hostname", "localhost");
 		this.defaultPostPort = ApplicationUtil.property("alerter.post.port", 28018);
 		this.cronScriptOutputCheckDelay = TimeUnit.SECONDS.toMillis(100);
