@@ -14,7 +14,7 @@ Don't forget to commit and push alerter.
 
 Then on the build machine:
 
-    $ cd alerter-build/alerter
+    $ cd 1.0/alerter
     $ git pull origin master
     $ cd build
     $ sh build.sh
