@@ -23,7 +23,8 @@ public class TailFactory extends ActiveProcessorFactory {
 	public Tail make(JsonDescriptor jsonDescriptor, IncludePath path) throws ValidationError {
 		TailDesc descriptor = convertDescriptor(path, TailDesc.class, jsonDescriptor);
 		String file = checkVariableSubstitution(path, jsonDescriptor, "file", checkFieldValue(path, jsonDescriptor, "file", descriptor.getFile()));
-		Tail tail = new Tail(getProcessorService(), path, FileSystems.getDefault().getPath(file));
+		boolean ignoreBlankLine = optionalFieldValue(path, jsonDescriptor, "insecure", descriptor.isIgnoreBlankLine(), false);
+		Tail tail = new Tail(getProcessorService(), path, FileSystems.getDefault().getPath(file), ignoreBlankLine);
 		initialize(tail, descriptor);
 		return tail;
 	}

@@ -11,17 +11,22 @@ import java.nio.file.Path;
 public class Tail extends Producer {
 
 	private Path file;
+	private boolean ignoreBlankLine;
 	private TailedFile tailedFile;
 
-	public Tail(ProcessorService processorService, IncludePath path, Path file) {
+	public Tail(ProcessorService processorService, IncludePath path, Path file, boolean ignoreBlankLine) {
 		super(processorService, path);
 		this.file = file;
+		this.ignoreBlankLine = ignoreBlankLine;
 	}
 
 	@Override
 	public void doStart() {
 		AlerterProfile profile = getProcessorService().getProfileService().profile();
 		tailedFile = new TailedFile(profile, file, (line, lineNumber) -> {
+			if (ignoreBlankLine && line.trim().isEmpty()) {
+				return;
+			}
 			LineObject lineObject = new LineObject();
 			lineObject.file = file.toAbsolutePath().toString();
 			lineObject.text = line;
