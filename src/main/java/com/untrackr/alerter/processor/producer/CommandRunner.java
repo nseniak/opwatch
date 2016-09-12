@@ -87,7 +87,12 @@ public class CommandRunner {
 				processor.outputProduced(output);
 			}
 		} catch (IOException e) {
-			throw new RuntimeProcessorError(e, processor, null);
+			if (e.getMessage().equals("Stream closed")) {
+				// The processor is being stopped. Just exit.
+				return;
+			} else {
+				throw new RuntimeProcessorError(e, processor, null);
+			}
 		} catch (InterruptedException e) {
 			// Nothing to do: exiting
 			return;
