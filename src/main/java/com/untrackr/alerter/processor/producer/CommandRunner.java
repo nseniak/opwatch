@@ -32,12 +32,12 @@ public class CommandRunner {
 			File currentDescDir = processor.getPath().last().getFile().getParentFile();
 			String[] cmdArray = {"/bin/sh", "-c", command};
 			process = Runtime.getRuntime().exec(cmdArray, null, currentDescDir);
-		} catch (IOException e) {
+		} catch (Throwable t) {
 			if (commandExecutionErrorSignaled) {
 				return;
 			} else {
 				commandExecutionErrorSignaled = true;
-				throw new RuntimeProcessorError(e, processor, null);
+				throw new RuntimeProcessorError(t, processor, null);
 			}
 		}
 		commandExecutionErrorSignaled = false;
