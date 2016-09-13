@@ -51,7 +51,19 @@ public class CommandRunner {
 
 	public void consume(Processor processor, Payload payload) {
 		if (process == null) {
-			throw new RuntimeProcessorError("command process not started", processor, payload);
+			AlerterProfile profile = processorService.getProfileService().profile();
+			long start = System.currentTimeMillis();
+			while (process == null) {
+				if ((System.currentTimeMillis() - start) > profile.getCommandStartTimeout()) {
+					throw new RuntimeProcessorError("command process not started", processor, payload);
+				}
+				try {
+					Thread.sleep(profile.getCommandStartSleepTime());
+				} catch (InterruptedException e) {
+					// Shutting dowm
+					return;
+				}
+			}
 		}
 		if (!checkAlive(processor)) {
 			throw new RuntimeProcessorError("command process has exited", processor, payload);

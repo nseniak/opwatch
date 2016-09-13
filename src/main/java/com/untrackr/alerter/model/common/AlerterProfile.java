@@ -30,6 +30,8 @@ public class AlerterProfile {
 	private int defaultPostPort;
 	private long cronScriptOutputCheckDelay;
 	private long cronCommandExitTimeout;
+	private long commandStartTimeout;
+	private long commandStartSleepTime;
 
 	public AlerterProfile() throws IOException {
 		this.fileWatchingCheckDelay = TimeUnit.SECONDS.toMillis(1);
@@ -55,6 +57,8 @@ public class AlerterProfile {
 		this.defaultPostPort = ApplicationUtil.property("alerter.post.port", 28018);
 		this.cronScriptOutputCheckDelay = TimeUnit.SECONDS.toMillis(100);
 		this.cronCommandExitTimeout = TimeUnit.MINUTES.toMillis(3);
+		this.commandStartTimeout = TimeUnit.MINUTES.toMillis(1);
+		this.commandStartSleepTime = TimeUnit.MILLISECONDS.toMillis(200);
 	}
 
 	public long getFileWatchingCheckDelay() {
@@ -241,5 +245,20 @@ public class AlerterProfile {
 		this.cronCommandExitTimeout = cronCommandExitTimeout;
 	}
 
-}
+	public long getCommandStartTimeout() {
+		return commandStartTimeout;
+	}
 
+	public void setCommandStartTimeout(long commandStartTimeout) {
+		this.commandStartTimeout = commandStartTimeout;
+	}
+
+	public long getCommandStartSleepTime() {
+		return commandStartSleepTime;
+	}
+
+	public void setCommandStartSleepTime(long commandStartSleepTime) {
+		this.commandStartSleepTime = commandStartSleepTime;
+	}
+
+}
