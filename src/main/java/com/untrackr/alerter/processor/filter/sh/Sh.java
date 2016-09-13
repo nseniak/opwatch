@@ -34,10 +34,7 @@ public class Sh extends Filter {
 
 	@Override
 	public void doStop() {
-		boolean stopped = commandConsumerThreadFuture.cancel(true);
-		if (!stopped) {
-			throw new RuntimeProcessorError("cannot stop command consumer thread", this, null);
-		}
+		commandConsumerThreadFuture.cancel(true);
 		commandRunner.stopProcess();
 		super.doStop();
 	}
