@@ -1,6 +1,5 @@
 package com.untrackr.alerter.processor.producer.stat;
 
-import com.untrackr.alerter.model.common.JsonDescriptor;
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.common.ValidationError;
@@ -19,11 +18,10 @@ public class StatFactory extends ScheduledExecutorFactory {
 	}
 
 	@Override
-	public Processor make(Object object) throws ValidationError {
-		JsonDescriptor jsonDescriptor = scriptDescriptor(object);
-		StatDesc descriptor = convertScriptDescriptor(StatDesc.class, jsonDescriptor);
-		String file = checkVariableSubstitution(jsonDescriptor, "file", checkFieldValue(jsonDescriptor, "file", descriptor.getFile()));
-		Stat stat = new Stat(getProcessorService(), ScriptStack.currentStack(), makeScheduledExecutor(jsonDescriptor, descriptor), new java.io.File(file));
+	public Processor make(Object scriptObject) throws ValidationError {
+		StatDesc descriptor = convertProcessorArgument(StatDesc.class, scriptObject);
+		String file = checkVariableSubstitution("file", checkFieldValue("file", descriptor.getFile()));
+		Stat stat = new Stat(getProcessorService(), ScriptStack.currentStack(), makeScheduledExecutor(descriptor), new java.io.File(file));
 		initialize(stat, descriptor);
 		return stat;
 	}

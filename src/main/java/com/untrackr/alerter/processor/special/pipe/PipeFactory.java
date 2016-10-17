@@ -1,6 +1,5 @@
 package com.untrackr.alerter.processor.special.pipe;
 
-import com.untrackr.alerter.model.common.JsonDescriptor;
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ProcessorFactory;
 import com.untrackr.alerter.processor.common.ScriptStack;
@@ -20,9 +19,8 @@ public class PipeFactory extends ProcessorFactory {
 	}
 
 	@Override
-	public Processor make(Object object) throws ValidationError {
-		JsonDescriptor jsonDescriptor = scriptDescriptor(object);
-		PipeDesc descriptor = convertScriptDescriptor(PipeDesc.class, jsonDescriptor);
+	public Processor make(Object scriptObject) throws ValidationError {
+		PipeDesc descriptor = convertProcessorArgument(PipeDesc.class, scriptObject);
 		if (descriptor.getProcessors().isEmpty()) {
 			return new Identity(getProcessorService(), ScriptStack.currentStack());
 		}

@@ -1,6 +1,5 @@
 package com.untrackr.alerter.processor.producer;
 
-import com.untrackr.alerter.model.common.JsonDescriptor;
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
 import com.untrackr.alerter.processor.common.ScheduledProducerDesc;
 import com.untrackr.alerter.service.ProcessorService;
@@ -11,9 +10,9 @@ public abstract class ScheduledExecutorFactory extends ActiveProcessorFactory {
 		super(processorService);
 	}
 
-	protected ScheduledExecutor makeScheduledExecutor(JsonDescriptor jsonDescriptor, ScheduledProducerDesc descriptor) {
+	protected ScheduledExecutor makeScheduledExecutor(ScheduledProducerDesc descriptor) {
 		long defaultPeriod = getProcessorService().getProfileService().profile().getDefaultScheduledProducerPeriod();
-		long period = optionalDurationValue(jsonDescriptor, "period", descriptor.getPeriod(), defaultPeriod);
+		long period = optionalDurationValue("period", descriptor.getPeriod(), defaultPeriod);
 		return new ScheduledExecutor(processorService, period);
 	}
 

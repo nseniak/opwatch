@@ -8,10 +8,7 @@ public abstract class JavascriptFunction {
 
 	protected ScriptObjectMirror function;
 
-	protected JavascriptFunction(String processorName, ScriptObjectMirror function) {
-		if (!function.isFunction()) {
-			throw new ValidationError(processorName + ": not a function", null);
-		}
+	protected JavascriptFunction(ScriptObjectMirror function) {
 		this.function = function;
 	}
 

@@ -1,6 +1,5 @@
 package com.untrackr.alerter.processor.producer.trail;
 
-import com.untrackr.alerter.model.common.JsonDescriptor;
 import com.untrackr.alerter.processor.common.JavascriptTransformer;
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ScriptStack;
@@ -20,12 +19,11 @@ public class TrailFactory extends ScheduledExecutorFactory {
 	}
 
 	@Override
-	public Processor make(Object object) throws ValidationError {
-		JsonDescriptor jsonDescriptor = scriptDescriptor(object);
-		TrailDesc descriptor = convertScriptDescriptor(TrailDesc.class, jsonDescriptor);
-		JavascriptTransformer transformer = optionalFieldValue(jsonDescriptor, "transformer", descriptor.getTransformer(), null);
-		long duration = durationValue(jsonDescriptor, "duration", descriptor.getDuration());
-		Trail trail = new Trail(getProcessorService(), ScriptStack.currentStack(), makeScheduledExecutor(jsonDescriptor, descriptor), transformer, duration);
+	public Processor make(Object scriptObject) throws ValidationError {
+		TrailDesc descriptor = convertProcessorArgument(TrailDesc.class, scriptObject);
+		JavascriptTransformer transformer = optionalFieldValue("transformer", descriptor.getTransformer(), null);
+		long duration = durationValue("duration", descriptor.getDuration());
+		Trail trail = new Trail(getProcessorService(), ScriptStack.currentStack(), makeScheduledExecutor(descriptor), transformer, duration);
 		initialize(trail, descriptor);
 		return trail;
 	}

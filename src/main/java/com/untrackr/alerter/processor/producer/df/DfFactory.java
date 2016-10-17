@@ -1,6 +1,5 @@
 package com.untrackr.alerter.processor.producer.df;
 
-import com.untrackr.alerter.model.common.JsonDescriptor;
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.common.ValidationError;
@@ -19,11 +18,10 @@ public class DfFactory extends ScheduledExecutorFactory {
 	}
 
 	@Override
-	public Processor make(Object object) throws ValidationError {
-		JsonDescriptor jsonDescriptor = scriptDescriptor(object);
-		DfDesc descriptor = convertScriptDescriptor(DfDesc.class, jsonDescriptor);
-		String file = checkVariableSubstitution(jsonDescriptor, "file", checkFieldValue(jsonDescriptor, "file", descriptor.getFile()));
-		Df df = new Df(getProcessorService(), ScriptStack.currentStack(), makeScheduledExecutor(jsonDescriptor, descriptor), new java.io.File(file));
+	public Processor make(Object scriptObject) throws ValidationError {
+		DfDesc descriptor = convertProcessorArgument(DfDesc.class, scriptObject);
+		String file = checkVariableSubstitution("file", checkFieldValue("file", descriptor.getFile()));
+		Df df = new Df(getProcessorService(), ScriptStack.currentStack(), makeScheduledExecutor(descriptor), new java.io.File(file));
 		initialize(df, descriptor);
 		return df;
 	}

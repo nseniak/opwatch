@@ -1,6 +1,5 @@
 package com.untrackr.alerter.processor.filter.collect;
 
-import com.untrackr.alerter.model.common.JsonDescriptor;
 import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -16,11 +15,10 @@ public class CollectFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public Processor make(Object object) throws ValidationError {
-		JsonDescriptor scriptDescriptor = scriptDescriptor(object);
-		CollectDesc descriptor = convertScriptDescriptor(CollectDesc.class, scriptDescriptor);
-		JavascriptTransformer transformer = optionalFieldValue(scriptDescriptor, "transformer", descriptor.getTransformer(), null);
-		int count = checkFieldValue(scriptDescriptor, "count", descriptor.getCount());
+	public Processor make(Object scriptObject) throws ValidationError {
+		CollectDesc descriptor = convertProcessorArgument(CollectDesc.class, scriptObject);
+		JavascriptTransformer transformer = optionalFieldValue("transformer", descriptor.getTransformer(), null);
+		int count = checkFieldValue("count", descriptor.getCount());
 		Collect collect = new Collect(getProcessorService(), ScriptStack.currentStack(), transformer, count);
 		initialize(collect, descriptor);
 		return collect;

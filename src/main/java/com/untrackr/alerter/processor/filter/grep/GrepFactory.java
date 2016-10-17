@@ -1,6 +1,5 @@
 package com.untrackr.alerter.processor.filter.grep;
 
-import com.untrackr.alerter.model.common.JsonDescriptor;
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ScriptStack;
@@ -22,34 +21,33 @@ public class GrepFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public Processor make(Object object) throws ValidationError {
-		JsonDescriptor scriptDescriptor = scriptDescriptor(object);
-		GrepDesc descriptor = convertScriptDescriptor(GrepDesc.class, scriptDescriptor);
-		String fieldName = optionalFieldValue(scriptDescriptor, "field", descriptor.getField(), "text");
-		List<String> regexes = optionalFieldValue(scriptDescriptor, "regexes", descriptor.getRegexes(), null);
-		String regex = optionalFieldValue(scriptDescriptor, "regex", descriptor.getRegex(), null);
+	public Processor make(Object scriptObject) throws ValidationError {
+		GrepDesc descriptor = convertProcessorArgument(GrepDesc.class, scriptObject);
+		String fieldName = optionalFieldValue("field", descriptor.getField(), "text");
+		List<String> regexes = optionalFieldValue("regexes", descriptor.getRegexes(), null);
+		String regex = optionalFieldValue("regex", descriptor.getRegex(), null);
 		if ((regex != null) && (regexes != null)) {
-			throw new ValidationError("cannot have both \"regex\" and \"regexes\" defined in " + name(), scriptDescriptor);
+			throw new ValidationError(name() + ": cannot have both \"regex\" and \"regexes\" defined");
 		}
 		Pattern pattern = null;
 		if (regex != null) {
-			pattern = compilePattern(scriptDescriptor, "regex", regex);
+			pattern = compilePattern("regex", regex);
 		}
 		if (regexes != null) {
 			StringBuilder builder = new StringBuilder();
 			String delimiter = "";
 			for (String alternative : regexes) {
 				// Compile the aternative, just to check the syntax
-				compilePattern(scriptDescriptor, "regexes", alternative);
+				compilePattern("regexes", alternative);
 				builder.append(delimiter).append("(?:").append(alternative).append(")");
 				delimiter = "|";
 			}
-			pattern = compilePattern(scriptDescriptor, "regexes", builder.toString());
+			pattern = compilePattern("regexes", builder.toString());
 		}
 		if (pattern == null) {
-			throw new ValidationError("missing " + name() + " field: must define either \"regex\" or \"regexes\"", scriptDescriptor);
+			throw new ValidationError(name() + ": either \"regex\" or \"regexes\" must be defined");
 		}
-		boolean invert = optionalFieldValue(scriptDescriptor, "invert", descriptor.getInvert(), Boolean.FALSE);
+		boolean invert = optionalFieldValue("invert", descriptor.getInvert(), Boolean.FALSE);
 		Grep grep = new Grep(getProcessorService(), ScriptStack.currentStack(), fieldName, pattern, invert);
 		initialize(grep, descriptor);
 		return grep;

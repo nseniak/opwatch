@@ -1,6 +1,5 @@
 package com.untrackr.alerter.processor.filter.sh;
 
-import com.untrackr.alerter.model.common.JsonDescriptor;
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ScriptStack;
@@ -20,10 +19,9 @@ public class ShFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public Processor make(Object object) throws ValidationError {
-		JsonDescriptor jsonDescriptor = scriptDescriptor(object);
-		ShDesc descriptor = convertScriptDescriptor(ShDesc.class, jsonDescriptor);
-		CommandRunner producer = makeCommandOutputProducer(jsonDescriptor, descriptor);
+	public Processor make(Object scriptObject) throws ValidationError {
+		ShDesc descriptor = convertProcessorArgument(ShDesc.class, scriptObject);
+		CommandRunner producer = makeCommandOutputProducer(descriptor);
 		Sh sh = new Sh(getProcessorService(), ScriptStack.currentStack(), producer);
 		initialize(sh, descriptor);
 		return sh;

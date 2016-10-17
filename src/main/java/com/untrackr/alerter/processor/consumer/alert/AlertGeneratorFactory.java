@@ -1,7 +1,6 @@
 package com.untrackr.alerter.processor.consumer.alert;
 
 import com.untrackr.alerter.model.common.Alert;
-import com.untrackr.alerter.model.common.JsonDescriptor;
 import com.untrackr.alerter.model.common.PushoverKey;
 import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.service.ProcessorService;
@@ -18,32 +17,31 @@ public class AlertGeneratorFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public Processor make(Object object) throws ValidationError {
-		JsonDescriptor scriptDescriptor = scriptDescriptor(object);
-		AlertGeneratorDesc descriptor = convertScriptDescriptor(AlertGeneratorDesc.class, scriptDescriptor);
-		String priorityName = optionalFieldValue(scriptDescriptor, "priority", descriptor.getPriority(), "normal");
+	public Processor make(Object scriptObject) throws ValidationError {
+		AlertGeneratorDesc descriptor = convertProcessorArgument(AlertGeneratorDesc.class, scriptObject);
+		String priorityName = optionalFieldValue("priority", descriptor.getPriority(), "normal");
 		Alert.Priority priority;
 		try {
 			priority = Alert.Priority.valueOf(priorityName);
 		} catch (IllegalArgumentException e) {
-			throw new ValidationError("bad alert priority: \"" + priorityName + "\"", scriptDescriptor);
+			throw new ValidationError("bad alert priority: \"" + priorityName + "\"");
 		}
-		String title = checkFieldValue(scriptDescriptor, "title", descriptor.getTitle());
-		JavascriptPredicate predicate = optionalFieldValue(scriptDescriptor, "predicate", descriptor.getPredicate(), null);
-		boolean toggle = optionalFieldValue(scriptDescriptor, "toggle", descriptor.getToggle(), false);
-		String applicationName = optionalFieldValue(scriptDescriptor, "application", descriptor.getApplication(), processorService.profile().getDefaultPushoverApplication());
-		String groupName = optionalFieldValue(scriptDescriptor, "group", descriptor.getGroup(), processorService.profile().getDefaultPushoverGroup());
-		PushoverKey pushoverKey = makeKey(applicationName, groupName, scriptDescriptor);
+		String title = checkFieldValue("title", descriptor.getTitle());
+		JavascriptPredicate predicate = optionalFieldValue("predicate", descriptor.getPredicate(), null);
+		boolean toggle = optionalFieldValue("toggle", descriptor.getToggle(), false);
+		String applicationName = optionalFieldValue("application", descriptor.getApplication(), processorService.profile().getDefaultPushoverApplication());
+		String groupName = optionalFieldValue("group", descriptor.getGroup(), processorService.profile().getDefaultPushoverGroup());
+		PushoverKey pushoverKey = makeKey(applicationName, groupName);
 		AlertGenerator alertGenerator = new AlertGenerator(getProcessorService(), ScriptStack.currentStack(), pushoverKey, title, priority, predicate, toggle);
 		initialize(alertGenerator, descriptor);
 		return alertGenerator;
 	}
 
-	public PushoverKey makeKey(String applicationName, String groupName, JsonDescriptor jsonDescriptor) {
+	public PushoverKey makeKey(String applicationName, String groupName) {
 		try {
 			return processorService.profile().getPushoverSettings().makeKey(applicationName, groupName);
 		} catch (Throwable t) {
-			throw new ValidationError(t.getMessage(), jsonDescriptor);
+			throw new ValidationError(t.getMessage());
 		}
 	}
 

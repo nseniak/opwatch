@@ -1,6 +1,5 @@
 package com.untrackr.alerter.processor.producer.cron;
 
-import com.untrackr.alerter.model.common.JsonDescriptor;
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.common.ValidationError;
@@ -21,11 +20,10 @@ public class CronFactory extends ScheduledExecutorFactory {
 	}
 
 	@Override
-	public Processor make(Object object) throws ValidationError {
-		JsonDescriptor jsonDescriptor = scriptDescriptor(object);
-		CronDesc descriptor = convertScriptDescriptor(CronDesc.class, jsonDescriptor);
-		ScheduledExecutor executor = makeScheduledExecutor(jsonDescriptor, descriptor);
-		CommandRunner runner = makeCommandOutputProducer(jsonDescriptor, descriptor);
+	public Processor make(Object scriptObject) throws ValidationError {
+		CronDesc descriptor = convertProcessorArgument(CronDesc.class, scriptObject);
+		ScheduledExecutor executor = makeScheduledExecutor(descriptor);
+		CommandRunner runner = makeCommandOutputProducer(descriptor);
 		Cron cron = new Cron(getProcessorService(), ScriptStack.currentStack(), executor, runner);
 		initialize(cron, descriptor);
 		return cron;

@@ -1,6 +1,5 @@
 package com.untrackr.alerter.processor.producer.receive;
 
-import com.untrackr.alerter.model.common.JsonDescriptor;
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ScriptStack;
@@ -19,10 +18,9 @@ public class ReceiveFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public Processor make(Object object) throws ValidationError {
-		JsonDescriptor jsonDescriptor = scriptDescriptor(object);
-		ReceiveDesc descriptor = convertScriptDescriptor(ReceiveDesc.class, jsonDescriptor);
-		String urlPath = checkFieldValue(jsonDescriptor, "url", descriptor.getPath());
+	public Processor make(Object scriptObject) throws ValidationError {
+		ReceiveDesc descriptor = convertProcessorArgument(ReceiveDesc.class, scriptObject);
+		String urlPath = checkFieldValue("url", descriptor.getPath());
 		Receive receive = new Receive(getProcessorService(), ScriptStack.currentStack(), urlPath);
 		initialize(receive, descriptor);
 		return receive;

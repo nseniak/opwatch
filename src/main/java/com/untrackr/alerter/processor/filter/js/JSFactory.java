@@ -1,6 +1,5 @@
 package com.untrackr.alerter.processor.filter.js;
 
-import com.untrackr.alerter.model.common.JsonDescriptor;
 import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -16,10 +15,9 @@ public class JSFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public Processor make(Object object) throws ValidationError {
-		JsonDescriptor scriptDescriptor = scriptDescriptor(object);
-		JSDesc descriptor = convertScriptDescriptor(JSDesc.class, scriptDescriptor);
-		JavascriptTransformer transformer = checkFieldValue(scriptDescriptor, "transformer", descriptor.getTransformer());
+	public Processor make(Object scriptObject) throws ValidationError {
+		JSDesc descriptor = convertProcessorArgument(JSDesc.class, scriptObject);
+		JavascriptTransformer transformer = checkFieldValue("transformer", descriptor.getTransformer());
 		JS js = new JS(getProcessorService(), ScriptStack.currentStack(), transformer);
 		initialize(js, descriptor);
 		return js;

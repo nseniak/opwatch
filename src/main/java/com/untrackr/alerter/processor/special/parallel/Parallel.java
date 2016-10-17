@@ -1,6 +1,5 @@
 package com.untrackr.alerter.processor.special.parallel;
 
-import com.untrackr.alerter.model.common.JsonDescriptor;
 import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -61,13 +60,13 @@ public class Parallel extends Processor {
 		// Nothing to do. Producers and consumers are already connected.
 	}
 
-	public void inferSignature(JsonDescriptor jsonObject) {
+	public void inferSignature() {
 		signature = new ProcessorSignature(ProcessorSignature.PipeRequirement.any, ProcessorSignature.PipeRequirement.any);
 		for (Processor processor : processors) {
 			ProcessorSignature bottomSignature = signature.bottom(processor.getSignature());
 			if (bottomSignature == null) {
 				String message = "signature of " + processor.descriptor() + " is " + processor.getSignature().describe() + " and is inconsistent with previous processors in parallel group: " + signature.describe();
-				throw new ValidationError(message, jsonObject);
+				throw new ValidationError(message);
 			}
 			signature = bottomSignature;
 		}

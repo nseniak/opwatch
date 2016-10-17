@@ -4,8 +4,8 @@ import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 public class JavascriptPredicate extends JavascriptFunction {
 
-	public JavascriptPredicate(String processorName, ScriptObjectMirror function) {
-		super(processorName, function);
+	public JavascriptPredicate(ScriptObjectMirror function) {
+		super(function);
 	}
 
 	public boolean call(Payload payload, ActiveProcessor processor) {

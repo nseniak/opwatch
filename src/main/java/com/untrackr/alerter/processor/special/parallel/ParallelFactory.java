@@ -1,6 +1,5 @@
 package com.untrackr.alerter.processor.special.parallel;
 
-import com.untrackr.alerter.model.common.JsonDescriptor;
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ProcessorFactory;
 import com.untrackr.alerter.processor.common.ScriptStack;
@@ -19,11 +18,10 @@ public class ParallelFactory extends ProcessorFactory {
 	}
 
 	@Override
-	public Processor make(Object object) throws ValidationError {
-		JsonDescriptor jsonDescriptor = scriptDescriptor(object);
-		ParallelDesc descriptor = convertScriptDescriptor(ParallelDesc.class, jsonDescriptor);
+	public Processor make(Object scriptObject) throws ValidationError {
+		ParallelDesc descriptor = convertProcessorArgument(ParallelDesc.class, scriptObject);
 		Parallel parallel = new Parallel(getProcessorService(), descriptor.getProcessors(), ScriptStack.currentStack());
-		parallel.inferSignature(jsonDescriptor);
+		parallel.inferSignature();
 		return parallel;
 	}
 

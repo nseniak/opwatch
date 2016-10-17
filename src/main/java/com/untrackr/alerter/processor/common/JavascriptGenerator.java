@@ -4,8 +4,8 @@ import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 public class JavascriptGenerator extends JavascriptFunction {
 
-	public JavascriptGenerator(String processorName, ScriptObjectMirror function) {
-		super(processorName, function);
+	public JavascriptGenerator(ScriptObjectMirror function) {
+		super(function);
 	}
 
 	public Object call(ActiveProcessor processor) {

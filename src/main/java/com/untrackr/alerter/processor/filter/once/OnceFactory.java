@@ -1,6 +1,5 @@
 package com.untrackr.alerter.processor.filter.once;
 
-import com.untrackr.alerter.model.common.JsonDescriptor;
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ScriptStack;
@@ -19,10 +18,9 @@ public class OnceFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public Processor make(Object object) throws ValidationError {
-		JsonDescriptor jsonDescriptor = scriptDescriptor(object);
-		OnceDesc descriptor = convertScriptDescriptor(OnceDesc.class, jsonDescriptor);
-		long delay = durationValue(jsonDescriptor, "delay", descriptor.getDelay());
+	public Processor make(Object scriptObject) throws ValidationError {
+		OnceDesc descriptor = convertProcessorArgument(OnceDesc.class, scriptObject);
+		long delay = durationValue("delay", descriptor.getDelay());
 		Once once = new Once(getProcessorService(), ScriptStack.currentStack(), delay);
 		initialize(once, descriptor);
 		return once;

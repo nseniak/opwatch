@@ -4,8 +4,8 @@ import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 public class JavascriptTransformer extends JavascriptFunction {
 
-	public JavascriptTransformer(String processorName, ScriptObjectMirror function) {
-		super(processorName, function);
+	public JavascriptTransformer(ScriptObjectMirror function) {
+		super(function);
 	}
 
 	public Object call(Payload payload, ActiveProcessor processor) {

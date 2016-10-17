@@ -1,7 +1,6 @@
 package com.untrackr.alerter.processor.consumer.post;
 
 import com.untrackr.alerter.model.common.AlerterProfile;
-import com.untrackr.alerter.model.common.JsonDescriptor;
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ScriptStack;
@@ -25,13 +24,12 @@ public class PostFactory extends ActiveProcessorFactory {
 	private static Pattern pathPattern = Pattern.compile("(?<hostname>[^:/]+)?(?::(?<port>[0-9]+))?(?<stack>/.*)");
 
 	@Override
-	public Processor make(Object object) throws ValidationError {
-		JsonDescriptor scriptDescriptor = scriptDescriptor(object);
-		PostDesc descriptor = convertScriptDescriptor(PostDesc.class, scriptDescriptor);
-		String pathString = checkVariableSubstitution(scriptDescriptor, "stack", checkFieldValue(scriptDescriptor, "stack", descriptor.getPath()));
+	public Processor make(Object scriptObject) throws ValidationError {
+		PostDesc descriptor = convertProcessorArgument(PostDesc.class, scriptObject);
+		String pathString = checkVariableSubstitution("path", checkFieldValue("path", descriptor.getPath()));
 		Matcher matcher = pathPattern.matcher(pathString);
 		if (!matcher.matches()) {
-			throw new ValidationError("incorrect \"stack\" syntax: \"" + pathString + "\"", scriptDescriptor);
+			throw new ValidationError("incorrect \"path\" syntax: \"" + pathString + "\"");
 		}
 		AlerterProfile profile = processorService.getProfileService().profile();
 		String hostname = (matcher.group("hostname") != null) ? matcher.group("hostname") : profile.getDefaultPostHostname();
