@@ -1,10 +1,6 @@
 package com.untrackr.alerter.processor.special.pipe;
 
-import com.untrackr.alerter.processor.common.IncludePath;
-import com.untrackr.alerter.processor.common.Payload;
-import com.untrackr.alerter.processor.common.Processor;
-import com.untrackr.alerter.processor.common.ProcessorSignature;
-import com.untrackr.alerter.processor.common.ValidationError;
+import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.List;
@@ -13,8 +9,8 @@ public class Pipe extends Processor {
 
 	List<Processor> processors;
 
-	public Pipe(ProcessorService processorService, List<Processor> processors, IncludePath path) {
-		super(processorService, path);
+	public Pipe(ProcessorService processorService, List<Processor> processors, ScriptStack stack) {
+		super(processorService, stack);
 		this.processors = processors;
 		this.signature = new ProcessorSignature(first().getSignature().getInputRequirement(), last().getSignature().getOutputRequirement());
 		Processor previousProducer = null;

@@ -2,7 +2,7 @@ package com.untrackr.alerter.processor.filter.jstack;
 
 import com.untrackr.alerter.common.ScriptObject;
 import com.untrackr.alerter.model.common.Alert;
-import com.untrackr.alerter.processor.common.IncludePath;
+import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.common.Payload;
 import com.untrackr.alerter.processor.common.RuntimeProcessorError;
 import com.untrackr.alerter.processor.filter.Filter;
@@ -20,8 +20,8 @@ public class Jstack extends Filter {
 
 	private final static int MAX_EXCEPTION_LINES = 500;
 
-	public Jstack(ProcessorService processorService, IncludePath path, String fieldName, Pattern methodPattern) {
-		super(processorService, path);
+	public Jstack(ProcessorService processorService, ScriptStack stack, String fieldName, Pattern methodPattern) {
+		super(processorService, stack);
 		this.fieldName = fieldName;
 		this.methodPattern = methodPattern;
 	}

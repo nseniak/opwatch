@@ -2,7 +2,7 @@ package com.untrackr.alerter.processor.producer.tail;
 
 import com.untrackr.alerter.ioservice.TailedFile;
 import com.untrackr.alerter.model.common.AlerterProfile;
-import com.untrackr.alerter.processor.common.IncludePath;
+import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.producer.Producer;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -14,8 +14,8 @@ public class Tail extends Producer {
 	private boolean ignoreBlankLine;
 	private TailedFile tailedFile;
 
-	public Tail(ProcessorService processorService, IncludePath path, Path file, boolean ignoreBlankLine) {
-		super(processorService, path);
+	public Tail(ProcessorService processorService, ScriptStack stack, Path file, boolean ignoreBlankLine) {
+		super(processorService, stack);
 		this.file = file;
 		this.ignoreBlankLine = ignoreBlankLine;
 	}

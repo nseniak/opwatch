@@ -1,7 +1,20 @@
 package com.untrackr.alerter.model.common;
 
-import java.util.HashMap;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
-public class JsonDescriptor extends HashMap<String, Object> {
+/**
+ * Wrapper for a script object mirror
+ */
+public class JsonDescriptor {
+
+	private ScriptObjectMirror objectMirror;
+
+	public JsonDescriptor(ScriptObjectMirror objectMirror) {
+		this.objectMirror = objectMirror;
+	}
+
+	public ScriptObjectMirror getObjectMirror() {
+		return objectMirror;
+	}
 
 }

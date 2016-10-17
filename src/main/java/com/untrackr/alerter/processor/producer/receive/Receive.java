@@ -1,8 +1,7 @@
 package com.untrackr.alerter.processor.producer.receive;
 
 import com.untrackr.alerter.common.RemotePayload;
-import com.untrackr.alerter.processor.common.IncludePath;
-import com.untrackr.alerter.processor.common.Payload;
+import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.common.RuntimeProcessorError;
 import com.untrackr.alerter.processor.producer.Producer;
 import com.untrackr.alerter.service.HttpService;
@@ -12,8 +11,8 @@ public class Receive extends Producer implements HttpService.PostBodyConsumer {
 
 	private String urlPath;
 
-	public Receive(ProcessorService processorService, IncludePath path, String urlPath) {
-		super(processorService, path);
+	public Receive(ProcessorService processorService, ScriptStack stack, String urlPath) {
+		super(processorService, stack);
 		this.urlPath = urlPath;
 	}
 

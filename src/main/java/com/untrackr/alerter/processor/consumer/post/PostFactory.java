@@ -3,8 +3,8 @@ package com.untrackr.alerter.processor.consumer.post;
 import com.untrackr.alerter.model.common.AlerterProfile;
 import com.untrackr.alerter.model.common.JsonDescriptor;
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
-import com.untrackr.alerter.processor.common.IncludePath;
 import com.untrackr.alerter.processor.common.Processor;
+import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.common.ValidationError;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -18,25 +18,26 @@ public class PostFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public String type() {
+	public String name() {
 		return "post";
 	}
 
-	private static Pattern pathPattern = Pattern.compile("(?<hostname>[^:/]+)?(?::(?<port>[0-9]+))?(?<path>/.*)");
+	private static Pattern pathPattern = Pattern.compile("(?<hostname>[^:/]+)?(?::(?<port>[0-9]+))?(?<stack>/.*)");
 
 	@Override
-	public Processor make(JsonDescriptor jsonDescriptor, IncludePath path) throws ValidationError {
-		PostDesc descriptor = convertDescriptor(path, PostDesc.class, jsonDescriptor);
-		String pathString = checkVariableSubstitution(path, jsonDescriptor, "path", checkFieldValue(path, jsonDescriptor, "path", descriptor.getPath()));
+	public Processor make(Object object) throws ValidationError {
+		JsonDescriptor scriptDescriptor = scriptDescriptor(object);
+		PostDesc descriptor = convertScriptDescriptor(PostDesc.class, scriptDescriptor);
+		String pathString = checkVariableSubstitution(scriptDescriptor, "stack", checkFieldValue(scriptDescriptor, "stack", descriptor.getPath()));
 		Matcher matcher = pathPattern.matcher(pathString);
 		if (!matcher.matches()) {
-			throw new ValidationError("incorrect \"path\" syntax: \"" + pathString + "\"", path, jsonDescriptor);
+			throw new ValidationError("incorrect \"stack\" syntax: \"" + pathString + "\"", scriptDescriptor);
 		}
 		AlerterProfile profile = processorService.getProfileService().profile();
 		String hostname = (matcher.group("hostname") != null) ? matcher.group("hostname") : profile.getDefaultPostHostname();
 		int port = (matcher.group("port") != null) ? Integer.parseInt(matcher.group("hostname")) : profile.getDefaultPostPort();
-		String urlPath = matcher.group("path");
-		Post post = new Post(getProcessorService(), path, pathString, hostname, port, urlPath);
+		String urlPath = matcher.group("stack");
+		Post post = new Post(getProcessorService(), ScriptStack.currentStack(), pathString, hostname, port, urlPath);
 		initialize(post, descriptor);
 		return post;
 	}

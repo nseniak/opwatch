@@ -7,8 +7,7 @@ public class ShDesc extends ActiveProcessorDesc implements CommandExecutorDesc {
 
 	private String command;
 
-	@Override
-	public String getCommand() {
+	public String getGenerator() {
 		return command;
 	}
 

@@ -1,7 +1,7 @@
 package com.untrackr.alerter.processor.producer.df;
 
 import com.untrackr.alerter.common.ScriptObject;
-import com.untrackr.alerter.processor.common.IncludePath;
+import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.common.RuntimeProcessorError;
 import com.untrackr.alerter.processor.producer.ScheduledExecutor;
 import com.untrackr.alerter.processor.producer.ScheduledProducer;
@@ -14,8 +14,8 @@ public class Df extends ScheduledProducer {
 	private File file;
 	private boolean fileNotFoundErrorSignaled = false;
 
-	public Df(ProcessorService processorService, IncludePath path, ScheduledExecutor scheduledExecutor, File file) {
-		super(processorService, path, scheduledExecutor);
+	public Df(ProcessorService processorService, ScriptStack stack, ScheduledExecutor scheduledExecutor, File file) {
+		super(processorService, stack, scheduledExecutor);
 		this.file = file;
 	}
 

@@ -2,7 +2,8 @@ package com.untrackr.alerter.processor.producer.tail;
 
 import com.untrackr.alerter.model.common.JsonDescriptor;
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
-import com.untrackr.alerter.processor.common.IncludePath;
+import com.untrackr.alerter.processor.common.Processor;
+import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.common.ValidationError;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -15,16 +16,17 @@ public class TailFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public String type() {
+	public String name() {
 		return "tail";
 	}
 
 	@Override
-	public Tail make(JsonDescriptor jsonDescriptor, IncludePath path) throws ValidationError {
-		TailDesc descriptor = convertDescriptor(path, TailDesc.class, jsonDescriptor);
-		String file = checkVariableSubstitution(path, jsonDescriptor, "file", checkFieldValue(path, jsonDescriptor, "file", descriptor.getFile()));
-		boolean ignoreBlankLine = optionalFieldValue(path, jsonDescriptor, "insecure", descriptor.isIgnoreBlankLine(), false);
-		Tail tail = new Tail(getProcessorService(), path, FileSystems.getDefault().getPath(file), ignoreBlankLine);
+	public Processor make(Object object) throws ValidationError {
+		JsonDescriptor jsonDescriptor = scriptDescriptor(object);
+		TailDesc descriptor = convertScriptDescriptor(TailDesc.class, jsonDescriptor);
+		String file = checkVariableSubstitution(jsonDescriptor, "file", checkFieldValue(jsonDescriptor, "file", descriptor.getFile()));
+		boolean ignoreBlankLine = optionalFieldValue(jsonDescriptor, "insecure", descriptor.isIgnoreBlankLine(), false);
+		Tail tail = new Tail(getProcessorService(), ScriptStack.currentStack(), FileSystems.getDefault().getPath(file), ignoreBlankLine);
 		initialize(tail, descriptor);
 		return tail;
 	}

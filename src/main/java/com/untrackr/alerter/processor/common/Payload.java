@@ -17,15 +17,15 @@ public class Payload {
 
 	private ProcessorService processorService;
 	private Processor producer;
-	private Object jsonObject;
+	private Object scriptObject;
 	private Payload input;
 	private long timestamp;
 	private String hostname;
 
-	private Payload(ProcessorService processorService, Processor producer, Object jsonObject, Payload input, long timestamp, String hostname) {
+	private Payload(ProcessorService processorService, Processor producer, Object scriptObject, Payload input, long timestamp, String hostname) {
 		this.processorService = processorService;
 		this.producer = producer;
-		this.jsonObject = jsonObject;
+		this.scriptObject = scriptObject;
 		this.input = input;
 		this.timestamp = timestamp;
 		this.hostname = hostname;
@@ -69,7 +69,7 @@ public class Payload {
 	}
 
 	public String asText() {
-		return processorService.valueAsString(jsonObject);
+		return processorService.valueAsString(scriptObject);
 	}
 
 	public List<Payload> inputList() {
@@ -89,8 +89,8 @@ public class Payload {
 		List<Processor> producers = new ArrayList<>(inputList().stream().map(Payload::getProducer).collect(toList()));
 		producers.add(last);
 		for (Processor producer : producers) {
-			if (!getProducer().getPath().isEmpty()) {
-				String filename = getProducer().getPath().last().getFilename();
+			if (!getProducer().getStack().empty()) {
+				String filename = getProducer().getStack().top().getFileName();
 				if (!filename.equals(lastFilename)) {
 					lastFilename = filename;
 					builder.append("[").append(filename).append("] > ");
@@ -114,8 +114,8 @@ public class Payload {
 		return producer;
 	}
 
-	public Object getJsonObject() {
-		return jsonObject;
+	public Object getScriptObject() {
+		return scriptObject;
 	}
 
 	public Payload getInput() {

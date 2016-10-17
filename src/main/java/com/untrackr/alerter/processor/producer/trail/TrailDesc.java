@@ -1,18 +1,19 @@
 package com.untrackr.alerter.processor.producer.trail;
 
+import com.untrackr.alerter.processor.common.JavascriptTransformer;
 import com.untrackr.alerter.processor.common.ScheduledProducerDesc;
 
 public class TrailDesc extends ScheduledProducerDesc {
 
-	private String value;
+	private JavascriptTransformer transformer;
 	private String duration;
 
-	public String getValue() {
-		return value;
+	public JavascriptTransformer getTransformer() {
+		return transformer;
 	}
 
-	public void setValue(String value) {
-		this.value = value;
+	public void setTransformer(JavascriptTransformer transformer) {
+		this.transformer = transformer;
 	}
 
 	public String getDuration() {

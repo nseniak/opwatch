@@ -1,12 +1,12 @@
 package com.untrackr.alerter.processor.producer.trail;
 
 import com.untrackr.alerter.model.common.JsonDescriptor;
-import com.untrackr.alerter.processor.common.IncludePath;
+import com.untrackr.alerter.processor.common.JavascriptTransformer;
+import com.untrackr.alerter.processor.common.Processor;
+import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.common.ValidationError;
 import com.untrackr.alerter.processor.producer.ScheduledExecutorFactory;
 import com.untrackr.alerter.service.ProcessorService;
-
-import javax.script.CompiledScript;
 
 public class TrailFactory extends ScheduledExecutorFactory {
 
@@ -15,17 +15,17 @@ public class TrailFactory extends ScheduledExecutorFactory {
 	}
 
 	@Override
-	public String type() {
+	public String name() {
 		return "trail";
 	}
 
 	@Override
-	public Trail make(JsonDescriptor jsonDescriptor, IncludePath path) throws ValidationError {
-		TrailDesc descriptor = convertDescriptor(path, TrailDesc.class, jsonDescriptor);
-		String valueSource = optionalFieldValue(path, jsonDescriptor, "value", descriptor.getValue(), null);
-		CompiledScript valueScript = (valueSource == null) ? null : compileScript(path, jsonDescriptor, "value", valueSource);
-		long duration = durationValue(path, jsonDescriptor, "duration", descriptor.getDuration());
-		Trail trail = new Trail(getProcessorService(), path, makeScheduledExecutor(path, jsonDescriptor, descriptor), valueSource, valueScript, duration);
+	public Processor make(Object object) throws ValidationError {
+		JsonDescriptor jsonDescriptor = scriptDescriptor(object);
+		TrailDesc descriptor = convertScriptDescriptor(TrailDesc.class, jsonDescriptor);
+		JavascriptTransformer transformer = optionalFieldValue(jsonDescriptor, "transformer", descriptor.getTransformer(), null);
+		long duration = durationValue(jsonDescriptor, "duration", descriptor.getDuration());
+		Trail trail = new Trail(getProcessorService(), ScriptStack.currentStack(), makeScheduledExecutor(jsonDescriptor, descriptor), transformer, duration);
 		initialize(trail, descriptor);
 		return trail;
 	}

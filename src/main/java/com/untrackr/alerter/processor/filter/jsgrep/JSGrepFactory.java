@@ -1,12 +1,8 @@
 package com.untrackr.alerter.processor.filter.jsgrep;
 
 import com.untrackr.alerter.model.common.JsonDescriptor;
-import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
-import com.untrackr.alerter.processor.common.IncludePath;
-import com.untrackr.alerter.processor.common.ValidationError;
+import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.service.ProcessorService;
-
-import javax.script.CompiledScript;
 
 public class JSGrepFactory extends ActiveProcessorFactory {
 
@@ -15,16 +11,16 @@ public class JSGrepFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public String type() {
+	public String name() {
 		return "jsgrep";
 	}
 
 	@Override
-	public JSGrep make(JsonDescriptor jsonDescriptor, IncludePath path) throws ValidationError {
-		JSGrepDesc descriptor = convertDescriptor(path, JSGrepDesc.class, jsonDescriptor);
-		String testSource = checkFieldValue(path, jsonDescriptor, "test", descriptor.getTest());
-		CompiledScript testScript = compileScript(path, jsonDescriptor, "test", testSource);
-		JSGrep jsgrep = new JSGrep(getProcessorService(), path, testSource, testScript);
+	public Processor make(Object object) throws ValidationError {
+		JsonDescriptor scriptDescriptor = scriptDescriptor(object);
+		JSGrepDesc descriptor = convertScriptDescriptor(JSGrepDesc.class, scriptDescriptor);
+		JavascriptPredicate predicate = checkFieldValue(scriptDescriptor, "predicate", descriptor.getPredicate());
+		JSGrep jsgrep = new JSGrep(getProcessorService(), ScriptStack.currentStack(), predicate);
 		initialize(jsgrep, descriptor);
 		return jsgrep;
 	}

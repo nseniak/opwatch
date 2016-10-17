@@ -1,18 +1,19 @@
 package com.untrackr.alerter.processor.filter.collect;
 
-import com.untrackr.alerter.processor.common.ConditionalAlertGeneratorDesc;
+import com.untrackr.alerter.processor.common.ActiveProcessorDesc;
+import com.untrackr.alerter.processor.common.JavascriptTransformer;
 
-public class CollectDesc extends ConditionalAlertGeneratorDesc {
+public class CollectDesc extends ActiveProcessorDesc {
 
-	private String value;
+	private JavascriptTransformer transformer;
 	private Integer count;
 
-	public String getValue() {
-		return value;
+	public JavascriptTransformer getTransformer() {
+		return transformer;
 	}
 
-	public void setValue(String value) {
-		this.value = value;
+	public void setTransformer(JavascriptTransformer transformer) {
+		this.transformer = transformer;
 	}
 
 	public Integer getCount() {

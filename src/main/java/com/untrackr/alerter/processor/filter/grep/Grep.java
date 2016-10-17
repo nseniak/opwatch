@@ -1,6 +1,6 @@
 package com.untrackr.alerter.processor.filter.grep;
 
-import com.untrackr.alerter.processor.common.IncludePath;
+import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.common.Payload;
 import com.untrackr.alerter.processor.common.RuntimeProcessorError;
 import com.untrackr.alerter.processor.filter.ConditionalFilter;
@@ -15,15 +15,15 @@ public class Grep extends ConditionalFilter {
 	private boolean invert;
 	private boolean fieldErrorSignaled = false;
 
-	public Grep(ProcessorService processorService, IncludePath path, String fieldName, Pattern pattern, boolean invert) {
-		super(processorService, path);
+	public Grep(ProcessorService processorService, ScriptStack stack, String fieldName, Pattern pattern, boolean invert) {
+		super(processorService, stack);
 		this.fieldName = fieldName;
 		this.pattern = pattern;
 		this.invert = invert;
 	}
 
 	@Override
-	public boolean conditionValue(Payload input) {
+	public boolean predicateValue(Payload input) {
 		String text;
 		try {
 			text = payloadFieldValue(input, fieldName, String.class);

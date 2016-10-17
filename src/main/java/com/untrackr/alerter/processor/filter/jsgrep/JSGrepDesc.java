@@ -1,17 +1,18 @@
 package com.untrackr.alerter.processor.filter.jsgrep;
 
-import com.untrackr.alerter.processor.common.ConditionalAlertGeneratorDesc;
+import com.untrackr.alerter.processor.common.ActiveProcessorDesc;
+import com.untrackr.alerter.processor.common.JavascriptPredicate;
 
-public class JSGrepDesc extends ConditionalAlertGeneratorDesc {
+public class JSGrepDesc extends ActiveProcessorDesc {
 
-	private String test;
+	private JavascriptPredicate predicate;
 
-	public String getTest() {
-		return test;
+	public JavascriptPredicate getPredicate() {
+		return predicate;
 	}
 
-	public void setTest(String test) {
-		this.test = test;
+	public void setPredicate(JavascriptPredicate predicate) {
+		this.predicate = predicate;
 	}
 
 }

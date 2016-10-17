@@ -1,12 +1,13 @@
 package com.untrackr.alerter.processor.consumer.alert;
 
 import com.untrackr.alerter.processor.common.ActiveProcessorDesc;
+import com.untrackr.alerter.processor.common.JavascriptPredicate;
 
 public class AlertGeneratorDesc extends ActiveProcessorDesc {
 
 	private String priority;
 	private String title;
-	private String condition;
+	private JavascriptPredicate predicate;
 	private Boolean toggle;
 	private String application;
 	private String group;
@@ -27,12 +28,12 @@ public class AlertGeneratorDesc extends ActiveProcessorDesc {
 		this.title = title;
 	}
 
-	public String getCondition() {
-		return condition;
+	public JavascriptPredicate getPredicate() {
+		return predicate;
 	}
 
-	public void setCondition(String condition) {
-		this.condition = condition;
+	public void setPredicate(JavascriptPredicate predicate) {
+		this.predicate = predicate;
 	}
 
 	public Boolean getToggle() {

@@ -8,14 +8,14 @@ import java.util.concurrent.Future;
 public abstract class Processor {
 
 	protected ProcessorService processorService;
-	protected IncludePath path;
+	protected ScriptStack stack;
 	protected ProcessorSignature signature;
 	protected ConsumerThreadRunner consumerThreadRunner;
 	protected Future<?> consumerThreadFuture;
 
-	public Processor(ProcessorService processorService, IncludePath path) {
+	public Processor(ProcessorService processorService, ScriptStack stack) {
 		this.processorService = processorService;
-		this.path = path;
+		this.stack = stack;
 	}
 
 	public abstract void addProducer(Processor producer);
@@ -32,7 +32,7 @@ public abstract class Processor {
 
 	public abstract void consume(Payload payload);
 
-	public abstract void check() throws ValidationError;
+	public abstract void check();
 
 	public boolean allStarted(List<Processor> processors) {
 		return processors.stream().allMatch(Processor::started);
@@ -51,9 +51,9 @@ public abstract class Processor {
 		return type() + "{}";
 	}
 
-	public String pathDescriptor() {
+	public String processorDescriptor() {
 		StringBuilder builder = new StringBuilder();
-		builder.append(path.pathDescriptor()).append(" > ").append(descriptor());
+		builder.append(stack.asString()).append(" > ").append(descriptor());
 		return builder.toString();
 	}
 
@@ -61,8 +61,8 @@ public abstract class Processor {
 		return processorService;
 	}
 
-	public IncludePath getPath() {
-		return path;
+	public ScriptStack getStack() {
+		return stack;
 	}
 
 	public ProcessorSignature getSignature() {

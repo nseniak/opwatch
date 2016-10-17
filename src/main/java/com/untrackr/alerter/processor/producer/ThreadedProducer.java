@@ -1,6 +1,6 @@
 package com.untrackr.alerter.processor.producer;
 
-import com.untrackr.alerter.processor.common.IncludePath;
+import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.common.RuntimeProcessorError;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -10,8 +10,8 @@ public abstract class ThreadedProducer extends Producer {
 
 	private Future<?> future;
 
-	public ThreadedProducer(ProcessorService processorService, IncludePath path) {
-		super(processorService, path);
+	public ThreadedProducer(ProcessorService processorService, ScriptStack stack) {
+		super(processorService, stack);
 	}
 
 	@Override

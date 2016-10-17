@@ -1,12 +1,8 @@
 package com.untrackr.alerter.processor.filter.collect;
 
 import com.untrackr.alerter.model.common.JsonDescriptor;
-import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
-import com.untrackr.alerter.processor.common.IncludePath;
-import com.untrackr.alerter.processor.common.ValidationError;
+import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.service.ProcessorService;
-
-import javax.script.CompiledScript;
 
 public class CollectFactory extends ActiveProcessorFactory {
 
@@ -15,17 +11,17 @@ public class CollectFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public String type() {
+	public String name() {
 		return "collect";
 	}
 
 	@Override
-	public Collect make(JsonDescriptor jsonDescriptor, IncludePath path) throws ValidationError {
-		CollectDesc descriptor = convertDescriptor(path, CollectDesc.class, jsonDescriptor);
-		String valueSource = optionalFieldValue(path, jsonDescriptor, "value", descriptor.getValue(), null);
-		CompiledScript valueScript = (valueSource == null) ? null : compileScript(path, jsonDescriptor, "value", valueSource);
-		int count = checkFieldValue(path, jsonDescriptor, "count", descriptor.getCount());
-		Collect collect = new Collect(getProcessorService(), path, valueSource, valueScript, count);
+	public Processor make(Object object) throws ValidationError {
+		JsonDescriptor scriptDescriptor = scriptDescriptor(object);
+		CollectDesc descriptor = convertScriptDescriptor(CollectDesc.class, scriptDescriptor);
+		JavascriptTransformer transformer = optionalFieldValue(scriptDescriptor, "transformer", descriptor.getTransformer(), null);
+		int count = checkFieldValue(scriptDescriptor, "count", descriptor.getCount());
+		Collect collect = new Collect(getProcessorService(), ScriptStack.currentStack(), transformer, count);
 		initialize(collect, descriptor);
 		return collect;
 	}

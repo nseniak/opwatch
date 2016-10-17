@@ -3,35 +3,29 @@ package com.untrackr.alerter.processor.filter.collect;
 import com.google.common.collect.EvictingQueue;
 import com.untrackr.alerter.common.ObjectSeries;
 import com.untrackr.alerter.common.SeriesObject;
-import com.untrackr.alerter.processor.common.IncludePath;
+import com.untrackr.alerter.processor.common.JavascriptTransformer;
 import com.untrackr.alerter.processor.common.Payload;
+import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.filter.Filter;
 import com.untrackr.alerter.service.ProcessorService;
 
-import javax.script.Bindings;
-import javax.script.CompiledScript;
-
 public class Collect extends Filter {
 
-	private String source;
-	private CompiledScript value;
+	private JavascriptTransformer transformer;
 	private int count;
 	private EvictingQueue<Object> queue;
-	private Bindings bindings;
 
-	public Collect(ProcessorService processorService, IncludePath path, String source, CompiledScript value, int count) {
-		super(processorService, path);
-		this.source = source;
-		this.value = value;
+	public Collect(ProcessorService processorService, ScriptStack stack, JavascriptTransformer transformer, int count) {
+		super(processorService, stack);
+		this.transformer = transformer;
 		this.count = count;
 		this.queue = EvictingQueue.create(count);
-		this.bindings = processorService.getNashorn().createBindings();
 	}
 
 	@Override
 	public void consume(Payload payload) {
 		long timestamp = System.currentTimeMillis();
-		Object result = (value == null) ? payload.getJsonObject() : runScript(value, bindings, payload);
+		Object result = (transformer == null) ? payload.getScriptObject() : transformer.call(payload, this);
 		if (result != null) {
 			queue.add(result);
 			if (queue.size() == count) {
@@ -48,7 +42,7 @@ public class Collect extends Filter {
 
 	@Override
 	public String identifier() {
-		return source;
+		return transformer.toString();
 	}
 
 }

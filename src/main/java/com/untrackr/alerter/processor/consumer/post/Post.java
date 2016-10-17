@@ -1,7 +1,7 @@
 package com.untrackr.alerter.processor.consumer.post;
 
 import com.untrackr.alerter.common.RemotePayload;
-import com.untrackr.alerter.processor.common.IncludePath;
+import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.common.Payload;
 import com.untrackr.alerter.processor.common.RuntimeProcessorError;
 import com.untrackr.alerter.processor.consumer.Consumer;
@@ -20,8 +20,8 @@ public class Post extends Consumer {
 	private String urlPath;
 	private boolean postErrorSignaled = false;
 
-	public Post(ProcessorService processorService, IncludePath path, String pathString, String hostname, int port, String urlPath) {
-		super(processorService, path);
+	public Post(ProcessorService processorService, ScriptStack stack, String pathString, String hostname, int port, String urlPath) {
+		super(processorService, stack);
 		this.pathString = pathString;
 		this.hostname = hostname;
 		this.port = port;

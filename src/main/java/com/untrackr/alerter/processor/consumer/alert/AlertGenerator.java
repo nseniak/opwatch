@@ -2,39 +2,35 @@ package com.untrackr.alerter.processor.consumer.alert;
 
 import com.untrackr.alerter.model.common.Alert;
 import com.untrackr.alerter.model.common.PushoverKey;
-import com.untrackr.alerter.processor.common.IncludePath;
+import com.untrackr.alerter.processor.common.JavascriptPredicate;
 import com.untrackr.alerter.processor.common.Payload;
+import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.consumer.Consumer;
 import com.untrackr.alerter.service.ProcessorService;
-
-import javax.script.Bindings;
-import javax.script.CompiledScript;
 
 public class AlertGenerator extends Consumer {
 
 	private Alert.Priority priority;
 	private String title;
-	private CompiledScript condition;
+	private JavascriptPredicate predicate;
 	private boolean toggle;
-	private Bindings bindings;
 	private boolean toggleUp;
 	private PushoverKey pushoverKey;
 
 
-	public AlertGenerator(ProcessorService processorService, IncludePath path, PushoverKey pushoverKey, String title,
-												Alert.Priority priority, CompiledScript condition, boolean toggle) {
-		super(processorService, path);
+	public AlertGenerator(ProcessorService processorService, ScriptStack stack, PushoverKey pushoverKey, String title,
+												Alert.Priority priority, JavascriptPredicate predicate, boolean toggle) {
+		super(processorService, stack);
 		this.priority = priority;
 		this.title = title;
-		this.condition = condition;
+		this.predicate = predicate;
 		this.toggle = toggle;
 		this.pushoverKey = pushoverKey;
-		this.bindings = processorService.getNashorn().createBindings();
 	}
 
 	@Override
 	public void consume(Payload payload) {
-		boolean alert = (condition == null) || scriptBooleanValue(condition, bindings, payload);
+		boolean alert = (predicate == null) || predicate.call(payload, this);
 		if (!toggle) {
 			if (alert) {
 				processorService.processorAlert(pushoverKey, priority, title, payload, this);
@@ -51,10 +47,6 @@ public class AlertGenerator extends Consumer {
 
 	public String type() {
 		return "alert";
-	}
-
-	public void setCondition(CompiledScript condition) {
-		this.condition = condition;
 	}
 
 	@Override

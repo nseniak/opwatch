@@ -5,9 +5,6 @@ import com.untrackr.alerter.service.ProcessorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.script.Bindings;
-import javax.script.CompiledScript;
-import javax.script.ScriptException;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -20,11 +17,10 @@ public abstract class ActiveProcessor extends Processor {
 	private long lastOutputTime = 0;
 	private String name;
 	protected boolean started;
-	private boolean nonBooleanValueErrorSignaled;
-	private Set<CompiledScript> scriptErrorSignaled = new HashSet<>();
+	private Set<JavascriptFunction> scriptErrorSignaled = new HashSet<>();
 
-	public ActiveProcessor(ProcessorService processorService, IncludePath path) {
-		super(processorService, path);
+	public ActiveProcessor(ProcessorService processorService, ScriptStack stack) {
+		super(processorService, stack);
 	}
 
 	@Override
@@ -69,7 +65,7 @@ public abstract class ActiveProcessor extends Processor {
 
 	protected abstract void doStop();
 
-	public void check() throws ValidationError {
+	public void check() {
 		StringJoiner joiner = new StringJoiner(", ");
 		switch (signature.getInputRequirement()) {
 			case required:
@@ -100,7 +96,7 @@ public abstract class ActiveProcessor extends Processor {
 				break;
 		}
 		if (joiner.length() != 0) {
-			throw new ValidationError("incorrect pipe: " + joiner.toString(), path);
+			throw new ScriptExecutionError("incorrect pipe: " + joiner.toString(), stack);
 		}
 	}
 
@@ -131,7 +127,7 @@ public abstract class ActiveProcessor extends Processor {
 
 	public void output(List<Processor> consumers, Payload payload) {
 		if (processorService.getProfileService().profile().isTrace()) {
-			logger.info("Output: " + pathDescriptor() + " ==> " + payload.asText());
+			logger.info("Output: " + processorDescriptor() + " ==> " + payload.asText());
 		}
 		long now = System.currentTimeMillis();
 		long elapsedSinceLastOutput = now - lastOutputTime;
@@ -163,7 +159,7 @@ public abstract class ActiveProcessor extends Processor {
 	}
 
 	public <T> T payloadFieldValue(Payload input, String fieldName, Class<T> clazz) {
-		Object jsonObject = input.getJsonObject();
+		Object jsonObject = input.getScriptObject();
 		Object value = null;
 		if (jsonObject instanceof Map) {
 			value = ((Map) jsonObject).get(fieldName);
@@ -185,32 +181,8 @@ public abstract class ActiveProcessor extends Processor {
 		return (T) value;
 	}
 
-	public Object runScript(CompiledScript value, Bindings bindings, Payload payload) {
-		// Copy the input because the js code might do side effects on it
-		bindings.put("input", payload.getJsonObject());
-		try {
-			return value.eval(bindings);
-		} catch (ScriptException e) {
-			RuntimeProcessorError error = new RuntimeProcessorError(e, this, payload);
-			error.setSilent(scriptErrorSignaled.add(value));
-			throw error;
-		}
-	}
-
-	public boolean scriptBooleanValue(CompiledScript value, Bindings bindings, Payload payload) {
-		Object result = runScript(value, bindings, payload);
-		if (result == Boolean.TRUE) {
-			return true;
-		} else if (result == Boolean.FALSE) {
-			return false;
-		} else {
-			if (nonBooleanValueErrorSignaled) {
-				return false;
-			} else {
-				nonBooleanValueErrorSignaled = true;
-				throw new RuntimeProcessorError("test returned a non-boolean value: " + processorService.valueAsString(result), this, payload);
-			}
-		}
+	public boolean scriptErrorSignaled(JavascriptFunction function) {
+		return scriptErrorSignaled.add(function);
 	}
 
 	public String identifier() {

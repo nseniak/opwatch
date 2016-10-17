@@ -1,20 +1,20 @@
 package com.untrackr.alerter.processor.special.parallel;
 
-import com.untrackr.alerter.model.common.JsonDescriptor;
+import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ProcessorDesc;
 
 import java.util.List;
 
 public class ParallelDesc extends ProcessorDesc {
 
-	private List<JsonDescriptor> parallel;
+	private List<Processor> processors;
 
-	public List<JsonDescriptor> getParallel() {
-		return parallel;
+	public List<Processor> getProcessors() {
+		return processors;
 	}
 
-	public void setParallel(List<JsonDescriptor> parallel) {
-		this.parallel = parallel;
+	public void setProcessors(List<Processor> processors) {
+		this.processors = processors;
 	}
 
 }

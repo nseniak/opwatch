@@ -1,8 +1,10 @@
 package com.untrackr.alerter.processor.filter.grep;
 
-import com.untrackr.alerter.processor.common.ConditionalAlertGeneratorDesc;
+import com.untrackr.alerter.processor.common.ActiveProcessorDesc;
 
-public class GrepDesc extends ConditionalAlertGeneratorDesc {
+import java.util.List;
+
+public class GrepDesc extends ActiveProcessorDesc {
 
 	/**
 	 * Field name. Defaults to "text".
@@ -15,7 +17,7 @@ public class GrepDesc extends ConditionalAlertGeneratorDesc {
 	/**
 	 * List of regexes. Mutually exclusive with regex.
 	 */
-	private String[] regexes;
+	private List<String> regexes;
 	/**
 	 * Exclude regex. Defaults to false.
 	 */
@@ -37,11 +39,11 @@ public class GrepDesc extends ConditionalAlertGeneratorDesc {
 		this.regex = regex;
 	}
 
-	public String[] getRegexes() {
+	public List<String> getRegexes() {
 		return regexes;
 	}
 
-	public void setRegexes(String[] regexes) {
+	public void setRegexes(List<String> regexes) {
 		this.regexes = regexes;
 	}
 

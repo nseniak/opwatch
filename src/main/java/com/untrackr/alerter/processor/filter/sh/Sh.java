@@ -1,9 +1,8 @@
 package com.untrackr.alerter.processor.filter.sh;
 
-import com.untrackr.alerter.processor.common.IncludePath;
+import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.common.Payload;
 import com.untrackr.alerter.processor.common.ProcessorSignature;
-import com.untrackr.alerter.processor.common.RuntimeProcessorError;
 import com.untrackr.alerter.processor.filter.Filter;
 import com.untrackr.alerter.processor.producer.CommandRunner;
 import com.untrackr.alerter.service.ProcessorService;
@@ -15,8 +14,8 @@ public class Sh extends Filter {
 	protected Future<?> commandConsumerThreadFuture;
 	private CommandRunner commandRunner;
 
-	public Sh(ProcessorService processorService, IncludePath path, CommandRunner commandRunner) {
-		super(processorService, path);
+	public Sh(ProcessorService processorService, ScriptStack stack, CommandRunner commandRunner) {
+		super(processorService, stack);
 		this.commandRunner = commandRunner;
 		this.signature = new ProcessorSignature(ProcessorSignature.PipeRequirement.any, ProcessorSignature.PipeRequirement.any);
 	}

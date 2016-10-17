@@ -1,7 +1,8 @@
 package com.untrackr.alerter.processor.producer.cron;
 
 import com.untrackr.alerter.model.common.JsonDescriptor;
-import com.untrackr.alerter.processor.common.IncludePath;
+import com.untrackr.alerter.processor.common.Processor;
+import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.common.ValidationError;
 import com.untrackr.alerter.processor.producer.CommandRunner;
 import com.untrackr.alerter.processor.producer.ScheduledExecutor;
@@ -15,16 +16,17 @@ public class CronFactory extends ScheduledExecutorFactory {
 	}
 
 	@Override
-	public String type() {
+	public String name() {
 		return "cron";
 	}
 
 	@Override
-	public Cron make(JsonDescriptor jsonDescriptor, IncludePath path) throws ValidationError {
-		CronDesc descriptor = convertDescriptor(path, CronDesc.class, jsonDescriptor);
-		ScheduledExecutor executor = makeScheduledExecutor(path, jsonDescriptor, descriptor);
-		CommandRunner runner = makeCommandOutputProducer(path, jsonDescriptor, descriptor);
-		Cron cron = new Cron(getProcessorService(), path, executor, runner);
+	public Processor make(Object object) throws ValidationError {
+		JsonDescriptor jsonDescriptor = scriptDescriptor(object);
+		CronDesc descriptor = convertScriptDescriptor(CronDesc.class, jsonDescriptor);
+		ScheduledExecutor executor = makeScheduledExecutor(jsonDescriptor, descriptor);
+		CommandRunner runner = makeCommandOutputProducer(jsonDescriptor, descriptor);
+		Cron cron = new Cron(getProcessorService(), ScriptStack.currentStack(), executor, runner);
 		initialize(cron, descriptor);
 		return cron;
 	}

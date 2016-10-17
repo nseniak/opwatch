@@ -6,6 +6,10 @@ public class RuntimeProcessorError extends RuntimeException {
 	private Payload payload;
 	private boolean silent;
 
+	public RuntimeProcessorError(String message, Processor processor) {
+		this(message, processor, null);
+	}
+
 	public RuntimeProcessorError(String message, Processor processor, Payload payload) {
 		super(message);
 		this.processor = processor;
@@ -16,6 +20,10 @@ public class RuntimeProcessorError extends RuntimeException {
 		super(t);
 		this.processor = processor;
 		this.payload = payload;
+	}
+
+	public RuntimeProcessorError(Throwable t, Processor processor) {
+		this(t, processor, null);
 	}
 
 	public Processor getProcessor() {

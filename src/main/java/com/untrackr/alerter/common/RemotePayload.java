@@ -12,7 +12,7 @@ public class RemotePayload {
 	}
 
 	public RemotePayload(Payload payload) {
-		this.jsonObject = payload.getJsonObject();
+		this.jsonObject = payload.getScriptObject();
 		this.timestamp = payload.getTimestamp();
 		this.hostname = payload.getHostname();
 	}

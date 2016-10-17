@@ -1,8 +1,5 @@
 package com.untrackr.alerter.model.common;
 
-import com.untrackr.alerter.processor.common.IncludePath;
-import com.untrackr.alerter.processor.common.ValidationError;
-
 import java.util.List;
 
 public class PushoverSettings {

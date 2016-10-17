@@ -7,7 +7,7 @@ public class CronDesc extends ScheduledProducerDesc implements CommandExecutorDe
 
 	private String command;
 
-	public String getCommand() {
+	public String getGenerator() {
 		return command;
 	}
 

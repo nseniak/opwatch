@@ -1,34 +1,26 @@
 package com.untrackr.alerter.processor.producer.trail;
 
-import com.untrackr.alerter.common.SeriesObject;
 import com.untrackr.alerter.common.ObjectSeries;
-import com.untrackr.alerter.processor.common.IncludePath;
-import com.untrackr.alerter.processor.common.Payload;
-import com.untrackr.alerter.processor.common.ProcessorSignature;
+import com.untrackr.alerter.common.SeriesObject;
+import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.processor.producer.ScheduledExecutor;
 import com.untrackr.alerter.processor.producer.ScheduledProducer;
 import com.untrackr.alerter.service.ProcessorService;
 
-import javax.script.Bindings;
-import javax.script.CompiledScript;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class Trail extends ScheduledProducer {
 
-	private String source;
-	private CompiledScript value;
+	private JavascriptTransformer transformer;
 	private long duration;
 	private LinkedBlockingQueue<SeriesObject> queue;
-	private Bindings bindings;
 	private long startupTimestamp;
 
-	public Trail(ProcessorService processorService, IncludePath path, ScheduledExecutor scheduledExecutor, String source, CompiledScript value, long duration) {
-		super(processorService, path, scheduledExecutor);
-		this.source = source;
-		this.value = value;
+	public Trail(ProcessorService processorService, ScriptStack stack, ScheduledExecutor scheduledExecutor, JavascriptTransformer transformer, long duration) {
+		super(processorService, stack, scheduledExecutor);
+		this.transformer = transformer;
 		this.duration = duration;
 		this.queue = new LinkedBlockingQueue<>();
-		this.bindings = processorService.getNashorn().createBindings();
 		this.signature = ProcessorSignature.makeFilter();
 	}
 
@@ -47,7 +39,7 @@ public class Trail extends ScheduledProducer {
 	@Override
 	public void consume(Payload payload) {
 		long timestamp = System.currentTimeMillis();
-		Object result = (value == null) ? payload.getJsonObject() : runScript(value, bindings, payload);
+		Object result = (transformer == null) ? payload.getScriptObject() : transformer.call(payload, this);
 		if (result != null) {
 			queue.add(new SeriesObject(result, timestamp));
 		}
@@ -65,7 +57,7 @@ public class Trail extends ScheduledProducer {
 
 	@Override
 	public String identifier() {
-		return source;
+		return transformer.toString();
 	}
 
 }

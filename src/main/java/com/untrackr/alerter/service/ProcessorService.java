@@ -11,7 +11,7 @@ import com.untrackr.alerter.model.common.AlertData;
 import com.untrackr.alerter.model.common.AlerterProfile;
 import com.untrackr.alerter.model.common.PushoverKey;
 import com.untrackr.alerter.processor.common.*;
-import com.untrackr.alerter.processor.filter.print.Print;
+import com.untrackr.alerter.processor.filter.print.Echo;
 import com.untrackr.alerter.processor.producer.console.Console;
 import com.untrackr.alerter.processor.special.pipe.Pipe;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
@@ -24,7 +24,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
-import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.io.File;
 import java.io.IOException;
@@ -75,8 +74,6 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	private ObjectMapper objectMapper;
 
-	private NashornScriptEngine nashorn;
-
 	private Processor mainProcessor;
 
 	private String mainProcessorFile;
@@ -113,9 +110,6 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 				throw new IllegalStateException("cannot determine hostname; please define environment variable ALERTER_HOSTNAME");
 			}
 		}
-		// Nashorn
-		nashorn = (NashornScriptEngine) new ScriptEngineManager().getEngineByName("nashorn");
-		logger.info("Hostname: " + hostName);
 	}
 
 
@@ -127,21 +121,20 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			}
 			mainProcessorFile = property("alerter.main");
 			boolean error = withErrorHandling(null, null, () -> {
-				IncludePath emptyPath = new IncludePath();
-				mainProcessor = factoryService.loadProcessor(mainProcessorFile, emptyPath);
+				mainProcessor = factoryService.loadProcessor(mainProcessorFile);
 				if (profileService.profile().isInteractive()) {
 					List<Processor> pipeProcessors = new ArrayList<>();
 					if (mainProcessor.getSignature().getInputRequirement() != ProcessorSignature.PipeRequirement.forbidden) {
 						logger.info("Adding \"console\" as input processor");
-						pipeProcessors.add(new Console(this, emptyPath));
+						pipeProcessors.add(new Console(this, ScriptStack.emptyStack()));
 					}
 					pipeProcessors.add(mainProcessor);
 					if (mainProcessor.getSignature().getOutputRequirement() != ProcessorSignature.PipeRequirement.forbidden) {
 						logger.info("Adding \"print\" as output processor");
-						pipeProcessors.add(new Print(this, emptyPath));
+						pipeProcessors.add(new Echo(this, ScriptStack.emptyStack()));
 					}
 					if (pipeProcessors.size() != 1) {
-						mainProcessor = new Pipe(this, pipeProcessors, emptyPath);
+						mainProcessor = new Pipe(this, pipeProcessors, ScriptStack.emptyStack());
 					}
 				}
 				mainProcessor.check();
@@ -182,13 +175,13 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		}
 	}
 
-	public void displayValidationError(ValidationError e) {
+	public void displayScriptExecutionError(ScriptExecutionError e) {
 		String title = "Alerter startup error";
 		String message = e.getLocalizedMessage();
 		AlertData data = new AlertData();
-		IncludePath path = e.getPath();
-		if ((path != null) && !path.isEmpty()) {
-			data.add("location", path.pathDescriptor());
+		ScriptStack stack = e.getScriptStack();
+		if (!stack.empty()) {
+			data.add("stack", stack.asString());
 		}
 		data.add("hostname", getHostName());
 		Throwable c = e.getCause();
@@ -231,7 +224,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		data.add("hostname", getHostName());
 		Processor processor = e.getProcessor();
 		Payload payload = e.getPayload();
-		String location = (payload == null) ? processor.pathDescriptor() : payload.pathDescriptor(processor);
+		String location = (payload == null) ? processor.processorDescriptor() : payload.pathDescriptor(processor);
 		data.add("location", location);
 		if (payload != null) {
 			data.add("input", payload.asText());
@@ -278,8 +271,8 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 				error = false;
 			} catch (RuntimeProcessorError e) {
 				displayRuntimeError(e);
-			} catch (ValidationError e) {
-				displayValidationError(e);
+			} catch (ScriptExecutionError e) {
+				displayScriptExecutionError(e);
 			} catch (Throwable t) {
 				displayRuntimeError(new RuntimeProcessorError(t, processor, payload));
 			}
@@ -287,34 +280,6 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			logger.error("Error while displaying error", t);
 		}
 		return error;
-	}
-
-	public IncludePath.LoadedFile findFile(String filename, IncludePath currentPath) {
-		File file = new File(filename);
-		if (file.exists() && file.isFile()) {
-			return new IncludePath.LoadedFile(filename, file);
-		}
-		if (file.isAbsolute()) {
-			return null;
-		}
-		if (!currentPath.isEmpty()) {
-			IncludePath.LoadedFile last = currentPath.last();
-			String lastParentDir = last.getFile().getParent();
-			if (lastParentDir == null) {
-				lastParentDir = ".";
-			}
-			File relative = new File(lastParentDir, filename);
-			if (relative.exists() && relative.isFile()) {
-				return new IncludePath.LoadedFile(filename, relative);
-			}
-		}
-		for (File directory : descriptorDirectories) {
-			File directoryFile = new File(directory, filename);
-			if (directoryFile.exists() && directoryFile.isFile()) {
-				return new IncludePath.LoadedFile(filename, directoryFile);
-			}
-		}
-		return null;
 	}
 
 	public String valueAsString(Object value) {
@@ -381,12 +346,12 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		return objectMapper;
 	}
 
-	public NashornScriptEngine getNashorn() {
-		return nashorn;
-	}
-
 	public String getHostName() {
 		return hostName;
+	}
+
+	public NashornScriptEngine scriptEngine() {
+		return factoryService.getScriptEngine();
 	}
 
 }

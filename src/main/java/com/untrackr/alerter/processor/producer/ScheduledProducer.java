@@ -1,6 +1,6 @@
 package com.untrackr.alerter.processor.producer;
 
-import com.untrackr.alerter.processor.common.IncludePath;
+import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.common.Payload;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -8,8 +8,8 @@ public abstract class ScheduledProducer extends Producer {
 
 	private ScheduledExecutor scheduledExecutor;
 
-	public ScheduledProducer(ProcessorService processorService, IncludePath path, ScheduledExecutor scheduledExecutor) {
-		super(processorService, path);
+	public ScheduledProducer(ProcessorService processorService, ScriptStack stack, ScheduledExecutor scheduledExecutor) {
+		super(processorService, stack);
 		this.scheduledExecutor = scheduledExecutor;
 	}
 

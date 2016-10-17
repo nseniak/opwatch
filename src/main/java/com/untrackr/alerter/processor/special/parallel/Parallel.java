@@ -10,8 +10,8 @@ public class Parallel extends Processor {
 
 	private List<Processor> processors;
 
-	public Parallel(ProcessorService processorService, List<Processor> processors, IncludePath path) throws ValidationError {
-		super(processorService, path);
+	public Parallel(ProcessorService processorService, List<Processor> processors, ScriptStack stack) throws ValidationError {
+		super(processorService, stack);
 		this.processors = processors;
 	}
 
@@ -61,13 +61,13 @@ public class Parallel extends Processor {
 		// Nothing to do. Producers and consumers are already connected.
 	}
 
-	public void inferSignature(JsonDescriptor jsonObject, IncludePath path) throws ValidationError {
+	public void inferSignature(JsonDescriptor jsonObject) {
 		signature = new ProcessorSignature(ProcessorSignature.PipeRequirement.any, ProcessorSignature.PipeRequirement.any);
 		for (Processor processor : processors) {
 			ProcessorSignature bottomSignature = signature.bottom(processor.getSignature());
 			if (bottomSignature == null) {
 				String message = "signature of " + processor.descriptor() + " is " + processor.getSignature().describe() + " and is inconsistent with previous processors in parallel group: " + signature.describe();
-				throw new ValidationError(message, path, jsonObject);
+				throw new ValidationError(message, jsonObject);
 			}
 			signature = bottomSignature;
 		}

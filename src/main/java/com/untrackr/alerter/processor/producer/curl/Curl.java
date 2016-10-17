@@ -2,7 +2,7 @@ package com.untrackr.alerter.processor.producer.curl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.untrackr.alerter.common.ScriptObject;
-import com.untrackr.alerter.processor.common.IncludePath;
+import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.producer.ScheduledExecutor;
 import com.untrackr.alerter.processor.producer.ScheduledProducer;
 import com.untrackr.alerter.service.ProcessorService;
@@ -30,13 +30,13 @@ public class Curl extends ScheduledProducer {
 	private MediaType anyText = MediaType.valueOf("text/*");
 
 	public Curl(ProcessorService processorService,
-							IncludePath path,
+							ScriptStack stack,
 							ScheduledExecutor scheduledExecutor,
 							URI uri,
 							int connectTimeout,
 							int readTimeout,
 							boolean insecure) {
-		super(processorService, path, scheduledExecutor);
+		super(processorService, stack, scheduledExecutor);
 		this.uri = uri;
 		this.connectTimeout = connectTimeout;
 		this.readTimeout = readTimeout;

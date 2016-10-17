@@ -29,7 +29,7 @@ public class CommandRunner {
 
 	public void startProcess(ActiveProcessor processor) {
 		try {
-			File currentDescDir = processor.getPath().last().getFile().getParentFile();
+			File currentDescDir = new File(processor.getStack().top().getFileName()).getParentFile();
 			String[] cmdArray = {"/bin/sh", "-c", command};
 			process = Runtime.getRuntime().exec(cmdArray, null, currentDescDir);
 		} catch (Throwable t) {
