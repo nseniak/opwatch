@@ -54,7 +54,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	private AlertService alertService;
 
 	@Autowired
-	private FactoryService factoryService;
+	private ScriptService scriptService;
 
 	@Autowired
 	private FileTailingService fileTailingService;
@@ -121,7 +121,8 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			}
 			mainProcessorFile = property("alerter.main");
 			boolean error = withErrorHandling(null, null, () -> {
-				mainProcessor = factoryService.loadProcessor(mainProcessorFile);
+				scriptService.initialize();
+				mainProcessor = scriptService.loadProcessor(mainProcessorFile);
 				if (profileService.profile().isInteractive()) {
 					List<Processor> pipeProcessors = new ArrayList<>();
 					if (mainProcessor.getSignature().getInputRequirement() != ProcessorSignature.PipeRequirement.forbidden) {
@@ -318,10 +319,6 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		return profileService;
 	}
 
-	public FactoryService getFactoryService() {
-		return factoryService;
-	}
-
 	public FileTailingService getFileTailingService() {
 		return fileTailingService;
 	}
@@ -351,7 +348,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	}
 
 	public NashornScriptEngine scriptEngine() {
-		return factoryService.getScriptEngine();
+		return scriptService.getScriptEngine();
 	}
 
 }
