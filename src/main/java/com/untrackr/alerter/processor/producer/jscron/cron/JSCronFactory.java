@@ -1,6 +1,6 @@
 package com.untrackr.alerter.processor.producer.jscron.cron;
 
-import com.untrackr.alerter.processor.common.JavascriptGenerator;
+import com.untrackr.alerter.processor.common.JavascriptProducer;
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.common.ValidationError;
@@ -23,8 +23,8 @@ public class JSCronFactory extends ScheduledExecutorFactory {
 	public Processor make(Object scriptObject) throws ValidationError {
 		JSCronDesc descriptor = convertProcessorArgument(JSCronDesc.class, scriptObject);
 		ScheduledExecutor executor = makeScheduledExecutor(descriptor);
-		JavascriptGenerator generator = checkFieldValue("generator", descriptor.getGenerator());
-		JSCron JSCron = new JSCron(getProcessorService(), ScriptStack.currentStack(), executor, generator);
+		JavascriptProducer producer = checkFieldValue("producer", descriptor.getProducer());
+		JSCron JSCron = new JSCron(getProcessorService(), ScriptStack.currentStack(), executor, producer);
 		initialize(JSCron, descriptor);
 		return JSCron;
 	}

@@ -110,8 +110,8 @@ public abstract class ActiveProcessor extends Processor {
 		}
 	}
 
-	public void outputFiltered(Object object, Payload input) {
-		Payload payload = Payload.makeFiltered(processorService, this, object, input);
+	public void outputTransformed(Object object, Payload input) {
+		Payload payload = Payload.makeTransformed(processorService, this, object, input);
 		output(consumers, payload);
 	}
 

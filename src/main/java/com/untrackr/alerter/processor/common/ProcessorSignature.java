@@ -22,7 +22,7 @@ public class ProcessorSignature {
 		return new ProcessorSignature(PipeRequirement.required, PipeRequirement.forbidden);
 	}
 
-	public static ProcessorSignature makeFilter() {
+	public static ProcessorSignature makeTransformer() {
 		return new ProcessorSignature(PipeRequirement.required, PipeRequirement.required);
 	}
 

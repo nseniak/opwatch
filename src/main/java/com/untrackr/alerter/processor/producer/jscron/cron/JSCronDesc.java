@@ -1,18 +1,18 @@
 package com.untrackr.alerter.processor.producer.jscron.cron;
 
-import com.untrackr.alerter.processor.common.JavascriptGenerator;
+import com.untrackr.alerter.processor.common.JavascriptProducer;
 import com.untrackr.alerter.processor.common.ScheduledProducerDesc;
 
 public class JSCronDesc extends ScheduledProducerDesc {
 
-	private JavascriptGenerator generator;
+	private JavascriptProducer producer;
 
-	public JavascriptGenerator getGenerator() {
-		return generator;
+	public JavascriptProducer getProducer() {
+		return producer;
 	}
 
-	public void setGenerator(JavascriptGenerator generator) {
-		this.generator = generator;
+	public void setProducer(JavascriptProducer producer) {
+		this.producer = producer;
 	}
 
 }

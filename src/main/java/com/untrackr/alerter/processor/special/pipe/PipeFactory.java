@@ -4,7 +4,7 @@ import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ProcessorFactory;
 import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.common.ValidationError;
-import com.untrackr.alerter.processor.filter.identity.Identity;
+import com.untrackr.alerter.processor.transformer.identity.Identity;
 import com.untrackr.alerter.service.ProcessorService;
 
 public class PipeFactory extends ProcessorFactory {

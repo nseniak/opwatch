@@ -31,16 +31,6 @@ public abstract class ProcessorFactory {
 
 	public abstract Processor make(Object scriptObject);
 
-	private String scriptTypeName(Object object) {
-		if (object instanceof String) {
-			return "string";
-		} else if (object instanceof Number) {
-			return "number";
-		} else {
-			return object.getClass().getName();
-		}
-	}
-
 	protected <T> T convertProcessorArgument(Class<T> clazz, Object scriptObject) {
 		return (T) convertScriptValue(ConvertedValueSource.makeArgument(), clazz, scriptObject);
 	}
@@ -58,8 +48,8 @@ public abstract class ProcessorFactory {
 					return new JavascriptTransformer(scriptObject);
 				} else if (type == JavascriptPredicate.class) {
 					return new JavascriptPredicate(scriptObject);
-				} else if (type == JavascriptGenerator.class) {
-					return new JavascriptGenerator(scriptObject);
+				} else if (type == JavascriptProducer.class) {
+					return new JavascriptProducer(scriptObject);
 				} else {
 					Object value = BeanUtils.instantiate(clazz);
 					BeanWrapperImpl wrapper = new BeanWrapperImpl(value);

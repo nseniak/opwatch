@@ -11,7 +11,7 @@ import com.untrackr.alerter.model.common.AlertData;
 import com.untrackr.alerter.model.common.AlerterProfile;
 import com.untrackr.alerter.model.common.PushoverKey;
 import com.untrackr.alerter.processor.common.*;
-import com.untrackr.alerter.processor.filter.print.Echo;
+import com.untrackr.alerter.processor.transformer.print.Echo;
 import com.untrackr.alerter.processor.producer.console.Console;
 import com.untrackr.alerter.processor.special.pipe.Pipe;
 import jdk.nashorn.api.scripting.NashornScriptEngine;

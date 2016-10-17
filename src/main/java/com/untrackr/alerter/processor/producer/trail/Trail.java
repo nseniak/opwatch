@@ -21,7 +21,7 @@ public class Trail extends ScheduledProducer {
 		this.transformer = transformer;
 		this.duration = duration;
 		this.queue = new LinkedBlockingQueue<>();
-		this.signature = ProcessorSignature.makeFilter();
+		this.signature = ProcessorSignature.makeTransformer();
 	}
 
 	@Override

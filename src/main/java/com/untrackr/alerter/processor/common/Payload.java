@@ -53,7 +53,7 @@ public class Payload {
 		);
 	}
 
-	public static Payload makeFiltered(ProcessorService processorService, Processor producer, Object object, Payload input) {
+	public static Payload makeTransformed(ProcessorService processorService, Processor producer, Object object, Payload input) {
 		return new Payload(
 				processorService,
 				producer,

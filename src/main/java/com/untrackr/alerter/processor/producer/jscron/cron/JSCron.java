@@ -1,6 +1,6 @@
 package com.untrackr.alerter.processor.producer.jscron.cron;
 
-import com.untrackr.alerter.processor.common.JavascriptGenerator;
+import com.untrackr.alerter.processor.common.JavascriptProducer;
 import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.producer.ScheduledExecutor;
 import com.untrackr.alerter.processor.producer.ScheduledProducer;
@@ -8,16 +8,16 @@ import com.untrackr.alerter.service.ProcessorService;
 
 public class JSCron extends ScheduledProducer {
 
-	private JavascriptGenerator generator;
+	private JavascriptProducer producer;
 
-	public JSCron(ProcessorService processorService, ScriptStack stack, ScheduledExecutor scheduledExecutor, JavascriptGenerator generator) {
+	public JSCron(ProcessorService processorService, ScriptStack stack, ScheduledExecutor scheduledExecutor, JavascriptProducer producer) {
 		super(processorService, stack, scheduledExecutor);
-		this.generator = generator;
+		this.producer = producer;
 	}
 
 	@Override
 	protected void produce() {
-		Object result = generator.call(this);
+		Object result = producer.call(this);
 		if (result != null) {
 			outputProduced(result);
 		}
@@ -25,7 +25,7 @@ public class JSCron extends ScheduledProducer {
 
 	@Override
 	public String identifier() {
-		return generator.toString();
+		return producer.toString();
 	}
 
 }
