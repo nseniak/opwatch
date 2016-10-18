@@ -172,6 +172,11 @@ public abstract class ProcessorFactory {
 		}
 	}
 
+	protected void initialize(Processor processor, ProcessorDesc processorDesc) {
+		String name = (processorDesc.getName() != null) ? processorDesc.getName() : name();
+		processor.setName(name);
+	}
+
 	public ProcessorService getProcessorService() {
 		return processorService;
 	}

@@ -86,7 +86,7 @@ public class CommandRunner {
 						return;
 					}
 					if ((exitTimeout >= 0) && ((System.currentTimeMillis() - t0) > exitTimeout)) {
-						throw new ProcessorExecutionException("timeout waiting for script output", processor, null);
+						throw new ProcessorExecutionException("timeout waiting for script output", processor);
 					}
 					Thread.sleep(profile.getCronScriptOutputCheckDelay());
 				}
@@ -129,7 +129,7 @@ public class CommandRunner {
 			} catch (IOException e) {
 				// Nothing to do
 			}
-			throw new ProcessorExecutionException("command exited with error status: " + process.exitValue() + output, processor, null);
+			throw new ProcessorExecutionException("command exited with error status: " + process.exitValue() + output, processor);
 		}
 		return false;
 	}

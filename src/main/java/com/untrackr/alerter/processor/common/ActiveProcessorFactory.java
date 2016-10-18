@@ -10,12 +10,6 @@ public abstract class ActiveProcessorFactory extends ProcessorFactory {
 		super(processorService);
 	}
 
-	protected void initialize(ActiveProcessor processor, ActiveProcessorDesc processorDesc) {
-		if (processorDesc.getName() != null) {
-			processor.setName(processorDesc.getName());
-		}
-	}
-
 	protected CommandRunner makeCommandOutputProducer(CommandExecutorDesc descriptor) {
 		String command = checkVariableSubstitution("command", checkFieldValue("command", descriptor.getGenerator()));
 		return new CommandRunner(processorService, command);

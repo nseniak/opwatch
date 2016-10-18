@@ -24,7 +24,7 @@ public class ScheduledExecutor {
 	public void stop(ScheduledProducer processor) {
 		boolean stopped = scheduledFuture.cancel(true);
 		if (!stopped) {
-			throw new ProcessorExecutionException("cannot stop scheduled producer", processor, null);
+			throw new ProcessorExecutionException("cannot stop scheduled producer", processor);
 		}
 	}
 

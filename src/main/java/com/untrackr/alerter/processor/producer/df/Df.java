@@ -28,7 +28,7 @@ public class Df extends ScheduledProducer {
 				return;
 			} else {
 				fileNotFoundErrorSignaled = true;
-				throw new ProcessorExecutionException("file not found: " + file, this, null);
+				throw new ProcessorExecutionException("file not found: " + file, this);
 			}
 		}
 		fileNotFoundErrorSignaled = false;

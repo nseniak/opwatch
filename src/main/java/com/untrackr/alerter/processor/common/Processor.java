@@ -8,6 +8,7 @@ import java.util.concurrent.Future;
 public abstract class Processor {
 
 	protected ProcessorService processorService;
+	protected String name;
 	protected ScriptStack stack;
 	protected ProcessorSignature signature;
 	protected ConsumerThreadRunner consumerThreadRunner;
@@ -42,18 +43,12 @@ public abstract class Processor {
 		return processors.stream().allMatch(Processor::stopped);
 	}
 
-	public String type() {
-		// Default
-		return getClass().getSimpleName().toLowerCase();
-	}
-
 	public String descriptor() {
-		return type() + "{}";
-	}
-
-	public String processorDescriptor() {
 		StringBuilder builder = new StringBuilder();
-		builder.append(stack.asString()).append(" > ").append(descriptor());
+		builder.append(name);
+		if (!stack.empty()) {
+			builder.append(" built at ").append(stack.asString());
+		}
 		return builder.toString();
 	}
 
@@ -73,4 +68,11 @@ public abstract class Processor {
 		return consumerThreadRunner;
 	}
 
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 }

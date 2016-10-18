@@ -1,5 +1,6 @@
 package com.untrackr.alerter.processor.common;
 
+import jdk.nashorn.api.scripting.NashornException;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 public class JavascriptTransformer extends JavascriptFunction {
@@ -11,10 +12,10 @@ public class JavascriptTransformer extends JavascriptFunction {
 	public Object call(Payload payload, ActiveProcessor processor) {
 		try {
 			return function.call(function, payload.getScriptObject());
-		} catch (Throwable t) {
-			ProcessorExecutionException error = new ProcessorExecutionException(t, processor, payload);
-			error.setSilent(processor.scriptErrorSignaled(this));
-			throw error;
+		} catch (NashornException e) {
+			RuntimeScriptException exception = new RuntimeScriptException(e, processor, payload);
+			exception.setSilent(processor.scriptErrorSignaled(this));
+			throw exception;
 		}
 	}
 

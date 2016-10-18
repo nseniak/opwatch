@@ -21,10 +21,14 @@ public class PipeFactory extends ProcessorFactory {
 	@Override
 	public Processor make(Object scriptObject) throws RuntimeScriptException {
 		PipeDesc descriptor = convertProcessorArgument(PipeDesc.class, scriptObject);
+		Processor processor;
 		if (descriptor.getProcessors().isEmpty()) {
-			return new Identity(getProcessorService(), ScriptStack.currentStack());
+			processor = new Identity(getProcessorService(), ScriptStack.currentStack());
+		} else {
+			processor = new Pipe(getProcessorService(), descriptor.getProcessors(), ScriptStack.currentStack());
 		}
-		return new Pipe(getProcessorService(), descriptor.getProcessors(), ScriptStack.currentStack());
+		initialize(processor, descriptor);
+		return processor;
 	}
 
 }

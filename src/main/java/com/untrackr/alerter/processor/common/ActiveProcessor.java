@@ -15,7 +15,6 @@ public abstract class ActiveProcessor extends Processor {
 	protected List<Processor> producers = new ArrayList<>();
 	protected List<Processor> consumers = new ArrayList<>();
 	private long lastOutputTime = 0;
-	private String name;
 	protected boolean started;
 	private Set<JavascriptFunction> scriptErrorSignaled = new HashSet<>();
 
@@ -100,16 +99,6 @@ public abstract class ActiveProcessor extends Processor {
 		}
 	}
 
-	@Override
-	public String descriptor() {
-		String id = (name != null) ? name : identifier();
-		if (id == null) {
-			return super.descriptor();
-		} else {
-			return type() + "{'" + id + "'}";
-		}
-	}
-
 	public void outputTransformed(Object object, Payload input) {
 		Payload payload = Payload.makeTransformed(processorService, this, object, input);
 		output(consumers, payload);
@@ -127,7 +116,7 @@ public abstract class ActiveProcessor extends Processor {
 
 	public void output(List<Processor> consumers, Payload payload) {
 		if (processorService.getProfileService().profile().isTrace()) {
-			logger.info("Output: " + processorDescriptor() + " ==> " + payload.asText());
+			logger.info("Output: " + descriptor() + " ==> " + payload.asText());
 		}
 		long now = System.currentTimeMillis();
 		long elapsedSinceLastOutput = now - lastOutputTime;
@@ -154,7 +143,7 @@ public abstract class ActiveProcessor extends Processor {
 	public void stopConsumerThread() {
 		boolean stopped = consumerThreadFuture.cancel(true);
 		if (!stopped) {
-			throw new ProcessorExecutionException("cannot stop consumer thread", this, null);
+			throw new ProcessorExecutionException("cannot stop consumer thread", this);
 		}
 	}
 
@@ -188,14 +177,6 @@ public abstract class ActiveProcessor extends Processor {
 	public String identifier() {
 		// Default
 		return null;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 }

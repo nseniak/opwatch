@@ -32,7 +32,7 @@ public class Receive extends Producer implements HttpService.PostBodyConsumer {
 			RemotePayload remotePayload = processorService.getObjectMapper().convertValue(input, RemotePayload.class);
 			outputReceived(remotePayload);
 		} catch (IllegalArgumentException e) {
-			throw new ProcessorExecutionException("invalid input: " + processorService.valueAsString(input), this, null);
+			throw new ProcessorExecutionException("invalid input: " + processorService.valueAsString(input), this);
 		}
 	}
 

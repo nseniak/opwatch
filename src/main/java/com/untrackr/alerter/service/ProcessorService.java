@@ -37,7 +37,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.PatternSyntaxException;
 
 import static com.untrackr.alerter.common.ApplicationUtil.environmentVariable;
 import static com.untrackr.alerter.common.ApplicationUtil.property;
@@ -190,24 +189,18 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	private Alert makeAlert(PushoverKey pushoverKey, Alert.Priority priority, String title, Payload payload, Processor consumer) {
 		AlertData data = new AlertData();
 		data.add("hostname", getHostName());
-		data.add("source", payload.pathDescriptor(consumer));
+		data.add("processor", consumer.descriptor());
 		data.add("input", payload.asText());
 		Alert alert = new Alert(pushoverKey, priority, title, null, data);
 		return alert;
 	}
 
 	public void displayProcessorExecutionException(ProcessorExecutionException e) {
-		String title = "Execution error";
+		String title = "Processor execution error";
 		String message = e.getLocalizedMessage();
 		AlertData data = new AlertData();
 		data.add("hostname", getHostName());
-		Processor processor = e.getProcessor();
-		Payload payload = e.getPayload();
-		String location = (payload == null) ? processor.processorDescriptor() : payload.pathDescriptor(processor);
-		data.add("location", location);
-		if (payload != null) {
-			data.add("input", payload.asText());
-		}
+		addProcessor(data, e);
 		if ((e.getCause() != null) && !((e.getCause() instanceof IOException) || (e.getCause() instanceof NashornException) || (e.getCause() instanceof InternalScriptError))) {
 			addStack(data, e);
 			logger.error(title, e);
@@ -219,25 +212,29 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	}
 
 	public void displayRuntimeScriptException(RuntimeScriptException e) {
-		String title = "Alerter startup error";
+		String title = "Script execution error";
 		String message = e.getLocalizedMessage();
 		AlertData data = new AlertData();
+		data.add("hostname", getHostName());
+		addProcessor(data, e);
 		ScriptStack stack = e.getScriptStack();
 		if (!stack.empty()) {
-			data.add("stack", stack.asString());
+			data.add("js stack", stack.asString());
 		}
-		data.add("hostname", getHostName());
-		Throwable c = e.getCause();
-		if ((c != null) && !((c instanceof IOException) || (c instanceof PatternSyntaxException))) {
-			addStack(data, e);
-		}
-		if (c == null) {
-			logger.error(title);
-		} else {
-			logger.error(title, c);
-		}
+		logger.error(title);
 		Alert alert = new Alert(alertService.getDefaultPushoverKey(), Alert.Priority.emergency, title, message, data);
 		alertService.alert(alert);
+	}
+
+	private void addProcessor(AlertData data, AlerterException e) {
+		Processor processor = e.getProcessor();
+		if (processor != null) {
+			data.add("processor", processor.descriptor());
+			Payload payload = e.getPayload();
+			if (payload != null) {
+				data.add("input", payload.asText());
+			}
+		}
 	}
 
 	public void infrastructureAlert(Alert.Priority priority, String title, String details) {

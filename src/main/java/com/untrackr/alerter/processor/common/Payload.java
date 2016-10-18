@@ -4,11 +4,8 @@ import com.untrackr.alerter.common.RemotePayload;
 import com.untrackr.alerter.model.common.JsonMap;
 import com.untrackr.alerter.service.ProcessorService;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * Represents the output of a processor.
@@ -80,26 +77,6 @@ public class Payload {
 			cursor = cursor.getInput();
 		}
 		return list;
-	}
-
-	public String pathDescriptor(Processor last) {
-		StringBuilder builder = new StringBuilder();
-		String lastFilename = null;
-		String delimiter = "";
-		List<Processor> producers = new ArrayList<>(inputList().stream().map(Payload::getProducer).collect(toList()));
-		producers.add(last);
-		for (Processor producer : producers) {
-			if (!getProducer().getStack().empty()) {
-				String filename = getProducer().getStack().top().getFileName();
-				if (!filename.equals(lastFilename)) {
-					lastFilename = filename;
-					builder.append("[").append(filename).append("] > ");
-				}
-			}
-			builder.append(delimiter).append(producer.descriptor());
-			delimiter = " > ";
-		}
-		return builder.toString();
 	}
 
 	public ProcessorService getProcessorService() {

@@ -45,10 +45,6 @@ public class AlertGenerator extends Consumer {
 		}
 	}
 
-	public String type() {
-		return "alert";
-	}
-
 	@Override
 	public String identifier() {
 		return title;

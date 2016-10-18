@@ -23,7 +23,7 @@ public abstract class ThreadedProducer extends Producer {
 	public void doStop() {
 		boolean stopped = future.cancel(true);
 		if (!stopped) {
-			throw new ProcessorExecutionException("cannot stop producer thread", this, null);
+			throw new ProcessorExecutionException("cannot stop producer thread", this);
 		}
 	}
 

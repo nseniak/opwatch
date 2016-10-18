@@ -22,6 +22,7 @@ public class ParallelFactory extends ProcessorFactory {
 		ParallelDesc descriptor = convertProcessorArgument(ParallelDesc.class, scriptObject);
 		Parallel parallel = new Parallel(getProcessorService(), descriptor.getProcessors(), ScriptStack.currentStack());
 		parallel.inferSignature();
+		initialize(parallel, descriptor);
 		return parallel;
 	}
 
