@@ -16,12 +16,12 @@ public class JavascriptPredicate extends JavascriptFunction {
 			} else if (result == Boolean.FALSE) {
 				return false;
 			} else {
-				RuntimeProcessorError error = new RuntimeProcessorError("predicate returned a non-boolean value: " + result.toString(), processor, payload);
+				ProcessorExecutionException error = new ProcessorExecutionException("predicate returned a non-boolean value: " + result.toString(), processor, payload);
 				error.setSilent(processor.scriptErrorSignaled(this));
 				throw error;
 			}
 		} catch (Throwable t) {
-			RuntimeProcessorError error = new RuntimeProcessorError(t, processor, payload);
+			ProcessorExecutionException error = new ProcessorExecutionException(t, processor, payload);
 			error.setSilent(processor.scriptErrorSignaled(this));
 			throw error;
 		}

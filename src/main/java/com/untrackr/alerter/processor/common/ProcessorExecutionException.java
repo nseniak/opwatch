@@ -1,28 +1,28 @@
 package com.untrackr.alerter.processor.common;
 
-public class RuntimeProcessorError extends RuntimeException {
+public class ProcessorExecutionException extends AlerterException {
 
 	private Processor processor;
 	private Payload payload;
 	private boolean silent;
 
-	public RuntimeProcessorError(String message, Processor processor) {
+	public ProcessorExecutionException(String message, Processor processor) {
 		this(message, processor, null);
 	}
 
-	public RuntimeProcessorError(String message, Processor processor, Payload payload) {
+	public ProcessorExecutionException(String message, Processor processor, Payload payload) {
 		super(message);
 		this.processor = processor;
 		this.payload = payload;
 	}
 
-	public RuntimeProcessorError(Throwable t, Processor processor, Payload payload) {
-		super(t);
+	public ProcessorExecutionException(Throwable cause, Processor processor, Payload payload) {
+		super(cause);
 		this.processor = processor;
 		this.payload = payload;
 	}
 
-	public RuntimeProcessorError(Throwable t, Processor processor) {
+	public ProcessorExecutionException(Throwable t, Processor processor) {
 		this(t, processor, null);
 	}
 

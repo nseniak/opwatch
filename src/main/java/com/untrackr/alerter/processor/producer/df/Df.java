@@ -2,7 +2,7 @@ package com.untrackr.alerter.processor.producer.df;
 
 import com.untrackr.alerter.common.ScriptObject;
 import com.untrackr.alerter.processor.common.ScriptStack;
-import com.untrackr.alerter.processor.common.RuntimeProcessorError;
+import com.untrackr.alerter.processor.common.ProcessorExecutionException;
 import com.untrackr.alerter.processor.producer.ScheduledExecutor;
 import com.untrackr.alerter.processor.producer.ScheduledProducer;
 import com.untrackr.alerter.service.ProcessorService;
@@ -28,7 +28,7 @@ public class Df extends ScheduledProducer {
 				return;
 			} else {
 				fileNotFoundErrorSignaled = true;
-				throw new RuntimeProcessorError("file not found: " + file, this, null);
+				throw new ProcessorExecutionException("file not found: " + file, this, null);
 			}
 		}
 		fileNotFoundErrorSignaled = false;

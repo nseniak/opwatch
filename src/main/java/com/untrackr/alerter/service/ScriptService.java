@@ -1,9 +1,7 @@
 package com.untrackr.alerter.service;
 
 import com.untrackr.alerter.processor.common.Processor;
-import com.untrackr.alerter.processor.common.RuntimeScriptError;
-import com.untrackr.alerter.processor.common.ScriptExecutionError;
-import com.untrackr.alerter.processor.common.ScriptStack;
+import com.untrackr.alerter.processor.common.RuntimeScriptException;
 import com.untrackr.alerter.processor.consumer.alert.AlertGeneratorFactory;
 import com.untrackr.alerter.processor.consumer.post.PostFactory;
 import com.untrackr.alerter.processor.producer.console.ConsoleFactory;
@@ -36,6 +34,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import javax.script.*;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -51,7 +50,7 @@ public class ScriptService {
 	@Autowired
 	private ApplicationContext applicationContext;
 
-	private NashornScriptEngine scriptEngine;
+	private static NashornScriptEngine scriptEngine;
 
 	public void initialize() {
 		scriptEngine = (NashornScriptEngine) new ScriptEngineManager().getEngineByName("nashorn");
@@ -82,6 +81,12 @@ public class ScriptService {
 		createFactoryFunction(new JstackFactory(processorService));
 	}
 
+	public static Object eval(String str, String location) throws ScriptException {
+		ScriptContext context = scriptEngine.getContext();
+		context.setAttribute(ScriptEngine.FILENAME, location, ScriptContext.ENGINE_SCOPE);
+		return scriptEngine.eval(str, context);
+	}
+
 	private void loadScriptResources() {
 		try {
 			// Load NPM first
@@ -92,9 +97,9 @@ public class ScriptService {
 				loadScriptResource(scriptResource);
 			}
 		} catch (ScriptException e) {
-			throw new ScriptExecutionError(e.getMessage(), ScriptStack.exceptionStack(e));
-		} catch (Throwable t) {
-			throw new RuntimeException(t);
+			throw new RuntimeScriptException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -111,41 +116,19 @@ public class ScriptService {
 		bindings.put(processorFactory.name(), javascriptFunction(processorFactory::make));
 	}
 
-	public Processor loadProcessor(String filename) throws ScriptExecutionError {
+	public Processor loadProcessor(String filename) {
 		try {
 			ScriptContext context = scriptEngine.getContext();
 			context.setAttribute(ScriptEngine.FILENAME, filename, ScriptContext.ENGINE_SCOPE);
 			Object value = scriptEngine.eval(new FileReader(filename));
 			if (!(value instanceof Processor)) {
-				throw new ScriptExecutionError("value returned by \"" + filename + "\" is not a processor", ScriptStack.emptyStack());
+				throw new RuntimeScriptException("value returned by \"" + filename + "\" is not a processor");
 			}
 			return (Processor) value;
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException("file not found: \"" + filename + "\"");
 		} catch (ScriptException e) {
-			// Exception thrown by the javascript runtime.
-			ScriptStack stack = ScriptStack.exceptionStack(e);
-			if (stack.empty() && (e.getCause() != null)) {
-				stack = ScriptStack.exceptionStack(e.getCause());
-			}
-			if (stack.empty()) {
-				stack.addElement(e.getFileName(), e.getLineNumber());
-			}
-			throw new ScriptExecutionError(e.getLocalizedMessage(), stack);
-		} catch (RuntimeScriptError e) {
-			// Exception thrown by our code to signal an execution error.
-			ScriptStack stack = ScriptStack.exceptionStack(e);
-			ScriptStack.ScriptStackElement top = stack.top();
-			String detailedMessage = e.getLocalizedMessage();
-			if (top != null) {
-				// Messages in ScriptException are of the form "XXX in YYY at line number ZZZ", so for consistency we
-				// add file and line information to the detailed error message.
-				detailedMessage = detailedMessage + " in " + top.getFileName() + " at line number " + top.getLineNumber();
-			}
-			throw new ScriptExecutionError(detailedMessage, ScriptStack.exceptionStack(e));
-		} catch (Throwable t) {
-			// Exception occurring somewhere in the code. This could be our code unexpectedly throwing an exception,
-			// typically because of a bug as the code should always throw RuntimeScriptError to signal errors in a
-			// disciplined way.
-			throw new ScriptExecutionError(t.getMessage(), t, ScriptStack.exceptionStack(t));
+			throw new RuntimeScriptException(e);
 		}
 	}
 

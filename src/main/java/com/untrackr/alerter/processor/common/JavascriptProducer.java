@@ -12,7 +12,7 @@ public class JavascriptProducer extends JavascriptFunction {
 		try {
 			return function.call(function);
 		} catch (Throwable t) {
-			RuntimeProcessorError error = new RuntimeProcessorError(t, processor);
+			ProcessorExecutionException error = new ProcessorExecutionException(t, processor);
 			error.setSilent(processor.scriptErrorSignaled(this));
 			throw error;
 		}

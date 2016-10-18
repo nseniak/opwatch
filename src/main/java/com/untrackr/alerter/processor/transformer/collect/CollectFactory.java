@@ -15,7 +15,7 @@ public class CollectFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public Processor make(Object scriptObject) throws ValidationError {
+	public Processor make(Object scriptObject) throws RuntimeScriptException {
 		CollectDesc descriptor = convertProcessorArgument(CollectDesc.class, scriptObject);
 		JavascriptTransformer transformer = optionalFieldValue("transformer", descriptor.getTransformer(), null);
 		int count = checkFieldValue("count", descriptor.getCount());

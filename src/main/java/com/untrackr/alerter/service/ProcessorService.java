@@ -11,9 +11,10 @@ import com.untrackr.alerter.model.common.AlertData;
 import com.untrackr.alerter.model.common.AlerterProfile;
 import com.untrackr.alerter.model.common.PushoverKey;
 import com.untrackr.alerter.processor.common.*;
-import com.untrackr.alerter.processor.transformer.print.Echo;
 import com.untrackr.alerter.processor.producer.console.Console;
 import com.untrackr.alerter.processor.special.pipe.Pipe;
+import com.untrackr.alerter.processor.transformer.print.Echo;
+import jdk.nashorn.api.scripting.NashornException;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
-import javax.script.ScriptException;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -120,7 +120,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 				return;
 			}
 			mainProcessorFile = property("alerter.main");
-			boolean error = withErrorHandling(null, null, () -> {
+			boolean error = withProcessorErrorHandling(null, null, () -> {
 				scriptService.initialize();
 				mainProcessor = scriptService.loadProcessor(mainProcessorFile);
 				if (profileService.profile().isInteractive()) {
@@ -166,7 +166,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			return;
 		}
 		try {
-			boolean error = withErrorHandling(mainProcessor, null, mainProcessor::stop);
+			boolean error = withProcessorErrorHandling(mainProcessor, null, mainProcessor::stop);
 			if (error) {
 				logger.error("Cannot stop main processor");
 			}
@@ -174,28 +174,6 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			logger.info("Stopped");
 			mainProcessor = null;
 		}
-	}
-
-	public void displayScriptExecutionError(ScriptExecutionError e) {
-		String title = "Alerter startup error";
-		String message = e.getLocalizedMessage();
-		AlertData data = new AlertData();
-		ScriptStack stack = e.getScriptStack();
-		if (!stack.empty()) {
-			data.add("stack", stack.asString());
-		}
-		data.add("hostname", getHostName());
-		Throwable c = e.getCause();
-		if ((c != null) && !((c instanceof IOException) || (c instanceof PatternSyntaxException))) {
-			addStack(data, e);
-		}
-		if (c == null) {
-			logger.error(title);
-		} else {
-			logger.error(title, c);
-		}
-		Alert alert = new Alert(alertService.getDefaultPushoverKey(), Alert.Priority.emergency, title, message, data);
-		alertService.alert(alert);
 	}
 
 	public void processorAlert(PushoverKey pushoverKey, Alert.Priority priority, String title, Payload payload, Processor consumer) {
@@ -218,7 +196,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		return alert;
 	}
 
-	public void displayRuntimeError(RuntimeProcessorError e) {
+	public void displayProcessorExecutionException(ProcessorExecutionException e) {
 		String title = "Execution error";
 		String message = e.getLocalizedMessage();
 		AlertData data = new AlertData();
@@ -230,14 +208,36 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		if (payload != null) {
 			data.add("input", payload.asText());
 		}
-		if ((e.getCause() != null) && !((e.getCause() instanceof IOException) || (e.getCause() instanceof ScriptException) || (e.getCause() instanceof InternalScriptError))) {
+		if ((e.getCause() != null) && !((e.getCause() instanceof IOException) || (e.getCause() instanceof NashornException) || (e.getCause() instanceof InternalScriptError))) {
 			addStack(data, e);
+			logger.error(title, e);
 		}
-		logger.error(title, e);
 		if (!e.isSilent()) {
 			Alert alert = new Alert(alertService.getDefaultPushoverKey(), Alert.Priority.emergency, title, message, data);
 			alertService.alert(alert);
 		}
+	}
+
+	public void displayRuntimeScriptException(RuntimeScriptException e) {
+		String title = "Alerter startup error";
+		String message = e.getLocalizedMessage();
+		AlertData data = new AlertData();
+		ScriptStack stack = e.getScriptStack();
+		if (!stack.empty()) {
+			data.add("stack", stack.asString());
+		}
+		data.add("hostname", getHostName());
+		Throwable c = e.getCause();
+		if ((c != null) && !((c instanceof IOException) || (c instanceof PatternSyntaxException))) {
+			addStack(data, e);
+		}
+		if (c == null) {
+			logger.error(title);
+		} else {
+			logger.error(title, c);
+		}
+		Alert alert = new Alert(alertService.getDefaultPushoverKey(), Alert.Priority.emergency, title, message, data);
+		alertService.alert(alert);
 	}
 
 	public void infrastructureAlert(Alert.Priority priority, String title, String details) {
@@ -264,18 +264,18 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		data.add("stack", writer.toString());
 	}
 
-	public boolean withErrorHandling(Processor processor, Payload payload, Runnable runnable) {
+	public boolean withProcessorErrorHandling(Processor processor, Payload payload, Runnable runnable) {
 		boolean error = true;
 		try {
 			try {
 				runnable.run();
 				error = false;
-			} catch (RuntimeProcessorError e) {
-				displayRuntimeError(e);
-			} catch (ScriptExecutionError e) {
-				displayScriptExecutionError(e);
+			} catch (ProcessorExecutionException e) {
+				displayProcessorExecutionException(e);
+			} catch (RuntimeScriptException e) {
+				displayRuntimeScriptException(e);
 			} catch (Throwable t) {
-				displayRuntimeError(new RuntimeProcessorError(t, processor, payload));
+				displayProcessorExecutionException(new ProcessorExecutionException(t, processor, payload));
 			}
 		} catch (Throwable t) {
 			logger.error("Error while displaying error", t);

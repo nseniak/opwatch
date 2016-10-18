@@ -24,7 +24,7 @@ public class Sh extends Transformer {
 	public void doStart() {
 		super.doStart();
 		commandConsumerThreadFuture = processorService.getConsumerExecutor().submit(() -> {
-			processorService.withErrorHandling(this, null, () -> {
+			processorService.withProcessorErrorHandling(this, null, () -> {
 				commandRunner.startProcess(this);
 				commandRunner.produce(this, -1);
 			});

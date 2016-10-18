@@ -15,7 +15,7 @@ public abstract class ScheduledProducer extends Producer {
 
 	@Override
 	public void doStart() {
-		scheduledExecutor.schedule(() -> processorService.withErrorHandling(this, null, this::produce));
+		scheduledExecutor.schedule(() -> processorService.withProcessorErrorHandling(this, null, this::produce));
 	}
 
 	@Override

@@ -4,7 +4,7 @@ import com.untrackr.alerter.common.ScriptObject;
 import com.untrackr.alerter.model.common.Alert;
 import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.common.Payload;
-import com.untrackr.alerter.processor.common.RuntimeProcessorError;
+import com.untrackr.alerter.processor.common.ProcessorExecutionException;
 import com.untrackr.alerter.processor.transformer.Transformer;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -38,7 +38,7 @@ public class Jstack extends Transformer {
 					return;
 				}
 			}
-		} catch (RuntimeProcessorError e) {
+		} catch (ProcessorExecutionException e) {
 			if (!errorSignaled) {
 				errorSignaled = true;
 				throw e;

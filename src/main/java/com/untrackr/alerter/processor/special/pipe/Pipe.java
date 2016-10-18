@@ -35,7 +35,7 @@ public class Pipe extends Processor {
 	}
 
 	@Override
-	public void check() throws ValidationError {
+	public void check() throws RuntimeScriptException {
 		for (Processor processor : processors) {
 			processor.check();
 		}
@@ -45,14 +45,14 @@ public class Pipe extends Processor {
 	public void start() {
 		for (int i = processors.size() - 1; i >= 0; i--) {
 			Processor processor = processors.get(i);
-			processorService.withErrorHandling(processor, null, processor::start);
+			processorService.withProcessorErrorHandling(processor, null, processor::start);
 		}
 	}
 
 	@Override
 	public void stop() {
 		for (Processor processor : processors) {
-			processorService.withErrorHandling(processor, null, processor::stop);
+			processorService.withProcessorErrorHandling(processor, null, processor::stop);
 		}
 	}
 

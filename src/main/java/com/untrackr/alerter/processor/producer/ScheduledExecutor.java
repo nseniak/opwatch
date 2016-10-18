@@ -1,6 +1,6 @@
 package com.untrackr.alerter.processor.producer;
 
-import com.untrackr.alerter.processor.common.RuntimeProcessorError;
+import com.untrackr.alerter.processor.common.ProcessorExecutionException;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.concurrent.ScheduledFuture;
@@ -24,7 +24,7 @@ public class ScheduledExecutor {
 	public void stop(ScheduledProducer processor) {
 		boolean stopped = scheduledFuture.cancel(true);
 		if (!stopped) {
-			throw new RuntimeProcessorError("cannot stop scheduled producer", processor, null);
+			throw new ProcessorExecutionException("cannot stop scheduled producer", processor, null);
 		}
 	}
 

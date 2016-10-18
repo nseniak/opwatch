@@ -12,7 +12,7 @@ public class JavascriptTransformer extends JavascriptFunction {
 		try {
 			return function.call(function, payload.getScriptObject());
 		} catch (Throwable t) {
-			RuntimeProcessorError error = new RuntimeProcessorError(t, processor, payload);
+			ProcessorExecutionException error = new ProcessorExecutionException(t, processor, payload);
 			error.setSilent(processor.scriptErrorSignaled(this));
 			throw error;
 		}

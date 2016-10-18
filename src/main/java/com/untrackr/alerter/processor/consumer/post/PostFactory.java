@@ -4,7 +4,7 @@ import com.untrackr.alerter.model.common.AlerterProfile;
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ScriptStack;
-import com.untrackr.alerter.processor.common.ValidationError;
+import com.untrackr.alerter.processor.common.RuntimeScriptException;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.regex.Matcher;
@@ -24,12 +24,12 @@ public class PostFactory extends ActiveProcessorFactory {
 	private static Pattern pathPattern = Pattern.compile("(?<hostname>[^:/]+)?(?::(?<port>[0-9]+))?(?<stack>/.*)");
 
 	@Override
-	public Processor make(Object scriptObject) throws ValidationError {
+	public Processor make(Object scriptObject) throws RuntimeScriptException {
 		PostDesc descriptor = convertProcessorArgument(PostDesc.class, scriptObject);
 		String pathString = checkVariableSubstitution("path", checkFieldValue("path", descriptor.getPath()));
 		Matcher matcher = pathPattern.matcher(pathString);
 		if (!matcher.matches()) {
-			throw new ValidationError("incorrect \"path\" syntax: \"" + pathString + "\"");
+			throw new RuntimeScriptException("incorrect \"path\" syntax: \"" + pathString + "\"");
 		}
 		AlerterProfile profile = processorService.getProfileService().profile();
 		String hostname = (matcher.group("hostname") != null) ? matcher.group("hostname") : profile.getDefaultPostHostname();

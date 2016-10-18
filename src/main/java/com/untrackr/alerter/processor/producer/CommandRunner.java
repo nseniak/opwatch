@@ -5,7 +5,7 @@ import com.untrackr.alerter.model.common.AlerterProfile;
 import com.untrackr.alerter.processor.common.ActiveProcessor;
 import com.untrackr.alerter.processor.common.Payload;
 import com.untrackr.alerter.processor.common.Processor;
-import com.untrackr.alerter.processor.common.RuntimeProcessorError;
+import com.untrackr.alerter.processor.common.ProcessorExecutionException;
 import com.untrackr.alerter.service.ProcessorService;
 import org.apache.commons.io.IOUtils;
 
@@ -33,12 +33,9 @@ public class CommandRunner {
 			String[] cmdArray = {"/bin/sh", "-c", command};
 			process = Runtime.getRuntime().exec(cmdArray, null, currentDescDir);
 		} catch (Throwable t) {
-			if (commandExecutionErrorSignaled) {
-				return;
-			} else {
-				commandExecutionErrorSignaled = true;
-				throw new RuntimeProcessorError(t, processor, null);
-			}
+			ProcessorExecutionException error = new ProcessorExecutionException(t, processor, null);
+			error.setSilent(commandExecutionErrorSignaled);
+			commandExecutionErrorSignaled = true;
 		}
 		commandExecutionErrorSignaled = false;
 	}
@@ -55,7 +52,7 @@ public class CommandRunner {
 			long start = System.currentTimeMillis();
 			while (process == null) {
 				if ((System.currentTimeMillis() - start) > profile.getCommandStartTimeout()) {
-					throw new RuntimeProcessorError("command process not started", processor, payload);
+					throw new ProcessorExecutionException("command process not started", processor, payload);
 				}
 				try {
 					Thread.sleep(profile.getCommandStartSleepTime());
@@ -66,14 +63,14 @@ public class CommandRunner {
 			}
 		}
 		if (!checkAlive(processor)) {
-			throw new RuntimeProcessorError("command process has exited", processor, payload);
+			throw new ProcessorExecutionException("command process has exited", processor, payload);
 		}
 		try {
 			process.getOutputStream().write(payload.asText().getBytes());
 			process.getOutputStream().write('\n');
 			process.getOutputStream().flush();
 		} catch (IOException e) {
-			throw new RuntimeProcessorError(e, processor, payload);
+			throw new ProcessorExecutionException(e, processor, payload);
 		}
 	}
 
@@ -89,7 +86,7 @@ public class CommandRunner {
 						return;
 					}
 					if ((exitTimeout >= 0) && ((System.currentTimeMillis() - t0) > exitTimeout)) {
-						throw new RuntimeProcessorError("timeout waiting for script output", processor, null);
+						throw new ProcessorExecutionException("timeout waiting for script output", processor, null);
 					}
 					Thread.sleep(profile.getCronScriptOutputCheckDelay());
 				}
@@ -103,7 +100,7 @@ public class CommandRunner {
 				// The processor is being stopped. Just exit.
 				return;
 			} else {
-				throw new RuntimeProcessorError(e, processor, null);
+				throw new ProcessorExecutionException(e, processor, null);
 			}
 		} catch (InterruptedException e) {
 			// Nothing to do: exiting
@@ -132,7 +129,7 @@ public class CommandRunner {
 			} catch (IOException e) {
 				// Nothing to do
 			}
-			throw new RuntimeProcessorError("command exited with error status: " + process.exitValue() + output, processor, null);
+			throw new ProcessorExecutionException("command exited with error status: " + process.exitValue() + output, processor, null);
 		}
 		return false;
 	}

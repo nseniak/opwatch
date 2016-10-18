@@ -96,7 +96,7 @@ public abstract class ActiveProcessor extends Processor {
 				break;
 		}
 		if (joiner.length() != 0) {
-			throw new ScriptExecutionError("incorrect pipe: " + joiner.toString(), stack);
+			throw new ProcessorExecutionException("incorrect pipe: " + joiner.toString(), this);
 		}
 	}
 
@@ -154,7 +154,7 @@ public abstract class ActiveProcessor extends Processor {
 	public void stopConsumerThread() {
 		boolean stopped = consumerThreadFuture.cancel(true);
 		if (!stopped) {
-			throw new RuntimeProcessorError("cannot stop consumer thread", this, null);
+			throw new ProcessorExecutionException("cannot stop consumer thread", this, null);
 		}
 	}
 
@@ -173,10 +173,10 @@ public abstract class ActiveProcessor extends Processor {
 			}
 		}
 		if (value == null) {
-			throw new RuntimeProcessorError("missing field value \"" + fieldName + "\"", this, input);
+			throw new ProcessorExecutionException("missing field value \"" + fieldName + "\"", this, input);
 		}
 		if (!clazz.isAssignableFrom(value.getClass())) {
-			throw new RuntimeProcessorError("wrong type for field \"" + fieldName + "\"", this, input);
+			throw new ProcessorExecutionException("wrong type for field \"" + fieldName + "\"", this, input);
 		}
 		return (T) value;
 	}

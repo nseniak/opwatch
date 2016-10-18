@@ -3,7 +3,7 @@ package com.untrackr.alerter.processor.transformer.grep;
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ScriptStack;
-import com.untrackr.alerter.processor.common.ValidationError;
+import com.untrackr.alerter.processor.common.RuntimeScriptException;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.List;
@@ -21,13 +21,13 @@ public class GrepFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public Processor make(Object scriptObject) throws ValidationError {
+	public Processor make(Object scriptObject) throws RuntimeScriptException {
 		GrepDesc descriptor = convertProcessorArgument(GrepDesc.class, scriptObject);
 		String fieldName = optionalFieldValue("field", descriptor.getField(), "text");
 		List<String> regexes = optionalFieldValue("regexes", descriptor.getRegexes(), null);
 		String regex = optionalFieldValue("regex", descriptor.getRegex(), null);
 		if ((regex != null) && (regexes != null)) {
-			throw new ValidationError(name() + ": cannot have both \"regex\" and \"regexes\" defined");
+			throw new RuntimeScriptException(name() + ": cannot have both \"regex\" and \"regexes\" defined");
 		}
 		Pattern pattern = null;
 		if (regex != null) {
@@ -45,7 +45,7 @@ public class GrepFactory extends ActiveProcessorFactory {
 			pattern = compilePattern("regexes", builder.toString());
 		}
 		if (pattern == null) {
-			throw new ValidationError(name() + ": either \"regex\" or \"regexes\" must be defined");
+			throw new RuntimeScriptException(name() + ": either \"regex\" or \"regexes\" must be defined");
 		}
 		boolean invert = optionalFieldValue("invert", descriptor.getInvert(), Boolean.FALSE);
 		Grep grep = new Grep(getProcessorService(), ScriptStack.currentStack(), fieldName, pattern, invert);

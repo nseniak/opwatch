@@ -14,7 +14,11 @@ public class ScriptStack {
 	}
 
 	private ScriptStack(Throwable t) {
-		initFromStack(t.getStackTrace());
+		Throwable cause = t;
+		while (cause.getCause() != null) {
+			cause = cause.getCause();
+		}
+		initFromStack(cause.getStackTrace());
 	}
 
 	private ScriptStack(StackTraceElement[] stack) {
@@ -34,7 +38,6 @@ public class ScriptStack {
 	}
 
 	private void initFromStack(StackTraceElement[] javaStack) {
-		ScriptStack stack = new ScriptStack();
 		for (StackTraceElement element : javaStack) {
 			if (element.getMethodName().equals(":program")) {
 				addElement(element.getFileName(), element.getLineNumber());

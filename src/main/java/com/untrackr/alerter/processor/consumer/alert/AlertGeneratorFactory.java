@@ -17,14 +17,14 @@ public class AlertGeneratorFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public Processor make(Object scriptObject) throws ValidationError {
+	public Processor make(Object scriptObject) throws RuntimeScriptException {
 		AlertGeneratorDesc descriptor = convertProcessorArgument(AlertGeneratorDesc.class, scriptObject);
 		String priorityName = optionalFieldValue("priority", descriptor.getPriority(), "normal");
 		Alert.Priority priority;
 		try {
 			priority = Alert.Priority.valueOf(priorityName);
 		} catch (IllegalArgumentException e) {
-			throw new ValidationError("bad alert priority: \"" + priorityName + "\"");
+			throw new RuntimeScriptException("bad alert priority: \"" + priorityName + "\"");
 		}
 		String title = checkFieldValue("title", descriptor.getTitle());
 		JavascriptPredicate predicate = optionalFieldValue("predicate", descriptor.getPredicate(), null);
@@ -41,7 +41,7 @@ public class AlertGeneratorFactory extends ActiveProcessorFactory {
 		try {
 			return processorService.profile().getPushoverSettings().makeKey(applicationName, groupName);
 		} catch (Throwable t) {
-			throw new ValidationError(t.getMessage());
+			throw new RuntimeScriptException(t.getMessage());
 		}
 	}
 

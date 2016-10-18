@@ -1,7 +1,7 @@
 package com.untrackr.alerter.processor.producer;
 
 import com.untrackr.alerter.processor.common.ScriptStack;
-import com.untrackr.alerter.processor.common.RuntimeProcessorError;
+import com.untrackr.alerter.processor.common.ProcessorExecutionException;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.concurrent.Future;
@@ -23,7 +23,7 @@ public abstract class ThreadedProducer extends Producer {
 	public void doStop() {
 		boolean stopped = future.cancel(true);
 		if (!stopped) {
-			throw new RuntimeProcessorError("cannot stop producer thread", this, null);
+			throw new ProcessorExecutionException("cannot stop producer thread", this, null);
 		}
 	}
 

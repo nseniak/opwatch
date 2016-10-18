@@ -58,8 +58,8 @@ module = (typeof module === 'undefined') ? {} : module;
     var module = new Module(file, parent, core);
     var body = readFile(module.filename, module.core);
     var dir = new File(module.filename).getParent();
-    var args = ['exports', 'module', 'require', '__filename', '__dirname'];
-    var func = new Function(args, body);
+    // Evaluate using a utility function that specifies the right location, for debugging and trace purposes
+    var func = Packages.com.untrackr.alerter.service.ScriptService.eval("function (exports, module, require, __filename, __dirname) {" + body + "}", module.filename);
     func.apply(module,
       [module.exports, module, module.require, module.filename, dir]);
     module.loaded = true;
@@ -167,6 +167,11 @@ module = (typeof module === 'undefined') ? {} : module;
       if (NODE_PATH) {
         r = r.concat(parsePaths(NODE_PATH));
       }
+    }
+    // Add the alerter paths
+    var alerterPaths = java.lang.System.getProperty('alerter.path');
+    if (alerterPaths) {
+      r = r.concat(parsePaths(alerterPaths));
     }
     // r.push( $PREFIX + "/node/library" )
     return r;

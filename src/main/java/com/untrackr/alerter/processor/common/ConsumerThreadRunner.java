@@ -39,7 +39,7 @@ public class ConsumerThreadRunner implements Runnable {
 		while (true) {
 			try {
 				Payload payload = inputQueue.take();
-				processorService.withErrorHandling(processor, payload, () -> processor.consume(payload));
+				processorService.withProcessorErrorHandling(processor, payload, () -> processor.consume(payload));
 			} catch (InterruptedException e) {
 				// Nothing to do: the application is exiting.
 				return;

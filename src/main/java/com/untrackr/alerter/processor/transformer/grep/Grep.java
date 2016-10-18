@@ -2,7 +2,7 @@ package com.untrackr.alerter.processor.transformer.grep;
 
 import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.common.Payload;
-import com.untrackr.alerter.processor.common.RuntimeProcessorError;
+import com.untrackr.alerter.processor.common.ProcessorExecutionException;
 import com.untrackr.alerter.processor.transformer.ConditionalTransformer;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -27,7 +27,7 @@ public class Grep extends ConditionalTransformer {
 		String text;
 		try {
 			text = payloadFieldValue(input, fieldName, String.class);
-		} catch (RuntimeProcessorError e) {
+		} catch (ProcessorExecutionException e) {
 			if (fieldErrorSignaled) {
 				return false;
 			} else {

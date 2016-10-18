@@ -59,7 +59,7 @@ public abstract class ProcessorFactory {
 							Type fieldType = descriptor.getReadMethod().getGenericReturnType();
 							wrapper.setPropertyValue(key, convertScriptValue(ConvertedValueSource.makeField(key), fieldType, scriptObject.get(key)));
 						} catch (InvalidPropertyException e) {
-							throw new ValidationError(name() + ": invalid property name \"" + key + "\"");
+							throw new RuntimeScriptException(name() + ": invalid property name \"" + key + "\"");
 						}
 					}
 					return value;
@@ -81,7 +81,7 @@ public abstract class ProcessorFactory {
 				}
 			}
 		}
-		throw new ValidationError(name() + ": invalid " + valueSource.describe() + ", expected " + typeName(type) + ", got: " + scriptValue.toString());
+		throw new RuntimeScriptException(name() + ": invalid " + valueSource.describe() + ", expected " + typeName(type) + ", got: " + scriptValue.toString());
 	}
 
 	private String typeName(Type type) {
@@ -123,15 +123,15 @@ public abstract class ProcessorFactory {
 		return null;
 	}
 
-	public <T> T checkFieldValue(String field, T value) throws ValidationError {
+	public <T> T checkFieldValue(String field, T value) throws RuntimeScriptException {
 		if (value != null) {
 			return value;
 		} else {
-			throw new ValidationError(name() + ": missing field \"" + field + "\" in descriptor");
+			throw new RuntimeScriptException(name() + ": missing field \"" + field + "\" in descriptor");
 		}
 	}
 
-	public <T> T optionalFieldValue(String field, T value, T defaultValue) throws ValidationError {
+	public <T> T optionalFieldValue(String field, T value, T defaultValue) throws RuntimeScriptException {
 		if (value == null) {
 			return defaultValue;
 		} else {
@@ -144,7 +144,7 @@ public abstract class ProcessorFactory {
 		try {
 			return Duration.parse(delayString).toMillis();
 		} catch (DateTimeParseException e) {
-			throw new ValidationError(name() + ":" + e.getLocalizedMessage() + " at index " + e.getErrorIndex() + ": \"" + delayString + "\"");
+			throw new RuntimeScriptException(name() + ":" + e.getLocalizedMessage() + " at index " + e.getErrorIndex() + ": \"" + delayString + "\"");
 		}
 	}
 
@@ -156,19 +156,19 @@ public abstract class ProcessorFactory {
 		}
 	}
 
-	public String checkVariableSubstitution(String field, String text) throws ValidationError {
+	public String checkVariableSubstitution(String field, String text) throws RuntimeScriptException {
 		try {
 			return ApplicationUtil.substituteVariables(text);
 		} catch (UndefinedSubstitutionVariable e) {
-			throw new ValidationError(name() + ": unknown variable in " + name() + " field \"" + field + "\": " + e.getName());
+			throw new RuntimeScriptException(name() + ": unknown variable in " + name() + " field \"" + field + "\": " + e.getName());
 		}
 	}
 
-	public Pattern compilePattern(String field, String regex) throws ValidationError {
+	public Pattern compilePattern(String field, String regex) throws RuntimeScriptException {
 		try {
 			return Pattern.compile(regex);
 		} catch (PatternSyntaxException e) {
-			throw new ValidationError(name() + ": invalid regex in field \"" + field + "\":" + e.getMessage());
+			throw new RuntimeScriptException(name() + ": invalid regex in field \"" + field + "\":" + e.getMessage());
 		}
 	}
 
