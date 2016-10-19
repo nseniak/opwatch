@@ -15,11 +15,10 @@ public class JSGrepFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public Processor make(Object scriptObject) throws RuntimeScriptException {
+	public Processor make(Object scriptObject) {
 		JSGrepDesc descriptor = convertProcessorArgument(JSGrepDesc.class, scriptObject);
-		JavascriptPredicate predicate = checkFieldValue("predicate", descriptor.getPredicate());
-		JSGrep jsgrep = new JSGrep(getProcessorService(), ScriptStack.currentStack(), predicate);
-		initialize(jsgrep, descriptor);
+		JavascriptPredicate predicate = checkPropertyValue("predicate", descriptor.getPredicate());
+		JSGrep jsgrep = new JSGrep(getProcessorService(), displayName(descriptor), predicate);
 		return jsgrep;
 	}
 

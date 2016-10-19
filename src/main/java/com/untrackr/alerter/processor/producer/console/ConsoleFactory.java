@@ -2,8 +2,6 @@ package com.untrackr.alerter.processor.producer.console;
 
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
 import com.untrackr.alerter.processor.common.Processor;
-import com.untrackr.alerter.processor.common.ScriptStack;
-import com.untrackr.alerter.processor.common.RuntimeScriptException;
 import com.untrackr.alerter.service.ProcessorService;
 
 public class ConsoleFactory extends ActiveProcessorFactory {
@@ -18,10 +16,9 @@ public class ConsoleFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public Processor make(Object scriptObject) throws RuntimeScriptException {
+	public Processor make(Object scriptObject) {
 		ConsoleDesc descriptor = convertProcessorArgument(ConsoleDesc.class, scriptObject);
-		Console console = new Console(getProcessorService(), ScriptStack.currentStack());
-		initialize(console, descriptor);
+		Console console = new Console(getProcessorService(), displayName(descriptor));
 		return console;
 	}
 

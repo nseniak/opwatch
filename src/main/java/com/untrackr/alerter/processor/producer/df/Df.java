@@ -1,8 +1,8 @@
 package com.untrackr.alerter.processor.producer.df;
 
 import com.untrackr.alerter.common.ScriptObject;
-import com.untrackr.alerter.processor.common.ScriptStack;
-import com.untrackr.alerter.processor.common.ProcessorExecutionException;
+import com.untrackr.alerter.processor.common.AlerterException;
+import com.untrackr.alerter.processor.common.ExceptionContext;
 import com.untrackr.alerter.processor.producer.ScheduledExecutor;
 import com.untrackr.alerter.processor.producer.ScheduledProducer;
 import com.untrackr.alerter.service.ProcessorService;
@@ -14,8 +14,8 @@ public class Df extends ScheduledProducer {
 	private File file;
 	private boolean fileNotFoundErrorSignaled = false;
 
-	public Df(ProcessorService processorService, ScriptStack stack, ScheduledExecutor scheduledExecutor, File file) {
-		super(processorService, stack, scheduledExecutor);
+	public Df(ProcessorService processorService, String name, ScheduledExecutor scheduledExecutor, File file) {
+		super(processorService, name, scheduledExecutor);
 		this.file = file;
 	}
 
@@ -28,7 +28,7 @@ public class Df extends ScheduledProducer {
 				return;
 			} else {
 				fileNotFoundErrorSignaled = true;
-				throw new ProcessorExecutionException("file not found: " + file, this);
+				throw new AlerterException("file not found: " + file, ExceptionContext.makeProcessorNoPayload(this));
 			}
 		}
 		fileNotFoundErrorSignaled = false;
@@ -40,11 +40,6 @@ public class Df extends ScheduledProducer {
 		info.used = partitionUsed;
 		info.percentUsed = ((double) partitionUsed * 100) / partitionSize;
 		outputProduced(info);
-	}
-
-	@Override
-	public String identifier() {
-		return file.toString();
 	}
 
 	public static class PartitionInfo extends ScriptObject {

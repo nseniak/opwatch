@@ -1,9 +1,9 @@
 package com.untrackr.alerter.processor.consumer.post;
 
 import com.untrackr.alerter.common.RemotePayload;
-import com.untrackr.alerter.processor.common.ScriptStack;
+import com.untrackr.alerter.processor.common.AlerterException;
+import com.untrackr.alerter.processor.common.ExceptionContext;
 import com.untrackr.alerter.processor.common.Payload;
-import com.untrackr.alerter.processor.common.ProcessorExecutionException;
 import com.untrackr.alerter.processor.consumer.Consumer;
 import com.untrackr.alerter.service.ProcessorService;
 import org.springframework.http.HttpStatus;
@@ -20,8 +20,8 @@ public class Post extends Consumer {
 	private String urlPath;
 	private boolean postErrorSignaled = false;
 
-	public Post(ProcessorService processorService, ScriptStack stack, String pathString, String hostname, int port, String urlPath) {
-		super(processorService, stack);
+	public Post(ProcessorService processorService, String name, String pathString, String hostname, int port, String urlPath) {
+		super(processorService, name);
 		this.pathString = pathString;
 		this.hostname = hostname;
 		this.port = port;
@@ -41,20 +41,17 @@ public class Post extends Consumer {
 				return;
 			} else {
 				postErrorSignaled = true;
-				throw new ProcessorExecutionException("http error when posting to \"" + pathString + "\": " + e.getLocalizedMessage(), this, payload);
+				throw new AlerterException("http error when posting to \"" + pathString + "\": " + e.getLocalizedMessage(),
+						ExceptionContext.makeProcessorPayload(this, payload));
 			}
 		}
 		HttpStatus status = response.getStatusCode();
 		if (status != HttpStatus.OK) {
 			postErrorSignaled = true;
-			throw new ProcessorExecutionException("invalid response status when posting to \"" + pathString + "\": " + status.value() + " " + status.getReasonPhrase(), this, payload);
+			throw new AlerterException("invalid response status when posting to \"" + pathString + "\": " + status.value() + " " + status.getReasonPhrase(),
+					ExceptionContext.makeProcessorPayload(this, payload));
 		}
 		postErrorSignaled = false;
-	}
-
-	@Override
-	public String identifier() {
-		return pathString;
 	}
 
 }

@@ -15,12 +15,11 @@ public class CollectFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public Processor make(Object scriptObject) throws RuntimeScriptException {
+	public Processor make(Object scriptObject) {
 		CollectDesc descriptor = convertProcessorArgument(CollectDesc.class, scriptObject);
-		JavascriptTransformer transformer = optionalFieldValue("transformer", descriptor.getTransformer(), null);
-		int count = checkFieldValue("count", descriptor.getCount());
-		Collect collect = new Collect(getProcessorService(), ScriptStack.currentStack(), transformer, count);
-		initialize(collect, descriptor);
+		JavascriptTransformer transformer = optionaPropertyValue("transformer", descriptor.getTransformer(), null);
+		int count = checkPropertyValue("count", descriptor.getCount());
+		Collect collect = new Collect(getProcessorService(), displayName(descriptor), transformer, count);
 		return collect;
 	}
 

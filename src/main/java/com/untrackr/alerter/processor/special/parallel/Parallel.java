@@ -9,8 +9,8 @@ public class Parallel extends Processor {
 
 	private List<Processor> processors;
 
-	public Parallel(ProcessorService processorService, List<Processor> processors, ScriptStack stack) throws RuntimeScriptException {
-		super(processorService, stack);
+	public Parallel(ProcessorService processorService, List<Processor> processors, String name) {
+		super(processorService, name);
 		this.processors = processors;
 	}
 
@@ -30,12 +30,12 @@ public class Parallel extends Processor {
 
 	@Override
 	public void start() {
-		processors.forEach(processor -> processorService.withProcessorErrorHandling(processor, null, processor::start));
+		processors.forEach(processor -> processorService.withProcessorErrorHandling(processor, processor::start));
 	}
 
 	@Override
 	public void stop() {
-		processors.forEach(processor -> processorService.withProcessorErrorHandling(processor, null, processor::stop));
+		processors.forEach(processor -> processorService.withProcessorErrorHandling(processor, processor::stop));
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public class Parallel extends Processor {
 	}
 
 	@Override
-	public void check() throws RuntimeScriptException {
+	public void check() {
 		for (Processor processor : processors) {
 			processor.check();
 		}
@@ -65,8 +65,8 @@ public class Parallel extends Processor {
 		for (Processor processor : processors) {
 			ProcessorSignature bottomSignature = signature.bottom(processor.getSignature());
 			if (bottomSignature == null) {
-				String message = "signature of " + processor.descriptor() + " is " + processor.getSignature().describe() + " and is inconsistent with previous processors in parallel group: " + signature.describe();
-				throw new RuntimeScriptException(message);
+				String message = "signature of " + processor.getName() + " is " + processor.getSignature().describe() + " and is inconsistent with previous processors in parallel group: " + signature.describe();
+				throw new AlerterException(message, ExceptionContext.makeProcessorFactory(processor.getName()));
 			}
 			signature = bottomSignature;
 		}

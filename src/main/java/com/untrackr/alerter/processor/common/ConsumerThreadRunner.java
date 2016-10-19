@@ -27,7 +27,7 @@ public class ConsumerThreadRunner implements Runnable {
 		try {
 			long timeout = processorService.getProfileService().profile().getProcessorInputQueueTimeout();
 			while (!inputQueue.offer(payload, timeout, TimeUnit.MILLISECONDS)) {
-				processorService.infrastructureAlert(Alert.Priority.high, "Processor queue is full", processor.descriptor());
+				processorService.infrastructureAlert(Alert.Priority.high, "Processor queue is full", processor.getLocation().descriptor());
 			}
 		} catch (InterruptedException e) {
 			// Nothing to do: the application is exiting.
@@ -39,7 +39,7 @@ public class ConsumerThreadRunner implements Runnable {
 		while (true) {
 			try {
 				Payload payload = inputQueue.take();
-				processorService.withProcessorErrorHandling(processor, payload, () -> processor.consume(payload));
+				processorService.withProcessorErrorHandling(processor, () -> processor.consume(payload));
 			} catch (InterruptedException e) {
 				// Nothing to do: the application is exiting.
 				return;

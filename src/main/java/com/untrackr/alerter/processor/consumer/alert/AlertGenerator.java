@@ -4,25 +4,25 @@ import com.untrackr.alerter.model.common.Alert;
 import com.untrackr.alerter.model.common.PushoverKey;
 import com.untrackr.alerter.processor.common.JavascriptPredicate;
 import com.untrackr.alerter.processor.common.Payload;
-import com.untrackr.alerter.processor.common.ScriptStack;
+import com.untrackr.alerter.processor.common.StringValue;
 import com.untrackr.alerter.processor.consumer.Consumer;
 import com.untrackr.alerter.service.ProcessorService;
 
 public class AlertGenerator extends Consumer {
 
 	private Alert.Priority priority;
-	private String title;
+	private StringValue message;
 	private JavascriptPredicate predicate;
 	private boolean toggle;
 	private boolean toggleUp;
 	private PushoverKey pushoverKey;
 
 
-	public AlertGenerator(ProcessorService processorService, ScriptStack stack, PushoverKey pushoverKey, String title,
+	public AlertGenerator(ProcessorService processorService, String name, PushoverKey pushoverKey, StringValue message,
 												Alert.Priority priority, JavascriptPredicate predicate, boolean toggle) {
-		super(processorService, stack);
+		super(processorService, name);
 		this.priority = priority;
-		this.title = title;
+		this.message = message;
 		this.predicate = predicate;
 		this.toggle = toggle;
 		this.pushoverKey = pushoverKey;
@@ -33,21 +33,16 @@ public class AlertGenerator extends Consumer {
 		boolean alert = (predicate == null) || predicate.call(payload, this);
 		if (!toggle) {
 			if (alert) {
-				processorService.processorAlert(pushoverKey, priority, title, payload, this);
+				processorService.processorAlert(pushoverKey, priority, message.value(this, payload), payload, this);
 			}
 		} else {
 			if (!toggleUp && alert) {
-				processorService.processorAlert(pushoverKey, priority, title, payload, this);
+				processorService.processorAlert(pushoverKey, priority, message.value(this, payload), payload, this);
 			} else if (toggleUp && !alert) {
-				processorService.processorAlertEnd(pushoverKey, priority, title, payload, this);
+				processorService.processorAlertEnd(pushoverKey, priority, message.value(this, payload), payload, this);
 			}
 			toggleUp = alert;
 		}
-	}
-
-	@Override
-	public String identifier() {
-		return title;
 	}
 
 	public boolean isToggle() {

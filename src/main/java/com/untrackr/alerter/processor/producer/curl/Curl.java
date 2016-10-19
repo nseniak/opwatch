@@ -2,7 +2,6 @@ package com.untrackr.alerter.processor.producer.curl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.untrackr.alerter.common.ScriptObject;
-import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.producer.ScheduledExecutor;
 import com.untrackr.alerter.processor.producer.ScheduledProducer;
 import com.untrackr.alerter.service.ProcessorService;
@@ -30,13 +29,13 @@ public class Curl extends ScheduledProducer {
 	private MediaType anyText = MediaType.valueOf("text/*");
 
 	public Curl(ProcessorService processorService,
-							ScriptStack stack,
+							String name,
 							ScheduledExecutor scheduledExecutor,
 							URI uri,
 							int connectTimeout,
 							int readTimeout,
 							boolean insecure) {
-		super(processorService, stack, scheduledExecutor);
+		super(processorService, name, scheduledExecutor);
 		this.uri = uri;
 		this.connectTimeout = connectTimeout;
 		this.readTimeout = readTimeout;
@@ -91,11 +90,6 @@ public class Curl extends ScheduledProducer {
 			result.error = e.getCause().getMessage();
 		}
 		outputProduced(result);
-	}
-
-	@Override
-	public String identifier() {
-		return uri.toString();
 	}
 
 	public static class Response extends ScriptObject {

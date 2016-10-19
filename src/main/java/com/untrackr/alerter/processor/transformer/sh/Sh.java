@@ -1,10 +1,9 @@
 package com.untrackr.alerter.processor.transformer.sh;
 
-import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.common.Payload;
 import com.untrackr.alerter.processor.common.ProcessorSignature;
-import com.untrackr.alerter.processor.transformer.Transformer;
 import com.untrackr.alerter.processor.producer.CommandRunner;
+import com.untrackr.alerter.processor.transformer.Transformer;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.concurrent.Future;
@@ -14,8 +13,8 @@ public class Sh extends Transformer {
 	protected Future<?> commandConsumerThreadFuture;
 	private CommandRunner commandRunner;
 
-	public Sh(ProcessorService processorService, ScriptStack stack, CommandRunner commandRunner) {
-		super(processorService, stack);
+	public Sh(ProcessorService processorService, String name, CommandRunner commandRunner) {
+		super(processorService, name);
 		this.commandRunner = commandRunner;
 		this.signature = new ProcessorSignature(ProcessorSignature.PipeRequirement.any, ProcessorSignature.PipeRequirement.any);
 	}
@@ -24,7 +23,7 @@ public class Sh extends Transformer {
 	public void doStart() {
 		super.doStart();
 		commandConsumerThreadFuture = processorService.getConsumerExecutor().submit(() -> {
-			processorService.withProcessorErrorHandling(this, null, () -> {
+			processorService.withProcessorErrorHandling(this, () -> {
 				commandRunner.startProcess(this);
 				commandRunner.produce(this, -1);
 			});
@@ -41,11 +40,6 @@ public class Sh extends Transformer {
 	@Override
 	public void consume(Payload payload) {
 		commandRunner.consume(this, payload);
-	}
-
-	@Override
-	public String identifier() {
-		return commandRunner.getCommand();
 	}
 
 }

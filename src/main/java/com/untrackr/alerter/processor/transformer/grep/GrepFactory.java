@@ -1,9 +1,6 @@
 package com.untrackr.alerter.processor.transformer.grep;
 
-import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
-import com.untrackr.alerter.processor.common.Processor;
-import com.untrackr.alerter.processor.common.ScriptStack;
-import com.untrackr.alerter.processor.common.RuntimeScriptException;
+import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.List;
@@ -21,13 +18,13 @@ public class GrepFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public Processor make(Object scriptObject) throws RuntimeScriptException {
+	public Processor make(Object scriptObject) {
 		GrepDesc descriptor = convertProcessorArgument(GrepDesc.class, scriptObject);
-		String fieldName = optionalFieldValue("field", descriptor.getField(), "text");
-		List<String> regexes = optionalFieldValue("regexes", descriptor.getRegexes(), null);
-		String regex = optionalFieldValue("regex", descriptor.getRegex(), null);
+		String fieldName = optionaPropertyValue("field", descriptor.getField(), "text");
+		List<String> regexes = optionaPropertyValue("regexes", descriptor.getRegexes(), null);
+		String regex = optionaPropertyValue("regex", descriptor.getRegex(), null);
 		if ((regex != null) && (regexes != null)) {
-			throw new RuntimeScriptException(name() + ": cannot have both \"regex\" and \"regexes\" defined");
+			throw new AlerterException("cannot have both \"regex\" and \"regexes\" defined", ExceptionContext.makeProcessorFactory(name()));
 		}
 		Pattern pattern = null;
 		if (regex != null) {
@@ -45,11 +42,10 @@ public class GrepFactory extends ActiveProcessorFactory {
 			pattern = compilePattern("regexes", builder.toString());
 		}
 		if (pattern == null) {
-			throw new RuntimeScriptException(name() + ": either \"regex\" or \"regexes\" must be defined");
+			throw new AlerterException("either \"regex\" or \"regexes\" must be defined", ExceptionContext.makeProcessorFactory(name()));
 		}
-		boolean invert = optionalFieldValue("invert", descriptor.getInvert(), Boolean.FALSE);
-		Grep grep = new Grep(getProcessorService(), ScriptStack.currentStack(), fieldName, pattern, invert);
-		initialize(grep, descriptor);
+		boolean invert = optionaPropertyValue("invert", descriptor.getInvert(), Boolean.FALSE);
+		Grep grep = new Grep(getProcessorService(), displayName(descriptor), fieldName, pattern, invert);
 		return grep;
 	}
 

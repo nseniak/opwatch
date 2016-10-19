@@ -1,19 +1,16 @@
 package com.untrackr.alerter.processor.transformer.once;
 
-import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.common.Payload;
 import com.untrackr.alerter.processor.transformer.Transformer;
 import com.untrackr.alerter.service.ProcessorService;
-
-import java.time.Duration;
 
 public class Once extends Transformer {
 
 	private long delay;
 	private long lastInputTimestamp = 0;
 
-	public Once(ProcessorService processorService, ScriptStack stack, long delay) {
-		super(processorService, stack);
+	public Once(ProcessorService processorService, String name, long delay) {
+		super(processorService, name);
 		this.delay = delay;
 	}
 
@@ -23,11 +20,6 @@ public class Once extends Transformer {
 			outputTransformed(payload.getScriptObject(), payload);
 		}
 		lastInputTimestamp = payload.getTimestamp();
-	}
-
-	@Override
-	public String identifier() {
-		return Duration.ofMillis(delay).toString();
 	}
 
 }

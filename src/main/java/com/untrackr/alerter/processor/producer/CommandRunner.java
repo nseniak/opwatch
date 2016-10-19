@@ -2,10 +2,7 @@ package com.untrackr.alerter.processor.producer;
 
 import com.untrackr.alerter.ioservice.LineReader;
 import com.untrackr.alerter.model.common.AlerterProfile;
-import com.untrackr.alerter.processor.common.ActiveProcessor;
-import com.untrackr.alerter.processor.common.Payload;
-import com.untrackr.alerter.processor.common.Processor;
-import com.untrackr.alerter.processor.common.ProcessorExecutionException;
+import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.service.ProcessorService;
 import org.apache.commons.io.IOUtils;
 
@@ -18,22 +15,23 @@ public class CommandRunner {
 
 	private ProcessorService processorService;
 	private String command;
+	private File directory;
 	private boolean commandExecutionErrorSignaled;
 	private Process process;
 
-	public CommandRunner(ProcessorService processorService, String command) {
+	public CommandRunner(ProcessorService processorService, String command, File directory) {
 		this.processorService = processorService;
 		this.command = command;
+		this.directory = directory;
 		this.commandExecutionErrorSignaled = false;
 	}
 
 	public void startProcess(ActiveProcessor processor) {
 		try {
-			File currentDescDir = new File(processor.getStack().top().getFileName()).getParentFile();
 			String[] cmdArray = {"/bin/sh", "-c", command};
-			process = Runtime.getRuntime().exec(cmdArray, null, currentDescDir);
+			process = Runtime.getRuntime().exec(cmdArray, null, directory);
 		} catch (Throwable t) {
-			ProcessorExecutionException error = new ProcessorExecutionException(t, processor, null);
+			AlerterException error = new AlerterException(t, ExceptionContext.makeProcessorNoPayload(processor));
 			error.setSilent(commandExecutionErrorSignaled);
 			commandExecutionErrorSignaled = true;
 		}
@@ -52,7 +50,7 @@ public class CommandRunner {
 			long start = System.currentTimeMillis();
 			while (process == null) {
 				if ((System.currentTimeMillis() - start) > profile.getCommandStartTimeout()) {
-					throw new ProcessorExecutionException("command process not started", processor, payload);
+					throw new AlerterException("command process not started", ExceptionContext.makeProcessorPayload(processor, payload));
 				}
 				try {
 					Thread.sleep(profile.getCommandStartSleepTime());
@@ -63,14 +61,14 @@ public class CommandRunner {
 			}
 		}
 		if (!checkAlive(processor)) {
-			throw new ProcessorExecutionException("command process has exited", processor, payload);
+			throw new AlerterException("command process has exited", ExceptionContext.makeProcessorPayload(processor, payload));
 		}
 		try {
 			process.getOutputStream().write(payload.asText().getBytes());
 			process.getOutputStream().write('\n');
 			process.getOutputStream().flush();
 		} catch (IOException e) {
-			throw new ProcessorExecutionException(e, processor, payload);
+			throw new AlerterException(e, ExceptionContext.makeProcessorPayload(processor, payload));
 		}
 	}
 
@@ -86,7 +84,7 @@ public class CommandRunner {
 						return;
 					}
 					if ((exitTimeout >= 0) && ((System.currentTimeMillis() - t0) > exitTimeout)) {
-						throw new ProcessorExecutionException("timeout waiting for script output", processor);
+						throw new AlerterException("timeout waiting for script output", ExceptionContext.makeProcessorNoPayload(processor));
 					}
 					Thread.sleep(profile.getCronScriptOutputCheckDelay());
 				}
@@ -100,7 +98,7 @@ public class CommandRunner {
 				// The processor is being stopped. Just exit.
 				return;
 			} else {
-				throw new ProcessorExecutionException(e, processor, null);
+				throw new AlerterException(e, ExceptionContext.makeProcessorNoPayload(processor));
 			}
 		} catch (InterruptedException e) {
 			// Nothing to do: exiting
@@ -129,7 +127,8 @@ public class CommandRunner {
 			} catch (IOException e) {
 				// Nothing to do
 			}
-			throw new ProcessorExecutionException("command exited with error status: " + process.exitValue() + output, processor);
+			throw new AlerterException("command exited with error status: " + process.exitValue() + output,
+					ExceptionContext.makeProcessorNoPayload(processor));
 		}
 		return false;
 	}

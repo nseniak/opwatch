@@ -1,22 +1,28 @@
 package com.untrackr.alerter.processor.common;
 
 import com.untrackr.alerter.service.ProcessorService;
+import org.javatuples.Pair;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Future;
 
 public abstract class Processor {
 
 	protected ProcessorService processorService;
 	protected String name;
-	protected ScriptStack stack;
+	protected ProcessorLocation location;
 	protected ProcessorSignature signature;
 	protected ConsumerThreadRunner consumerThreadRunner;
 	protected Future<?> consumerThreadFuture;
+	private Set<JavascriptFunction> scriptErrorSignaled = new HashSet<>();
+	private Set<Pair<Processor, String>> propertyErrorSignaled = new HashSet<>();
 
-	public Processor(ProcessorService processorService, ScriptStack stack) {
+	public Processor(ProcessorService processorService, String name) {
 		this.processorService = processorService;
-		this.stack = stack;
+		this.name = name;
+		this.location = new ProcessorLocation(name);
 	}
 
 	public abstract void addProducer(Processor producer);
@@ -43,21 +49,20 @@ public abstract class Processor {
 		return processors.stream().allMatch(Processor::stopped);
 	}
 
-	public String descriptor() {
-		StringBuilder builder = new StringBuilder();
-		builder.append(name);
-		if (!stack.empty()) {
-			builder.append(" built at ").append(stack.asString());
-		}
-		return builder.toString();
+	public boolean scriptErrorSignaled(JavascriptFunction function) {
+		return !scriptErrorSignaled.add(function);
+	}
+
+	public boolean propertyErrorSignaled(String propertyName) {
+		return !propertyErrorSignaled.add(new Pair<>(this, propertyName));
 	}
 
 	public ProcessorService getProcessorService() {
 		return processorService;
 	}
 
-	public ScriptStack getStack() {
-		return stack;
+	public ProcessorLocation getLocation() {
+		return location;
 	}
 
 	public ProcessorSignature getSignature() {

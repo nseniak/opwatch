@@ -1,7 +1,6 @@
 package com.untrackr.alerter.processor.producer.stat;
 
 import com.untrackr.alerter.common.ScriptObject;
-import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.producer.ScheduledExecutor;
 import com.untrackr.alerter.processor.producer.ScheduledProducer;
 import com.untrackr.alerter.service.ProcessorService;
@@ -13,8 +12,8 @@ public class Stat extends ScheduledProducer {
 
 	private File file;
 
-	public Stat(ProcessorService processorService, ScriptStack stack, ScheduledExecutor scheduledExecutor, File file) {
-		super(processorService, stack, scheduledExecutor);
+	public Stat(ProcessorService processorService, String name, ScheduledExecutor scheduledExecutor, File file) {
+		super(processorService, name, scheduledExecutor);
 		this.file = file;
 	}
 
@@ -30,11 +29,6 @@ public class Stat extends ScheduledProducer {
 			info.lastModified = new Date(file.lastModified());
 		}
 		outputProduced(info);
-	}
-
-	@Override
-	public String identifier() {
-		return file.toString();
 	}
 
 	public static class FileInfo extends ScriptObject {

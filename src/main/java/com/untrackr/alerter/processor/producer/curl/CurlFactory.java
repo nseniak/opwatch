@@ -1,8 +1,6 @@
 package com.untrackr.alerter.processor.producer.curl;
 
-import com.untrackr.alerter.processor.common.Processor;
-import com.untrackr.alerter.processor.common.ScriptStack;
-import com.untrackr.alerter.processor.common.RuntimeScriptException;
+import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.processor.producer.ScheduledExecutorFactory;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -21,23 +19,23 @@ public class CurlFactory extends ScheduledExecutorFactory {
 	}
 
 	@Override
-	public Processor make(Object scriptObject) throws RuntimeScriptException {
+	public Processor make(Object scriptObject) {
 		CurlDesc descriptor = convertProcessorArgument(CurlDesc.class, scriptObject);
-		String urlString = checkVariableSubstitution("url", checkFieldValue("url", descriptor.getUrl()));
+		String urlString = checkVariableSubstitution("url", checkPropertyValue("url", descriptor.getUrl()));
 		URI uri;
 		try {
 			uri = new URI(urlString);
 		} catch (URISyntaxException e) {
-			throw new RuntimeScriptException("invalid \"url\": " + e.getLocalizedMessage() + ": \"" + urlString + "\"");
+			throw new AlerterException("invalid \"url\": " + e.getLocalizedMessage() + ": \"" + urlString + "\"",
+					ExceptionContext.makeProcessorFactory(name()));
 		}
 		long defaultConnectTimeout = processorService.getProfileService().profile().getDefaultHttpConnectTimeout();
 		long connectTimeout = optionalDurationValue("connectTimeout", descriptor.getConnectTimeout(), defaultConnectTimeout);
 		long defaultReadTimeout = processorService.getProfileService().profile().getDefaultHttpReadTimeout();
 		long readTimeout = optionalDurationValue("readTimeout", descriptor.getReadTimeout(), defaultReadTimeout);
-		boolean insecure = optionalFieldValue("insecure", descriptor.isInsecure(), false);
-		Curl curl = new Curl(getProcessorService(), ScriptStack.currentStack(), makeScheduledExecutor(descriptor), uri,
+		boolean insecure = optionaPropertyValue("insecure", descriptor.isInsecure(), false);
+		Curl curl = new Curl(getProcessorService(), displayName(descriptor), makeScheduledExecutor(descriptor), uri,
 				(int) connectTimeout, (int) readTimeout, insecure);
-		initialize(curl, descriptor);
 		return curl;
 	}
 

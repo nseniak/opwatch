@@ -4,6 +4,8 @@ import com.untrackr.alerter.processor.producer.CommandExecutorDesc;
 import com.untrackr.alerter.processor.producer.CommandRunner;
 import com.untrackr.alerter.service.ProcessorService;
 
+import java.io.File;
+
 public abstract class ActiveProcessorFactory extends ProcessorFactory {
 
 	public ActiveProcessorFactory(ProcessorService processorService) {
@@ -11,8 +13,13 @@ public abstract class ActiveProcessorFactory extends ProcessorFactory {
 	}
 
 	protected CommandRunner makeCommandOutputProducer(CommandExecutorDesc descriptor) {
-		String command = checkVariableSubstitution("command", checkFieldValue("command", descriptor.getGenerator()));
-		return new CommandRunner(processorService, command);
+		String command = checkVariableSubstitution("command", checkPropertyValue("command", descriptor.getGenerator()));
+		ScriptStack.ScriptStackElement top = ScriptStack.currentStack().top();
+		File directory = new File(".");
+		if (top != null) {
+			directory = new File(top.getFileName()).getParentFile();
+		}
+		return new CommandRunner(processorService, command, directory);
 	}
 
 }

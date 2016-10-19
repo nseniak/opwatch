@@ -1,7 +1,7 @@
 package com.untrackr.alerter.processor.producer;
 
-import com.untrackr.alerter.processor.common.ScriptStack;
-import com.untrackr.alerter.processor.common.ProcessorExecutionException;
+import com.untrackr.alerter.processor.common.AlerterException;
+import com.untrackr.alerter.processor.common.ExceptionContext;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.concurrent.Future;
@@ -10,8 +10,8 @@ public abstract class ThreadedProducer extends Producer {
 
 	private Future<?> future;
 
-	public ThreadedProducer(ProcessorService processorService, ScriptStack stack) {
-		super(processorService, stack);
+	public ThreadedProducer(ProcessorService processorService, String name) {
+		super(processorService, name);
 	}
 
 	@Override
@@ -23,7 +23,7 @@ public abstract class ThreadedProducer extends Producer {
 	public void doStop() {
 		boolean stopped = future.cancel(true);
 		if (!stopped) {
-			throw new ProcessorExecutionException("cannot stop producer thread", this);
+			throw new AlerterException("cannot stop producer thread", ExceptionContext.makeToplevel());
 		}
 	}
 

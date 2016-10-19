@@ -3,19 +3,9 @@ package com.untrackr.alerter.processor.common;
 import com.untrackr.alerter.common.ApplicationUtil;
 import com.untrackr.alerter.common.UndefinedSubstitutionVariable;
 import com.untrackr.alerter.service.ProcessorService;
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
-import jdk.nashorn.api.scripting.ScriptUtils;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.beans.InvalidPropertyException;
 
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.time.Duration;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -29,109 +19,31 @@ public abstract class ProcessorFactory {
 
 	public abstract String name();
 
+	public String displayName(ProcessorDesc processorDesc) {
+		if (processorDesc.getName() != null) {
+			return processorDesc.getName();
+		} else {
+			return name();
+		}
+	}
+
 	public abstract Processor make(Object scriptObject);
 
 	protected <T> T convertProcessorArgument(Class<T> clazz, Object scriptObject) {
-		return (T) convertScriptValue(ConvertedValueSource.makeArgument(), clazz, scriptObject);
+		return (T) processorService.getScriptService().convertScriptValue(ValueLocation.makeArgument(name()), clazz, scriptObject,
+				() -> ExceptionContext.makeProcessorFactory(name()));
 	}
 
-	public Object convertScriptValue(ConvertedValueSource valueSource, Type type, Object scriptValue) {
-		if (scriptValue == null) {
-			return null;
-		} else if (type instanceof Class) {
-			Class clazz = (Class) type;
-			if (clazz.isAssignableFrom(scriptValue.getClass())) {
-				return scriptValue;
-			} else if (scriptValue instanceof ScriptObjectMirror) {
-				ScriptObjectMirror scriptObject = (ScriptObjectMirror) scriptValue;
-				if ((type == JavascriptTransformer.class) && scriptObject.isFunction()) {
-					return new JavascriptTransformer(scriptObject);
-				} else if (type == JavascriptPredicate.class) {
-					return new JavascriptPredicate(scriptObject);
-				} else if (type == JavascriptProducer.class) {
-					return new JavascriptProducer(scriptObject);
-				} else {
-					Object value = BeanUtils.instantiate(clazz);
-					BeanWrapperImpl wrapper = new BeanWrapperImpl(value);
-					for (String key : scriptObject.getOwnKeys(true)) {
-						try {
-							PropertyDescriptor descriptor = wrapper.getPropertyDescriptor(key);
-							Type fieldType = descriptor.getReadMethod().getGenericReturnType();
-							wrapper.setPropertyValue(key, convertScriptValue(ConvertedValueSource.makeField(key), fieldType, scriptObject.get(key)));
-						} catch (InvalidPropertyException e) {
-							throw new RuntimeScriptException(name() + ": invalid property name \"" + key + "\"");
-						}
-					}
-					return value;
-				}
-			}
-		} else {
-			Type listType = parameterizedListType(type);
-			if (listType != null) {
-				try {
-					ScriptObjectMirror scriptObject = (ScriptObjectMirror) scriptValue;
-					List<Object> scriptList = (List<Object>) ScriptUtils.convert(scriptObject, List.class);
-					List<Object> list = new ArrayList<>();
-					for (Object scriptListObject : scriptList) {
-						list.add(convertScriptValue(valueSource.toListElement(), listType, scriptListObject));
-					}
-					return list;
-				} catch (ClassCastException e) {
-					// Nothing to do
-				}
-			}
-		}
-		throw new RuntimeScriptException(name() + ": invalid " + valueSource.describe() + ", expected " + typeName(type) + ", got: " + scriptValue.toString());
-	}
-
-	private String typeName(Type type) {
-		if (type instanceof Class) {
-			return simpleClassName((Class) type);
-		}
-		Type listType = parameterizedListType(type);
-		if (listType != null) {
-			return typeName(listType) + " array";
-		} else {
-			return type.toString();
-		}
-	}
-
-	private String simpleClassName(Class<?> clazz) {
-		if (String.class.isAssignableFrom(clazz)) {
-			return "a string";
-		} else if (Integer.class.isAssignableFrom(clazz)) {
-			return "an integer";
-		} else if (Number.class.isAssignableFrom(clazz)) {
-			return "a number";
-		} else if (JavascriptFunction.class.isAssignableFrom(clazz)) {
-			return "a function";
-		} else if (ProcessorDesc.class.isAssignableFrom(clazz)) {
-			return "a processor descriptor";
-		} else {
-			return "a " + clazz.getSimpleName();
-		}
-	}
-
-	private Type parameterizedListType(Type type) {
-		if (type instanceof ParameterizedType) {
-			ParameterizedType paramType = (ParameterizedType) type;
-			Type[] args = paramType.getActualTypeArguments();
-			if ((paramType.getRawType() == List.class) && (args.length == 1)) {
-				return args[0];
-			}
-		}
-		return null;
-	}
-
-	public <T> T checkFieldValue(String field, T value) throws RuntimeScriptException {
+	public <T> T checkPropertyValue(String property, T value) {
 		if (value != null) {
 			return value;
 		} else {
-			throw new RuntimeScriptException(name() + ": missing field \"" + field + "\" in descriptor");
+			ValueLocation location = ValueLocation.makeProperty(name(), property);
+			throw new AlerterException("missing " + location.describeAsValue(), ExceptionContext.makeProcessorFactory(name()));
 		}
 	}
 
-	public <T> T optionalFieldValue(String field, T value, T defaultValue) throws RuntimeScriptException {
+	public <T> T optionaPropertyValue(String property, T value, T defaultValue) {
 		if (value == null) {
 			return defaultValue;
 		} else {
@@ -140,11 +52,12 @@ public abstract class ProcessorFactory {
 	}
 
 	public long durationValue(String fieldName, String delayString) {
-		checkFieldValue(fieldName, delayString);
+		checkPropertyValue(fieldName, delayString);
 		try {
 			return Duration.parse(delayString).toMillis();
 		} catch (DateTimeParseException e) {
-			throw new RuntimeScriptException(name() + ":" + e.getLocalizedMessage() + " at index " + e.getErrorIndex() + ": \"" + delayString + "\"");
+			throw new AlerterException(e.getLocalizedMessage() + " at index " + e.getErrorIndex() + ": \"" + delayString + "\"",
+					ExceptionContext.makeProcessorFactory(name()));
 		}
 	}
 
@@ -156,25 +69,24 @@ public abstract class ProcessorFactory {
 		}
 	}
 
-	public String checkVariableSubstitution(String field, String text) throws RuntimeScriptException {
+	public String checkVariableSubstitution(String property, String text) {
 		try {
 			return ApplicationUtil.substituteVariables(text);
 		} catch (UndefinedSubstitutionVariable e) {
-			throw new RuntimeScriptException(name() + ": unknown variable in " + name() + " field \"" + field + "\": " + e.getName());
+			ValueLocation location = ValueLocation.makeProperty(name(), property);
+			throw new AlerterException("unknown variable in " + location.describeAsValue() + ": " + e.getName(),
+					ExceptionContext.makeProcessorFactory(name()));
 		}
 	}
 
-	public Pattern compilePattern(String field, String regex) throws RuntimeScriptException {
+	public Pattern compilePattern(String property, String regex) {
 		try {
 			return Pattern.compile(regex);
 		} catch (PatternSyntaxException e) {
-			throw new RuntimeScriptException(name() + ": invalid regex in field \"" + field + "\":" + e.getMessage());
+			ValueLocation location = ValueLocation.makeProperty(name(), property);
+			throw new AlerterException("invalid regex in " + location.describeAsValue() + ":" + e.getMessage(),
+					ExceptionContext.makeProcessorFactory(name()));
 		}
-	}
-
-	protected void initialize(Processor processor, ProcessorDesc processorDesc) {
-		String name = (processorDesc.getName() != null) ? processorDesc.getName() : name();
-		processor.setName(name);
 	}
 
 	public ProcessorService getProcessorService() {

@@ -2,9 +2,7 @@ package com.untrackr.alerter.processor.transformer.jstack;
 
 import com.untrackr.alerter.common.ScriptObject;
 import com.untrackr.alerter.model.common.Alert;
-import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.common.Payload;
-import com.untrackr.alerter.processor.common.ProcessorExecutionException;
 import com.untrackr.alerter.processor.transformer.Transformer;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -13,35 +11,27 @@ import java.util.regex.Pattern;
 
 public class Jstack extends Transformer {
 
-	private String fieldName;
+	private String propertyName;
 	private Pattern methodPattern;
-	private boolean errorSignaled = false;
 	private ParsingState state = new ParsingState();
 
 	private final static int MAX_EXCEPTION_LINES = 500;
 
-	public Jstack(ProcessorService processorService, ScriptStack stack, String fieldName, Pattern methodPattern) {
-		super(processorService, stack);
-		this.fieldName = fieldName;
+	public Jstack(ProcessorService processorService, String name, String propertyName, Pattern methodPattern) {
+		super(processorService, name);
+		this.propertyName = propertyName;
 		this.methodPattern = methodPattern;
 	}
 
 	@Override
 	public void consume(Payload input) {
-		try {
-			String text = payloadFieldValue(input, fieldName, String.class);
-			String[] lines = text.split("\n");
-			for (String line : lines) {
-				ParsedException exception = parseNextLine(line);
-				if (exception != null) {
-					outputTransformed(exception, input);
-					return;
-				}
-			}
-		} catch (ProcessorExecutionException e) {
-			if (!errorSignaled) {
-				errorSignaled = true;
-				throw e;
+		String text = payloadPropertyValue(input, propertyName, String.class);
+		String[] lines = text.split("\n");
+		for (String line : lines) {
+			ParsedException exception = parseNextLine(line);
+			if (exception != null) {
+				outputTransformed(exception, input);
+				return;
 			}
 		}
 	}

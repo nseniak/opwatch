@@ -2,7 +2,6 @@ package com.untrackr.alerter.processor.transformer.js;
 
 import com.untrackr.alerter.processor.common.JavascriptTransformer;
 import com.untrackr.alerter.processor.common.Payload;
-import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.transformer.Transformer;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -10,8 +9,8 @@ public class JS extends Transformer {
 
 	private JavascriptTransformer transformer;
 
-	public JS(ProcessorService processorService, ScriptStack stack, JavascriptTransformer transformer) {
-		super(processorService, stack);
+	public JS(ProcessorService processorService, String name, JavascriptTransformer transformer) {
+		super(processorService, name);
 		this.transformer = transformer;
 	}
 
@@ -21,11 +20,6 @@ public class JS extends Transformer {
 		if (result != null) {
 			outputTransformed(result, payload);
 		}
-	}
-
-	@Override
-	public String identifier() {
-		return transformer.toString();
 	}
 
 }

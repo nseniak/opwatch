@@ -15,11 +15,10 @@ public class JSFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public Processor make(Object scriptObject) throws RuntimeScriptException {
+	public Processor make(Object scriptObject) {
 		JSDesc descriptor = convertProcessorArgument(JSDesc.class, scriptObject);
-		JavascriptTransformer transformer = checkFieldValue("transformer", descriptor.getTransformer());
-		JS js = new JS(getProcessorService(), ScriptStack.currentStack(), transformer);
-		initialize(js, descriptor);
+		JavascriptTransformer transformer = checkPropertyValue("transformer", descriptor.getTransformer());
+		JS js = new JS(getProcessorService(), displayName(descriptor), transformer);
 		return js;
 	}
 

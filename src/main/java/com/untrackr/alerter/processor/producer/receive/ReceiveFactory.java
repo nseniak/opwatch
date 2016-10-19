@@ -3,7 +3,6 @@ package com.untrackr.alerter.processor.producer.receive;
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ScriptStack;
-import com.untrackr.alerter.processor.common.RuntimeScriptException;
 import com.untrackr.alerter.service.ProcessorService;
 
 public class ReceiveFactory extends ActiveProcessorFactory {
@@ -18,11 +17,10 @@ public class ReceiveFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public Processor make(Object scriptObject) throws RuntimeScriptException {
+	public Processor make(Object scriptObject) {
 		ReceiveDesc descriptor = convertProcessorArgument(ReceiveDesc.class, scriptObject);
-		String urlPath = checkFieldValue("url", descriptor.getPath());
-		Receive receive = new Receive(getProcessorService(), ScriptStack.currentStack(), urlPath);
-		initialize(receive, descriptor);
+		String urlPath = checkPropertyValue("url", descriptor.getPath());
+		Receive receive = new Receive(getProcessorService(), displayName(descriptor), urlPath);
 		return receive;
 	}
 

@@ -3,7 +3,6 @@ package com.untrackr.alerter.processor.transformer.jstack;
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ScriptStack;
-import com.untrackr.alerter.processor.common.RuntimeScriptException;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.regex.Pattern;
@@ -20,13 +19,12 @@ public class JstackFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public Processor make(Object scriptObject) throws RuntimeScriptException {
+	public Processor make(Object scriptObject) {
 		JstackDesc descriptor = convertProcessorArgument(JstackDesc.class, scriptObject);
-		String fieldName = optionalFieldValue("field", descriptor.getField(), "text");
-		String methodRegex = optionalFieldValue("methodRegex", descriptor.getMethodRegex(), null);
+		String fieldName = optionaPropertyValue("field", descriptor.getField(), "text");
+		String methodRegex = optionaPropertyValue("methodRegex", descriptor.getMethodRegex(), null);
 		Pattern methodPattern = (methodRegex == null) ? null : compilePattern("regex", methodRegex);
-		Jstack jstack = new Jstack(getProcessorService(), ScriptStack.currentStack(), fieldName, methodPattern);
-		initialize(jstack, descriptor);
+		Jstack jstack = new Jstack(getProcessorService(), displayName(descriptor), fieldName, methodPattern);
 		return jstack;
 	}
 

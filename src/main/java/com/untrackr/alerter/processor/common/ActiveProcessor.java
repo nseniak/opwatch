@@ -6,7 +6,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.StringJoiner;
 
 public abstract class ActiveProcessor extends Processor {
 
@@ -16,10 +19,9 @@ public abstract class ActiveProcessor extends Processor {
 	protected List<Processor> consumers = new ArrayList<>();
 	private long lastOutputTime = 0;
 	protected boolean started;
-	private Set<JavascriptFunction> scriptErrorSignaled = new HashSet<>();
 
-	public ActiveProcessor(ProcessorService processorService, ScriptStack stack) {
-		super(processorService, stack);
+	public ActiveProcessor(ProcessorService processorService, String name) {
+		super(processorService, name);
 	}
 
 	@Override
@@ -95,7 +97,7 @@ public abstract class ActiveProcessor extends Processor {
 				break;
 		}
 		if (joiner.length() != 0) {
-			throw new ProcessorExecutionException("incorrect pipe: " + joiner.toString(), this);
+			throw new AlerterException("incorrect pipe: " + joiner.toString(), ExceptionContext.makeProcessorNoPayload(this));
 		}
 	}
 
@@ -116,7 +118,7 @@ public abstract class ActiveProcessor extends Processor {
 
 	public void output(List<Processor> consumers, Payload payload) {
 		if (processorService.getProfileService().profile().isTrace()) {
-			logger.info("Output: " + descriptor() + " ==> " + payload.asText());
+			logger.info("Output: " + location.descriptor() + " ==> " + payload.asText());
 		}
 		long now = System.currentTimeMillis();
 		long elapsedSinceLastOutput = now - lastOutputTime;
@@ -143,18 +145,18 @@ public abstract class ActiveProcessor extends Processor {
 	public void stopConsumerThread() {
 		boolean stopped = consumerThreadFuture.cancel(true);
 		if (!stopped) {
-			throw new ProcessorExecutionException("cannot stop consumer thread", this);
+			throw new AlerterException("cannot stop consumer thread", ExceptionContext.makeProcessorNoPayload(this));
 		}
 	}
 
-	public <T> T payloadFieldValue(Payload input, String fieldName, Class<T> clazz) {
-		Object jsonObject = input.getScriptObject();
+	public <T> T payloadPropertyValue(Payload payload, String propertyName, Class<?> clazz) {
+		Object jsonObject = payload.getScriptObject();
 		Object value = null;
 		if (jsonObject instanceof Map) {
-			value = ((Map) jsonObject).get(fieldName);
+			value = ((Map) jsonObject).get(propertyName);
 		} else {
 			try {
-				Field field = jsonObject.getClass().getDeclaredField(fieldName);
+				Field field = jsonObject.getClass().getDeclaredField(propertyName);
 				field.setAccessible(true);
 				value = field.get(jsonObject);
 			} catch (NoSuchFieldException | IllegalAccessException e) {
@@ -162,21 +164,16 @@ public abstract class ActiveProcessor extends Processor {
 			}
 		}
 		if (value == null) {
-			throw new ProcessorExecutionException("missing field value \"" + fieldName + "\"", this, input);
+			AlerterException exception = new AlerterException("missing field value \"" + propertyName + "\"", ExceptionContext.makeProcessorPayload(this, payload));
+			exception.setSilent(propertyErrorSignaled(propertyName));
+			throw exception;
 		}
 		if (!clazz.isAssignableFrom(value.getClass())) {
-			throw new ProcessorExecutionException("wrong type for field \"" + fieldName + "\"", this, input);
+			AlerterException exception = new AlerterException("wrong type for field \"" + propertyName + "\"", ExceptionContext.makeProcessorPayload(this, payload));
+			exception.setSilent(propertyErrorSignaled(propertyName));
+			throw exception;
 		}
 		return (T) value;
-	}
-
-	public boolean scriptErrorSignaled(JavascriptFunction function) {
-		return scriptErrorSignaled.add(function);
-	}
-
-	public String identifier() {
-		// Default
-		return null;
 	}
 
 }

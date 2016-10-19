@@ -1,14 +1,13 @@
 package com.untrackr.alerter.processor.producer.console;
 
-import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.producer.Producer;
 import com.untrackr.alerter.service.ConsoleService;
 import com.untrackr.alerter.service.ProcessorService;
 
 public class Console extends Producer implements ConsoleService.ConsoleLineConsumer {
 
-	public Console(ProcessorService processorService, ScriptStack stack) {
-		super(processorService, stack);
+	public Console(ProcessorService processorService, String name) {
+		super(processorService, name);
 	}
 
 	@Override

@@ -3,7 +3,6 @@ package com.untrackr.alerter.processor.special.parallel;
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ProcessorFactory;
 import com.untrackr.alerter.processor.common.ScriptStack;
-import com.untrackr.alerter.processor.common.RuntimeScriptException;
 import com.untrackr.alerter.service.ProcessorService;
 
 public class ParallelFactory extends ProcessorFactory {
@@ -18,11 +17,10 @@ public class ParallelFactory extends ProcessorFactory {
 	}
 
 	@Override
-	public Processor make(Object scriptObject) throws RuntimeScriptException {
+	public Processor make(Object scriptObject) {
 		ParallelDesc descriptor = convertProcessorArgument(ParallelDesc.class, scriptObject);
-		Parallel parallel = new Parallel(getProcessorService(), descriptor.getProcessors(), ScriptStack.currentStack());
+		Parallel parallel = new Parallel(getProcessorService(), descriptor.getProcessors(), displayName(descriptor));
 		parallel.inferSignature();
-		initialize(parallel, descriptor);
 		return parallel;
 	}
 

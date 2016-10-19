@@ -16,8 +16,8 @@ public class Trail extends ScheduledProducer {
 	private LinkedBlockingQueue<SeriesObject> queue;
 	private long startupTimestamp;
 
-	public Trail(ProcessorService processorService, ScriptStack stack, ScheduledExecutor scheduledExecutor, JavascriptTransformer transformer, long duration) {
-		super(processorService, stack, scheduledExecutor);
+	public Trail(ProcessorService processorService, String name, ScheduledExecutor scheduledExecutor, JavascriptTransformer transformer, long duration) {
+		super(processorService, name, scheduledExecutor);
 		this.transformer = transformer;
 		this.duration = duration;
 		this.queue = new LinkedBlockingQueue<>();
@@ -53,11 +53,6 @@ public class Trail extends ScheduledProducer {
 		}
 		queue.removeIf(to -> (timestamp - to.getStamp()) > duration);
 		outputProduced(new ObjectSeries(queue));
-	}
-
-	@Override
-	public String identifier() {
-		return transformer.toString();
 	}
 
 }

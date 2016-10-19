@@ -1,7 +1,9 @@
 package com.untrackr.alerter.processor.common;
 
 import com.google.common.collect.Lists;
+import jdk.nashorn.api.scripting.NashornException;
 
+import javax.script.ScriptException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
@@ -25,8 +27,23 @@ public class ScriptStack {
 		initFromStack(stack);
 	}
 
-	public static ScriptStack exceptionStack(Throwable t) {
-		return new ScriptStack(t);
+	public static ScriptStack exceptionStack(Throwable cause, String fileName, int lineNumber) {
+		ScriptStack scriptStack = new ScriptStack(cause);
+		if (fileName != null) {
+			ScriptStack.ScriptStackElement top = scriptStack.top();
+			if ((top == null) || !(fileName.equals(top.getFileName()) && (lineNumber == top.getLineNumber()))) {
+				scriptStack.addElement(fileName, lineNumber);
+			}
+		}
+		return scriptStack;
+	}
+
+	public static ScriptStack exceptionStack(ScriptException cause) {
+		return exceptionStack(cause, cause.getFileName(), cause.getLineNumber());
+	}
+
+	public static ScriptStack exceptionStack(NashornException cause) {
+		return exceptionStack(cause, cause.getFileName(), cause.getLineNumber());
 	}
 
 	public static ScriptStack currentStack() {

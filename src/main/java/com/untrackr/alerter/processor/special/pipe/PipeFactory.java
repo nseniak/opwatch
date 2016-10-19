@@ -2,8 +2,6 @@ package com.untrackr.alerter.processor.special.pipe;
 
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ProcessorFactory;
-import com.untrackr.alerter.processor.common.ScriptStack;
-import com.untrackr.alerter.processor.common.RuntimeScriptException;
 import com.untrackr.alerter.processor.transformer.identity.Identity;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -19,15 +17,14 @@ public class PipeFactory extends ProcessorFactory {
 	}
 
 	@Override
-	public Processor make(Object scriptObject) throws RuntimeScriptException {
+	public Processor make(Object scriptObject) {
 		PipeDesc descriptor = convertProcessorArgument(PipeDesc.class, scriptObject);
 		Processor processor;
 		if (descriptor.getProcessors().isEmpty()) {
-			processor = new Identity(getProcessorService(), ScriptStack.currentStack());
+			processor = new Identity(getProcessorService(), displayName(descriptor));
 		} else {
-			processor = new Pipe(getProcessorService(), descriptor.getProcessors(), ScriptStack.currentStack());
+			processor = new Pipe(getProcessorService(), descriptor.getProcessors(), displayName(descriptor));
 		}
-		initialize(processor, descriptor);
 		return processor;
 	}
 

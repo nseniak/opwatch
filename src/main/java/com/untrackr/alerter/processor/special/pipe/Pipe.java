@@ -9,8 +9,8 @@ public class Pipe extends Processor {
 
 	List<Processor> processors;
 
-	public Pipe(ProcessorService processorService, List<Processor> processors, ScriptStack stack) {
-		super(processorService, stack);
+	public Pipe(ProcessorService processorService, List<Processor> processors, String name) {
+		super(processorService, name);
 		this.processors = processors;
 		this.signature = new ProcessorSignature(first().getSignature().getInputRequirement(), last().getSignature().getOutputRequirement());
 		Processor previousProducer = null;
@@ -35,7 +35,7 @@ public class Pipe extends Processor {
 	}
 
 	@Override
-	public void check() throws RuntimeScriptException {
+	public void check() {
 		for (Processor processor : processors) {
 			processor.check();
 		}
@@ -45,14 +45,14 @@ public class Pipe extends Processor {
 	public void start() {
 		for (int i = processors.size() - 1; i >= 0; i--) {
 			Processor processor = processors.get(i);
-			processorService.withProcessorErrorHandling(processor, null, processor::start);
+			processorService.withProcessorErrorHandling(processor, processor::start);
 		}
 	}
 
 	@Override
 	public void stop() {
 		for (Processor processor : processors) {
-			processorService.withProcessorErrorHandling(processor, null, processor::stop);
+			processorService.withProcessorErrorHandling(processor, processor::stop);
 		}
 	}
 

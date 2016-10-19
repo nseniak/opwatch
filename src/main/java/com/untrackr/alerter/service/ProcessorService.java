@@ -13,9 +13,8 @@ import com.untrackr.alerter.model.common.PushoverKey;
 import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.processor.producer.console.Console;
 import com.untrackr.alerter.processor.special.pipe.Pipe;
-import com.untrackr.alerter.processor.transformer.print.Echo;
+import com.untrackr.alerter.processor.transformer.print.Print;
 import jdk.nashorn.api.scripting.NashornException;
-import jdk.nashorn.api.scripting.NashornScriptEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -119,22 +118,22 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 				return;
 			}
 			mainProcessorFile = property("alerter.main");
-			boolean error = withProcessorErrorHandling(null, null, () -> {
+			boolean error = withToplevelErrorHandling(() -> {
 				scriptService.initialize();
 				mainProcessor = scriptService.loadProcessor(mainProcessorFile);
 				if (profileService.profile().isInteractive()) {
 					List<Processor> pipeProcessors = new ArrayList<>();
 					if (mainProcessor.getSignature().getInputRequirement() != ProcessorSignature.PipeRequirement.forbidden) {
 						logger.info("Adding \"console\" as input processor");
-						pipeProcessors.add(new Console(this, ScriptStack.emptyStack()));
+						pipeProcessors.add(new Console(this, "console"));
 					}
 					pipeProcessors.add(mainProcessor);
 					if (mainProcessor.getSignature().getOutputRequirement() != ProcessorSignature.PipeRequirement.forbidden) {
 						logger.info("Adding \"print\" as output processor");
-						pipeProcessors.add(new Echo(this, ScriptStack.emptyStack()));
+						pipeProcessors.add(new Print(this, "print"));
 					}
 					if (pipeProcessors.size() != 1) {
-						mainProcessor = new Pipe(this, pipeProcessors, ScriptStack.emptyStack());
+						mainProcessor = new Pipe(this, pipeProcessors, "pipe");
 					}
 				}
 				mainProcessor.check();
@@ -165,7 +164,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			return;
 		}
 		try {
-			boolean error = withProcessorErrorHandling(mainProcessor, null, mainProcessor::stop);
+			boolean error = withProcessorErrorHandling(mainProcessor, mainProcessor::stop);
 			if (error) {
 				logger.error("Cannot stop main processor");
 			}
@@ -189,18 +188,33 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	private Alert makeAlert(PushoverKey pushoverKey, Alert.Priority priority, String title, Payload payload, Processor consumer) {
 		AlertData data = new AlertData();
 		data.add("hostname", getHostName());
-		data.add("processor", consumer.descriptor());
+		data.add("emitter", consumer.getLocation().descriptor());
 		data.add("input", payload.asText());
 		Alert alert = new Alert(pushoverKey, priority, title, null, data);
 		return alert;
 	}
 
-	public void displayProcessorExecutionException(ProcessorExecutionException e) {
-		String title = "Processor execution error";
-		String message = e.getLocalizedMessage();
+	public void displayAlerterException(AlerterException e) {
 		AlertData data = new AlertData();
 		data.add("hostname", getHostName());
-		addProcessor(data, e);
+		ExceptionContext context = e.getExceptionContext();
+		ProcessorLocation processorLocation = context.getProcessorLocation();
+		CallbackErrorLocation callbackLocation = context.getCallbackErrorLocation();
+		String title = (callbackLocation != null) ? "Scripting error" : "Execution error";
+		String message = e.getLocalizedMessage();
+		if (processorLocation != null) {
+			data.add("processor", processorLocation.descriptor());
+		}
+		if (callbackLocation != null) {
+			String descriptor = callbackLocation.descriptor();
+			if (descriptor != null) {
+				data.add("script", descriptor);
+			}
+		}
+		Payload payload = context.getPayload();
+		if (payload != null) {
+			data.add("payload", payload.asText());
+		}
 		if ((e.getCause() != null) && !((e.getCause() instanceof IOException) || (e.getCause() instanceof NashornException) || (e.getCause() instanceof InternalScriptError))) {
 			addStack(data, e);
 			logger.error(title, e);
@@ -208,32 +222,6 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		if (!e.isSilent()) {
 			Alert alert = new Alert(alertService.getDefaultPushoverKey(), Alert.Priority.emergency, title, message, data);
 			alertService.alert(alert);
-		}
-	}
-
-	public void displayRuntimeScriptException(RuntimeScriptException e) {
-		String title = "Script execution error";
-		String message = e.getLocalizedMessage();
-		AlertData data = new AlertData();
-		data.add("hostname", getHostName());
-		addProcessor(data, e);
-		ScriptStack stack = e.getScriptStack();
-		if (!stack.empty()) {
-			data.add("js stack", stack.asString());
-		}
-		logger.error(title);
-		Alert alert = new Alert(alertService.getDefaultPushoverKey(), Alert.Priority.emergency, title, message, data);
-		alertService.alert(alert);
-	}
-
-	private void addProcessor(AlertData data, AlerterException e) {
-		Processor processor = e.getProcessor();
-		if (processor != null) {
-			data.add("processor", processor.descriptor());
-			Payload payload = e.getPayload();
-			if (payload != null) {
-				data.add("input", payload.asText());
-			}
 		}
 	}
 
@@ -261,18 +249,29 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		data.add("stack", writer.toString());
 	}
 
-	public boolean withProcessorErrorHandling(Processor processor, Payload payload, Runnable runnable) {
+	public boolean withToplevelErrorHandling(Runnable runnable) {
+		boolean error = true;
+		try {
+			runnable.run();
+			error = false;
+		} catch (AlerterException e) {
+			displayAlerterException(e);
+		} catch (Throwable t) {
+			displayAlerterException(new AlerterException(t, ExceptionContext.makeToplevel()));
+		}
+		return error;
+	}
+
+	public boolean withProcessorErrorHandling(Processor processor, Runnable runnable) {
 		boolean error = true;
 		try {
 			try {
 				runnable.run();
 				error = false;
-			} catch (ProcessorExecutionException e) {
-				displayProcessorExecutionException(e);
-			} catch (RuntimeScriptException e) {
-				displayRuntimeScriptException(e);
+			} catch (AlerterException e) {
+				displayAlerterException(e);
 			} catch (Throwable t) {
-				displayProcessorExecutionException(new ProcessorExecutionException(t, processor, payload));
+				displayAlerterException(new AlerterException(t, ExceptionContext.makeProcessorNoPayload(processor)));
 			}
 		} catch (Throwable t) {
 			logger.error("Error while displaying error", t);
@@ -344,8 +343,8 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		return hostName;
 	}
 
-	public NashornScriptEngine scriptEngine() {
-		return scriptService.getScriptEngine();
+	public ScriptService getScriptService() {
+		return scriptService;
 	}
 
 }

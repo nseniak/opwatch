@@ -2,7 +2,6 @@ package com.untrackr.alerter.processor.producer.top;
 
 import com.sun.management.OperatingSystemMXBean;
 import com.untrackr.alerter.common.ScriptObject;
-import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.producer.ScheduledExecutor;
 import com.untrackr.alerter.processor.producer.ScheduledProducer;
 import com.untrackr.alerter.service.ProcessorService;
@@ -11,8 +10,8 @@ import java.lang.management.ManagementFactory;
 
 public class Top extends ScheduledProducer {
 
-	public Top(ProcessorService processorService, ScriptStack stack, ScheduledExecutor scheduledExecutor) {
-		super(processorService, stack, scheduledExecutor);
+	public Top(ProcessorService processorService, String name, ScheduledExecutor scheduledExecutor) {
+		super(processorService, name, scheduledExecutor);
 	}
 
 	@Override
