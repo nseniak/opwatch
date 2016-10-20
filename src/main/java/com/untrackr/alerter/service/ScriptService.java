@@ -64,30 +64,34 @@ public class ScriptService {
 	public void initialize() {
 		scriptEngine = (NashornScriptEngine) new ScriptEngineManager().getEngineByName("nashorn");
 		loadScriptResources();
-		createFactoryFunction(new ParallelFactory(processorService));
-		createFactoryFunction(new PipeFactory(processorService));
-		createFactoryFunction(new ConsoleFactory(processorService));
-		createFactoryFunction(new GrepFactory(processorService));
-		createFactoryFunction(new JSGrepFactory(processorService));
-		createFactoryFunction(new JSFactory(processorService));
-		createFactoryFunction(new CollectFactory(processorService));
-		createFactoryFunction(new TailFactory(processorService));
-		createFactoryFunction(new PrintFactory(processorService));
-		createFactoryFunction(new StatFactory(processorService));
-		createFactoryFunction(new DfFactory(processorService));
-		createFactoryFunction(new DfFactory(processorService));
-		createFactoryFunction(new TopFactory(processorService));
-		createFactoryFunction(new AlertGeneratorFactory(processorService));
-		createFactoryFunction(new OnceFactory(processorService));
-		createFactoryFunction(new CurlFactory(processorService));
-		createFactoryFunction(new CountFactory(processorService));
-		createFactoryFunction(new TrailFactory(processorService));
-		createFactoryFunction(new ReceiveFactory(processorService));
-		createFactoryFunction(new PostFactory(processorService));
-		createFactoryFunction(new CronFactory(processorService));
-		createFactoryFunction(new JSCronFactory(processorService));
-		createFactoryFunction(new ShFactory(processorService));
-		createFactoryFunction(new JstackFactory(processorService));
+		try {
+			createFactoryFunction(new ParallelFactory(processorService));
+			createFactoryFunction(new PipeFactory(processorService));
+			createFactoryFunction(new ConsoleFactory(processorService));
+			createFactoryFunction(new GrepFactory(processorService));
+			createFactoryFunction(new JSGrepFactory(processorService));
+			createFactoryFunction(new JSFactory(processorService));
+			createFactoryFunction(new CollectFactory(processorService));
+			createFactoryFunction(new TailFactory(processorService));
+			createFactoryFunction(new PrintFactory(processorService));
+			createFactoryFunction(new StatFactory(processorService));
+			createFactoryFunction(new DfFactory(processorService));
+			createFactoryFunction(new DfFactory(processorService));
+			createFactoryFunction(new TopFactory(processorService));
+			createFactoryFunction(new AlertGeneratorFactory(processorService));
+			createFactoryFunction(new OnceFactory(processorService));
+			createFactoryFunction(new CurlFactory(processorService));
+			createFactoryFunction(new CountFactory(processorService));
+			createFactoryFunction(new TrailFactory(processorService));
+			createFactoryFunction(new ReceiveFactory(processorService));
+			createFactoryFunction(new PostFactory(processorService));
+			createFactoryFunction(new CronFactory(processorService));
+			createFactoryFunction(new JSCronFactory(processorService));
+			createFactoryFunction(new ShFactory(processorService));
+			createFactoryFunction(new JstackFactory(processorService));
+		} catch (ScriptException e) {
+			throw new AlerterException(e, ExceptionContext.makeToplevel());
+		}
 	}
 
 	public static Object eval(String str, String location) throws ScriptException {
@@ -119,10 +123,14 @@ public class ScriptService {
 		scriptEngine.eval(new InputStreamReader(scriptResource.getInputStream()), context);
 	}
 
-	private void createFactoryFunction(com.untrackr.alerter.processor.common.ProcessorFactory processorFactory) {
+	private void createFactoryFunction(ProcessorFactory processorFactory) throws ScriptException {
+		String name = processorFactory.name();
 		ScriptContext context = scriptEngine.getContext();
 		Bindings bindings = context.getBindings(ScriptContext.ENGINE_SCOPE);
-		bindings.put(processorFactory.name(), javascriptFunction(processorFactory::make));
+		bindings.put("__" + name, javascriptFunction(processorFactory::make));
+		StringBuilder definition = new StringBuilder();
+		definition.append("function " + processorFactory.name() + " (descriptor) { return __").append(name).append("(descriptor); }");
+		scriptEngine.eval(definition.toString());
 	}
 
 	public Processor loadProcessor(String filename) {
