@@ -1,8 +1,7 @@
-package com.untrackr.alerter.processor.producer.jscron.cron;
+package com.untrackr.alerter.processor.producer.jscron;
 
 import com.untrackr.alerter.processor.common.JavascriptProducer;
 import com.untrackr.alerter.processor.common.Processor;
-import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.producer.ScheduledExecutor;
 import com.untrackr.alerter.processor.producer.ScheduledExecutorFactory;
 import com.untrackr.alerter.service.ProcessorService;

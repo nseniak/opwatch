@@ -8,7 +8,7 @@ import com.untrackr.alerter.processor.producer.count.CountFactory;
 import com.untrackr.alerter.processor.producer.cron.CronFactory;
 import com.untrackr.alerter.processor.producer.curl.CurlFactory;
 import com.untrackr.alerter.processor.producer.df.DfFactory;
-import com.untrackr.alerter.processor.producer.jscron.cron.JSCronFactory;
+import com.untrackr.alerter.processor.producer.jscron.JSCronFactory;
 import com.untrackr.alerter.processor.producer.receive.ReceiveFactory;
 import com.untrackr.alerter.processor.producer.stat.StatFactory;
 import com.untrackr.alerter.processor.producer.tail.TailFactory;
