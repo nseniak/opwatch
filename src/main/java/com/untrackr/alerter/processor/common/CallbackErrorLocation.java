@@ -33,13 +33,11 @@ public class CallbackErrorLocation {
 	public String descriptor() {
 		StringBuilder stringBuilder = new StringBuilder();
 		String location = callbackLocation.describeAsLocation();
-		String delimiter = "";
 		if (location != null) {
-			stringBuilder.append(location);
-			delimiter = ", stack is ";
+			stringBuilder.append("[").append(location).append("] ");
 		}
 		if (!scriptStack.empty()) {
-			stringBuilder.append(delimiter).append(scriptStack.asString());
+			stringBuilder.append(scriptStack.asString());
 		}
 		if (stringBuilder.length() == 0) {
 			return null;

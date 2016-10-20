@@ -208,7 +208,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		if (callbackLocation != null) {
 			String descriptor = callbackLocation.descriptor();
 			if (descriptor != null) {
-				data.add("script", descriptor);
+				data.add("stack", descriptor);
 			}
 		}
 		Payload payload = context.getPayload();

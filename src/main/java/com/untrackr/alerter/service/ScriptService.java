@@ -131,7 +131,7 @@ public class ScriptService {
 			context.setAttribute(ScriptEngine.FILENAME, filename, ScriptContext.ENGINE_SCOPE);
 			Object value = scriptEngine.eval(new FileReader(filename));
 			if (!(value instanceof Processor)) {
-				throw new AlerterException("value returned by script \"" + filename + "\" is not a processor: " + value.toString(), ExceptionContext.makeToplevel());
+				throw new AlerterException("value returned by script \"" + filename + "\" is not a processor: " + value, ExceptionContext.makeToplevel());
 			}
 			return (Processor) value;
 		} catch (FileNotFoundException e) {
@@ -202,7 +202,7 @@ public class ScriptService {
 				}
 			}
 		}
-		throw new AlerterException("invalid " + valueLocation.describeAsValue() + ", expected " + typeName(type) + ", got: " + scriptValue.toString(),
+		throw new AlerterException("invalid " + valueLocation.describeAsValue() + ", expected " + typeName(type) + ", got: " + scriptValue,
 				contextFactory.make());
 	}
 

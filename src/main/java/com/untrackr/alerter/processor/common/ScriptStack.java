@@ -82,7 +82,7 @@ public class ScriptStack {
 
 	public String asString() {
 		StringJoiner joiner = new StringJoiner(" > ");
-		Lists.reverse(elements).forEach(element -> joiner.add(element.getFileName() + ":" + element.getLineNumber()));
+		elements.forEach(element -> joiner.add(element.getFileName() + ":" + element.getLineNumber()));
 		return joiner.toString();
 	}
 
