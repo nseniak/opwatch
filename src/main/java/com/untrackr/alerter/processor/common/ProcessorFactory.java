@@ -53,10 +53,19 @@ public abstract class ProcessorFactory {
 
 	public long durationValue(String fieldName, String delayString) {
 		checkPropertyValue(fieldName, delayString);
+		String duration;
+		int start;
+		if (delayString.startsWith("P") || delayString.startsWith("p")) {
+			duration = delayString;
+			start = 0;
+		} else {
+			duration = "pt" + delayString;
+			start = 2;
+		}
 		try {
-			return Duration.parse(delayString).toMillis();
+			return Duration.parse(duration).toMillis();
 		} catch (DateTimeParseException e) {
-			throw new AlerterException(e.getLocalizedMessage() + " at index " + e.getErrorIndex() + ": \"" + delayString + "\"",
+			throw new AlerterException(e.getLocalizedMessage() + " at index " + (e.getErrorIndex() - start) + ": \"" + delayString + "\"",
 					ExceptionContext.makeProcessorFactory(name()));
 		}
 	}
