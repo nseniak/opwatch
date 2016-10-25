@@ -2,8 +2,10 @@ package com.untrackr.alerter.processor.special.pipe;
 
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ProcessorFactory;
-import com.untrackr.alerter.processor.transformer.identity.Identity;
 import com.untrackr.alerter.service.ProcessorService;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
+
+import java.util.List;
 
 public class PipeFactory extends ProcessorFactory {
 
@@ -17,15 +19,18 @@ public class PipeFactory extends ProcessorFactory {
 	}
 
 	@Override
-	public Processor make(Object scriptObject) {
-		PipeDesc descriptor = convertProcessorArgument(PipeDesc.class, scriptObject);
-		Processor processor;
-		if (descriptor.getProcessors().isEmpty()) {
-			processor = new Identity(getProcessorService(), displayName(descriptor));
+	public Pipe make(Object scriptObject) {
+		List<Processor> processors;
+		String name;
+		if ((scriptObject instanceof ScriptObjectMirror) && (((ScriptObjectMirror) scriptObject).isArray())) {
+			processors = (List<Processor>) convertProcessorArgument(List.class, processorListType(), scriptObject);
+			name = name();
 		} else {
-			processor = new Pipe(getProcessorService(), descriptor.getProcessors(), displayName(descriptor));
+			PipeDesc descriptor = convertProcessorArgument(PipeDesc.class, scriptObject);
+			processors = descriptor.getProcessors();
+			name = displayName(descriptor);
 		}
-		return processor;
+		return new Pipe(getProcessorService(), processors, name);
 	}
 
 }

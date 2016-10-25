@@ -5,7 +5,7 @@ import static com.untrackr.alerter.processor.common.ValueLocation.SourceType.pro
 public class ValueLocation {
 
 	public enum SourceType {
-		property, list_property_element, argument, toplevel
+		property, list_property_element, argument, list_argument_element, toplevel
 	}
 
 	private SourceType sourceType;
@@ -26,6 +26,10 @@ public class ValueLocation {
 		return new ValueLocation(SourceType.list_property_element, processorName, propertyName);
 	}
 
+	public static ValueLocation makeListArgumentElement(String processorName) {
+		return new ValueLocation(SourceType.list_argument_element, processorName, null);
+	}
+
 	public static ValueLocation makeToplevel() {
 		return new ValueLocation(SourceType.toplevel, null, null);
 	}
@@ -35,9 +39,12 @@ public class ValueLocation {
 	}
 
 	public ValueLocation toListElement() {
-		if (sourceType == SourceType.property) {
-			return makeListPropertyElement(processorName, propertyName);
-		} else {
+		switch (sourceType) {
+			case property:
+				return makeListPropertyElement(processorName, propertyName);
+			case argument:
+				return makeListArgumentElement(processorName);
+			default:
 			return makeToplevel();
 		}
 	}
@@ -58,6 +65,8 @@ public class ValueLocation {
 				return "\"" + propertyName + "\" value";
 			case list_property_element:
 				return "element in \"" + propertyName + "\" array";
+			case list_argument_element:
+				return "element in array argument";
 			case argument:
 				return "argument";
 			default:

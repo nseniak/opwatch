@@ -4,14 +4,29 @@ import com.untrackr.alerter.common.ApplicationUtil;
 import com.untrackr.alerter.common.UndefinedSubstitutionVariable;
 import com.untrackr.alerter.service.ProcessorService;
 
+import java.lang.reflect.Type;
 import java.time.Duration;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 public abstract class ProcessorFactory {
 
 	protected ProcessorService processorService;
+
+	/**
+	 * Only for usage in processorListType
+	 */
+	private List<Processor> processorListField;
+
+	protected Type processorListType() {
+		try {
+			return ProcessorFactory.class.getDeclaredField("processorListField").getGenericType();
+		} catch (NoSuchFieldException e) {
+			throw new AlerterException(e, ExceptionContext.makeProcessorFactory(name()));
+		}
+	}
 
 	public ProcessorFactory(ProcessorService processorService) {
 		this.processorService = processorService;
@@ -31,6 +46,11 @@ public abstract class ProcessorFactory {
 
 	protected <T> T convertProcessorArgument(Class<T> clazz, Object scriptObject) {
 		return (T) processorService.getScriptService().convertScriptValue(ValueLocation.makeArgument(name()), clazz, scriptObject,
+				() -> ExceptionContext.makeProcessorFactory(name()));
+	}
+
+	protected <T> T convertProcessorArgument(Class<T> clazz, Type type, Object scriptObject) {
+		return (T) processorService.getScriptService().convertScriptValue(ValueLocation.makeArgument(name()), type, scriptObject,
 				() -> ExceptionContext.makeProcessorFactory(name()));
 	}
 
