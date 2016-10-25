@@ -19,7 +19,8 @@ public class AlerterProfile {
 	private long defaultScheduledProducerPeriod;
 	private boolean interactive;
 	private boolean trace;
-	private int maxAlertsPerMinute;
+	private int alertGeneratorMaxAlertsPerMinute;
+	private int globalMaxAlertsPerMinute;
 	private long defaultHttpConnectTimeout;
 	private long defaultHttpReadTimeout;
 	private int lineBufferSize;
@@ -46,7 +47,8 @@ public class AlerterProfile {
 		this.defaultScheduledProducerPeriod = TimeUnit.SECONDS.toMillis(10);
 		this.interactive = ApplicationUtil.property("alerter.interactive", false);
 		this.trace = ApplicationUtil.property("alerter.trace", false);
-		this.maxAlertsPerMinute = 10;
+		this.alertGeneratorMaxAlertsPerMinute = 10;
+		this.globalMaxAlertsPerMinute = 50;
 		this.defaultHttpConnectTimeout = TimeUnit.SECONDS.toMillis(5);
 		this.defaultHttpReadTimeout = TimeUnit.SECONDS.toMillis(10);
 		this.lineBufferSize = 8192 * 100;
@@ -157,12 +159,20 @@ public class AlerterProfile {
 		this.trace = trace;
 	}
 
-	public int getMaxAlertsPerMinute() {
-		return maxAlertsPerMinute;
+	public int getAlertGeneratorMaxAlertsPerMinute() {
+		return alertGeneratorMaxAlertsPerMinute;
 	}
 
-	public void setMaxAlertsPerMinute(int maxAlertsPerMinute) {
-		this.maxAlertsPerMinute = maxAlertsPerMinute;
+	public void setAlertGeneratorMaxAlertsPerMinute(int alertGeneratorMaxAlertsPerMinute) {
+		this.alertGeneratorMaxAlertsPerMinute = alertGeneratorMaxAlertsPerMinute;
+	}
+
+	public int getGlobalMaxAlertsPerMinute() {
+		return globalMaxAlertsPerMinute;
+	}
+
+	public void setGlobalMaxAlertsPerMinute(int globalMaxAlertsPerMinute) {
+		this.globalMaxAlertsPerMinute = globalMaxAlertsPerMinute;
 	}
 
 	public long getDefaultHttpConnectTimeout() {

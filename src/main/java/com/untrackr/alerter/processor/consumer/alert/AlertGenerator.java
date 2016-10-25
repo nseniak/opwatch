@@ -33,13 +33,13 @@ public class AlertGenerator extends Consumer {
 		boolean alert = (predicate == null) || predicate.call(payload, this);
 		if (!toggle) {
 			if (alert) {
-				processorService.processorAlert(pushoverKey, priority, message.value(this, payload), payload, this);
+				processorService.processorAlert(pushoverKey, priority, message.value(this, payload), this);
 			}
 		} else {
 			if (!toggleUp && alert) {
-				processorService.processorAlert(pushoverKey, priority, message.value(this, payload), payload, this);
+				processorService.processorAlert(pushoverKey, priority, message.value(this, payload), this);
 			} else if (toggleUp && !alert) {
-				processorService.processorAlertEnd(pushoverKey, priority, message.value(this, payload), payload, this);
+				processorService.processorAlertEnd(pushoverKey, priority, message.value(this, payload), this);
 			}
 			toggleUp = alert;
 		}

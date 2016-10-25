@@ -24,7 +24,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -66,9 +65,9 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	@Autowired
 	private ApplicationContext applicationContext;
 
-	private List<File> descriptorDirectories;
-
 	private String hostName;
+
+	private FrequencyLimiter frequencyLimiter;
 
 	private ObjectMapper objectMapper;
 
@@ -84,15 +83,6 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		// Path
-		descriptorDirectories = new ArrayList<>();
-		String path = property("alerter.path", null);
-		if (path != null) {
-			String[] directoryStrings = path.split(":");
-			for (String directoryString : directoryStrings) {
-				descriptorDirectories.add(new File(directoryString));
-			}
-		}
 		// Object mapper
 		objectMapper = new ObjectMapper();
 		objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
@@ -108,6 +98,8 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 				throw new IllegalStateException("cannot determine hostname; please define environment variable ALERTER_HOSTNAME");
 			}
 		}
+		// Global alert frequency limiter
+		frequencyLimiter = new FrequencyLimiter(TimeUnit.MINUTES.toMillis(1), profileService.profile().getGlobalMaxAlertsPerMinute());
 	}
 
 
@@ -148,8 +140,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 				mainProcessor = null;
 			} else {
 				logger.info("Started");
-				Alert alert = new Alert(alertService.getDefaultPushoverKey(), Alert.Priority.info, "Alerter up and running on " + getHostName());
-				alertService.alert(alert);
+				infoAlert(alertService.getDefaultPushoverKey(), "Alerter up and running on " + getHostName());
 			}
 		} catch (Throwable t) {
 			String message = "Unexpected startup error occurred";
@@ -174,23 +165,26 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		}
 	}
 
-	public void processorAlert(PushoverKey pushoverKey, Alert.Priority priority, String title, Payload payload, Processor consumer) {
-		Alert alert = makeAlert(pushoverKey, priority, title, payload, consumer);
+	public void processorAlert(PushoverKey pushoverKey, Alert.Priority priority, String title, Processor emitter) {
+		Alert alert = makeProcessorAlert(pushoverKey, priority, title, emitter);
 		alertService.alert(alert);
 	}
 
-	public void processorAlertEnd(PushoverKey pushoverKey, Alert.Priority priority, String title, Payload payload, Processor consumer) {
-		Alert alert = makeAlert(pushoverKey, priority, title, payload, consumer);
+	public void processorAlertEnd(PushoverKey pushoverKey, Alert.Priority priority, String title, Processor emitter) {
+		Alert alert = makeProcessorAlert(pushoverKey, priority, title, emitter);
 		alert.setEnd(true);
 		alertService.alert(alert);
 	}
 
-	private Alert makeAlert(PushoverKey pushoverKey, Alert.Priority priority, String title, Payload payload, Processor consumer) {
+	public void infoAlert(PushoverKey pushoverKey, String title) {
+		Alert alert = new Alert(pushoverKey, Alert.Priority.info, title, null, null, null);
+		alertService.alert(alert);
+	}
+
+	private Alert makeProcessorAlert(PushoverKey pushoverKey, Alert.Priority priority, String title, Processor emitter) {
 		AlertData data = new AlertData();
 		data.add("hostname", getHostName());
-		data.add("emitter", consumer.getLocation().descriptor());
-		data.add("input", payload.asText());
-		Alert alert = new Alert(pushoverKey, priority, title, null, data);
+		Alert alert = new Alert(pushoverKey, priority, title, null, emitter, data);
 		return alert;
 	}
 
@@ -220,7 +214,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			logger.error(title, e);
 		}
 		if (!e.isSilent()) {
-			Alert alert = new Alert(alertService.getDefaultPushoverKey(), Alert.Priority.emergency, title, message, data);
+			Alert alert = new Alert(alertService.getDefaultPushoverKey(), Alert.Priority.emergency, title, message, null, data);
 			alertService.alert(alert);
 		}
 	}
@@ -240,7 +234,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		} else {
 			logger.error(logMessage);
 		}
-		alertService.alert(new Alert(alertService.getDefaultPushoverKey(), priority, title, message, data));
+		alertService.alert(new Alert(alertService.getDefaultPushoverKey(), priority, title, message, null, data));
 	}
 
 	private void addStack(AlertData data, Throwable t) {

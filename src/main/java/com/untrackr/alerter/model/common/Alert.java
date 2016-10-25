@@ -1,5 +1,7 @@
 package com.untrackr.alerter.model.common;
 
+import com.untrackr.alerter.processor.common.Processor;
+
 public class Alert {
 
 	public enum Priority {
@@ -24,6 +26,7 @@ public class Alert {
 	private Priority priority;
 	private String title;
 	private String message;
+	private Processor emitter;
 	private AlertData data;
 	private Integer retry;
 	private Integer expire;
@@ -31,16 +34,13 @@ public class Alert {
 	private boolean end;
 	private PushoverKey pushoverKey;
 
-	public Alert(PushoverKey pushoverKey, Priority priority, String title, String message, AlertData data) {
+	public Alert(PushoverKey pushoverKey, Priority priority, String title, String message, Processor emitter, AlertData data) {
 		this.pushoverKey = pushoverKey;
 		this.priority = priority;
 		this.title = title;
 		this.message = message;
+		this.emitter = emitter;
 		this.data = data;
-	}
-
-	public Alert(PushoverKey pushoverKey, Priority priority, String title) {
-		this(pushoverKey, priority, title, null, null);
 	}
 
 	public Priority getPriority() {
@@ -105,6 +105,14 @@ public class Alert {
 
 	public void setEnd(boolean end) {
 		this.end = end;
+	}
+
+	public Processor getEmitter() {
+		return emitter;
+	}
+
+	public void setEmitter(Processor emitter) {
+		this.emitter = emitter;
 	}
 
 	public PushoverKey getPushoverKey() {
