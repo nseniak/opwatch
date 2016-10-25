@@ -1,7 +1,6 @@
 package com.untrackr.alerter.processor.producer.console;
 
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
-import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.service.ProcessorService;
 
 public class ConsoleFactory extends ActiveProcessorFactory {
@@ -16,7 +15,7 @@ public class ConsoleFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public Processor make(Object scriptObject) {
+	public Console make(Object scriptObject) {
 		ConsoleDesc descriptor = convertProcessorArgument(ConsoleDesc.class, scriptObject);
 		Console console = new Console(getProcessorService(), displayName(descriptor));
 		return console;

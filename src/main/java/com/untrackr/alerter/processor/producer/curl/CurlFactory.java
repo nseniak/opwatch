@@ -19,7 +19,7 @@ public class CurlFactory extends ScheduledExecutorFactory {
 	}
 
 	@Override
-	public Processor make(Object scriptObject) {
+	public Curl make(Object scriptObject) {
 		CurlDesc descriptor = convertProcessorArgument(CurlDesc.class, scriptObject);
 		String urlString = checkVariableSubstitution("url", checkPropertyValue("url", descriptor.getUrl()));
 		URI uri;

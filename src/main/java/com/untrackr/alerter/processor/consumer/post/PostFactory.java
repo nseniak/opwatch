@@ -21,7 +21,7 @@ public class PostFactory extends ActiveProcessorFactory {
 	private static Pattern pathPattern = Pattern.compile("(?<hostname>[^:/]+)?(?::(?<port>[0-9]+))?(?<stack>/.*)");
 
 	@Override
-	public Processor make(Object scriptObject) {
+	public Post make(Object scriptObject) {
 		PostDesc descriptor = convertProcessorArgument(PostDesc.class, scriptObject);
 		String pathString = checkVariableSubstitution("path", checkPropertyValue("path", descriptor.getPath()));
 		Matcher matcher = pathPattern.matcher(pathString);

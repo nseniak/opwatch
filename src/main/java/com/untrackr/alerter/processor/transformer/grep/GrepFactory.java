@@ -18,7 +18,7 @@ public class GrepFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public Processor make(Object scriptObject) {
+	public Grep make(Object scriptObject) {
 		GrepDesc descriptor = convertProcessorArgument(GrepDesc.class, scriptObject);
 		String fieldName = optionaPropertyValue("field", descriptor.getField(), "text");
 		List<String> regexes = optionaPropertyValue("regexes", descriptor.getRegexes(), null);

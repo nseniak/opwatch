@@ -1,8 +1,6 @@
 package com.untrackr.alerter.processor.transformer.once;
 
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
-import com.untrackr.alerter.processor.common.Processor;
-import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.service.ProcessorService;
 
 public class OnceFactory extends ActiveProcessorFactory {
@@ -17,7 +15,7 @@ public class OnceFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public Processor make(Object scriptObject) {
+	public Once make(Object scriptObject) {
 		OnceDesc descriptor = convertProcessorArgument(OnceDesc.class, scriptObject);
 		long delay = durationValue("delay", descriptor.getDelay());
 		Once once = new Once(getProcessorService(), displayName(descriptor), delay);

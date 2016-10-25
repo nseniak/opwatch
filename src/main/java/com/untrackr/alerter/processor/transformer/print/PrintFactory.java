@@ -1,7 +1,6 @@
 package com.untrackr.alerter.processor.transformer.print;
 
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
-import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.service.ProcessorService;
 
 public class PrintFactory extends ActiveProcessorFactory {
@@ -16,7 +15,7 @@ public class PrintFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public Processor make(Object scriptObject) {
+	public Print make(Object scriptObject) {
 		PrintDesc descriptor = convertProcessorArgument(PrintDesc.class, scriptObject);
 		Print print = new Print(getProcessorService(), displayName(descriptor));
 		return print;

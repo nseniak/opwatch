@@ -1,7 +1,5 @@
 package com.untrackr.alerter.processor.producer.top;
 
-import com.untrackr.alerter.processor.common.Processor;
-import com.untrackr.alerter.processor.common.ScriptStack;
 import com.untrackr.alerter.processor.producer.ScheduledExecutorFactory;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -17,7 +15,7 @@ public class TopFactory extends ScheduledExecutorFactory {
 	}
 
 	@Override
-	public Processor make(Object scriptObject) {
+	public Top make(Object scriptObject) {
 		TopDesc descriptor = convertProcessorArgument(TopDesc.class, scriptObject);
 		Top top = new Top(getProcessorService(), displayName(descriptor), makeScheduledExecutor(descriptor));
 		return top;

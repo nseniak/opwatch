@@ -15,7 +15,7 @@ public class JSFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public Processor make(Object scriptObject) {
+	public JS make(Object scriptObject) {
 		JSDesc descriptor = convertProcessorArgument(JSDesc.class, scriptObject);
 		JavascriptTransformer transformer = checkPropertyValue("transformer", descriptor.getTransformer());
 		JS js = new JS(getProcessorService(), displayName(descriptor), transformer);
