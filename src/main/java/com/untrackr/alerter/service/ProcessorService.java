@@ -3,18 +3,23 @@ package com.untrackr.alerter.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.untrackr.alerter.common.InternalScriptError;
 import com.untrackr.alerter.common.ThreadUtil;
 import com.untrackr.alerter.ioservice.FileTailingService;
 import com.untrackr.alerter.model.common.Alert;
 import com.untrackr.alerter.model.common.AlertData;
 import com.untrackr.alerter.model.common.AlerterProfile;
-import com.untrackr.alerter.model.common.PushoverKey;
 import com.untrackr.alerter.processor.common.*;
-import com.untrackr.alerter.processor.producer.console.Console;
+import com.untrackr.alerter.processor.consumer.alert.AlertGenerator;
+import com.untrackr.alerter.processor.producer.console.Stdin;
 import com.untrackr.alerter.processor.special.pipe.Pipe;
-import com.untrackr.alerter.processor.transformer.print.Print;
+import com.untrackr.alerter.processor.transformer.print.Stdout;
 import jdk.nashorn.api.scripting.NashornException;
+import jline.console.ConsoleReader;
+import jline.console.UserInterruptException;
+import joptsimple.OptionException;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
+import joptsimple.OptionSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -23,7 +28,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+import sun.misc.Signal;
 
+import javax.script.ScriptException;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -36,8 +44,7 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static com.untrackr.alerter.common.ApplicationUtil.environmentVariable;
-import static com.untrackr.alerter.common.ApplicationUtil.property;
+import static jdk.nashorn.internal.runtime.ScriptRuntime.UNDEFINED;
 
 @Service
 public class ProcessorService implements InitializingBean, DisposableBean {
@@ -67,13 +74,11 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	private String hostName;
 
-	private FrequencyLimiter frequencyLimiter;
-
 	private ObjectMapper objectMapper;
 
-	private Processor mainProcessor;
+	private Thread mainThread;
 
-	private String mainProcessorFile;
+	private Processor runningProcessor;
 
 	private ThreadPoolExecutor consumerExecutor = new ThreadPoolExecutor(0, Integer.MAX_VALUE,
 			60L, TimeUnit.SECONDS, new SynchronousQueue<>(),
@@ -87,104 +92,168 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		objectMapper = new ObjectMapper();
 		objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 		objectMapper.configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
-		// Hostname
-		String hostNameArg = environmentVariable("ALERTER_HOSTNAME", null);
-		if (hostNameArg != null) {
-			hostName = hostNameArg;
+	}
+
+	public void runCommandLine(String[] argStrings) {
+		mainThread = Thread.currentThread();
+		Signal.handle(new Signal("INT"), sig -> {
+			printCtrlC();
+			mainThread.interrupt();
+		});
+		scriptService.initialize();
+		try {
+			CommandLineOptions options = parseOptions(argStrings);
+			initialize(options);
+			if (options.getFiles().isEmpty()) {
+				runShell(options);
+			} else {
+				runFiles(options);
+			}
+		} catch (Exception e) {
+			printError(e.getMessage());
+		}
+	}
+
+	private CommandLineOptions parseOptions(String[] argStrings) {
+		OptionParser parser = new OptionParser();
+		OptionSpec<String> hostname = parser.accepts("hostname").withRequiredArg().ofType(String.class);
+		OptionSpec<File> files = parser.nonOptions().ofType(File.class);
+		OptionSet optionSet;
+		try {
+			optionSet = parser.parse(argStrings);
+		} catch (OptionException e) {
+			throw new RuntimeException(e);
+		}
+		CommandLineOptions options = new CommandLineOptions();
+		options.setHostname(optionSet.valueOf(hostname));
+		options.setFiles(optionSet.valuesOf(files));
+		return options;
+	}
+
+	private void initialize(CommandLineOptions options) {
+		if (options.getHostname() != null) {
+			hostName = options.getHostname();
 		} else {
 			try {
 				hostName = InetAddress.getLocalHost().getHostName();
 			} catch (UnknownHostException e) {
-				throw new IllegalStateException("cannot determine hostname; please define environment variable ALERTER_HOSTNAME");
+				throw new IllegalStateException("Cannot determine hostname; please pass the option --hostname=<hostname>");
 			}
 		}
-		// Global alert frequency limiter
-		frequencyLimiter = new FrequencyLimiter(TimeUnit.MINUTES.toMillis(1), profileService.profile().getGlobalMaxAlertsPerMinute());
 	}
 
-
-	public void startMainProcessor() {
+	public void runShell(CommandLineOptions options) {
+		ConsoleReader reader;
 		try {
-			if (mainProcessor != null) {
-				logger.info("Main processor already started");
-				return;
-			}
-			mainProcessorFile = property("alerter.main");
-			boolean error = withToplevelErrorHandling(() -> {
-				scriptService.initialize();
-				mainProcessor = scriptService.loadProcessor(mainProcessorFile);
-				if (profileService.profile().isInteractive()) {
-					List<Processor> pipeProcessors = new ArrayList<>();
-					if (mainProcessor.getSignature().getInputRequirement() != ProcessorSignature.PipeRequirement.forbidden) {
-						logger.info("Adding \"console\" as input processor");
-						pipeProcessors.add(new Console(this, "console"));
-					}
-					pipeProcessors.add(mainProcessor);
-					if (mainProcessor.getSignature().getOutputRequirement() != ProcessorSignature.PipeRequirement.forbidden) {
-						logger.info("Adding \"print\" as output processor");
-						pipeProcessors.add(new Print(this, "print"));
-					}
-					if (pipeProcessors.size() != 1) {
-						mainProcessor = new Pipe(this, pipeProcessors, "pipe");
-					}
-				}
-				mainProcessor.check();
-				mainProcessor.start();
-			});
-			if (mainProcessor == null) {
-				logger.error("Cannot load main processor: " + mainProcessorFile);
-			} else if (error) {
-				logger.error("Cannot start main processor: " + mainProcessorFile);
-				// Stop those sub-processors that have been started
-				mainProcessor.stop();
-				mainProcessor = null;
-			} else {
-				logger.info("Started");
-				infoAlert(alertService.getDefaultPushoverKey(), "Alerter up and running on " + getHostName());
-			}
-		} catch (Throwable t) {
-			String message = "Unexpected startup error occurred";
-			logger.error(message, t);
-			infrastructureAlert(Alert.Priority.emergency, message, "--", t);
-		}
-	}
-
-	public void stopMainProcessor() {
-		if (mainProcessor == null) {
-			logger.info("Main processor not started");
+			reader = new ConsoleReader();
+		} catch (IOException e) {
+			printError("Cannot read from console.");
 			return;
 		}
-		try {
-			boolean error = withProcessorErrorHandling(mainProcessor, mainProcessor::stop);
-			if (error) {
-				logger.error("Cannot stop main processor");
+		reader.setHandleUserInterrupt(true);
+		reader.setPrompt("> ");
+		String line;
+		while ((line = readLine(reader)) != null) {
+			if (!line.trim().isEmpty()) {
+				scriptService.execute(line);
 			}
-		} finally {
-			logger.info("Stopped");
-			mainProcessor = null;
 		}
 	}
 
-	public void processorAlert(PushoverKey pushoverKey, Alert.Priority priority, String title, Processor emitter) {
-		Alert alert = makeProcessorAlert(pushoverKey, priority, title, emitter);
+	public void printError(String message) {
+		System.err.println(message);
+	}
+
+	public void printMessage(String message) {
+		System.out.println(message);
+	}
+
+	private void printCtrlC() {
+		System.err.print("^C");
+	}
+
+	private String readLine(ConsoleReader reader) {
+		while (true) {
+			try {
+				return reader.readLine();
+			} catch (IOException e) {
+				return null;
+			} catch (UserInterruptException e) {
+				printCtrlC();
+			}
+		}
+	}
+
+	public Object runProcessor(Object scriptObject) {
+		String name = "run";
+		Processor processor = (Processor) scriptService.convertScriptValue(ValueLocation.makeArgument(name), Processor.class, scriptObject,
+				() -> ExceptionContext.makeProcessorFactory(name));
+		Processor wrappedProcessor = wrapToplevelProcessor(processor);
+		wrappedProcessor.check();
+		wrappedProcessor.start();
+		infoAlert("alerter up and running");
+		runningProcessor = processor;
+		try {
+			while (true) {
+				Thread.sleep(TimeUnit.DAYS.toMillis(1));
+			}
+		} catch (InterruptedException e) {
+			printError("Processor interrupted");
+		} finally {
+			runningProcessor = null;
+		}
+		wrappedProcessor.stop();
+		return UNDEFINED;
+	}
+
+	public Processor wrapToplevelProcessor(Processor processor) {
+		List<Processor> pipeProcessors = new ArrayList<>();
+		if (processor.getSignature().getInputRequirement() != ProcessorSignature.PipeRequirement.forbidden) {
+			logger.info("Adding \"stdin\" as input");
+			pipeProcessors.add(new Stdin(this, "stdin"));
+		}
+		pipeProcessors.add(processor);
+		if (processor.getSignature().getOutputRequirement() != ProcessorSignature.PipeRequirement.forbidden) {
+			logger.info("Adding \"stdout\" as output");
+			pipeProcessors.add(new Stdout(this, "stdout"));
+		}
+		if (pipeProcessors.size() == 1) {
+			return processor;
+		} else {
+			return new Pipe(this, pipeProcessors, "pipe");
+		}
+	}
+
+	private void runFiles(CommandLineOptions options) {
+		for (File file : options.getFiles()) {
+			scriptService.loadScriptFile(file);
+		}
+	}
+
+	public void stopRunningProcessor() {
+		mainThread.interrupt();
+	}
+
+	public void processorAlert(Alert.Priority priority, String title, AlertGenerator emitter) {
+		Alert alert = makeProcessorAlert(priority, title, emitter);
 		alertService.alert(alert);
 	}
 
-	public void processorAlertEnd(PushoverKey pushoverKey, Alert.Priority priority, String title, Processor emitter) {
-		Alert alert = makeProcessorAlert(pushoverKey, priority, title, emitter);
+	public void processorAlertEnd(Alert.Priority priority, String title, AlertGenerator emitter) {
+		Alert alert = makeProcessorAlert(priority, title, emitter);
 		alert.setEnd(true);
 		alertService.alert(alert);
 	}
 
-	public void infoAlert(PushoverKey pushoverKey, String title) {
-		Alert alert = new Alert(pushoverKey, Alert.Priority.info, title, null, null, null);
+	public void infoAlert(String title) {
+		Alert alert = new Alert(Alert.Priority.info, title, null, null, null);
 		alertService.alert(alert);
 	}
 
-	private Alert makeProcessorAlert(PushoverKey pushoverKey, Alert.Priority priority, String title, Processor emitter) {
+	private Alert makeProcessorAlert(Alert.Priority priority, String title, AlertGenerator emitter) {
 		AlertData data = new AlertData();
 		data.add("hostname", getHostName());
-		Alert alert = new Alert(pushoverKey, priority, title, null, emitter, data);
+		Alert alert = new Alert(priority, title, null, emitter, data);
 		return alert;
 	}
 
@@ -209,12 +278,13 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		if (payload != null) {
 			data.add("payload", payload.asText());
 		}
-		if ((e.getCause() != null) && !((e.getCause() instanceof IOException) || (e.getCause() instanceof NashornException) || (e.getCause() instanceof InternalScriptError))) {
+		Throwable cause = e.getCause();
+		if ((cause != null) && !((cause instanceof ScriptException) || (cause instanceof IOException) || (cause instanceof NashornException))) {
 			addStack(data, e);
 			logger.error(title, e);
 		}
 		if (!e.isSilent()) {
-			Alert alert = new Alert(alertService.getDefaultPushoverKey(), Alert.Priority.emergency, title, message, null, data);
+			Alert alert = new Alert(Alert.Priority.emergency, title, message, null, data);
 			alertService.alert(alert);
 		}
 	}
@@ -234,7 +304,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		} else {
 			logger.error(logMessage);
 		}
-		alertService.alert(new Alert(alertService.getDefaultPushoverKey(), priority, title, message, null, data));
+		alertService.alert(new Alert(priority, title, message, null, data));
 	}
 
 	private void addStack(AlertData data, Throwable t) {
@@ -288,13 +358,13 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	@Override
 	public void destroy() throws Exception {
 		logger.info("Exiting");
-		stopMainProcessor();
 		ThreadUtil.safeExecutorShutdownNow(consumerExecutor, "ConsumerExecutor", profileService.profile().getExecutorTerminationTimeout());
 		ThreadUtil.safeExecutorShutdownNow(scheduledExecutor, "ScheduledExecutor", profileService.profile().getExecutorTerminationTimeout());
 	}
 
 	public HealthcheckInfo healthcheck() {
-		return new HealthcheckInfo(hostName, mainProcessorFile, ((mainProcessor != null) && mainProcessor.started()));
+		String runningProcessorDesc = (runningProcessor == null) ? null : runningProcessor.getLocation().descriptor();
+		return new HealthcheckInfo(hostName, runningProcessorDesc);
 	}
 
 	public AlerterProfile profile() {

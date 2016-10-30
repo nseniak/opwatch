@@ -1,6 +1,6 @@
 package com.untrackr.alerter.model.common;
 
-import com.untrackr.alerter.processor.common.Processor;
+import com.untrackr.alerter.processor.consumer.alert.AlertGenerator;
 
 public class Alert {
 
@@ -26,16 +26,14 @@ public class Alert {
 	private Priority priority;
 	private String title;
 	private String message;
-	private Processor emitter;
+	private AlertGenerator emitter;
 	private AlertData data;
 	private Integer retry;
 	private Integer expire;
 	private long timestamp;
 	private boolean end;
-	private PushoverKey pushoverKey;
 
-	public Alert(PushoverKey pushoverKey, Priority priority, String title, String message, Processor emitter, AlertData data) {
-		this.pushoverKey = pushoverKey;
+	public Alert(Priority priority, String title, String message, AlertGenerator emitter, AlertData data) {
 		this.priority = priority;
 		this.title = title;
 		this.message = message;
@@ -107,20 +105,12 @@ public class Alert {
 		this.end = end;
 	}
 
-	public Processor getEmitter() {
+	public AlertGenerator getEmitter() {
 		return emitter;
 	}
 
-	public void setEmitter(Processor emitter) {
+	public void setEmitter(AlertGenerator emitter) {
 		this.emitter = emitter;
-	}
-
-	public PushoverKey getPushoverKey() {
-		return pushoverKey;
-	}
-
-	public void setPushoverKey(PushoverKey pushoverKey) {
-		this.pushoverKey = pushoverKey;
 	}
 
 }

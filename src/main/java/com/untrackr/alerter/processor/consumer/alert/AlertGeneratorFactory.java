@@ -1,7 +1,6 @@
 package com.untrackr.alerter.processor.consumer.alert;
 
 import com.untrackr.alerter.model.common.Alert;
-import com.untrackr.alerter.model.common.PushoverKey;
 import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -31,17 +30,9 @@ public class AlertGeneratorFactory extends ActiveProcessorFactory {
 		boolean toggle = optionaPropertyValue("toggle", descriptor.getToggle(), false);
 		String applicationName = optionaPropertyValue("application", descriptor.getApplication(), processorService.profile().getDefaultPushoverApplication());
 		String groupName = optionaPropertyValue("group", descriptor.getGroup(), processorService.profile().getDefaultPushoverGroup());
-		PushoverKey pushoverKey = makeKey(applicationName, groupName);
-		AlertGenerator alertGenerator = new AlertGenerator(getProcessorService(), displayName(descriptor), pushoverKey, message, priority, predicate, toggle);
+		AlertGenerator alertGenerator = new AlertGenerator(getProcessorService(), displayName(descriptor), applicationName, groupName,
+				message, priority, predicate, toggle);
 		return alertGenerator;
-	}
-
-	public PushoverKey makeKey(String applicationName, String groupName) {
-		try {
-			return processorService.profile().getPushoverSettings().makeKey(applicationName, groupName);
-		} catch (Throwable t) {
-			throw new AlerterException(t.getMessage(), ExceptionContext.makeProcessorFactory(name()));
-		}
 	}
 
 }

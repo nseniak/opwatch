@@ -9,41 +9,41 @@ public class ValueLocation {
 	}
 
 	private SourceType sourceType;
-	private String processorName;
+	private String functionName;
 	private String propertyName;
 
-	private ValueLocation(SourceType sourceType, String processorName, String propertyName) {
+	private ValueLocation(SourceType sourceType, String functionName, String propertyName) {
 		this.sourceType = sourceType;
-		this.processorName = processorName;
+		this.functionName = functionName;
 		this.propertyName = propertyName;
 	}
 
-	public static ValueLocation makeProperty(String processorName, String propertyName) {
-		return new ValueLocation(property, processorName, propertyName);
+	public static ValueLocation makeProperty(String functionName, String propertyName) {
+		return new ValueLocation(property, functionName, propertyName);
 	}
 
-	public static ValueLocation makeListPropertyElement(String processorName, String propertyName) {
-		return new ValueLocation(SourceType.list_property_element, processorName, propertyName);
+	public static ValueLocation makeListPropertyElement(String functionName, String propertyName) {
+		return new ValueLocation(SourceType.list_property_element, functionName, propertyName);
 	}
 
-	public static ValueLocation makeListArgumentElement(String processorName) {
-		return new ValueLocation(SourceType.list_argument_element, processorName, null);
+	public static ValueLocation makeListArgumentElement(String functionName) {
+		return new ValueLocation(SourceType.list_argument_element, functionName, null);
 	}
 
 	public static ValueLocation makeToplevel() {
 		return new ValueLocation(SourceType.toplevel, null, null);
 	}
 
-	public static ValueLocation makeArgument(String processorName) {
-		return new ValueLocation(SourceType.argument, processorName, null);
+	public static ValueLocation makeArgument(String functionName) {
+		return new ValueLocation(SourceType.argument, functionName, null);
 	}
 
 	public ValueLocation toListElement() {
 		switch (sourceType) {
 			case property:
-				return makeListPropertyElement(processorName, propertyName);
+				return makeListPropertyElement(functionName, propertyName);
 			case argument:
-				return makeListArgumentElement(processorName);
+				return makeListArgumentElement(functionName);
 			default:
 			return makeToplevel();
 		}
@@ -53,7 +53,7 @@ public class ValueLocation {
 		switch (sourceType) {
 			case property:
 			case list_property_element:
-				return processorName + "." + propertyName;
+				return functionName + "." + propertyName;
 			default:
 				return null;
 		}
@@ -78,8 +78,8 @@ public class ValueLocation {
 		return sourceType;
 	}
 
-	public String getProcessorName() {
-		return processorName;
+	public String getFunctionName() {
+		return functionName;
 	}
 
 	public String getPropertyName() {

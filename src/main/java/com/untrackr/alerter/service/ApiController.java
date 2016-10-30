@@ -14,18 +14,7 @@ public class ApiController {
 
 	@RequestMapping(value = "/stop", method = RequestMethod.POST)
 	public void pause() {
-		processorService.stopMainProcessor();
-	}
-
-	@RequestMapping(value = "/start", method = RequestMethod.POST)
-	public void resume() {
-		processorService.startMainProcessor();
-	}
-
-	@RequestMapping(value = "/restart", method = RequestMethod.POST)
-	public void restart() {
-		processorService.stopMainProcessor();
-		processorService.startMainProcessor();
+		processorService.stopRunningProcessor();
 	}
 
 	@RequestMapping(value = "/trace/start", method = RequestMethod.POST)

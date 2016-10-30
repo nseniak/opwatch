@@ -1,5 +1,7 @@
 package com.untrackr.alerter.common;
 
+import com.untrackr.alerter.processor.common.AlerterException;
+import com.untrackr.alerter.processor.common.ExceptionContext;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 
@@ -51,7 +53,7 @@ public class ObjectSeries extends ArrayList<SeriesObject> {
 		if (object instanceof Number) {
 			return ((Number) object).doubleValue();
 		} else {
-			throw new InternalScriptError("illegal operation on a non-number");
+			throw new AlerterException("illegal operation on a non-number", ExceptionContext.makeToplevel());
 		}
 	}
 

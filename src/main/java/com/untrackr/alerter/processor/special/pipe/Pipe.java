@@ -12,7 +12,11 @@ public class Pipe extends Processor {
 	public Pipe(ProcessorService processorService, List<Processor> processors, String name) {
 		super(processorService, name);
 		this.processors = processors;
-		this.signature = new ProcessorSignature(first().getSignature().getInputRequirement(), last().getSignature().getOutputRequirement());
+		if (processors.isEmpty()) {
+			this.signature = new ProcessorSignature(ProcessorSignature.PipeRequirement.required, ProcessorSignature.PipeRequirement.any);
+		} else {
+			this.signature = new ProcessorSignature(first().getSignature().getInputRequirement(), last().getSignature().getOutputRequirement());
+		}
 		Processor previousProducer = null;
 		for (Processor processor : processors) {
 			if (previousProducer == null) {

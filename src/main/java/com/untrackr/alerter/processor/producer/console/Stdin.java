@@ -4,9 +4,9 @@ import com.untrackr.alerter.processor.producer.Producer;
 import com.untrackr.alerter.service.ConsoleService;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class Console extends Producer implements ConsoleService.ConsoleLineConsumer {
+public class Stdin extends Producer implements ConsoleService.ConsoleLineConsumer {
 
-	public Console(ProcessorService processorService, String name) {
+	public Stdin(ProcessorService processorService, String name) {
 		super(processorService, name);
 	}
 

@@ -3,8 +3,11 @@ package com.untrackr.alerter.service;
 import com.untrackr.alerter.model.common.Alert;
 import com.untrackr.alerter.model.common.PushoverKey;
 import com.untrackr.alerter.model.common.PushoverSettings;
+import com.untrackr.alerter.processor.common.AlerterException;
+import com.untrackr.alerter.processor.common.ExceptionContext;
 import com.untrackr.alerter.processor.common.FrequencyLimiter;
 import com.untrackr.alerter.processor.common.Processor;
+import com.untrackr.alerter.processor.consumer.alert.AlertGenerator;
 import net.pushover.client.*;
 import org.apache.commons.math3.util.Pair;
 import org.slf4j.Logger;
@@ -36,6 +39,8 @@ public class AlertService {
 	private static final int MAX_DATA_ITEM_LENGTH = 120;
 	private static final String FIELD_DELIMITER = "\n--\n";
 
+	private static final String ALERTER_PREFIX = "[alerter] ";
+
 	private Map<Processor, FrequencyLimiter> processorFrequenceyLimiter = new ConcurrentHashMap<>();
 	private FrequencyLimiter globalFrequencyLimiter;
 
@@ -56,7 +61,6 @@ public class AlertService {
 
 	public synchronized void alert(Alert alert) {
 		alert.setTimestamp(System.currentTimeMillis());
-		PushoverKey pushoverKey = alert.getPushoverKey();
 		MessagePriority priority = MessagePriority.EMERGENCY;
 		String prefix = "";
 		if (alert.isEnd()) {
@@ -97,17 +101,17 @@ public class AlertService {
 			}
 		}
 		String title = truncate(prefix + alert.getTitle(), MAX_TITLE_LENGTH);
-		logger.info("Alert: " + title);
+		alertMessage("Alert: " + title);
 		StringWriter writer = new StringWriter();
 		if (alert.getMessage() != null) {
 			writer.append(alert.getMessage()).append(FIELD_DELIMITER);
-			logger.info("   message: " + alert.getMessage());
+			alertMessage("   message: " + alert.getMessage());
 		}
 		if (alert.getData() != null) {
 			for (Pair<String, String> pair : alert.getData()) {
 				String key = pair.getKey();
 				String value = pair.getValue();
-				logger.info("   " + key + ": " + value);
+				alertMessage("   " + key + ": " + value);
 				writer.append(key).append(": ").append(truncate(value, MAX_DATA_ITEM_LENGTH)).append(FIELD_DELIMITER);
 			}
 		}
@@ -119,12 +123,13 @@ public class AlertService {
 			return;
 		}
 		message = truncate(message, MAX_MESSAGE_LENGTH);
+		AlertGenerator emitter = alert.getEmitter();
+		PushoverKey pushoverKey = (emitter == null) ? defaultPushoverKey : makeKey(emitter);
 		send(pushoverKey, title, message, priority, retry, expire);
 	}
 
 	private boolean checkFrequencyLimits(Alert alert) {
-		PushoverKey pushoverKey = alert.getPushoverKey();
-		Processor emitter = alert.getEmitter();
+		AlertGenerator emitter = alert.getEmitter();
 		if (emitter != null) {
 			FrequencyLimiter limiter = processorFrequenceyLimiter.get(alert.getEmitter());
 			if (limiter == null) {
@@ -138,8 +143,8 @@ public class AlertService {
 					int max = limiter.getMaxPerPeriod();
 					String title = "Limit of " + max + " alerts per alerter reached on " + processorService.getHostName();
 					String message = "Muting for a moment: " + emitter.getLocation().descriptor();
-					send(pushoverKey, title, message, MessagePriority.NORMAL, null, null);
-					logger.warn("Alert not sent: max alerter alerts per minutes reached for " + emitter.getLocation().descriptor());
+					send(defaultPushoverKey, title, message, MessagePriority.NORMAL, null, null);
+					alertMessage("Alert not sent: max alerter alerts per minutes reached for " + emitter.getLocation().descriptor());
 				}
 				return true;
 			}
@@ -149,13 +154,21 @@ public class AlertService {
 			if (overflow == 1) {
 				int max = globalFrequencyLimiter.getMaxPerPeriod();
 				String title = "Global limit of " + max + " alerts reached on " + processorService.getHostName();
-				String message ="Muting for a moment: " + processorService.getHostName();
-				send(pushoverKey, title, message, MessagePriority.NORMAL, null, null);
-				logger.warn("Alert not sent: Global max alerts per minutes reached for " + emitter.getLocation().descriptor());
+				String message = "Muting for a moment: " + processorService.getHostName();
+				send(defaultPushoverKey, title, message, MessagePriority.NORMAL, null, null);
+				alertMessage("Alert not sent: Global max alerts per minutes reached for " + emitter.getLocation().descriptor());
 			}
 			return true;
 		}
 		return false;
+	}
+
+	public PushoverKey makeKey(AlertGenerator emitter) {
+		try {
+			return processorService.profile().getPushoverSettings().makeKey(emitter.getApplication(), emitter.getName());
+		} catch (Throwable t) {
+			throw new AlerterException(t.getMessage(), ExceptionContext.makeProcessorFactory(emitter.getName()));
+		}
 	}
 
 	private String truncate(String str, int length) {
@@ -168,7 +181,7 @@ public class AlertService {
 
 	private void send(PushoverKey pushoverKey, String title, String message, MessagePriority priority, Integer retry, Integer expire) {
 		if (profileService.profile().isInteractive()) {
-			logger.warn("Alert not sent: test mode");
+			alertMessage("Alert not sent (test mode)");
 			return;
 		}
 		PushoverMessage msg = PushoverMessage.builderWithApiToken(pushoverKey.getApiToken())
@@ -183,15 +196,26 @@ public class AlertService {
 		try {
 			Status result = pushoverClient.pushMessage(msg);
 			if (result.getStatus() != 1) {
-				logger.error("Status error while pushing to Pushover: " + result.toString());
+				alertError("Status error while pushing to Pushover: " + result.toString());
 			}
 		} catch (PushoverException e) {
-			logger.error("Exception while pushing to Pushover", e);
+			alertError("Exception while pushing to Pushover", e);
 		}
 	}
 
-	PushoverKey getDefaultPushoverKey() {
-		return defaultPushoverKey;
+	private void alertMessage(String message) {
+		logger.info(message);
+		processorService.printMessage(ALERTER_PREFIX + message);
+	}
+
+	private void alertError(String message) {
+		logger.error(message);
+		processorService.printError(ALERTER_PREFIX + message);
+	}
+
+	private void alertError(String message, Exception e) {
+		logger.error(message, e);
+		processorService.printError(ALERTER_PREFIX + message);
 	}
 
 }

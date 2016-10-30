@@ -5,9 +5,9 @@ import com.untrackr.alerter.processor.common.ProcessorSignature;
 import com.untrackr.alerter.processor.transformer.Transformer;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class Print extends Transformer {
+public class Stdout extends Transformer {
 
-	public Print(ProcessorService processorService, String name) {
+	public Stdout(ProcessorService processorService, String name) {
 		super(processorService, name);
 		// Override signature
 		this.signature = new ProcessorSignature(ProcessorSignature.PipeRequirement.required, ProcessorSignature.PipeRequirement.any);

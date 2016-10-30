@@ -1,0 +1,10 @@
+#!/bin/sh
+dirname=$(dirname $0)
+mkdir -p ${dirname}/log
+java -Dlogging.file=${dirname}/log/alerter.log \
+-Dalerter.interactive=true \
+-Dalerter.pushover.application=test \
+-Dalerter.pushover.group=nitsan \
+-Dalerter.trace=false \
+-jar ../target/alerter-1.0-SNAPSHOT.jar \
+$*

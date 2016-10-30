@@ -66,6 +66,7 @@ public abstract class ActiveProcessor extends Processor {
 
 	protected abstract void doStop();
 
+	@Override
 	public void check() {
 		StringJoiner joiner = new StringJoiner(", ");
 		switch (signature.getInputRequirement()) {
