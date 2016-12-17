@@ -10,14 +10,14 @@ public class StdinFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public String name() {
+	public String type() {
 		return "stdin";
 	}
 
 	@Override
 	public Stdin make(Object scriptObject) {
 		StdinDesc descriptor = convertProcessorArgument(StdinDesc.class, scriptObject);
-		Stdin stdin = new Stdin(getProcessorService(), displayName(descriptor));
+		Stdin stdin = new Stdin(getProcessorService(), descriptor, type());
 		return stdin;
 	}
 

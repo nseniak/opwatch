@@ -41,6 +41,7 @@ import org.springframework.stereotype.Service;
 import javax.script.*;
 import java.beans.PropertyDescriptor;
 import java.io.*;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -139,7 +140,7 @@ public class ScriptService {
 	}
 
 	private void createFactoryFunction(ProcessorFactory processorFactory) throws ScriptException {
-		createPrimitiveFunction(processorFactory.name(), javascriptFunction(processorFactory::make));
+		createPrimitiveFunction(processorFactory.type(), javascriptFunction(processorFactory::make));
 	}
 
 	private void createPrimitiveFunction(String name, JavascriptFunction function) throws ScriptException {
@@ -155,7 +156,9 @@ public class ScriptService {
 		ScriptContext context = scriptEngine.getContext();
 		try {
 			Object value = scriptEngine.eval(script, context);
-			processorService.printMessage(JSType.toString(value));
+			if (value != null) {
+				processorService.printMessage(JSType.toString(value));
+			}
 		} catch (Exception e) {
 			processorService.printError(e.getMessage());
 		}
@@ -190,20 +193,22 @@ public class ScriptService {
 				} else if (type == StringValue.class) {
 					return StringValue.makeFunctional(new JavascriptTransformer(scriptObject, valueLocation), valueLocation);
 				} else {
-					Object value = BeanUtils.instantiate(clazz);
-					BeanWrapperImpl wrapper = new BeanWrapperImpl(value);
-					for (String propertyName : scriptObject.getOwnKeys(true)) {
-						try {
-							PropertyDescriptor descriptor = wrapper.getPropertyDescriptor(propertyName);
-							Type fieldType = descriptor.getReadMethod().getGenericReturnType();
-							String processorName = valueLocation.getFunctionName();
-							ValueLocation propertyValueSource = ValueLocation.makeProperty(processorName, propertyName);
-							wrapper.setPropertyValue(propertyName, convertScriptValue(propertyValueSource, fieldType, scriptObject.get(propertyName), contextFactory));
-						} catch (InvalidPropertyException e) {
-							throw new AlerterException("invalid property name \"" + propertyName + "\"", contextFactory.make());
+					if (!Modifier.isAbstract(clazz.getModifiers())) {
+						Object value = BeanUtils.instantiate(clazz);
+						BeanWrapperImpl wrapper = new BeanWrapperImpl(value);
+						for (String propertyName : scriptObject.getOwnKeys(true)) {
+							try {
+								PropertyDescriptor descriptor = wrapper.getPropertyDescriptor(propertyName);
+								Type fieldType = descriptor.getReadMethod().getGenericReturnType();
+								String processorName = valueLocation.getFunctionName();
+								ValueLocation propertyValueSource = ValueLocation.makeProperty(processorName, propertyName);
+								wrapper.setPropertyValue(propertyName, convertScriptValue(propertyValueSource, fieldType, scriptObject.get(propertyName), contextFactory));
+							} catch (InvalidPropertyException e) {
+								throw new AlerterException("invalid property name \"" + propertyName + "\"", contextFactory.make());
+							}
 						}
+						return value;
 					}
-					return value;
 				}
 			}
 		} else {
@@ -271,6 +276,22 @@ public class ScriptService {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Exported for scripting purposes
+	 */
+	public static void logInfo(String message) {
+		logger.info(message);
+	}
+
+	/**
+	 * Exported for scripting purposes
+	 */
+	public static Object eval(String str, String location) throws ScriptException {
+		ScriptContext context = scriptEngine.getContext();
+		context.setAttribute(ScriptEngine.FILENAME, location, ScriptContext.ENGINE_SCOPE);
+		return scriptEngine.eval(str, context);
 	}
 
 	public NashornScriptEngine getScriptEngine() {

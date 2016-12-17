@@ -9,8 +9,8 @@ public class Pipe extends Processor {
 
 	List<Processor> processors;
 
-	public Pipe(ProcessorService processorService, List<Processor> processors, String name) {
-		super(processorService, name);
+	public Pipe(ProcessorService processorService, List<Processor> processors, PipeDesc descriptor, String name) {
+		super(processorService, descriptor, name);
 		this.processors = processors;
 		if (processors.isEmpty()) {
 			this.signature = new ProcessorSignature(ProcessorSignature.PipeRequirement.required, ProcessorSignature.PipeRequirement.any);

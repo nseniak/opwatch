@@ -9,8 +9,8 @@ public class JS extends Transformer {
 
 	private JavascriptTransformer transformer;
 
-	public JS(ProcessorService processorService, String name, JavascriptTransformer transformer) {
-		super(processorService, name);
+	public JS(ProcessorService processorService, JSDesc descriptor, String name, JavascriptTransformer transformer) {
+		super(processorService, descriptor, name);
 		this.transformer = transformer;
 	}
 

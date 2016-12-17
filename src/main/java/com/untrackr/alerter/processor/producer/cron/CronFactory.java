@@ -12,7 +12,7 @@ public class CronFactory extends ScheduledExecutorFactory {
 	}
 
 	@Override
-	public String name() {
+	public String type() {
 		return "cron";
 	}
 
@@ -21,7 +21,7 @@ public class CronFactory extends ScheduledExecutorFactory {
 		CronDesc descriptor = convertProcessorArgument(CronDesc.class, scriptObject);
 		ScheduledExecutor executor = makeScheduledExecutor(descriptor);
 		CommandRunner runner = makeCommandOutputProducer(descriptor);
-		Cron cron = new Cron(getProcessorService(), displayName(descriptor), executor, runner);
+		Cron cron = new Cron(getProcessorService(), descriptor, type(), executor, runner);
 		return cron;
 	}
 

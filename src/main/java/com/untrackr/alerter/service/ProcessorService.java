@@ -1,5 +1,6 @@
 package com.untrackr.alerter.service;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -11,8 +12,11 @@ import com.untrackr.alerter.model.common.AlerterProfile;
 import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.processor.consumer.alert.AlertGenerator;
 import com.untrackr.alerter.processor.producer.console.Stdin;
+import com.untrackr.alerter.processor.producer.console.StdinDesc;
 import com.untrackr.alerter.processor.special.pipe.Pipe;
+import com.untrackr.alerter.processor.special.pipe.PipeDesc;
 import com.untrackr.alerter.processor.transformer.print.Stdout;
+import com.untrackr.alerter.processor.transformer.print.StdoutDesc;
 import jdk.nashorn.api.scripting.NashornException;
 import jline.console.ConsoleReader;
 import jline.console.UserInterruptException;
@@ -92,14 +96,20 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		objectMapper = new ObjectMapper();
 		objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 		objectMapper.configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
+		objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+	}
+
+	@Override
+	public void destroy() throws Exception {
+		logger.info("Exiting");
+		mainThread.interrupt();
+		ThreadUtil.safeExecutorShutdownNow(consumerExecutor, "ConsumerExecutor", profileService.profile().getExecutorTerminationTimeout());
+		ThreadUtil.safeExecutorShutdownNow(scheduledExecutor, "ScheduledExecutor", profileService.profile().getExecutorTerminationTimeout());
 	}
 
 	public void runCommandLine(String[] argStrings) {
 		mainThread = Thread.currentThread();
-		Signal.handle(new Signal("INT"), sig -> {
-			printCtrlC();
-			mainThread.interrupt();
-		});
+		Signal.handle(new Signal("INT"), this::userInterruptHandler);
 		scriptService.initialize();
 		try {
 			CommandLineOptions options = parseOptions(argStrings);
@@ -112,6 +122,11 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		} catch (Exception e) {
 			printError(e.getMessage());
 		}
+	}
+
+	private void userInterruptHandler(Signal signal) {
+		printCtrlC();
+		mainThread.interrupt();
 	}
 
 	private CommandLineOptions parseOptions(String[] argStrings) {
@@ -202,6 +217,8 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		} finally {
 			runningProcessor = null;
 		}
+		// TODO Make sure this is called!
+		infoAlert("alerter stopped");
 		wrappedProcessor.stop();
 		return UNDEFINED;
 	}
@@ -210,17 +227,20 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		List<Processor> pipeProcessors = new ArrayList<>();
 		if (processor.getSignature().getInputRequirement() != ProcessorSignature.PipeRequirement.forbidden) {
 			logger.info("Adding \"stdin\" as input");
-			pipeProcessors.add(new Stdin(this, "stdin"));
+			pipeProcessors.add(new Stdin(this, new StdinDesc(), "stdin"));
 		}
 		pipeProcessors.add(processor);
 		if (processor.getSignature().getOutputRequirement() != ProcessorSignature.PipeRequirement.forbidden) {
 			logger.info("Adding \"stdout\" as output");
-			pipeProcessors.add(new Stdout(this, "stdout"));
+			pipeProcessors.add(new Stdout(this, new StdoutDesc(), "stdout"));
 		}
 		if (pipeProcessors.size() == 1) {
 			return processor;
 		} else {
-			return new Pipe(this, pipeProcessors, "pipe");
+			PipeDesc descriptor = new PipeDesc();
+			descriptor.setName("pipe");
+			descriptor.setProcessors(pipeProcessors);
+			return new Pipe(this, pipeProcessors, descriptor, "pipe");
 		}
 	}
 
@@ -276,7 +296,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		}
 		Payload payload = context.getPayload();
 		if (payload != null) {
-			data.add("payload", payload.asText());
+			data.add("payload", json(payload));
 		}
 		Throwable cause = e.getCause();
 		if ((cause != null) && !((cause instanceof ScriptException) || (cause instanceof IOException) || (cause instanceof NashornException))) {
@@ -343,7 +363,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		return error;
 	}
 
-	public String valueAsString(Object value) {
+	public String json(Object value) {
 		try {
 			return objectMapper.writeValueAsString(value);
 		} catch (JsonProcessingException e) {
@@ -351,15 +371,16 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		}
 	}
 
-	public void exit() {
-		SpringApplication.exit(applicationContext);
+	public Object parseJson(String text) {
+		try {
+			return objectMapper.readValue(text, Object.class);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	@Override
-	public void destroy() throws Exception {
-		logger.info("Exiting");
-		ThreadUtil.safeExecutorShutdownNow(consumerExecutor, "ConsumerExecutor", profileService.profile().getExecutorTerminationTimeout());
-		ThreadUtil.safeExecutorShutdownNow(scheduledExecutor, "ScheduledExecutor", profileService.profile().getExecutorTerminationTimeout());
+	public void exit() {
+		SpringApplication.exit(applicationContext);
 	}
 
 	public HealthcheckInfo healthcheck() {

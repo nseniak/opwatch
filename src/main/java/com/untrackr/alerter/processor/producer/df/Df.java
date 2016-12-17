@@ -14,8 +14,8 @@ public class Df extends ScheduledProducer {
 	private File file;
 	private boolean fileNotFoundErrorSignaled = false;
 
-	public Df(ProcessorService processorService, String name, ScheduledExecutor scheduledExecutor, File file) {
-		super(processorService, name, scheduledExecutor);
+	public Df(ProcessorService processorService, DfDesc descriptor, String name, ScheduledExecutor scheduledExecutor, File file) {
+		super(processorService, descriptor, name, scheduledExecutor);
 		this.file = file;
 	}
 

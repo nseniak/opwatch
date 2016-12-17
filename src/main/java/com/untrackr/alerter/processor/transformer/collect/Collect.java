@@ -5,6 +5,7 @@ import com.untrackr.alerter.common.ObjectSeries;
 import com.untrackr.alerter.common.SeriesObject;
 import com.untrackr.alerter.processor.common.JavascriptTransformer;
 import com.untrackr.alerter.processor.common.Payload;
+import com.untrackr.alerter.processor.common.ProcessorDesc;
 import com.untrackr.alerter.processor.transformer.Transformer;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -14,8 +15,8 @@ public class Collect extends Transformer {
 	private int count;
 	private EvictingQueue<Object> queue;
 
-	public Collect(ProcessorService processorService, String name, JavascriptTransformer transformer, int count) {
-		super(processorService, name);
+	public Collect(ProcessorService processorService, ProcessorDesc descriptor, String name, JavascriptTransformer transformer, int count) {
+		super(processorService, descriptor, name);
 		this.transformer = transformer;
 		this.count = count;
 		this.queue = EvictingQueue.create(count);
@@ -24,7 +25,7 @@ public class Collect extends Transformer {
 	@Override
 	public void consume(Payload payload) {
 		long timestamp = System.currentTimeMillis();
-		Object result = (transformer == null) ? payload.getScriptObject() : transformer.call(payload, this);
+		Object result = (transformer == null) ? payload.getValue() : transformer.call(payload, this);
 		if (result != null) {
 			queue.add(result);
 			if (queue.size() == count) {

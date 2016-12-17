@@ -40,15 +40,18 @@ public class AlertService {
 	private static final String FIELD_DELIMITER = "\n--\n";
 
 	private static final String ALERTER_PREFIX = "[alerter] ";
+	private static final String ALERT_PRINT_FORMAT = "[alert %d] %s";
 
 	private Map<Processor, FrequencyLimiter> processorFrequenceyLimiter = new ConcurrentHashMap<>();
 	private FrequencyLimiter globalFrequencyLimiter;
+	private int globalAlertCount;
 
 	@PostConstruct
 	public void initializeFrequencyLimiters() {
 		processorFrequenceyLimiter = new ConcurrentHashMap<>();
 		int maxAlertsPerMinute = processorService.getProfileService().profile().getGlobalMaxAlertsPerMinute();
 		globalFrequencyLimiter = new FrequencyLimiter(TimeUnit.MINUTES.toMillis(1), maxAlertsPerMinute);
+		globalAlertCount = 0;
 	}
 
 	@PostConstruct
@@ -60,6 +63,7 @@ public class AlertService {
 	}
 
 	public synchronized void alert(Alert alert) {
+		globalAlertCount = globalAlertCount + 1;
 		alert.setTimestamp(System.currentTimeMillis());
 		MessagePriority priority = MessagePriority.EMERGENCY;
 		String prefix = "";
@@ -101,17 +105,17 @@ public class AlertService {
 			}
 		}
 		String title = truncate(prefix + alert.getTitle(), MAX_TITLE_LENGTH);
-		alertMessage("Alert: " + title);
+		alertMessage(title, globalAlertCount);
 		StringWriter writer = new StringWriter();
 		if (alert.getMessage() != null) {
 			writer.append(alert.getMessage()).append(FIELD_DELIMITER);
-			alertMessage("   message: " + alert.getMessage());
+			alertMessage("   message: " + alert.getMessage(), globalAlertCount);
 		}
 		if (alert.getData() != null) {
 			for (Pair<String, String> pair : alert.getData()) {
 				String key = pair.getKey();
 				String value = pair.getValue();
-				alertMessage("   " + key + ": " + value);
+				alertMessage("   " + key + ": " + value, globalAlertCount);
 				writer.append(key).append(": ").append(truncate(value, MAX_DATA_ITEM_LENGTH)).append(FIELD_DELIMITER);
 			}
 		}
@@ -144,7 +148,7 @@ public class AlertService {
 					String title = "Limit of " + max + " alerts per alerter reached on " + processorService.getHostName();
 					String message = "Muting for a moment: " + emitter.getLocation().descriptor();
 					send(defaultPushoverKey, title, message, MessagePriority.NORMAL, null, null);
-					alertMessage("Alert not sent: max alerter alerts per minutes reached for " + emitter.getLocation().descriptor());
+					alertMessage("Alert not sent: max alerter alerts per minutes reached for " + emitter.getLocation().descriptor(), globalAlertCount);
 				}
 				return true;
 			}
@@ -156,7 +160,7 @@ public class AlertService {
 				String title = "Global limit of " + max + " alerts reached on " + processorService.getHostName();
 				String message = "Muting for a moment: " + processorService.getHostName();
 				send(defaultPushoverKey, title, message, MessagePriority.NORMAL, null, null);
-				alertMessage("Alert not sent: Global max alerts per minutes reached for " + emitter.getLocation().descriptor());
+				alertMessage("Alert not sent: Global max alerts per minutes reached for " + emitter.getLocation().descriptor(), globalAlertCount);
 			}
 			return true;
 		}
@@ -165,9 +169,9 @@ public class AlertService {
 
 	public PushoverKey makeKey(AlertGenerator emitter) {
 		try {
-			return processorService.profile().getPushoverSettings().makeKey(emitter.getApplication(), emitter.getName());
+			return processorService.profile().getPushoverSettings().makeKey(emitter.getApplication(), emitter.getType());
 		} catch (Throwable t) {
-			throw new AlerterException(t.getMessage(), ExceptionContext.makeProcessorFactory(emitter.getName()));
+			throw new AlerterException(t.getMessage(), ExceptionContext.makeProcessorFactory(emitter.getType()));
 		}
 	}
 
@@ -181,7 +185,7 @@ public class AlertService {
 
 	private void send(PushoverKey pushoverKey, String title, String message, MessagePriority priority, Integer retry, Integer expire) {
 		if (profileService.profile().isInteractive()) {
-			alertMessage("Alert not sent (test mode)");
+			alertMessage("Alert not sent (test mode)", globalAlertCount);
 			return;
 		}
 		PushoverMessage msg = PushoverMessage.builderWithApiToken(pushoverKey.getApiToken())
@@ -203,9 +207,9 @@ public class AlertService {
 		}
 	}
 
-	private void alertMessage(String message) {
+	private void alertMessage(String message, int count) {
 		logger.info(message);
-		processorService.printMessage(ALERTER_PREFIX + message);
+		processorService.printMessage(String.format(ALERT_PRINT_FORMAT, count, message));
 	}
 
 	private void alertError(String message) {

@@ -4,7 +4,7 @@ import com.untrackr.alerter.processor.common.Payload;
 
 public class RemotePayload {
 
-	private Object jsonObject;
+	private Object scriptObject;
 	private long timestamp;
 	private String hostname;
 
@@ -12,17 +12,17 @@ public class RemotePayload {
 	}
 
 	public RemotePayload(Payload payload) {
-		this.jsonObject = payload.getScriptObject();
+		this.scriptObject = payload.getValue();
 		this.timestamp = payload.getTimestamp();
 		this.hostname = payload.getHostname();
 	}
 
-	public Object getJsonObject() {
-		return jsonObject;
+	public Object getScriptObject() {
+		return scriptObject;
 	}
 
-	public void setJsonObject(Object jsonObject) {
-		this.jsonObject = jsonObject;
+	public void setScriptObject(Object scriptObject) {
+		this.scriptObject = scriptObject;
 	}
 
 	public long getTimestamp() {

@@ -12,8 +12,8 @@ public class Grep extends ConditionalTransformer {
 	private Pattern pattern;
 	private boolean invert;
 
-	public Grep(ProcessorService processorService, String name, String fieldName, Pattern pattern, boolean invert) {
-		super(processorService, name);
+	public Grep(ProcessorService processorService, GrepDesc descriptor, String name, String fieldName, Pattern pattern, boolean invert) {
+		super(processorService, descriptor, name);
 		this.fieldName = fieldName;
 		this.pattern = pattern;
 		this.invert = invert;

@@ -17,8 +17,8 @@ public class Jstack extends Transformer {
 
 	private final static int MAX_EXCEPTION_LINES = 500;
 
-	public Jstack(ProcessorService processorService, String name, String propertyName, Pattern methodPattern) {
-		super(processorService, name);
+	public Jstack(ProcessorService processorService, JstackDesc descriptor, String name, String propertyName, Pattern methodPattern) {
+		super(processorService, descriptor, name);
 		this.propertyName = propertyName;
 		this.methodPattern = methodPattern;
 	}

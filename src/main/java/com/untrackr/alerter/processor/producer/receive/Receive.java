@@ -1,8 +1,8 @@
 package com.untrackr.alerter.processor.producer.receive;
 
-import com.untrackr.alerter.common.RemotePayload;
 import com.untrackr.alerter.processor.common.AlerterException;
 import com.untrackr.alerter.processor.common.ExceptionContext;
+import com.untrackr.alerter.processor.common.Payload;
 import com.untrackr.alerter.processor.producer.Producer;
 import com.untrackr.alerter.service.HttpService;
 import com.untrackr.alerter.service.ProcessorService;
@@ -11,8 +11,8 @@ public class Receive extends Producer implements HttpService.PostBodyConsumer {
 
 	private String urlPath;
 
-	public Receive(ProcessorService processorService, String name, String urlPath) {
-		super(processorService, name);
+	public Receive(ProcessorService processorService, ReceiveDesc descriptor, String name, String urlPath) {
+		super(processorService, descriptor, name);
 		this.urlPath = urlPath;
 	}
 
@@ -29,10 +29,10 @@ public class Receive extends Producer implements HttpService.PostBodyConsumer {
 	@Override
 	public void consume(Object input) {
 		try {
-			RemotePayload remotePayload = processorService.getObjectMapper().convertValue(input, RemotePayload.class);
-			outputReceived(remotePayload);
+			Payload remotePayload = processorService.getObjectMapper().convertValue(input, Payload.class);
+			outputTransformed(remotePayload.getValue(), remotePayload);
 		} catch (IllegalArgumentException e) {
-			throw new AlerterException("invalid input: " + processorService.valueAsString(input),
+			throw new AlerterException("invalid input: " + processorService.json(input),
 					ExceptionContext.makeProcessorNoPayload(this));
 		}
 	}

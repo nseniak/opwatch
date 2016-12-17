@@ -1,6 +1,5 @@
 package com.untrackr.alerter.processor.common;
 
-import com.google.common.collect.Lists;
 import jdk.nashorn.api.scripting.NashornException;
 
 import javax.script.ScriptException;

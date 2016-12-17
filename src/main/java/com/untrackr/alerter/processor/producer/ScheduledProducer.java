@@ -1,14 +1,15 @@
 package com.untrackr.alerter.processor.producer;
 
 import com.untrackr.alerter.processor.common.Payload;
+import com.untrackr.alerter.processor.common.ProcessorDesc;
 import com.untrackr.alerter.service.ProcessorService;
 
 public abstract class ScheduledProducer extends Producer {
 
 	private ScheduledExecutor scheduledExecutor;
 
-	public ScheduledProducer(ProcessorService processorService, String name, ScheduledExecutor scheduledExecutor) {
-		super(processorService, name);
+	public ScheduledProducer(ProcessorService processorService, ProcessorDesc descriptor, String name, ScheduledExecutor scheduledExecutor) {
+		super(processorService, descriptor, name);
 		this.scheduledExecutor = scheduledExecutor;
 	}
 

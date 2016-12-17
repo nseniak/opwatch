@@ -11,14 +11,14 @@ public class Trail extends TrailCollecter {
 
 	private JavascriptTransformer transformer;
 
-	public Trail(ProcessorService processorService, String name, ScheduledExecutor scheduledExecutor, JavascriptTransformer transformer, long duration) {
-		super(processorService, name, scheduledExecutor, duration);
+	public Trail(ProcessorService processorService, TrailDesc descriptor, String name, ScheduledExecutor scheduledExecutor, JavascriptTransformer transformer, long duration) {
+		super(processorService, descriptor, name, scheduledExecutor, duration);
 		this.transformer = transformer;
 	}
 
 	@Override
 	protected Object collectedObject(Payload payload) {
-		return (transformer == null) ? payload.getScriptObject() : transformer.call(payload, this);
+		return (transformer == null) ? payload.getValue() : transformer.call(payload, this);
 	}
 
 	@Override

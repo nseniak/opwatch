@@ -10,14 +10,14 @@ public class TopFactory extends ScheduledExecutorFactory {
 	}
 
 	@Override
-	public String name() {
+	public String type() {
 		return "top";
 	}
 
 	@Override
 	public Top make(Object scriptObject) {
 		TopDesc descriptor = convertProcessorArgument(TopDesc.class, scriptObject);
-		Top top = new Top(getProcessorService(), displayName(descriptor), makeScheduledExecutor(descriptor));
+		Top top = new Top(getProcessorService(), descriptor, type(), makeScheduledExecutor(descriptor));
 		return top;
 	}
 

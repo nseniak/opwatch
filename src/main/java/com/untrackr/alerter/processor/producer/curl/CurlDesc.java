@@ -7,7 +7,7 @@ public class CurlDesc extends ScheduledProducerDesc {
 	private String url;
 	private String connectTimeout;
 	private String readTimeout;
-	private boolean insecure;
+	private Boolean insecure;
 
 	public String getUrl() {
 		return url;
@@ -33,11 +33,12 @@ public class CurlDesc extends ScheduledProducerDesc {
 		this.readTimeout = readTimeout;
 	}
 
-	public boolean isInsecure() {
+	public Boolean getInsecure() {
 		return insecure;
 	}
 
-	public void setInsecure(boolean insecure) {
+	public void setInsecure(Boolean insecure) {
 		this.insecure = insecure;
 	}
+
 }

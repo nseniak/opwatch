@@ -14,23 +14,27 @@ public class ParallelFactory extends ProcessorFactory {
 	}
 
 	@Override
-	public String name() {
+	public String type() {
 		return "parallel";
 	}
 
 	@Override
 	public Parallel make(Object scriptObject) {
 		List<Processor> processors;
+		ParallelDesc descriptor;
 		String name;
 		if ((scriptObject instanceof ScriptObjectMirror) && (((ScriptObjectMirror) scriptObject).isArray())) {
 			processors = (List<Processor>) convertProcessorArgument(List.class, processorListType(), scriptObject);
-			name = name();
+			descriptor = new ParallelDesc();
+			descriptor.setName(type());
+			descriptor.setProcessors(processors);
+			name = type();
 		} else {
-			ParallelDesc descriptor = convertProcessorArgument(ParallelDesc.class, scriptObject);
+			descriptor = convertProcessorArgument(ParallelDesc.class, scriptObject);
 			processors = descriptor.getProcessors();
-			name = displayName(descriptor);
+			name = type();
 		}
-		Parallel parallel = new Parallel(getProcessorService(), processors, name);
+		Parallel parallel = new Parallel(getProcessorService(), processors, descriptor, name);
 		parallel.inferSignature();
 		return parallel;
 	}

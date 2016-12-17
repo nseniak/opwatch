@@ -12,7 +12,7 @@ public class TailFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public String name() {
+	public String type() {
 		return "tail";
 	}
 
@@ -20,8 +20,9 @@ public class TailFactory extends ActiveProcessorFactory {
 	public Tail make(Object scriptObject) {
 		TailDesc descriptor = convertProcessorArgument(TailDesc.class, scriptObject);
 		String file = checkVariableSubstitution("file", checkPropertyValue("file", descriptor.getFile()));
-		boolean ignoreBlankLine = optionaPropertyValue("insecure", descriptor.isIgnoreBlankLine(), false);
-		Tail tail = new Tail(getProcessorService(), displayName(descriptor), FileSystems.getDefault().getPath(file), ignoreBlankLine);
+		boolean json = optionaPropertyValue("json", descriptor.getJson(), false);
+		boolean ignoreBlankLine = optionaPropertyValue("ignoreBlankLine", descriptor.getIgnoreBlankLine(), false);
+		Tail tail = new Tail(getProcessorService(), descriptor, type(), FileSystems.getDefault().getPath(file), json, ignoreBlankLine);
 		return tail;
 	}
 

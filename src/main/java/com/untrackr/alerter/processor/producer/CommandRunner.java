@@ -64,7 +64,7 @@ public class CommandRunner {
 			throw new AlerterException("command process has exited", ExceptionContext.makeProcessorPayload(processor, payload));
 		}
 		try {
-			process.getOutputStream().write(payload.asText().getBytes());
+			process.getOutputStream().write(processorService.json(payload).getBytes());
 			process.getOutputStream().write('\n');
 			process.getOutputStream().flush();
 		} catch (IOException e) {

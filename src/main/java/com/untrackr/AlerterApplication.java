@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.embedded.tomcat.ConnectorStartFailedException;
 import org.springframework.context.ApplicationContext;
 
 @SpringBootApplication
@@ -23,7 +24,13 @@ public class AlerterApplication implements CommandLineRunner {
 	}
 
 	public static void main(String[] args) throws Exception {
-		SpringApplication.run(AlerterApplication.class, args);
+		try {
+			SpringApplication.run(AlerterApplication.class, args);
+		} catch (ConnectorStartFailedException e) {
+			// TODO: Script option for starting with another port
+			System.err.println("Cannot start http server. Port already is use: " + e.getPort());
+			throw e;
+		}
 	}
 
 }

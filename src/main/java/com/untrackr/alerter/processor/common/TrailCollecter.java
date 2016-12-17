@@ -13,8 +13,8 @@ public abstract class TrailCollecter extends ScheduledProducer {
 	protected LinkedBlockingQueue<SeriesObject> queue;
 	private long startupTimestamp;
 
-	public TrailCollecter(ProcessorService processorService, String name, ScheduledExecutor scheduledExecutor, long duration) {
-		super(processorService, name, scheduledExecutor);
+	public TrailCollecter(ProcessorService processorService, ProcessorDesc descriptor, String name, ScheduledExecutor scheduledExecutor, long duration) {
+		super(processorService, descriptor, name, scheduledExecutor);
 		this.duration = duration;
 		this.queue = new LinkedBlockingQueue<>();
 		this.signature = ProcessorSignature.makeTransformer();

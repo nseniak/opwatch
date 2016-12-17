@@ -14,7 +14,7 @@ public class PostFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public String name() {
+	public String type() {
 		return "post";
 	}
 
@@ -26,13 +26,13 @@ public class PostFactory extends ActiveProcessorFactory {
 		String pathString = checkVariableSubstitution("path", checkPropertyValue("path", descriptor.getPath()));
 		Matcher matcher = pathPattern.matcher(pathString);
 		if (!matcher.matches()) {
-			throw new AlerterException("incorrect \"path\" syntax: \"" + pathString + "\"", ExceptionContext.makeProcessorFactory(name()));
+			throw new AlerterException("incorrect \"path\" syntax: \"" + pathString + "\"", ExceptionContext.makeProcessorFactory(type()));
 		}
 		AlerterProfile profile = processorService.getProfileService().profile();
 		String hostname = (matcher.group("hostname") != null) ? matcher.group("hostname") : profile.getDefaultPostHostname();
 		int port = (matcher.group("port") != null) ? Integer.parseInt(matcher.group("hostname")) : profile.getDefaultPostPort();
 		String urlPath = matcher.group("stack");
-		Post post = new Post(getProcessorService(), displayName(descriptor), pathString, hostname, port, urlPath);
+		Post post = new Post(getProcessorService(), descriptor, type(), pathString, hostname, port, urlPath);
 		return post;
 	}
 

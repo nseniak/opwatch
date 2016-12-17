@@ -12,8 +12,8 @@ public class Stat extends ScheduledProducer {
 
 	private File file;
 
-	public Stat(ProcessorService processorService, String name, ScheduledExecutor scheduledExecutor, File file) {
-		super(processorService, name, scheduledExecutor);
+	public Stat(ProcessorService processorService, StatDesc descriptor, String name, ScheduledExecutor scheduledExecutor, File file) {
+		super(processorService, descriptor, name, scheduledExecutor);
 		this.file = file;
 	}
 

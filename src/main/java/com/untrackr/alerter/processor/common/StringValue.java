@@ -34,7 +34,7 @@ public class StringValue {
 			return constant;
 		} else {
 			Object value = function.call(payload, processor);
-			return (String) payload.getProcessorService().getScriptService().convertScriptValue(function.getValueLocation(), String.class, value,
+			return (String) processor.getProcessorService().getScriptService().convertScriptValue(function.getValueLocation(), String.class, value,
 					() -> ExceptionContext.makeProcessorPayloadScriptCallback(processor, new CallbackErrorLocation(valueLocation), payload));
 		}
 	}

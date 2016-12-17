@@ -11,6 +11,7 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.SynchronousQueue;
@@ -61,7 +62,7 @@ public class FileTailingService implements DisposableBean {
 		try {
 			tailedFile.tail();
 		} catch (InterruptedException e) {
-			// Nothing to do: the tailed is being stopped
+			// Nothing to do: the tail is being stopped
 		} catch (Throwable t) {
 			processorService.infrastructureAlert(Alert.Priority.emergency, "Exception while tailing file", tailedFile.getFile().toString(), t);
 		}

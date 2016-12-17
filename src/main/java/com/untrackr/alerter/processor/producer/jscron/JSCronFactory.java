@@ -12,7 +12,7 @@ public class JSCronFactory extends ScheduledExecutorFactory {
 	}
 
 	@Override
-	public String name() {
+	public String type() {
 		return "jscron";
 	}
 
@@ -21,7 +21,7 @@ public class JSCronFactory extends ScheduledExecutorFactory {
 		JSCronDesc descriptor = convertProcessorArgument(JSCronDesc.class, scriptObject);
 		ScheduledExecutor executor = makeScheduledExecutor(descriptor);
 		JavascriptProducer producer = checkPropertyValue("producer", descriptor.getProducer());
-		JSCron JSCron = new JSCron(getProcessorService(), displayName(descriptor), executor, producer);
+		JSCron JSCron = new JSCron(getProcessorService(), descriptor, type(), executor, producer);
 		return JSCron;
 	}
 

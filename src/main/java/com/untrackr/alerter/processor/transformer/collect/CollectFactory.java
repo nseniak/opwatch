@@ -10,7 +10,7 @@ public class CollectFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public String name() {
+	public String type() {
 		return "collect";
 	}
 
@@ -19,7 +19,7 @@ public class CollectFactory extends ActiveProcessorFactory {
 		CollectDesc descriptor = convertProcessorArgument(CollectDesc.class, scriptObject);
 		JavascriptTransformer transformer = optionaPropertyValue("transformer", descriptor.getTransformer(), null);
 		int count = checkPropertyValue("count", descriptor.getCount());
-		Collect collect = new Collect(getProcessorService(), displayName(descriptor), transformer, count);
+		Collect collect = new Collect(getProcessorService(), descriptor, type(), transformer, count);
 		return collect;
 	}
 

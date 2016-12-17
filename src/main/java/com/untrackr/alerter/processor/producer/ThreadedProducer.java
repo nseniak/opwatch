@@ -2,6 +2,7 @@ package com.untrackr.alerter.processor.producer;
 
 import com.untrackr.alerter.processor.common.AlerterException;
 import com.untrackr.alerter.processor.common.ExceptionContext;
+import com.untrackr.alerter.processor.common.ProcessorDesc;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.concurrent.Future;
@@ -10,8 +11,8 @@ public abstract class ThreadedProducer extends Producer {
 
 	private Future<?> future;
 
-	public ThreadedProducer(ProcessorService processorService, String name) {
-		super(processorService, name);
+	public ThreadedProducer(ProcessorService processorService, ProcessorDesc descriptor, String name) {
+		super(processorService, descriptor, name);
 	}
 
 	@Override

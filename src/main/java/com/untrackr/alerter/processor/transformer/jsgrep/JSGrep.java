@@ -9,8 +9,8 @@ public class JSGrep extends ConditionalTransformer {
 
 	private JavascriptPredicate predicate;
 
-	public JSGrep(ProcessorService processorService, String name, JavascriptPredicate predicate) {
-		super(processorService, name);
+	public JSGrep(ProcessorService processorService, JSGrepDesc descriptor, String name, JavascriptPredicate predicate) {
+		super(processorService, descriptor, name);
 		this.predicate = predicate;
 	}
 

@@ -13,8 +13,8 @@ public class Sh extends Transformer {
 	protected Future<?> commandConsumerThreadFuture;
 	private CommandRunner commandRunner;
 
-	public Sh(ProcessorService processorService, String name, CommandRunner commandRunner) {
-		super(processorService, name);
+	public Sh(ProcessorService processorService, ShDesc descriptor, String name, CommandRunner commandRunner) {
+		super(processorService, descriptor, name);
 		this.commandRunner = commandRunner;
 		this.signature = new ProcessorSignature(ProcessorSignature.PipeRequirement.any, ProcessorSignature.PipeRequirement.any);
 	}

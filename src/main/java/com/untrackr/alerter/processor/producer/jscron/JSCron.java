@@ -9,8 +9,8 @@ public class JSCron extends ScheduledProducer {
 
 	private JavascriptProducer producer;
 
-	public JSCron(ProcessorService processorService, String name, ScheduledExecutor scheduledExecutor, JavascriptProducer producer) {
-		super(processorService, name, scheduledExecutor);
+	public JSCron(ProcessorService processorService, JSCronDesc descriptor, String name, ScheduledExecutor scheduledExecutor, JavascriptProducer producer) {
+		super(processorService, descriptor, name, scheduledExecutor);
 		this.producer = producer;
 	}
 

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+// TODO Make this a JavaScript function; make producers output arrays instead
 public class ObjectSeries extends ArrayList<SeriesObject> {
 
 	private DescriptiveStatistics stats;

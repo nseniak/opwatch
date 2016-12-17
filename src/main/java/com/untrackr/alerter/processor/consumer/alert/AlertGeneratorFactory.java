@@ -11,7 +11,7 @@ public class AlertGeneratorFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public String name() {
+	public String type() {
 		return "alert";
 	}
 
@@ -23,14 +23,14 @@ public class AlertGeneratorFactory extends ActiveProcessorFactory {
 		try {
 			priority = Alert.Priority.valueOf(priorityName);
 		} catch (IllegalArgumentException e) {
-			throw new AlerterException("bad alert priority: \"" + priorityName + "\"", ExceptionContext.makeProcessorFactory(name()));
+			throw new AlerterException("bad alert priority: \"" + priorityName + "\"", ExceptionContext.makeProcessorFactory(type()));
 		}
 		StringValue message = checkPropertyValue("message", descriptor.getMessage());
 		JavascriptPredicate predicate = optionaPropertyValue("predicate", descriptor.getPredicate(), null);
 		boolean toggle = optionaPropertyValue("toggle", descriptor.getToggle(), false);
 		String applicationName = optionaPropertyValue("application", descriptor.getApplication(), processorService.profile().getDefaultPushoverApplication());
 		String groupName = optionaPropertyValue("group", descriptor.getGroup(), processorService.profile().getDefaultPushoverGroup());
-		AlertGenerator alertGenerator = new AlertGenerator(getProcessorService(), displayName(descriptor), applicationName, groupName,
+		AlertGenerator alertGenerator = new AlertGenerator(getProcessorService(), descriptor, type(), applicationName, groupName,
 				message, priority, predicate, toggle);
 		return alertGenerator;
 	}

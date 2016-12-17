@@ -24,7 +24,7 @@ public abstract class ProcessorFactory {
 		try {
 			return ProcessorFactory.class.getDeclaredField("processorListField").getGenericType();
 		} catch (NoSuchFieldException e) {
-			throw new AlerterException(e, ExceptionContext.makeProcessorFactory(name()));
+			throw new AlerterException(e, ExceptionContext.makeProcessorFactory(type()));
 		}
 	}
 
@@ -32,34 +32,34 @@ public abstract class ProcessorFactory {
 		this.processorService = processorService;
 	}
 
-	public abstract String name();
+	public abstract String type();
 
 	public String displayName(ProcessorDesc processorDesc) {
 		if (processorDesc.getName() != null) {
 			return processorDesc.getName();
 		} else {
-			return name();
+			return type();
 		}
 	}
 
 	public abstract Processor make(Object scriptObject);
 
 	protected <T> T convertProcessorArgument(Class<T> clazz, Object scriptObject) {
-		return (T) processorService.getScriptService().convertScriptValue(ValueLocation.makeArgument(name()), clazz, scriptObject,
-				() -> ExceptionContext.makeProcessorFactory(name()));
+		return (T) processorService.getScriptService().convertScriptValue(ValueLocation.makeArgument(type()), clazz, scriptObject,
+				() -> ExceptionContext.makeProcessorFactory(type()));
 	}
 
 	protected <T> T convertProcessorArgument(Class<T> clazz, Type type, Object scriptObject) {
-		return (T) processorService.getScriptService().convertScriptValue(ValueLocation.makeArgument(name()), type, scriptObject,
-				() -> ExceptionContext.makeProcessorFactory(name()));
+		return (T) processorService.getScriptService().convertScriptValue(ValueLocation.makeArgument(type()), type, scriptObject,
+				() -> ExceptionContext.makeProcessorFactory(type()));
 	}
 
 	public <T> T checkPropertyValue(String property, T value) {
 		if (value != null) {
 			return value;
 		} else {
-			ValueLocation location = ValueLocation.makeProperty(name(), property);
-			throw new AlerterException("missing " + location.describeAsValue(), ExceptionContext.makeProcessorFactory(name()));
+			ValueLocation location = ValueLocation.makeProperty(type(), property);
+			throw new AlerterException("missing " + location.describeAsValue(), ExceptionContext.makeProcessorFactory(type()));
 		}
 	}
 
@@ -86,7 +86,7 @@ public abstract class ProcessorFactory {
 			return Duration.parse(duration).toMillis();
 		} catch (DateTimeParseException e) {
 			throw new AlerterException(e.getLocalizedMessage() + " at index " + (e.getErrorIndex() - start) + ": \"" + delayString + "\"",
-					ExceptionContext.makeProcessorFactory(name()));
+					ExceptionContext.makeProcessorFactory(type()));
 		}
 	}
 
@@ -102,9 +102,9 @@ public abstract class ProcessorFactory {
 		try {
 			return ApplicationUtil.substituteVariables(text);
 		} catch (UndefinedSubstitutionVariable e) {
-			ValueLocation location = ValueLocation.makeProperty(name(), property);
+			ValueLocation location = ValueLocation.makeProperty(type(), property);
 			throw new AlerterException("unknown variable in " + location.describeAsValue() + ": " + e.getName(),
-					ExceptionContext.makeProcessorFactory(name()));
+					ExceptionContext.makeProcessorFactory(type()));
 		}
 	}
 
@@ -112,9 +112,9 @@ public abstract class ProcessorFactory {
 		try {
 			return Pattern.compile(regex);
 		} catch (PatternSyntaxException e) {
-			ValueLocation location = ValueLocation.makeProperty(name(), property);
+			ValueLocation location = ValueLocation.makeProperty(type(), property);
 			throw new AlerterException("invalid regex in " + location.describeAsValue() + ":" + e.getMessage(),
-					ExceptionContext.makeProcessorFactory(name()));
+					ExceptionContext.makeProcessorFactory(type()));
 		}
 	}
 

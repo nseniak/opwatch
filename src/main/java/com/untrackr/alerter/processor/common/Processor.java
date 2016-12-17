@@ -11,7 +11,8 @@ import java.util.concurrent.Future;
 public abstract class Processor {
 
 	protected ProcessorService processorService;
-	protected String name;
+	protected ProcessorDesc descriptor;
+	protected String type;
 	protected ProcessorLocation location;
 	protected ProcessorSignature signature;
 	protected ConsumerThreadRunner consumerThreadRunner;
@@ -19,10 +20,11 @@ public abstract class Processor {
 	private Set<JavascriptFunction> scriptErrorSignaled = new HashSet<>();
 	private Set<Pair<Processor, String>> propertyErrorSignaled = new HashSet<>();
 
-	public Processor(ProcessorService processorService, String name) {
+	public Processor(ProcessorService processorService, ProcessorDesc descriptor, String type) {
 		this.processorService = processorService;
-		this.name = name;
-		this.location = new ProcessorLocation(name);
+		this.type = type;
+		this.descriptor = descriptor;
+		this.location = new ProcessorLocation(type);
 	}
 
 	public abstract void addProducer(Processor producer);
@@ -57,6 +59,12 @@ public abstract class Processor {
 		return !propertyErrorSignaled.add(new Pair<>(this, propertyName));
 	}
 
+	// TODO generate e.g. tail({file:"/tmp/foo.log"}). Add a method toJSON (which pretty prints)
+	@Override
+	public String toString() {
+		return "[object " + type + "]";
+	}
+
 	public ProcessorService getProcessorService() {
 		return processorService;
 	}
@@ -73,11 +81,11 @@ public abstract class Processor {
 		return consumerThreadRunner;
 	}
 
-	public String getName() {
-		return name;
+	public String getType() {
+		return type;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setType(String type) {
+		this.type = type;
 	}
 }

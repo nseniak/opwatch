@@ -10,14 +10,14 @@ public class StdoutFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public String name() {
+	public String type() {
 		return "cat";
 	}
 
 	@Override
 	public Stdout make(Object scriptObject) {
 		StdoutDesc descriptor = convertProcessorArgument(StdoutDesc.class, scriptObject);
-		Stdout stdout = new Stdout(getProcessorService(), displayName(descriptor));
+		Stdout stdout = new Stdout(getProcessorService(), descriptor, type());
 		return stdout;
 	}
 

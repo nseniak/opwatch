@@ -1,6 +1,5 @@
 package com.untrackr.alerter.processor.common;
 
-import com.untrackr.alerter.common.RemotePayload;
 import com.untrackr.alerter.service.ProcessorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +19,8 @@ public abstract class ActiveProcessor extends Processor {
 	private long lastOutputTime = 0;
 	protected boolean started;
 
-	public ActiveProcessor(ProcessorService processorService, String name) {
-		super(processorService, name);
+	public ActiveProcessor(ProcessorService processorService, ProcessorDesc descriptor, String name) {
+		super(processorService, descriptor, name);
 	}
 
 	@Override
@@ -102,24 +101,23 @@ public abstract class ActiveProcessor extends Processor {
 		}
 	}
 
-	public void outputTransformed(Object object, Payload input) {
-		Payload payload = Payload.makeTransformed(processorService, this, object, input);
+	public void outputTransformed(Object value, Payload input) {
+		Payload payload = Payload.makeTransformed(processorService, this, input, value);
 		output(consumers, payload);
 	}
 
-	public void outputProduced(Object object) {
-		Payload payload = Payload.makeRoot(processorService, this, object);
+	public void outputProduced(Object value) {
+		Payload payload = Payload.makeRoot(processorService, this, value);
 		output(consumers, payload);
 	}
 
-	public void outputReceived(RemotePayload remotePayload) {
-		Payload payload = Payload.makeRemote(processorService, this, remotePayload);
+	public void output(Payload payload) {
 		output(consumers, payload);
 	}
 
-	public void output(List<Processor> consumers, Payload payload) {
+	private void output(List<Processor> consumers, Payload payload) {
 		if (processorService.getProfileService().profile().isTrace()) {
-			logger.info("Output: " + location.descriptor() + " ==> " + payload.asText());
+			logger.info("Output: " + location.descriptor() + " ==> " + processorService.json(payload));
 		}
 		long now = System.currentTimeMillis();
 		long elapsedSinceLastOutput = now - lastOutputTime;
@@ -144,14 +142,16 @@ public abstract class ActiveProcessor extends Processor {
 	}
 
 	public void stopConsumerThread() {
-		boolean stopped = consumerThreadFuture.cancel(true);
-		if (!stopped) {
-			throw new AlerterException("cannot stop consumer thread", ExceptionContext.makeProcessorNoPayload(this));
+		if (!consumerThreadFuture.isDone()) {
+			boolean stopped = consumerThreadFuture.cancel(true);
+			if (!stopped) {
+				throw new AlerterException("cannot stop consumer thread", ExceptionContext.makeProcessorNoPayload(this));
+			}
 		}
 	}
 
 	public <T> T payloadPropertyValue(Payload payload, String propertyName, Class<?> clazz) {
-		Object jsonObject = payload.getScriptObject();
+		Object jsonObject = payload.getValue();
 		Object value = null;
 		if (jsonObject instanceof Map) {
 			value = ((Map) jsonObject).get(propertyName);

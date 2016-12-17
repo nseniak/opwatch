@@ -9,15 +9,15 @@ public class Once extends Transformer {
 	private long delay;
 	private long lastInputTimestamp = 0;
 
-	public Once(ProcessorService processorService, String name, long delay) {
-		super(processorService, name);
+	public Once(ProcessorService processorService, OnceDesc descriptor, String name, long delay) {
+		super(processorService, descriptor, name);
 		this.delay = delay;
 	}
 
 	@Override
 	public void consume(Payload payload) {
 		if ((payload.getTimestamp() - lastInputTimestamp) > delay) {
-			outputTransformed(payload.getScriptObject(), payload);
+			outputTransformed(payload.getValue(), payload);
 		}
 		lastInputTimestamp = payload.getTimestamp();
 	}

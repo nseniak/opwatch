@@ -10,7 +10,7 @@ public class StatFactory extends ScheduledExecutorFactory {
 	}
 
 	@Override
-	public String name() {
+	public String type() {
 		return "stat";
 	}
 
@@ -18,7 +18,7 @@ public class StatFactory extends ScheduledExecutorFactory {
 	public Stat make(Object scriptObject) {
 		StatDesc descriptor = convertProcessorArgument(StatDesc.class, scriptObject);
 		String file = checkVariableSubstitution("file", checkPropertyValue("file", descriptor.getFile()));
-		Stat stat = new Stat(getProcessorService(), displayName(descriptor), makeScheduledExecutor(descriptor), new java.io.File(file));
+		Stat stat = new Stat(getProcessorService(), descriptor, type(), makeScheduledExecutor(descriptor), new java.io.File(file));
 		return stat;
 	}
 

@@ -9,8 +9,8 @@ public class Parallel extends Processor {
 
 	private List<Processor> processors;
 
-	public Parallel(ProcessorService processorService, List<Processor> processors, String name) {
-		super(processorService, name);
+	public Parallel(ProcessorService processorService, List<Processor> processors, ProcessorDesc descriptor, String name) {
+		super(processorService, descriptor, name);
 		this.processors = processors;
 	}
 
@@ -65,8 +65,8 @@ public class Parallel extends Processor {
 		for (Processor processor : processors) {
 			ProcessorSignature bottomSignature = signature.bottom(processor.getSignature());
 			if (bottomSignature == null) {
-				String message = "signature of " + processor.getName() + " is " + processor.getSignature().describe() + " and is inconsistent with previous processors in parallel group: " + signature.describe();
-				throw new AlerterException(message, ExceptionContext.makeProcessorFactory(processor.getName()));
+				String message = "signature of " + processor.getType() + " is " + processor.getSignature().describe() + " and is inconsistent with previous processors in parallel group: " + signature.describe();
+				throw new AlerterException(message, ExceptionContext.makeProcessorFactory(processor.getType()));
 			}
 			signature = bottomSignature;
 		}

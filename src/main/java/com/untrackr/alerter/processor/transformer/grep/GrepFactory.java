@@ -13,7 +13,7 @@ public class GrepFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
-	public String name() {
+	public String type() {
 		return "grep";
 	}
 
@@ -24,7 +24,7 @@ public class GrepFactory extends ActiveProcessorFactory {
 		List<String> regexes = optionaPropertyValue("regexes", descriptor.getRegexes(), null);
 		String regex = optionaPropertyValue("regex", descriptor.getRegex(), null);
 		if ((regex != null) && (regexes != null)) {
-			throw new AlerterException("cannot have both \"regex\" and \"regexes\" defined", ExceptionContext.makeProcessorFactory(name()));
+			throw new AlerterException("cannot have both \"regex\" and \"regexes\" defined", ExceptionContext.makeProcessorFactory(type()));
 		}
 		Pattern pattern = null;
 		if (regex != null) {
@@ -42,10 +42,10 @@ public class GrepFactory extends ActiveProcessorFactory {
 			pattern = compilePattern("regexes", builder.toString());
 		}
 		if (pattern == null) {
-			throw new AlerterException("either \"regex\" or \"regexes\" must be defined", ExceptionContext.makeProcessorFactory(name()));
+			throw new AlerterException("either \"regex\" or \"regexes\" must be defined", ExceptionContext.makeProcessorFactory(type()));
 		}
 		boolean invert = optionaPropertyValue("invert", descriptor.getInvert(), Boolean.FALSE);
-		Grep grep = new Grep(getProcessorService(), displayName(descriptor), fieldName, pattern, invert);
+		Grep grep = new Grep(getProcessorService(), descriptor, type(), fieldName, pattern, invert);
 		return grep;
 	}
 

@@ -14,23 +14,27 @@ public class PipeFactory extends ProcessorFactory {
 	}
 
 	@Override
-	public String name() {
+	public String type() {
 		return "pipe";
 	}
 
 	@Override
 	public Pipe make(Object scriptObject) {
 		List<Processor> processors;
+		PipeDesc descriptor;
 		String name;
 		if ((scriptObject instanceof ScriptObjectMirror) && (((ScriptObjectMirror) scriptObject).isArray())) {
 			processors = (List<Processor>) convertProcessorArgument(List.class, processorListType(), scriptObject);
-			name = name();
+			descriptor = new PipeDesc();
+			descriptor.setName(type());
+			descriptor.setProcessors(processors);
+			name = type();
 		} else {
-			PipeDesc descriptor = convertProcessorArgument(PipeDesc.class, scriptObject);
+			descriptor = convertProcessorArgument(PipeDesc.class, scriptObject);
 			processors = descriptor.getProcessors();
-			name = displayName(descriptor);
+			name = type();
 		}
-		return new Pipe(getProcessorService(), processors, name);
+		return new Pipe(getProcessorService(), processors, descriptor, name);
 	}
 
 }

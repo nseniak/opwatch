@@ -6,8 +6,8 @@ import com.untrackr.alerter.service.ProcessorService;
 
 public class Stdin extends Producer implements ConsoleService.ConsoleLineConsumer {
 
-	public Stdin(ProcessorService processorService, String name) {
-		super(processorService, name);
+	public Stdin(ProcessorService processorService, StdinDesc descriptor, String name) {
+		super(processorService, descriptor, name);
 	}
 
 	@Override

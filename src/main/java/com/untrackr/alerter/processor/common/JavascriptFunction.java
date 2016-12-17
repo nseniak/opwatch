@@ -17,7 +17,7 @@ public abstract class JavascriptFunction {
 
 	protected Object invoke(Processor processor, Payload payload) {
 		try {
-			return function.call(function, payload.getScriptObject());
+			return function.call(function, payload.getValue(), payload);
 		} catch (NashornException e) {
 			ExceptionContext context = ExceptionContext.makeProcessorPayloadScriptCallback(processor, new CallbackErrorLocation(valueLocation, e), payload);
 			AlerterException exception = new AlerterException(e, context);

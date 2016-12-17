@@ -10,7 +10,7 @@ public class DfFactory extends ScheduledExecutorFactory {
 	}
 
 	@Override
-	public String name() {
+	public String type() {
 		return "df";
 	}
 
@@ -18,7 +18,7 @@ public class DfFactory extends ScheduledExecutorFactory {
 	public Df make(Object scriptObject) {
 		DfDesc descriptor = convertProcessorArgument(DfDesc.class, scriptObject);
 		String file = checkVariableSubstitution("file", checkPropertyValue("file", descriptor.getFile()));
-		Df df = new Df(getProcessorService(), displayName(descriptor), makeScheduledExecutor(descriptor), new java.io.File(file));
+		Df df = new Df(getProcessorService(), descriptor, type(), makeScheduledExecutor(descriptor), new java.io.File(file));
 		return df;
 	}
 

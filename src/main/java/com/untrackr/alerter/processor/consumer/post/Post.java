@@ -20,8 +20,8 @@ public class Post extends Consumer {
 	private String urlPath;
 	private boolean postErrorSignaled = false;
 
-	public Post(ProcessorService processorService, String name, String pathString, String hostname, int port, String urlPath) {
-		super(processorService, name);
+	public Post(ProcessorService processorService, PostDesc descriptor, String name, String pathString, String hostname, int port, String urlPath) {
+		super(processorService, descriptor, name);
 		this.pathString = pathString;
 		this.hostname = hostname;
 		this.port = port;

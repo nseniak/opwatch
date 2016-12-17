@@ -7,16 +7,16 @@ import com.untrackr.alerter.service.ProcessorService;
 
 public class Stdout extends Transformer {
 
-	public Stdout(ProcessorService processorService, String name) {
-		super(processorService, name);
+	public Stdout(ProcessorService processorService, StdoutDesc descriptor, String name) {
+		super(processorService, descriptor, name);
 		// Override signature
 		this.signature = new ProcessorSignature(ProcessorSignature.PipeRequirement.required, ProcessorSignature.PipeRequirement.any);
 	}
 
 	@Override
 	public void consume(Payload input) {
-		System.out.println(input.asText());
-		outputTransformed(input.getScriptObject(), input);
+		System.out.println(processorService.json(input));
+		outputTransformed(input.getValue(), input);
 	}
 
 }
