@@ -24,7 +24,6 @@ public class Collect extends Transformer {
 
 	@Override
 	public void consume(Payload payload) {
-		long timestamp = System.currentTimeMillis();
 		Object result = (transformer == null) ? payload.getValue() : transformer.call(payload, this);
 		if (result != null) {
 			queue.add(result);
