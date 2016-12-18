@@ -17,7 +17,7 @@ public class AlertGeneratorFactory extends ActiveProcessorFactory {
 
 	@Override
 	public AlertGenerator make(Object scriptObject) {
-		AlertGeneratorDesc descriptor = convertProcessorArgument(AlertGeneratorDesc.class, scriptObject);
+		AlertGeneratorDesc descriptor = convertProcessorDescriptor(AlertGeneratorDesc.class, scriptObject);
 		String priorityName = optionaPropertyValue("priority", descriptor.getPriority(), "normal");
 		Alert.Priority priority;
 		try {

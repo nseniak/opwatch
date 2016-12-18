@@ -18,7 +18,7 @@ public class JSCronFactory extends ScheduledExecutorFactory {
 
 	@Override
 	public JSCron make(Object scriptObject) {
-		JSCronDesc descriptor = convertProcessorArgument(JSCronDesc.class, scriptObject);
+		JSCronDesc descriptor = convertProcessorDescriptor(JSCronDesc.class, scriptObject);
 		ScheduledExecutor executor = makeScheduledExecutor(descriptor);
 		JavascriptProducer producer = checkPropertyValue("producer", descriptor.getProducer());
 		JSCron JSCron = new JSCron(getProcessorService(), descriptor, type(), executor, producer);

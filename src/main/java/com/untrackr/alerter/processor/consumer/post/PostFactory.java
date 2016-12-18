@@ -22,7 +22,7 @@ public class PostFactory extends ActiveProcessorFactory {
 
 	@Override
 	public Post make(Object scriptObject) {
-		PostDesc descriptor = convertProcessorArgument(PostDesc.class, scriptObject);
+		PostDesc descriptor = convertProcessorDescriptor(PostDesc.class, scriptObject);
 		String pathString = checkVariableSubstitution("path", checkPropertyValue("path", descriptor.getPath()));
 		Matcher matcher = pathPattern.matcher(pathString);
 		if (!matcher.matches()) {

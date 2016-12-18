@@ -16,7 +16,7 @@ public class DfFactory extends ScheduledExecutorFactory {
 
 	@Override
 	public Df make(Object scriptObject) {
-		DfDesc descriptor = convertProcessorArgument(DfDesc.class, scriptObject);
+		DfDesc descriptor = convertProcessorDescriptor(DfDesc.class, scriptObject);
 		String file = checkVariableSubstitution("file", checkPropertyValue("file", descriptor.getFile()));
 		Df df = new Df(getProcessorService(), descriptor, type(), makeScheduledExecutor(descriptor), new java.io.File(file));
 		return df;

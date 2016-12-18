@@ -16,7 +16,7 @@ public class TopFactory extends ScheduledExecutorFactory {
 
 	@Override
 	public Top make(Object scriptObject) {
-		TopDesc descriptor = convertProcessorArgument(TopDesc.class, scriptObject);
+		TopDesc descriptor = convertProcessorDescriptor(TopDesc.class, scriptObject);
 		Top top = new Top(getProcessorService(), descriptor, type(), makeScheduledExecutor(descriptor));
 		return top;
 	}

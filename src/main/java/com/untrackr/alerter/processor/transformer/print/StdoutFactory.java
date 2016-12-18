@@ -16,7 +16,7 @@ public class StdoutFactory extends ActiveProcessorFactory {
 
 	@Override
 	public Stdout make(Object scriptObject) {
-		StdoutDesc descriptor = convertProcessorArgument(StdoutDesc.class, scriptObject);
+		StdoutDesc descriptor = convertProcessorDescriptor(StdoutDesc.class, scriptObject);
 		Stdout stdout = new Stdout(getProcessorService(), descriptor, type());
 		return stdout;
 	}

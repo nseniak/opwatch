@@ -16,7 +16,7 @@ public class CollectFactory extends ActiveProcessorFactory {
 
 	@Override
 	public Collect make(Object scriptObject) {
-		CollectDesc descriptor = convertProcessorArgument(CollectDesc.class, scriptObject);
+		CollectDesc descriptor = convertProcessorDescriptor(CollectDesc.class, scriptObject);
 		JavascriptTransformer transformer = optionaPropertyValue("transformer", descriptor.getTransformer(), null);
 		int count = checkPropertyValue("count", descriptor.getCount());
 		Collect collect = new Collect(getProcessorService(), descriptor, type(), transformer, count);

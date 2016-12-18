@@ -44,13 +44,8 @@ public abstract class ProcessorFactory {
 
 	public abstract Processor make(Object scriptObject);
 
-	protected <T> T convertProcessorArgument(Class<T> clazz, Object scriptObject) {
-		return (T) processorService.getScriptService().convertScriptValue(ValueLocation.makeArgument(type()), clazz, scriptObject,
-				() -> ExceptionContext.makeProcessorFactory(type()));
-	}
-
-	protected <T> T convertProcessorArgument(Class<T> clazz, Type type, Object scriptObject) {
-		return (T) processorService.getScriptService().convertScriptValue(ValueLocation.makeArgument(type()), type, scriptObject,
+	protected <T> T convertProcessorDescriptor(Class<T> clazz, Object scriptObject) {
+		return (T) processorService.getScriptService().convertScriptValue(ValueLocation.makeArgument(type(), "descriptor"), clazz, scriptObject,
 				() -> ExceptionContext.makeProcessorFactory(type()));
 	}
 

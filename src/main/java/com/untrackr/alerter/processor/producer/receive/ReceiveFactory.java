@@ -16,7 +16,7 @@ public class ReceiveFactory extends ActiveProcessorFactory {
 
 	@Override
 	public Receive make(Object scriptObject) {
-		ReceiveDesc descriptor = convertProcessorArgument(ReceiveDesc.class, scriptObject);
+		ReceiveDesc descriptor = convertProcessorDescriptor(ReceiveDesc.class, scriptObject);
 		String urlPath = checkPropertyValue("url", descriptor.getPath());
 		Receive receive = new Receive(getProcessorService(), descriptor, type(), urlPath);
 		return receive;

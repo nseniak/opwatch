@@ -64,9 +64,9 @@ public class ScriptService {
 		scriptEngine = (NashornScriptEngine) new ScriptEngineManager().getEngineByName("nashorn");
 		loadScriptResources();
 		try {
-			createPrimitiveFunction("run", processorService::runProcessor);
-			createFactoryFunction(new ParallelFactory(processorService));
-			createFactoryFunction(new PipeFactory(processorService));
+			createSimplePrimitiveFunction("run", processorService::runProcessor);
+			createFactoryProcessorVarargFunction(new ParallelFactory(processorService));
+			createFactoryProcessorVarargFunction(new PipeFactory(processorService));
 			createFactoryFunction(new StdinFactory(processorService));
 			createFactoryFunction(new GrepFactory(processorService));
 			createFactoryFunction(new JSGrepFactory(processorService));
@@ -109,7 +109,7 @@ public class ScriptService {
 		}
 	}
 
-	public  void loadScriptResource(Resource scriptResource) {
+	public void loadScriptResource(Resource scriptResource) {
 		loadScript(() -> new InputStreamReader(scriptResource.getInputStream()), scriptResource.toString());
 	}
 
@@ -140,16 +140,32 @@ public class ScriptService {
 	}
 
 	private void createFactoryFunction(ProcessorFactory processorFactory) throws ScriptException {
-		createPrimitiveFunction(processorFactory.type(), javascriptFunction(processorFactory::make));
+		createSimplePrimitiveFunction(processorFactory.type(), javascriptFunction(processorFactory::make));
 	}
 
-	private void createPrimitiveFunction(String name, JavascriptFunction function) throws ScriptException {
+	private void createSimplePrimitiveFunction(String name, JavascriptFunction function) throws ScriptException {
+		createPrimitiveFunction(name, javascriptFunction(function),
+				"function %1$s (descriptor) { return __%1$s(descriptor); }");
+	}
+
+	private void createFactoryProcessorVarargFunction(ProcessorFactory processorFactory) throws ScriptException {
+		createPrimitiveFunction(processorFactory.type(), javascriptFunction(processorFactory::make),
+				"function %1$s () {\n" +
+						" if (arguments.length == 1) {\n" +
+						"   var arg = arguments[0];\n" +
+						"   if (arg && arg.hasOwnProperty('processors')) {\n" +
+						"     return __%1$s(arg)\n" +
+						"   }\n" +
+						" }\n" +
+						" return __%1$s({processors: Array.prototype.slice.call(arguments)});\n" +
+						"}\n");
+	}
+
+	private void createPrimitiveFunction(String name, JavascriptFunction function, String wrapperFormat) throws ScriptException {
 		ScriptContext context = scriptEngine.getContext();
 		Bindings bindings = context.getBindings(ScriptContext.ENGINE_SCOPE);
 		bindings.put("__" + name, function);
-		StringBuilder definition = new StringBuilder();
-		definition.append("function " + name + " (descriptor) { return __").append(name).append("(descriptor); }");
-		scriptEngine.eval(definition.toString());
+		scriptEngine.eval(String.format(wrapperFormat, name));
 	}
 
 	public void executeConsoleInput(String script) {

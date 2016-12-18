@@ -203,7 +203,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	public Object runProcessor(Object scriptObject) {
 		String name = "run";
-		Processor processor = (Processor) scriptService.convertScriptValue(ValueLocation.makeArgument(name), Processor.class, scriptObject,
+		Processor processor = (Processor) scriptService.convertScriptValue(ValueLocation.makeArgument(name, "processor"), Processor.class, scriptObject,
 				() -> ExceptionContext.makeProcessorFactory(name));
 		Processor wrappedProcessor = wrapToplevelProcessor(processor);
 		wrappedProcessor.check();

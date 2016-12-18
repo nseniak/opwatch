@@ -34,8 +34,8 @@ public class ValueLocation {
 		return new ValueLocation(SourceType.toplevel, null, null);
 	}
 
-	public static ValueLocation makeArgument(String functionName) {
-		return new ValueLocation(SourceType.argument, functionName, null);
+	public static ValueLocation makeArgument(String functionName, String argumentName) {
+		return new ValueLocation(SourceType.argument, functionName, argumentName);
 	}
 
 	public ValueLocation toListElement() {
@@ -68,7 +68,7 @@ public class ValueLocation {
 			case list_argument_element:
 				return "element in array argument";
 			case argument:
-				return "argument";
+				return propertyName + " argument";
 			default:
 				return "object";
 		}

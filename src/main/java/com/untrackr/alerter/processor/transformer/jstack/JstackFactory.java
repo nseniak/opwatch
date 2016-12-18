@@ -18,7 +18,7 @@ public class JstackFactory extends ActiveProcessorFactory {
 
 	@Override
 	public Jstack make(Object scriptObject) {
-		JstackDesc descriptor = convertProcessorArgument(JstackDesc.class, scriptObject);
+		JstackDesc descriptor = convertProcessorDescriptor(JstackDesc.class, scriptObject);
 		String fieldName = optionaPropertyValue("field", descriptor.getField(), "text");
 		String methodRegex = optionaPropertyValue("methodRegex", descriptor.getMethodRegex(), null);
 		Pattern methodPattern = (methodRegex == null) ? null : compilePattern("regex", methodRegex);

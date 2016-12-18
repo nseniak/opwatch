@@ -17,7 +17,7 @@ public class ShFactory extends ActiveProcessorFactory {
 
 	@Override
 	public Sh make(Object scriptObject) {
-		ShDesc descriptor = convertProcessorArgument(ShDesc.class, scriptObject);
+		ShDesc descriptor = convertProcessorDescriptor(ShDesc.class, scriptObject);
 		CommandRunner producer = makeCommandOutputProducer(descriptor);
 		Sh sh = new Sh(getProcessorService(), descriptor, type(), producer);
 		return sh;

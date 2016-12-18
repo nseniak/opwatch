@@ -16,7 +16,7 @@ public class OnceFactory extends ActiveProcessorFactory {
 
 	@Override
 	public Once make(Object scriptObject) {
-		OnceDesc descriptor = convertProcessorArgument(OnceDesc.class, scriptObject);
+		OnceDesc descriptor = convertProcessorDescriptor(OnceDesc.class, scriptObject);
 		long delay = durationValue("delay", descriptor.getDelay());
 		Once once = new Once(getProcessorService(), descriptor, type(), delay);
 		return once;

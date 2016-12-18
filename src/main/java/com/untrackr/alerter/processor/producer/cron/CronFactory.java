@@ -18,7 +18,7 @@ public class CronFactory extends ScheduledExecutorFactory {
 
 	@Override
 	public Cron make(Object scriptObject) {
-		CronDesc descriptor = convertProcessorArgument(CronDesc.class, scriptObject);
+		CronDesc descriptor = convertProcessorDescriptor(CronDesc.class, scriptObject);
 		ScheduledExecutor executor = makeScheduledExecutor(descriptor);
 		CommandRunner runner = makeCommandOutputProducer(descriptor);
 		Cron cron = new Cron(getProcessorService(), descriptor, type(), executor, runner);
