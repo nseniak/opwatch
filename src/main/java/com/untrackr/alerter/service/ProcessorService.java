@@ -84,6 +84,8 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	private Processor runningProcessor;
 
+	private static String SCRIPT_EXCEPTION_MESSAGE_PREFIX = "javax.script.ScriptException: ";
+
 	private ThreadPoolExecutor consumerExecutor = new ThreadPoolExecutor(0, Integer.MAX_VALUE,
 			60L, TimeUnit.SECONDS, new SynchronousQueue<>(),
 			ThreadUtil.threadFactory("Consumer"));
@@ -170,7 +172,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		String line;
 		while ((line = readLine(reader)) != null) {
 			if (!line.trim().isEmpty()) {
-				scriptService.execute(line);
+				scriptService.executeConsoleInput(line);
 			}
 		}
 	}
@@ -278,15 +280,24 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	}
 
 	public void displayAlerterException(AlerterException e) {
+		AlerterException rootException = e;
+		while ((rootException.getCause() != null) && (rootException.getCause() instanceof AlerterException)) {
+			rootException = (AlerterException) rootException.getCause();
+		}
 		AlertData data = new AlertData();
 		data.add("hostname", getHostName());
-		ExceptionContext context = e.getExceptionContext();
+		ExceptionContext context = rootException.getExceptionContext();
 		ProcessorLocation processorLocation = context.getProcessorLocation();
 		CallbackErrorLocation callbackLocation = context.getCallbackErrorLocation();
 		String title = (callbackLocation != null) ? "Scripting error" : "Execution error";
-		String message = e.getLocalizedMessage();
+		String message = rootException.getLocalizedMessage();
+		if (message.startsWith(SCRIPT_EXCEPTION_MESSAGE_PREFIX)) {
+			// Script exception messages contain the exception name, which is ugly
+			message = message.substring(SCRIPT_EXCEPTION_MESSAGE_PREFIX.length());
+		}
 		if (processorLocation != null) {
 			data.add("processor", processorLocation.descriptor());
+			message = processorLocation.getName() + ": " + message;
 		}
 		if (callbackLocation != null) {
 			String descriptor = callbackLocation.descriptor();
@@ -298,12 +309,12 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		if (payload != null) {
 			data.add("payload", json(payload));
 		}
-		Throwable cause = e.getCause();
+		Throwable cause = rootException.getCause();
 		if ((cause != null) && !((cause instanceof ScriptException) || (cause instanceof IOException) || (cause instanceof NashornException))) {
-			addStack(data, e);
-			logger.error(title, e);
+			addStack(data, rootException);
+			logger.error(title, rootException);
 		}
-		if (!e.isSilent()) {
+		if (!rootException.isSilent()) {
 			Alert alert = new Alert(Alert.Priority.emergency, title, message, null, data);
 			alertService.alert(alert);
 		}
@@ -338,8 +349,6 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		try {
 			runnable.run();
 			error = false;
-		} catch (AlerterException e) {
-			displayAlerterException(e);
 		} catch (Throwable t) {
 			displayAlerterException(new AlerterException(t, ExceptionContext.makeToplevel()));
 		}
@@ -352,8 +361,6 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			try {
 				runnable.run();
 				error = false;
-			} catch (AlerterException e) {
-				displayAlerterException(e);
 			} catch (Throwable t) {
 				displayAlerterException(new AlerterException(t, ExceptionContext.makeProcessorNoPayload(processor)));
 			}

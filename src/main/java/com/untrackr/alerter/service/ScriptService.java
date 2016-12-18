@@ -152,15 +152,15 @@ public class ScriptService {
 		scriptEngine.eval(definition.toString());
 	}
 
-	public void execute(String script) {
+	public void executeConsoleInput(String script) {
 		ScriptContext context = scriptEngine.getContext();
 		try {
 			Object value = scriptEngine.eval(script, context);
 			if (value != null) {
 				processorService.printMessage(JSType.toString(value));
 			}
-		} catch (Exception e) {
-			processorService.printError(e.getMessage());
+		} catch (Throwable t) {
+			processorService.displayAlerterException(new AlerterException(t, ExceptionContext.makeToplevel()));
 		}
 	}
 
