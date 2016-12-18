@@ -205,9 +205,8 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		String name = "run";
 		Processor processor = (Processor) scriptService.convertScriptValue(ValueLocation.makeArgument(name, "processor"), Processor.class, scriptObject,
 				() -> ExceptionContext.makeProcessorFactory(name));
-		Processor wrappedProcessor = wrapToplevelProcessor(processor);
-		wrappedProcessor.check();
-		wrappedProcessor.start();
+		processor.check();
+		processor.start();
 		infoAlert("alerter up and running");
 		runningProcessor = processor;
 		try {
@@ -221,7 +220,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		}
 		// TODO Make sure this is called!
 		infoAlert("alerter stopped");
-		wrappedProcessor.stop();
+		processor.stop();
 		return UNDEFINED;
 	}
 
@@ -234,7 +233,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		pipeProcessors.add(processor);
 		if (processor.getSignature().getOutputRequirement() != ProcessorSignature.PipeRequirement.forbidden) {
 			logger.info("Adding \"stdout\" as output");
-			pipeProcessors.add(new Stdout(this, new StdoutDesc(), "stdout"));
+			pipeProcessors.add(new Stdout(this, new StdoutDesc(), "stdout", false));
 		}
 		if (pipeProcessors.size() == 1) {
 			return processor;

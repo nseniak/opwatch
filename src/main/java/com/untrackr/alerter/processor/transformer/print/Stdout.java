@@ -7,16 +7,19 @@ import com.untrackr.alerter.service.ProcessorService;
 
 public class Stdout extends Transformer {
 
-	public Stdout(ProcessorService processorService, StdoutDesc descriptor, String name) {
+	private boolean displayPayload;
+
+	public Stdout(ProcessorService processorService, StdoutDesc descriptor, String name, boolean displayPayload) {
 		super(processorService, descriptor, name);
+		this.displayPayload = displayPayload;
 		// Override signature
 		this.signature = new ProcessorSignature(ProcessorSignature.PipeRequirement.required, ProcessorSignature.PipeRequirement.any);
 	}
 
 	@Override
-	public void consume(Payload input) {
-		System.out.println(processorService.json(input));
-		outputTransformed(input.getValue(), input);
+	public void consume(Payload payload) {
+		System.out.println(processorService.json(displayPayload ? payload : payload.getValue()));
+		outputTransformed(payload.getValue(), payload);
 	}
 
 }

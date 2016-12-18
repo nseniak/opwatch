@@ -97,7 +97,7 @@ public abstract class ActiveProcessor extends Processor {
 				break;
 		}
 		if (joiner.length() != 0) {
-			throw new AlerterException("incorrect pipe: " + joiner.toString(), ExceptionContext.makeProcessorNoPayload(this));
+			throw new AlerterException("incorrect pipeline: " + joiner.toString(), ExceptionContext.makeProcessorNoPayload(this));
 		}
 	}
 
