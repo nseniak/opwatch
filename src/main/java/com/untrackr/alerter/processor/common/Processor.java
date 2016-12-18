@@ -15,6 +15,7 @@ public abstract class Processor {
 	protected String type;
 	protected ProcessorLocation location;
 	protected ProcessorSignature signature;
+	protected Processor container;
 	protected ConsumerThreadRunner consumerThreadRunner;
 	protected Future<?> consumerThreadFuture;
 	private Set<JavascriptFunction> scriptErrorSignaled = new HashSet<>();
@@ -25,6 +26,13 @@ public abstract class Processor {
 		this.type = type;
 		this.descriptor = descriptor;
 		this.location = new ProcessorLocation(type);
+	}
+
+	public void assignContainer(Processor processor) {
+		if (container != null) {
+			throw new AlerterException("processor already used by " + container.getLocation().descriptor(), ExceptionContext.makeProcessorNoPayload(this));
+		}
+		container = processor;
 	}
 
 	public abstract void addProducer(Processor producer);

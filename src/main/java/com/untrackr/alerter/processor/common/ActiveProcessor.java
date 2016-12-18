@@ -36,6 +36,9 @@ public abstract class ActiveProcessor extends Processor {
 
 	@Override
 	public void start() {
+		if (started) {
+			throw new AlerterException("processor already running", ExceptionContext.makeProcessorNoPayload(this));
+		}
 		doStart();
 		started = true;
 	}

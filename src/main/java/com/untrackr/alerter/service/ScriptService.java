@@ -153,7 +153,7 @@ public class ScriptService {
 				"function %1$s () {\n" +
 						" if (arguments.length == 1) {\n" +
 						"   var arg = arguments[0];\n" +
-						"   if (arg && arg.hasOwnProperty('processors')) {\n" +
+						"   if (arg && arg['processors']) {\n" +
 						"     return __%1$s(arg)\n" +
 						"   }\n" +
 						" }\n" +

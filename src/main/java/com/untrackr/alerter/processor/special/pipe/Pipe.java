@@ -19,6 +19,7 @@ public class Pipe extends Processor {
 		}
 		Processor previousProducer = null;
 		for (Processor processor : processors) {
+			processor.assignContainer(this);
 			if (previousProducer == null) {
 				previousProducer = processor;
 			} else {
