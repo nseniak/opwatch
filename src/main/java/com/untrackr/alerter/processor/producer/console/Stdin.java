@@ -1,5 +1,6 @@
 package com.untrackr.alerter.processor.producer.console;
 
+import com.untrackr.alerter.processor.common.Payload;
 import com.untrackr.alerter.processor.producer.Producer;
 import com.untrackr.alerter.service.ConsoleService;
 import com.untrackr.alerter.service.ProcessorService;
@@ -22,7 +23,9 @@ public class Stdin extends Producer implements ConsoleService.ConsoleLineConsume
 
 	@Override
 	public void consume(ConsoleService.ConsoleLine line) {
-		outputProduced(line);
+		Payload payload = new StdinPayload(System.currentTimeMillis(), processorService.getHostName(), location, null,
+				line.getText(), line.getLine());
+		output(payload);
 	}
 
 }
