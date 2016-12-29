@@ -1,5 +1,6 @@
 package com.untrackr.alerter.common;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.untrackr.alerter.processor.common.AlerterException;
 import com.untrackr.alerter.processor.common.ExceptionContext;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -9,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-// TODO Make this a JavaScript function; make producers output arrays instead
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "_type")
 public class ObjectSeries extends ArrayList<SeriesObject> {
 
 	private DescriptiveStatistics stats;
