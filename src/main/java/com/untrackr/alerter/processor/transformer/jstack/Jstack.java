@@ -41,8 +41,12 @@ public class Jstack extends Transformer {
 	private static Pattern exceptionLinePattern = Pattern.compile("^" + exceptionDescription);
 	private static Pattern atLinePattern = Pattern.compile("^\tat (?<method>" + fullyQualifiedIdentifierRegex + ")\\((?<location>[^)]*)\\).*");
 	private static Pattern causedByPattern = Pattern.compile("^Caused by: " + exceptionDescription);
+	private static Pattern blankLine = Pattern.compile("^\\p{Space}*$");
 
 	public ParsedException parseNextLine(String line) {
+		if (!blankLine.matcher(line).matches()) {
+			state.setLatestNonBlankLine(line);
+		}
 		ParsedException currentException = state.getException();
 		if (currentException == null) {
 			// We're outside of an exception stack trace. Look for an exception line.
@@ -51,7 +55,8 @@ public class Jstack extends Transformer {
 				// Set current exception
 				String name = exceptionLineMatcher.group("name");
 				String message = exceptionLineMatcher.group("message");
-				ParsedException exception = new ParsedException(processorService, name, message);
+				String previous = (state.getLatestNonBlankLine() != null) ? state.getLatestNonBlankLine() : "";
+				ParsedException exception = new ParsedException(processorService, name, message, previous);
 				state.setAtLineSeen(false);
 				state.setLinesSinceException(0);
 				state.setException(exception);
@@ -140,6 +145,10 @@ public class Jstack extends Transformer {
 		 * True if at least one "at" line has been spotted since the exception line
 		 */
 		private boolean atLineSeen;
+		/**
+		 * Last non-blank line seen.
+		 */
+		private String latestNonBlankLine;
 
 		public ParsingState() {
 			reset();
@@ -175,6 +184,14 @@ public class Jstack extends Transformer {
 			this.atLineSeen = atLineSeen;
 		}
 
+		public String getLatestNonBlankLine() {
+			return latestNonBlankLine;
+		}
+
+		public void setLatestNonBlankLine(String latestNonBlankLine) {
+			this.latestNonBlankLine = latestNonBlankLine;
+		}
+
 	}
 
 	public static class ParsedException extends ScriptObject {
@@ -184,11 +201,13 @@ public class Jstack extends Transformer {
 		private String method;
 		private String location;
 		private String combined;
+		private String previous;
 
-		public ParsedException(ProcessorService processorService, String name, String message) {
+		public ParsedException(ProcessorService processorService, String name, String message, String previous) {
 			super(processorService);
 			this.name = name;
 			this.message = message;
+			this.previous = previous;
 		}
 
 		private void computeCombined() {
@@ -233,6 +252,14 @@ public class Jstack extends Transformer {
 
 		public void setCombined(String combined) {
 			this.combined = combined;
+		}
+
+		public String getPrevious() {
+			return previous;
+		}
+
+		public void setPrevious(String previous) {
+			this.previous = previous;
 		}
 
 	}
