@@ -1,11 +1,18 @@
 package com.untrackr.alerter.processor.common;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import jdk.nashorn.api.scripting.NashornException;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
+import java.io.IOException;
 import java.util.regex.Pattern;
 
-public abstract class JavascriptFunction {
+@JsonSerialize(using = JavascriptFunction.JavascriptFunctionJsonSerializer.class)
+public abstract class JavascriptFunction extends DescriptorFieldValue {
 
 	protected ScriptObjectMirror function;
 	protected ValueLocation valueLocation;
@@ -44,6 +51,25 @@ public abstract class JavascriptFunction {
 
 	public ValueLocation getValueLocation() {
 		return valueLocation;
+	}
+
+	public static class JavascriptFunctionJsonSerializer extends StdSerializer<JavascriptFunction> {
+
+		public JavascriptFunctionJsonSerializer() {
+			this(null);
+		}
+
+		public JavascriptFunctionJsonSerializer(Class<JavascriptFunction> t) {
+			super(t);
+		}
+
+		@Override
+		public void serialize(
+				JavascriptFunction value, JsonGenerator jgen, SerializerProvider provider)
+				throws IOException, JsonProcessingException {
+//			jgen.writeRaw(value.function.toString());
+			jgen.writeRawValue(value.function.toString());
+		}
 	}
 
 }

@@ -1,13 +1,24 @@
 package com.untrackr.alerter.processor.common;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.untrackr.alerter.service.ProcessorService;
 import org.javatuples.Pair;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
 
+import static com.fasterxml.jackson.core.JsonGenerator.Feature.QUOTE_FIELD_NAMES;
+
+@JsonSerialize(using = Processor.ProcessorJsonSerializer.class)
 public abstract class Processor {
 
 	protected ProcessorService processorService;
@@ -71,6 +82,36 @@ public abstract class Processor {
 	@Override
 	public String toString() {
 		return "[object " + type + "]";
+	}
+
+	public String pretty() {
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+		objectMapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
+		objectMapper.configure(QUOTE_FIELD_NAMES, false);
+		try {
+			return getType() + "(" + objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(descriptor) + ")";
+		} catch (JsonProcessingException e) {
+			return getType() + "(<cannot serialize>)";
+		}
+	}
+
+	public static class ProcessorJsonSerializer extends StdSerializer<Processor> {
+
+		public ProcessorJsonSerializer() {
+			this(null);
+		}
+
+		public ProcessorJsonSerializer(Class<Processor> t) {
+			super(t);
+		}
+
+		@Override
+		public void serialize(
+				Processor value, JsonGenerator jgen, SerializerProvider provider)
+				throws IOException, JsonProcessingException {
+			jgen.writeObject(value.descriptor);
+		}
 	}
 
 	public ProcessorService getProcessorService() {

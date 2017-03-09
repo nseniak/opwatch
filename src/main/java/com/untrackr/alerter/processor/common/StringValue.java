@@ -1,6 +1,15 @@
 package com.untrackr.alerter.processor.common;
 
-public class StringValue {
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+
+import java.io.IOException;
+
+@JsonSerialize(using = StringValue.StringValueJsonSerializer.class)
+public class StringValue extends DescriptorFieldValue {
 
 	public enum ProducerType {
 		constant, functional
@@ -36,6 +45,30 @@ public class StringValue {
 			Object value = function.call(payload, processor);
 			return (String) processor.getProcessorService().getScriptService().convertScriptValue(function.getValueLocation(), String.class, value,
 					() -> ExceptionContext.makeProcessorPayloadScriptCallback(processor, new CallbackErrorLocation(valueLocation), payload));
+		}
+	}
+
+	public static class StringValueJsonSerializer extends StdSerializer<StringValue> {
+
+		public StringValueJsonSerializer() {
+			this(null);
+		}
+
+		public StringValueJsonSerializer(Class<StringValue> t) {
+			super(t);
+		}
+
+		@Override
+		public void serialize(StringValue value, JsonGenerator jgen, SerializerProvider provider)
+				throws IOException, JsonProcessingException {
+			switch (value.type) {
+				case constant:
+					jgen.writeString(value.constant);
+					break;
+				case functional:
+					jgen.writeRawValue(value.function.toString());
+					break;
+			}
 		}
 	}
 
