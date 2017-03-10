@@ -2,6 +2,7 @@ package com.untrackr.alerter.processor.special.parallel;
 
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ProcessorFactory;
+import com.untrackr.alerter.processor.consumer.alert.AlertGeneratorDesc;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.List;
@@ -15,6 +16,11 @@ public class ParallelFactory extends ProcessorFactory {
 	@Override
 	public String type() {
 		return "parallel";
+	}
+
+	@Override
+	public Class<ParallelDesc> descriptorClass() {
+		return ParallelDesc.class;
 	}
 
 	@Override

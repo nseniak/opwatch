@@ -15,6 +15,11 @@ public class ReceiveFactory extends ActiveProcessorFactory {
 	}
 
 	@Override
+	public Class<ReceiveDesc> descriptorClass() {
+		return ReceiveDesc.class;
+	}
+
+	@Override
 	public Receive make(Object scriptObject) {
 		ReceiveDesc descriptor = convertProcessorDescriptor(ReceiveDesc.class, scriptObject);
 		String urlPath = checkPropertyValue("url", descriptor.getPath());

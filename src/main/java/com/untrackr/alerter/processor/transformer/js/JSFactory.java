@@ -1,6 +1,8 @@
 package com.untrackr.alerter.processor.transformer.js;
 
-import com.untrackr.alerter.processor.common.*;
+import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
+import com.untrackr.alerter.processor.common.JavascriptTransformer;
+import com.untrackr.alerter.processor.consumer.alert.AlertGeneratorDesc;
 import com.untrackr.alerter.service.ProcessorService;
 
 public class JSFactory extends ActiveProcessorFactory {
@@ -12,6 +14,11 @@ public class JSFactory extends ActiveProcessorFactory {
 	@Override
 	public String type() {
 		return "js";
+	}
+
+	@Override
+	public Class<JSDesc> descriptorClass() {
+		return JSDesc.class;
 	}
 
 	@Override

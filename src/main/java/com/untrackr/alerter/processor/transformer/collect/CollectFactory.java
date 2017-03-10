@@ -1,6 +1,8 @@
 package com.untrackr.alerter.processor.transformer.collect;
 
-import com.untrackr.alerter.processor.common.*;
+import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
+import com.untrackr.alerter.processor.common.JavascriptTransformer;
+import com.untrackr.alerter.processor.producer.receive.ReceiveDesc;
 import com.untrackr.alerter.service.ProcessorService;
 
 public class CollectFactory extends ActiveProcessorFactory {
@@ -12,6 +14,11 @@ public class CollectFactory extends ActiveProcessorFactory {
 	@Override
 	public String type() {
 		return "collect";
+	}
+
+	@Override
+	public Class<CollectDesc> descriptorClass() {
+		return CollectDesc.class;
 	}
 
 	@Override

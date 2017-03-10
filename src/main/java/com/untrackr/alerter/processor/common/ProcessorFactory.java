@@ -34,6 +34,8 @@ public abstract class ProcessorFactory {
 
 	public abstract String type();
 
+	public abstract <T extends ProcessorDesc> Class<T> descriptorClass();
+
 	public String displayName(ProcessorDesc processorDesc) {
 		if (processorDesc.getName() != null) {
 			return processorDesc.getName();

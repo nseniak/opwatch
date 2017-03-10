@@ -1,6 +1,7 @@
 package com.untrackr.alerter.processor.producer.jscron;
 
 import com.untrackr.alerter.processor.common.JavascriptProducer;
+import com.untrackr.alerter.processor.consumer.alert.AlertGeneratorDesc;
 import com.untrackr.alerter.processor.producer.ScheduledExecutor;
 import com.untrackr.alerter.processor.producer.ScheduledExecutorFactory;
 import com.untrackr.alerter.service.ProcessorService;
@@ -14,6 +15,11 @@ public class JSCronFactory extends ScheduledExecutorFactory {
 	@Override
 	public String type() {
 		return "jscron";
+	}
+
+	@Override
+	public Class<JSCronDesc> descriptorClass() {
+		return JSCronDesc.class;
 	}
 
 	@Override

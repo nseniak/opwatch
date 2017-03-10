@@ -1,6 +1,7 @@
 package com.untrackr.alerter.processor.producer.tail;
 
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
+import com.untrackr.alerter.processor.consumer.alert.AlertGeneratorDesc;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.nio.file.FileSystems;
@@ -14,6 +15,11 @@ public class TailFactory extends ActiveProcessorFactory {
 	@Override
 	public String type() {
 		return "tail";
+	}
+
+	@Override
+	public Class<TailDesc> descriptorClass() {
+		return TailDesc.class;
 	}
 
 	@Override

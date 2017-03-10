@@ -1,7 +1,10 @@
 package com.untrackr.alerter.processor.consumer.post;
 
 import com.untrackr.alerter.model.common.AlerterProfile;
-import com.untrackr.alerter.processor.common.*;
+import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
+import com.untrackr.alerter.processor.common.AlerterException;
+import com.untrackr.alerter.processor.common.ExceptionContext;
+import com.untrackr.alerter.processor.consumer.alert.AlertGeneratorDesc;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.regex.Matcher;
@@ -16,6 +19,11 @@ public class PostFactory extends ActiveProcessorFactory {
 	@Override
 	public String type() {
 		return "post";
+	}
+
+	@Override
+	public Class<PostDesc> descriptorClass() {
+		return PostDesc.class;
 	}
 
 	private static Pattern pathPattern = Pattern.compile("(?<hostname>[^:/]+)?(?::(?<port>[0-9]+))?(?<stack>/.*)");

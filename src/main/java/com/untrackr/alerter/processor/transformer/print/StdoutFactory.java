@@ -1,6 +1,7 @@
 package com.untrackr.alerter.processor.transformer.print;
 
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
+import com.untrackr.alerter.processor.consumer.alert.AlertGeneratorDesc;
 import com.untrackr.alerter.service.ProcessorService;
 
 public class StdoutFactory extends ActiveProcessorFactory {
@@ -12,6 +13,11 @@ public class StdoutFactory extends ActiveProcessorFactory {
 	@Override
 	public String type() {
 		return "stdout";
+	}
+
+	@Override
+	public Class<StdoutDesc> descriptorClass() {
+		return StdoutDesc.class;
 	}
 
 	@Override

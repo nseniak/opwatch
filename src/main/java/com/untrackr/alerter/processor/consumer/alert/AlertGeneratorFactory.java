@@ -2,6 +2,7 @@ package com.untrackr.alerter.processor.consumer.alert;
 
 import com.untrackr.alerter.model.common.Alert;
 import com.untrackr.alerter.processor.common.*;
+import com.untrackr.alerter.processor.producer.console.StdinDesc;
 import com.untrackr.alerter.service.ProcessorService;
 
 public class AlertGeneratorFactory extends ActiveProcessorFactory {
@@ -13,6 +14,11 @@ public class AlertGeneratorFactory extends ActiveProcessorFactory {
 	@Override
 	public String type() {
 		return "alert";
+	}
+
+	@Override
+	public Class<AlertGeneratorDesc> descriptorClass() {
+		return AlertGeneratorDesc.class;
 	}
 
 	@Override

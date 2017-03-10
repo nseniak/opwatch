@@ -1,6 +1,8 @@
 package com.untrackr.alerter.processor.transformer.grep;
 
-import com.untrackr.alerter.processor.common.*;
+import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
+import com.untrackr.alerter.processor.common.AlerterException;
+import com.untrackr.alerter.processor.common.ExceptionContext;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.List;
@@ -15,6 +17,11 @@ public class GrepFactory extends ActiveProcessorFactory {
 	@Override
 	public String type() {
 		return "grep";
+	}
+
+	@Override
+	public Class<GrepDesc> descriptorClass() {
+		return GrepDesc.class;
 	}
 
 	@Override

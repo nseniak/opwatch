@@ -1,6 +1,8 @@
 package com.untrackr.alerter.processor.transformer.jsgrep;
 
-import com.untrackr.alerter.processor.common.*;
+import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
+import com.untrackr.alerter.processor.common.JavascriptPredicate;
+import com.untrackr.alerter.processor.producer.console.StdinDesc;
 import com.untrackr.alerter.service.ProcessorService;
 
 public class JSGrepFactory extends ActiveProcessorFactory {
@@ -12,6 +14,11 @@ public class JSGrepFactory extends ActiveProcessorFactory {
 	@Override
 	public String type() {
 		return "jsgrep";
+	}
+
+	@Override
+	public Class<JSGrepDesc> descriptorClass() {
+		return JSGrepDesc.class;
 	}
 
 	@Override

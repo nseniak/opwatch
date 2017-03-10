@@ -1,6 +1,8 @@
 package com.untrackr.alerter.processor.producer.curl;
 
-import com.untrackr.alerter.processor.common.*;
+import com.untrackr.alerter.processor.common.AlerterException;
+import com.untrackr.alerter.processor.common.ExceptionContext;
+import com.untrackr.alerter.processor.consumer.alert.AlertGeneratorDesc;
 import com.untrackr.alerter.processor.producer.ScheduledExecutorFactory;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -16,6 +18,11 @@ public class CurlFactory extends ScheduledExecutorFactory {
 	@Override
 	public String type() {
 		return "curl";
+	}
+
+	@Override
+	public Class<CurlDesc> descriptorClass() {
+		return CurlDesc.class;
 	}
 
 	@Override

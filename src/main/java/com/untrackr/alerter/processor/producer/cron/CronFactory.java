@@ -1,5 +1,6 @@
 package com.untrackr.alerter.processor.producer.cron;
 
+import com.untrackr.alerter.processor.consumer.alert.AlertGeneratorDesc;
 import com.untrackr.alerter.processor.producer.CommandRunner;
 import com.untrackr.alerter.processor.producer.ScheduledExecutor;
 import com.untrackr.alerter.processor.producer.ScheduledExecutorFactory;
@@ -14,6 +15,11 @@ public class CronFactory extends ScheduledExecutorFactory {
 	@Override
 	public String type() {
 		return "cron";
+	}
+
+	@Override
+	public Class<CronDesc> descriptorClass() {
+		return CronDesc.class;
 	}
 
 	@Override

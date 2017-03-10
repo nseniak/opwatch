@@ -1,6 +1,7 @@
 package com.untrackr.alerter.processor.producer.trail;
 
 import com.untrackr.alerter.processor.common.JavascriptTransformer;
+import com.untrackr.alerter.processor.consumer.alert.AlertGeneratorDesc;
 import com.untrackr.alerter.processor.producer.ScheduledExecutorFactory;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -13,6 +14,11 @@ public class TrailFactory extends ScheduledExecutorFactory {
 	@Override
 	public String type() {
 		return "trail";
+	}
+
+	@Override
+	public Class<TrailDesc> descriptorClass() {
+		return TrailDesc.class;
 	}
 
 	@Override

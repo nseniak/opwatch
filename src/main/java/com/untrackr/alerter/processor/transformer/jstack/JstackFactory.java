@@ -1,6 +1,7 @@
 package com.untrackr.alerter.processor.transformer.jstack;
 
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
+import com.untrackr.alerter.processor.consumer.alert.AlertGeneratorDesc;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.regex.Pattern;
@@ -14,6 +15,11 @@ public class JstackFactory extends ActiveProcessorFactory {
 	@Override
 	public String type() {
 		return "jstack";
+	}
+
+	@Override
+	public Class<JstackDesc> descriptorClass() {
+		return JstackDesc.class;
 	}
 
 	@Override

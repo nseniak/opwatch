@@ -1,5 +1,6 @@
 package com.untrackr.alerter.processor.producer.df;
 
+import com.untrackr.alerter.processor.consumer.alert.AlertGeneratorDesc;
 import com.untrackr.alerter.processor.producer.ScheduledExecutorFactory;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -12,6 +13,11 @@ public class DfFactory extends ScheduledExecutorFactory {
 	@Override
 	public String type() {
 		return "df";
+	}
+
+	@Override
+	public Class<DfDesc> descriptorClass() {
+		return DfDesc.class;
 	}
 
 	@Override

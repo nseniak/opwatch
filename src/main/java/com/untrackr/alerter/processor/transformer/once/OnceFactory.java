@@ -1,6 +1,7 @@
 package com.untrackr.alerter.processor.transformer.once;
 
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
+import com.untrackr.alerter.processor.consumer.alert.AlertGeneratorDesc;
 import com.untrackr.alerter.service.ProcessorService;
 
 public class OnceFactory extends ActiveProcessorFactory {
@@ -12,6 +13,11 @@ public class OnceFactory extends ActiveProcessorFactory {
 	@Override
 	public String type() {
 		return "once";
+	}
+
+	@Override
+	public Class<OnceDesc> descriptorClass() {
+		return OnceDesc.class;
 	}
 
 	@Override
