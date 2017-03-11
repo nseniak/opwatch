@@ -4,7 +4,7 @@ import com.untrackr.alerter.processor.common.Payload;
 import com.untrackr.alerter.processor.transformer.Transformer;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class Once extends Transformer {
+public class Once extends Transformer<OnceDesc> {
 
 	private long delay;
 	private long lastInputTimestamp = 0;

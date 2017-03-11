@@ -5,7 +5,7 @@ import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.List;
 
-public class Pipe extends Processor {
+public class Pipe extends Processor<PipeDesc> {
 
 	List<Processor> processors;
 

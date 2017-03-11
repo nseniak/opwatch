@@ -5,7 +5,7 @@ import com.untrackr.alerter.processor.producer.ScheduledExecutor;
 import com.untrackr.alerter.processor.producer.ScheduledProducer;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class Cron extends ScheduledProducer {
+public class Cron extends ScheduledProducer<CronDesc> {
 
 	private CommandRunner commandRunner;
 

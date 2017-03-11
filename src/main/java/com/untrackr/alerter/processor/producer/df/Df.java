@@ -9,7 +9,7 @@ import com.untrackr.alerter.service.ProcessorService;
 
 import java.io.File;
 
-public class Df extends ScheduledProducer {
+public class Df extends ScheduledProducer<DfDesc> {
 
 	private File file;
 	private boolean fileNotFoundErrorSignaled = false;

@@ -3,7 +3,7 @@ package com.untrackr.alerter.processor.producer.receive;
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class ReceiveFactory extends ActiveProcessorFactory {
+public class ReceiveFactory extends ActiveProcessorFactory<ReceiveDesc, Receive> {
 
 	public ReceiveFactory(ProcessorService processorService) {
 		super(processorService);
@@ -21,7 +21,7 @@ public class ReceiveFactory extends ActiveProcessorFactory {
 
 	@Override
 	public Receive make(Object scriptObject) {
-		ReceiveDesc descriptor = convertProcessorDescriptor(ReceiveDesc.class, scriptObject);
+		ReceiveDesc descriptor = convertProcessorDescriptor(scriptObject);
 		String urlPath = checkPropertyValue("url", descriptor.getPath());
 		Receive receive = new Receive(getProcessorService(), descriptor, type(), urlPath);
 		return receive;

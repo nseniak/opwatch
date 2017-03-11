@@ -7,7 +7,7 @@ import com.untrackr.alerter.processor.common.StringValue;
 import com.untrackr.alerter.processor.consumer.Consumer;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class AlertGenerator extends Consumer {
+public class AlertGenerator extends Consumer<AlertGeneratorDesc> {
 
 	private Alert.Priority priority;
 	private StringValue message;

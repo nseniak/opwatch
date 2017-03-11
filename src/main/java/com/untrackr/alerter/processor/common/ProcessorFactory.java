@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-public abstract class ProcessorFactory {
+public abstract class ProcessorFactory<D extends ProcessorDesc, P extends Processor> {
 
 	protected ProcessorService processorService;
 
@@ -34,7 +34,7 @@ public abstract class ProcessorFactory {
 
 	public abstract String type();
 
-	public abstract <T extends ProcessorDesc> Class<T> descriptorClass();
+	public abstract Class<D> descriptorClass();
 
 	public String displayName(ProcessorDesc processorDesc) {
 		if (processorDesc.getName() != null) {
@@ -44,10 +44,10 @@ public abstract class ProcessorFactory {
 		}
 	}
 
-	public abstract Processor make(Object scriptObject);
+	public abstract P make(Object scriptObject);
 
-	protected <T> T convertProcessorDescriptor(Class<T> clazz, Object scriptObject) {
-		return (T) processorService.getScriptService().convertScriptValue(ValueLocation.makeArgument(type(), "descriptor"), clazz, scriptObject,
+	protected D convertProcessorDescriptor(Object scriptObject) {
+		return (D) processorService.getScriptService().convertScriptValue(ValueLocation.makeArgument(type(), "descriptor"), descriptorClass(), scriptObject,
 				() -> ExceptionContext.makeProcessorFactory(type()));
 	}
 

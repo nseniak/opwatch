@@ -5,7 +5,7 @@ import com.untrackr.alerter.processor.common.Payload;
 import com.untrackr.alerter.processor.transformer.Transformer;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class JS extends Transformer {
+public class JS extends Transformer<JSDesc> {
 
 	private JavascriptTransformer transformer;
 

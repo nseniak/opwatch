@@ -6,7 +6,7 @@ import com.untrackr.alerter.processor.common.TrailCollecter;
 import com.untrackr.alerter.processor.producer.ScheduledExecutor;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class Count extends TrailCollecter {
+public class Count extends TrailCollecter<CountDesc> {
 
 	private JavascriptPredicate predicate;
 

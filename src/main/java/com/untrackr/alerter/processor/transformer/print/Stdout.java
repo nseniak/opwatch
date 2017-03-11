@@ -5,7 +5,7 @@ import com.untrackr.alerter.processor.common.ProcessorSignature;
 import com.untrackr.alerter.processor.transformer.Transformer;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class Stdout extends Transformer {
+public class Stdout extends Transformer<StdoutDesc> {
 
 	private boolean displayPayload;
 

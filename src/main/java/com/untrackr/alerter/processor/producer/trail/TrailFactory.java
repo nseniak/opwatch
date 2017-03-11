@@ -1,11 +1,10 @@
 package com.untrackr.alerter.processor.producer.trail;
 
 import com.untrackr.alerter.processor.common.JavascriptTransformer;
-import com.untrackr.alerter.processor.consumer.alert.AlertGeneratorDesc;
 import com.untrackr.alerter.processor.producer.ScheduledExecutorFactory;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class TrailFactory extends ScheduledExecutorFactory {
+public class TrailFactory extends ScheduledExecutorFactory<TrailDesc, Trail> {
 
 	public TrailFactory(ProcessorService processorService) {
 		super(processorService);
@@ -23,7 +22,7 @@ public class TrailFactory extends ScheduledExecutorFactory {
 
 	@Override
 	public Trail make(Object scriptObject) {
-		TrailDesc descriptor = convertProcessorDescriptor(TrailDesc.class, scriptObject);
+		TrailDesc descriptor = convertProcessorDescriptor(scriptObject);
 		JavascriptTransformer transformer = optionaPropertyValue("transformer", descriptor.getTransformer(), null);
 		long duration = durationValue("duration", descriptor.getDuration());
 		Trail trail = new Trail(getProcessorService(), descriptor, type(), makeScheduledExecutor(descriptor), transformer, duration);

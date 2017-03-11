@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 
-public class Curl extends ScheduledProducer {
+public class Curl extends ScheduledProducer<CurlDesc> {
 
 	private final boolean insecure;
 	private URI uri;

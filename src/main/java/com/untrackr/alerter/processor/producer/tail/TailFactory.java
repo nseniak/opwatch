@@ -1,12 +1,11 @@
 package com.untrackr.alerter.processor.producer.tail;
 
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
-import com.untrackr.alerter.processor.consumer.alert.AlertGeneratorDesc;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.nio.file.FileSystems;
 
-public class TailFactory extends ActiveProcessorFactory {
+public class TailFactory extends ActiveProcessorFactory<TailDesc, Tail> {
 
 	public TailFactory(ProcessorService processorService) {
 		super(processorService);
@@ -24,7 +23,7 @@ public class TailFactory extends ActiveProcessorFactory {
 
 	@Override
 	public Tail make(Object scriptObject) {
-		TailDesc descriptor = convertProcessorDescriptor(TailDesc.class, scriptObject);
+		TailDesc descriptor = convertProcessorDescriptor(scriptObject);
 		String file = checkVariableSubstitution("file", checkPropertyValue("file", descriptor.getFile()));
 		boolean json = optionaPropertyValue("json", descriptor.getJson(), false);
 		boolean ignoreBlankLine = optionaPropertyValue("ignoreBlankLine", descriptor.getIgnoreBlankLine(), false);

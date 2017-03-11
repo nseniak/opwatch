@@ -2,12 +2,11 @@ package com.untrackr.alerter.processor.special.parallel;
 
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ProcessorFactory;
-import com.untrackr.alerter.processor.consumer.alert.AlertGeneratorDesc;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.List;
 
-public class ParallelFactory extends ProcessorFactory {
+public class ParallelFactory extends ProcessorFactory<ParallelDesc, Parallel> {
 
 	public ParallelFactory(ProcessorService processorService) {
 		super(processorService);
@@ -25,7 +24,7 @@ public class ParallelFactory extends ProcessorFactory {
 
 	@Override
 	public Parallel make(Object scriptObject) {
-		ParallelDesc descriptor = convertProcessorDescriptor(ParallelDesc.class, scriptObject);
+		ParallelDesc descriptor = convertProcessorDescriptor(scriptObject);
 		List<Processor> processors = descriptor.getProcessors();
 		Parallel parallel = new Parallel(getProcessorService(), processors, descriptor, type());
 		parallel.inferSignature();

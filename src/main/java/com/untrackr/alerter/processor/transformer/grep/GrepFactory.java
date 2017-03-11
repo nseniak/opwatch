@@ -8,7 +8,7 @@ import com.untrackr.alerter.service.ProcessorService;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class GrepFactory extends ActiveProcessorFactory {
+public class GrepFactory extends ActiveProcessorFactory<GrepDesc, Grep> {
 
 	public GrepFactory(ProcessorService processorService) {
 		super(processorService);
@@ -26,7 +26,7 @@ public class GrepFactory extends ActiveProcessorFactory {
 
 	@Override
 	public Grep make(Object scriptObject) {
-		GrepDesc descriptor = convertProcessorDescriptor(GrepDesc.class, scriptObject);
+		GrepDesc descriptor = convertProcessorDescriptor(scriptObject);
 		String fieldName = optionaPropertyValue("field", descriptor.getField(), "text");
 		List<String> regexes = optionaPropertyValue("regexes", descriptor.getRegexes(), null);
 		String regex = optionaPropertyValue("regex", descriptor.getRegex(), null);

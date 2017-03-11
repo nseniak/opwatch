@@ -12,7 +12,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-public class Post extends Consumer {
+public class Post extends Consumer<PostDesc> {
 
 	private String pathString;
 	private String hostname;

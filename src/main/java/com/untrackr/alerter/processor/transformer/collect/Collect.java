@@ -5,17 +5,16 @@ import com.untrackr.alerter.common.ObjectSeries;
 import com.untrackr.alerter.common.SeriesObject;
 import com.untrackr.alerter.processor.common.JavascriptTransformer;
 import com.untrackr.alerter.processor.common.Payload;
-import com.untrackr.alerter.processor.common.ProcessorDesc;
 import com.untrackr.alerter.processor.transformer.Transformer;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class Collect extends Transformer {
+public class Collect extends Transformer<CollectDesc> {
 
 	private JavascriptTransformer transformer;
 	private int count;
 	private EvictingQueue<Object> queue;
 
-	public Collect(ProcessorService processorService, ProcessorDesc descriptor, String name, JavascriptTransformer transformer, int count) {
+	public Collect(ProcessorService processorService, CollectDesc descriptor, String name, JavascriptTransformer transformer, int count) {
 		super(processorService, descriptor, name);
 		this.transformer = transformer;
 		this.count = count;

@@ -5,7 +5,7 @@ import com.untrackr.alerter.processor.producer.ScheduledExecutor;
 import com.untrackr.alerter.processor.producer.ScheduledProducer;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class JSCron extends ScheduledProducer {
+public class JSCron extends ScheduledProducer<JSCronDesc> {
 
 	private JavascriptProducer producer;
 

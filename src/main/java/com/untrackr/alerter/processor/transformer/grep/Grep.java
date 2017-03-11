@@ -6,7 +6,7 @@ import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.regex.Pattern;
 
-public class Grep extends ConditionalTransformer {
+public class Grep extends ConditionalTransformer<GrepDesc> {
 
 	private String fieldName;
 	private Pattern pattern;

@@ -6,7 +6,7 @@ import com.untrackr.alerter.processor.producer.ScheduledExecutor;
 import com.untrackr.alerter.processor.producer.ScheduledExecutorFactory;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class CronFactory extends ScheduledExecutorFactory {
+public class CronFactory extends ScheduledExecutorFactory<CronDesc, Cron> {
 
 	public CronFactory(ProcessorService processorService) {
 		super(processorService);
@@ -24,7 +24,7 @@ public class CronFactory extends ScheduledExecutorFactory {
 
 	@Override
 	public Cron make(Object scriptObject) {
-		CronDesc descriptor = convertProcessorDescriptor(CronDesc.class, scriptObject);
+		CronDesc descriptor = convertProcessorDescriptor(scriptObject);
 		ScheduledExecutor executor = makeScheduledExecutor(descriptor);
 		CommandRunner runner = makeCommandOutputProducer(descriptor);
 		Cron cron = new Cron(getProcessorService(), descriptor, type(), executor, runner);

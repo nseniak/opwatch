@@ -2,14 +2,13 @@ package com.untrackr.alerter.processor.producer.curl;
 
 import com.untrackr.alerter.processor.common.AlerterException;
 import com.untrackr.alerter.processor.common.ExceptionContext;
-import com.untrackr.alerter.processor.consumer.alert.AlertGeneratorDesc;
 import com.untrackr.alerter.processor.producer.ScheduledExecutorFactory;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class CurlFactory extends ScheduledExecutorFactory {
+public class CurlFactory extends ScheduledExecutorFactory<CurlDesc, Curl> {
 
 	public CurlFactory(ProcessorService processorService) {
 		super(processorService);
@@ -27,7 +26,7 @@ public class CurlFactory extends ScheduledExecutorFactory {
 
 	@Override
 	public Curl make(Object scriptObject) {
-		CurlDesc descriptor = convertProcessorDescriptor(CurlDesc.class, scriptObject);
+		CurlDesc descriptor = convertProcessorDescriptor(scriptObject);
 		String urlString = checkVariableSubstitution("url", checkPropertyValue("url", descriptor.getUrl()));
 		URI uri;
 		try {

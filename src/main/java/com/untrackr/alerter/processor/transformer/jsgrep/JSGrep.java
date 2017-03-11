@@ -5,7 +5,7 @@ import com.untrackr.alerter.processor.common.Payload;
 import com.untrackr.alerter.processor.transformer.ConditionalTransformer;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class JSGrep extends ConditionalTransformer {
+public class JSGrep extends ConditionalTransformer<JSGrepDesc> {
 
 	private JavascriptPredicate predicate;
 

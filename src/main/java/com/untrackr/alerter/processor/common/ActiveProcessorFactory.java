@@ -6,7 +6,7 @@ import com.untrackr.alerter.service.ProcessorService;
 
 import java.io.File;
 
-public abstract class ActiveProcessorFactory extends ProcessorFactory {
+public abstract class ActiveProcessorFactory<D extends ActiveProcessorDesc, P extends ActiveProcessor> extends ProcessorFactory<D, P> {
 
 	public ActiveProcessorFactory(ProcessorService processorService) {
 		super(processorService);

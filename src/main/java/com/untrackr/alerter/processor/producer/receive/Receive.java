@@ -7,7 +7,7 @@ import com.untrackr.alerter.processor.producer.Producer;
 import com.untrackr.alerter.service.HttpService;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class Receive extends Producer implements HttpService.PostBodyConsumer {
+public class Receive extends Producer<ReceiveDesc> implements HttpService.PostBodyConsumer {
 
 	private String urlPath;
 

@@ -1,10 +1,9 @@
 package com.untrackr.alerter.processor.transformer.print;
 
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
-import com.untrackr.alerter.processor.consumer.alert.AlertGeneratorDesc;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class StdoutFactory extends ActiveProcessorFactory {
+public class StdoutFactory extends ActiveProcessorFactory<StdoutDesc, Stdout> {
 
 	public StdoutFactory(ProcessorService processorService) {
 		super(processorService);
@@ -22,7 +21,7 @@ public class StdoutFactory extends ActiveProcessorFactory {
 
 	@Override
 	public Stdout make(Object scriptObject) {
-		StdoutDesc descriptor = convertProcessorDescriptor(StdoutDesc.class, scriptObject);
+		StdoutDesc descriptor = convertProcessorDescriptor(scriptObject);
 		boolean displayPayload = optionaPropertyValue("payload", descriptor.getPayload(), Boolean.FALSE);
 		Stdout stdout = new Stdout(getProcessorService(), descriptor, type(), displayPayload);
 		return stdout;

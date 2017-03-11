@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
-public abstract class ActiveProcessor extends Processor {
+public abstract class ActiveProcessor<D extends ActiveProcessorDesc> extends Processor<D> {
 
 	private static final Logger logger = LoggerFactory.getLogger(ActiveProcessor.class);
 
@@ -19,7 +19,7 @@ public abstract class ActiveProcessor extends Processor {
 	private long lastOutputTime = 0;
 	protected boolean started;
 
-	public ActiveProcessor(ProcessorService processorService, ProcessorDesc descriptor, String name) {
+	public ActiveProcessor(ProcessorService processorService, D descriptor, String name) {
 		super(processorService, descriptor, name);
 	}
 

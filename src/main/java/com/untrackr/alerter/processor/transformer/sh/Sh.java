@@ -8,7 +8,7 @@ import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.concurrent.Future;
 
-public class Sh extends Transformer {
+public class Sh extends Transformer<ShDesc> {
 
 	protected Future<?> commandConsumerThreadFuture;
 	private CommandRunner commandRunner;

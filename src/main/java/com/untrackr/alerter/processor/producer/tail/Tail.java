@@ -10,7 +10,7 @@ import com.untrackr.alerter.service.ProcessorService;
 
 import java.nio.file.Path;
 
-public class Tail extends Producer {
+public class Tail extends Producer<TailDesc> {
 
 	private Path file;
 	private boolean json;

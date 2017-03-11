@@ -9,7 +9,7 @@ import com.untrackr.alerter.service.ProcessorService;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Jstack extends Transformer {
+public class Jstack extends Transformer<JstackDesc> {
 
 	private String propertyName;
 	private Pattern methodPattern;

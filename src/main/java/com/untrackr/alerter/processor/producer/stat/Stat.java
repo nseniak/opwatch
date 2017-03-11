@@ -8,7 +8,7 @@ import com.untrackr.alerter.service.ProcessorService;
 import java.io.File;
 import java.util.Date;
 
-public class Stat extends ScheduledProducer {
+public class Stat extends ScheduledProducer<StatDesc> {
 
 	private File file;
 

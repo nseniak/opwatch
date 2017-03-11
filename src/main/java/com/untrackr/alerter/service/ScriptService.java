@@ -16,6 +16,7 @@ import com.untrackr.alerter.processor.producer.top.TopFactory;
 import com.untrackr.alerter.processor.producer.trail.TrailFactory;
 import com.untrackr.alerter.processor.special.parallel.ParallelFactory;
 import com.untrackr.alerter.processor.special.pipe.PipeFactory;
+import com.untrackr.alerter.processor.special.alias.AliasFactory;
 import com.untrackr.alerter.processor.transformer.collect.CollectFactory;
 import com.untrackr.alerter.processor.transformer.grep.GrepFactory;
 import com.untrackr.alerter.processor.transformer.js.JSFactory;
@@ -67,6 +68,7 @@ public class ScriptService {
 			createSimplePrimitiveFunction("run", processorService::runProcessor);
 			createFactoryProcessorVarargFunction(new ParallelFactory(processorService));
 			createFactoryProcessorVarargFunction(new PipeFactory(processorService));
+			createFactoryFunction(new AliasFactory(processorService));
 			createFactoryFunction(new StdinFactory(processorService));
 			createFactoryFunction(new GrepFactory(processorService));
 			createFactoryFunction(new JSGrepFactory(processorService));
@@ -139,7 +141,7 @@ public class ScriptService {
 
 	}
 
-	private void createFactoryFunction(ProcessorFactory processorFactory) throws ScriptException {
+	private <D extends ProcessorDesc, T extends Processor> void createFactoryFunction(ProcessorFactory<D, T> processorFactory) throws ScriptException {
 		createSimplePrimitiveFunction(processorFactory.type(), javascriptFunction(processorFactory::make));
 	}
 
@@ -148,7 +150,7 @@ public class ScriptService {
 				"function %1$s (descriptor) { return __%1$s(descriptor); }");
 	}
 
-	private void createFactoryProcessorVarargFunction(ProcessorFactory processorFactory) throws ScriptException {
+	private <D extends ProcessorDesc, T extends Processor> void createFactoryProcessorVarargFunction(ProcessorFactory<D, T> processorFactory) throws ScriptException {
 		createPrimitiveFunction(processorFactory.type(), javascriptFunction(processorFactory::make),
 				"function %1$s () {\n" +
 						" if (arguments.length == 1) {\n" +

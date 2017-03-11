@@ -7,13 +7,13 @@ import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-public abstract class TrailCollecter extends ScheduledProducer {
+public abstract class TrailCollecter<D extends ScheduledProducerDesc> extends ScheduledProducer<D> {
 
 	private long duration;
 	protected LinkedBlockingQueue<SeriesObject> queue;
 	private long startupTimestamp;
 
-	public TrailCollecter(ProcessorService processorService, ProcessorDesc descriptor, String name, ScheduledExecutor scheduledExecutor, long duration) {
+	public TrailCollecter(ProcessorService processorService, D descriptor, String name, ScheduledExecutor scheduledExecutor, long duration) {
 		super(processorService, descriptor, name, scheduledExecutor);
 		this.duration = duration;
 		this.queue = new LinkedBlockingQueue<>();

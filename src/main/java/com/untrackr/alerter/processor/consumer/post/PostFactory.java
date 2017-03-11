@@ -4,13 +4,12 @@ import com.untrackr.alerter.model.common.AlerterProfile;
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
 import com.untrackr.alerter.processor.common.AlerterException;
 import com.untrackr.alerter.processor.common.ExceptionContext;
-import com.untrackr.alerter.processor.consumer.alert.AlertGeneratorDesc;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class PostFactory extends ActiveProcessorFactory {
+public class PostFactory extends ActiveProcessorFactory<PostDesc, Post> {
 
 	public PostFactory(ProcessorService processorService) {
 		super(processorService);
@@ -30,7 +29,7 @@ public class PostFactory extends ActiveProcessorFactory {
 
 	@Override
 	public Post make(Object scriptObject) {
-		PostDesc descriptor = convertProcessorDescriptor(PostDesc.class, scriptObject);
+		PostDesc descriptor = convertProcessorDescriptor(scriptObject);
 		String pathString = checkVariableSubstitution("path", checkPropertyValue("path", descriptor.getPath()));
 		Matcher matcher = pathPattern.matcher(pathString);
 		if (!matcher.matches()) {

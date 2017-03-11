@@ -7,7 +7,7 @@ import com.untrackr.alerter.processor.common.TrailCollecter;
 import com.untrackr.alerter.processor.producer.ScheduledExecutor;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class Trail extends TrailCollecter {
+public class Trail extends TrailCollecter<TrailDesc> {
 
 	private JavascriptTransformer transformer;
 

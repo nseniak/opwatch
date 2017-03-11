@@ -4,7 +4,7 @@ import com.untrackr.alerter.processor.common.JavascriptPredicate;
 import com.untrackr.alerter.processor.producer.ScheduledExecutorFactory;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class CountFactory extends ScheduledExecutorFactory {
+public class CountFactory extends ScheduledExecutorFactory<CountDesc, Count> {
 
 	public CountFactory(ProcessorService processorService) {
 		super(processorService);
@@ -22,7 +22,7 @@ public class CountFactory extends ScheduledExecutorFactory {
 
 	@Override
 	public Count make(Object scriptObject) {
-		CountDesc descriptor = convertProcessorDescriptor(CountDesc.class, scriptObject);
+		CountDesc descriptor = convertProcessorDescriptor(scriptObject);
 		JavascriptPredicate predicate = optionaPropertyValue("predicate", descriptor.getPredicate(), null);
 		long duration = durationValue("duration", descriptor.getDuration());
 		Count count = new Count(getProcessorService(), descriptor, type(), makeScheduledExecutor(descriptor), predicate, duration);
