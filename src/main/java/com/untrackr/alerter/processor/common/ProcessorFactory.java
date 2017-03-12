@@ -36,14 +36,6 @@ public abstract class ProcessorFactory<D extends ProcessorDesc, P extends Proces
 
 	public abstract Class<D> descriptorClass();
 
-	public String displayName(ProcessorDesc processorDesc) {
-		if (processorDesc.getName() != null) {
-			return processorDesc.getName();
-		} else {
-			return type();
-		}
-	}
-
 	public abstract P make(Object scriptObject);
 
 	protected D convertProcessorDescriptor(Object scriptObject) {

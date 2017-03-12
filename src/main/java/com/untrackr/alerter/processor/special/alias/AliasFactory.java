@@ -25,7 +25,7 @@ public class AliasFactory extends ProcessorFactory<AliasDesc, Alias> {
 		AliasDesc descriptor = convertProcessorDescriptor(scriptObject);
 		String name = checkPropertyValue("name", descriptor.getName());
 		Processor processor = checkPropertyValue("processor", descriptor.getProcessor());
-		return new Alias(getProcessorService(), processor, descriptor, name);
+		return new Alias(getProcessorService(), processor, descriptor, type());
 	}
 
 }

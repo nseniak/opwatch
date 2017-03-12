@@ -11,7 +11,6 @@ import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-@JsonSerialize(using = JavascriptFunction.JavascriptFunctionJsonSerializer.class)
 public abstract class JavascriptFunction extends DescriptorFieldValue {
 
 	protected ScriptObjectMirror function;
@@ -53,23 +52,8 @@ public abstract class JavascriptFunction extends DescriptorFieldValue {
 		return valueLocation;
 	}
 
-	public static class JavascriptFunctionJsonSerializer extends StdSerializer<JavascriptFunction> {
-
-		public JavascriptFunctionJsonSerializer() {
-			this(null);
-		}
-
-		public JavascriptFunctionJsonSerializer(Class<JavascriptFunction> t) {
-			super(t);
-		}
-
-		@Override
-		public void serialize(
-				JavascriptFunction value, JsonGenerator jgen, SerializerProvider provider)
-				throws IOException, JsonProcessingException {
-//			jgen.writeRaw(value.function.toString());
-			jgen.writeRawValue(value.function.toString());
-		}
+	public ScriptObjectMirror getFunction() {
+		return function;
 	}
 
 }

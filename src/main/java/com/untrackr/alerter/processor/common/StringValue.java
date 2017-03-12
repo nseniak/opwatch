@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import java.io.IOException;
 
-@JsonSerialize(using = StringValue.StringValueJsonSerializer.class)
 public class StringValue extends DescriptorFieldValue {
 
 	public enum ProducerType {
@@ -17,7 +16,7 @@ public class StringValue extends DescriptorFieldValue {
 
 	private ProducerType type;
 	private String constant;
-	private JavascriptTransformer function;
+	private JavascriptTransformer producer;
 	private ValueLocation valueLocation;
 
 	private StringValue() {
@@ -33,7 +32,7 @@ public class StringValue extends DescriptorFieldValue {
 	public static StringValue makeFunctional(JavascriptTransformer function, ValueLocation valueLocation) {
 		StringValue producer = new StringValue();
 		producer.type = ProducerType.functional;
-		producer.function = function;
+		producer.producer = function;
 		producer.valueLocation = valueLocation;
 		return producer;
 	}
@@ -42,34 +41,18 @@ public class StringValue extends DescriptorFieldValue {
 		if (type == ProducerType.constant) {
 			return constant;
 		} else {
-			Object value = function.call(payload, processor);
-			return (String) processor.getProcessorService().getScriptService().convertScriptValue(function.getValueLocation(), String.class, value,
+			Object value = producer.call(payload, processor);
+			return (String) processor.getProcessorService().getScriptService().convertScriptValue(producer.getValueLocation(), String.class, value,
 					() -> ExceptionContext.makeProcessorPayloadScriptCallback(processor, new CallbackErrorLocation(valueLocation), payload));
 		}
 	}
 
-	public static class StringValueJsonSerializer extends StdSerializer<StringValue> {
+	public String getConstant() {
+		return constant;
+	}
 
-		public StringValueJsonSerializer() {
-			this(null);
-		}
-
-		public StringValueJsonSerializer(Class<StringValue> t) {
-			super(t);
-		}
-
-		@Override
-		public void serialize(StringValue value, JsonGenerator jgen, SerializerProvider provider)
-				throws IOException, JsonProcessingException {
-			switch (value.type) {
-				case constant:
-					jgen.writeString(value.constant);
-					break;
-				case functional:
-					jgen.writeRawValue(value.function.toString());
-					break;
-			}
-		}
+	public JavascriptTransformer getProducer() {
+		return producer;
 	}
 
 }
