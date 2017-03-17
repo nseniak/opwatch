@@ -7,7 +7,7 @@ import com.untrackr.alerter.service.ProcessorService;
  * Represents the output of a processor.
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "_type")
-public class Payload {
+public class Payload<V> {
 
 	/**
 	 * Time at which the payload was generated.
@@ -28,9 +28,9 @@ public class Payload {
 	/**
 	 * The payload value.
 	 */
-	private Object value;
+	private V value;
 
-	protected Payload(long timestamp, String hostname, ProcessorLocation producer, Payload previous, Object value) {
+	protected Payload(long timestamp, String hostname, ProcessorLocation producer, Payload previous, V value) {
 		this.timestamp = timestamp;
 		this.hostname = hostname;
 		this.producer = producer;
@@ -38,12 +38,12 @@ public class Payload {
 		this.value = value;
 	}
 
-	public static Payload makeRoot(ProcessorService processorService, Processor producer, Object value) {
-		return new Payload(System.currentTimeMillis(), processorService.getHostName(), producer.getLocation(), null, value);
+	public static <V> Payload makeRoot(ProcessorService processorService, Processor producer, V value) {
+		return new Payload<>(System.currentTimeMillis(), processorService.getHostName(), producer.getLocation(), null, value);
 	}
 
-	public static Payload makeTransformed(ProcessorService processorService, Processor producer, Payload previous, Object value) {
-		return new Payload(System.currentTimeMillis(), processorService.getHostName(), producer.getLocation(), previous, value);
+	public static <V> Payload makeTransformed(ProcessorService processorService, Processor producer, Payload previous, V value) {
+		return new Payload<>(System.currentTimeMillis(), processorService.getHostName(), producer.getLocation(), previous, value);
 	}
 
 	public long getTimestamp() {

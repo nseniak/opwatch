@@ -27,7 +27,6 @@ public class GrepFactory extends ActiveProcessorFactory<GrepDesc, Grep> {
 	@Override
 	public Grep make(Object scriptObject) {
 		GrepDesc descriptor = convertProcessorDescriptor(scriptObject);
-		String fieldName = optionalPropertyValue("field", descriptor.getField(), "text");
 		List<String> regexes = descriptor.getRegexes();
 		String regex = descriptor.getRegex();
 		if ((regex != null) && (regexes != null)) {
@@ -52,7 +51,7 @@ public class GrepFactory extends ActiveProcessorFactory<GrepDesc, Grep> {
 			throw new AlerterException("either \"regex\" or \"regexes\" must be defined", ExceptionContext.makeProcessorFactory(type()));
 		}
 		boolean invert = descriptor.getInvert();
-		Grep grep = new Grep(getProcessorService(), descriptor, type(), fieldName, pattern, invert);
+		Grep grep = new Grep(getProcessorService(), descriptor, type(), pattern, invert);
 		return grep;
 	}
 

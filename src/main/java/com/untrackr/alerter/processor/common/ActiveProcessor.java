@@ -1,6 +1,7 @@
 package com.untrackr.alerter.processor.common;
 
 import com.untrackr.alerter.service.ProcessorService;
+import com.untrackr.alerter.service.ScriptService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -151,6 +152,18 @@ public abstract class ActiveProcessor<D extends ActiveProcessorDesc> extends Pro
 				throw new AlerterException("cannot stop consumer thread", ExceptionContext.makeProcessorNoPayload(this));
 			}
 		}
+	}
+
+	public <T> T payloadValue(Payload payload, Class<?> clazz) {
+		Object value = payload.getValue();
+		if (!clazz.isAssignableFrom(value.getClass())) {
+			ScriptService sc = processorService.getScriptService();
+			AlerterException exception = new AlerterException("wrong input value: expected "
+					+ sc.typeName(clazz) + ", got " + sc.typeName(value.getClass()), ExceptionContext.makeProcessorPayload(this, payload));
+			exception.setSilent(typeErrorSignaled());
+			throw exception;
+		}
+		return (T) value;
 	}
 
 	public <T> T payloadPropertyValue(Payload payload, String propertyName, Class<?> clazz) {

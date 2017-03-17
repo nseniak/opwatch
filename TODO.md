@@ -4,6 +4,8 @@
 * Generify alert channels (email, other alerters, etc)
 * Make JS initialization external files instead of resources, so they can be hacked by the user
 * Extension mechanism for adding processors in Java
+* Tests
+* Better handling of internal errors: deactivate processor
 
 jscron => repeat
 

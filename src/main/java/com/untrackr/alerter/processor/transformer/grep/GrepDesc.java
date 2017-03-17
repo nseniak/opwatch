@@ -7,10 +7,6 @@ import java.util.List;
 public class GrepDesc extends ActiveProcessorDesc {
 
 	/**
-	 * Field name. Defaults to "text".
-	 */
-	private String field;
-	/**
 	 * Regex. Mutually exclusive with regexes.
 	 */
 	private String regex;
@@ -22,14 +18,6 @@ public class GrepDesc extends ActiveProcessorDesc {
 	 * Exclude regex. Defaults to false.
 	 */
 	private Boolean invert = false;
-
-	public String getField() {
-		return field;
-	}
-
-	public void setField(String field) {
-		this.field = field;
-	}
 
 	public String getRegex() {
 		return regex;

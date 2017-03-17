@@ -21,6 +21,7 @@ import com.untrackr.alerter.processor.transformer.collect.CollectFactory;
 import com.untrackr.alerter.processor.transformer.grep.GrepFactory;
 import com.untrackr.alerter.processor.transformer.js.JSFactory;
 import com.untrackr.alerter.processor.transformer.jsgrep.JSGrepFactory;
+import com.untrackr.alerter.processor.transformer.json.JsonFactory;
 import com.untrackr.alerter.processor.transformer.jstack.JstackFactory;
 import com.untrackr.alerter.processor.transformer.once.OnceFactory;
 import com.untrackr.alerter.processor.transformer.print.StdoutFactory;
@@ -95,6 +96,7 @@ public class ScriptService {
 			createFactoryFunction(new JSCronFactory(processorService));
 			createFactoryFunction(new ShFactory(processorService));
 			createFactoryFunction(new JstackFactory(processorService));
+			createFactoryFunction(new JsonFactory(processorService));
 			ProcessorDoc doc = documentationService.documentation(new CurlFactory(processorService));
 			logger.info("Doc");
 		} catch (ScriptException e) {
@@ -251,6 +253,10 @@ public class ScriptService {
 
 		ExceptionContext make();
 
+	}
+
+	public String typeName(Type type) {
+		return documentationService.typeName(type);
 	}
 
 	/**

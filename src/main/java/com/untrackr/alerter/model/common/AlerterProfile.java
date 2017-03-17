@@ -44,7 +44,7 @@ public class AlerterProfile {
 		this.tailPollInterval = TimeUnit.MILLISECONDS.toMillis(100);
 		this.defaultEmergencyRetry = 60;
 		this.defaultEmergencyExpire = 3600;
-		this.defaultScheduledProducerPeriod = TimeUnit.SECONDS.toMillis(10);
+		this.defaultScheduledProducerPeriod = TimeUnit.SECONDS.toMillis(1);
 		this.interactive = ApplicationUtil.property("alerter.interactive", false);
 		this.trace = ApplicationUtil.property("alerter.trace", false);
 		this.alertGeneratorMaxAlertsPerMinute = 10;

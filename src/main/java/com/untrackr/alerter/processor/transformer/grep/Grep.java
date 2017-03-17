@@ -8,20 +8,18 @@ import java.util.regex.Pattern;
 
 public class Grep extends ConditionalTransformer<GrepDesc> {
 
-	private String fieldName;
 	private Pattern pattern;
 	private boolean invert;
 
-	public Grep(ProcessorService processorService, GrepDesc descriptor, String name, String fieldName, Pattern pattern, boolean invert) {
+	public Grep(ProcessorService processorService, GrepDesc descriptor, String name, Pattern pattern, boolean invert) {
 		super(processorService, descriptor, name);
-		this.fieldName = fieldName;
 		this.pattern = pattern;
 		this.invert = invert;
 	}
 
 	@Override
 	public boolean predicateValue(Payload input) {
-		String text = payloadPropertyValue(input, fieldName, String.class);
+		String text = payloadValue(input, String.class);
 		boolean match = pattern.matcher(text).find();
 		return (match && !invert) || (!match && invert);
 	}

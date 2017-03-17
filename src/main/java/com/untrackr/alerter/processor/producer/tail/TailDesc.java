@@ -5,7 +5,6 @@ import com.untrackr.alerter.processor.common.ActiveProcessorDesc;
 public class TailDesc extends ActiveProcessorDesc {
 
 	private String file;
-	private Boolean json;
 	private Boolean ignoreBlankLine;
 
 	public String getFile() {
@@ -14,14 +13,6 @@ public class TailDesc extends ActiveProcessorDesc {
 
 	public void setFile(String file) {
 		this.file = file;
-	}
-
-	public Boolean getJson() {
-		return json;
-	}
-
-	public void setJson(Boolean json) {
-		this.json = json;
 	}
 
 	public Boolean getIgnoreBlankLine() {
