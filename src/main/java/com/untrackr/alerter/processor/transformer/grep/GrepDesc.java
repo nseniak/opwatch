@@ -21,7 +21,7 @@ public class GrepDesc extends ActiveProcessorDesc {
 	/**
 	 * Exclude regex. Defaults to false.
 	 */
-	private Boolean invert;
+	private Boolean invert = false;
 
 	public String getField() {
 		return field;

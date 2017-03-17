@@ -17,7 +17,6 @@ public class AlertGenerator extends Consumer<AlertGeneratorDesc> {
 	private String application;
 	private String group;
 
-
 	public AlertGenerator(ProcessorService processorService, AlertGeneratorDesc descriptor, String name, String application, String group, StringValue message,
 												Alert.Priority priority, JavascriptPredicate predicate, boolean toggle) {
 		super(processorService, descriptor, name);

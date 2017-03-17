@@ -39,7 +39,7 @@ public class CurlFactory extends ScheduledExecutorFactory<CurlDesc, Curl> {
 		long connectTimeout = optionalDurationValue("connectTimeout", descriptor.getConnectTimeout(), defaultConnectTimeout);
 		long defaultReadTimeout = processorService.getProfileService().profile().getDefaultHttpReadTimeout();
 		long readTimeout = optionalDurationValue("readTimeout", descriptor.getReadTimeout(), defaultReadTimeout);
-		boolean insecure = optionaPropertyValue("insecure", descriptor.getInsecure(), false);
+		boolean insecure = optionalPropertyValue("insecure", descriptor.getInsecure(), false);
 		Curl curl = new Curl(getProcessorService(), descriptor, type(), makeScheduledExecutor(descriptor), uri,
 				(int) connectTimeout, (int) readTimeout, insecure);
 		return curl;

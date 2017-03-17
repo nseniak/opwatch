@@ -25,8 +25,8 @@ public class TailFactory extends ActiveProcessorFactory<TailDesc, Tail> {
 	public Tail make(Object scriptObject) {
 		TailDesc descriptor = convertProcessorDescriptor(scriptObject);
 		String file = checkVariableSubstitution("file", checkPropertyValue("file", descriptor.getFile()));
-		boolean json = optionaPropertyValue("json", descriptor.getJson(), false);
-		boolean ignoreBlankLine = optionaPropertyValue("ignoreBlankLine", descriptor.getIgnoreBlankLine(), false);
+		boolean json = optionalPropertyValue("json", descriptor.getJson(), false);
+		boolean ignoreBlankLine = optionalPropertyValue("ignoreBlankLine", descriptor.getIgnoreBlankLine(), false);
 		Tail tail = new Tail(getProcessorService(), descriptor, type(), FileSystems.getDefault().getPath(file), json, ignoreBlankLine);
 		return tail;
 	}

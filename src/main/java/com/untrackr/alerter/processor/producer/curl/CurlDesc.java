@@ -7,7 +7,7 @@ public class CurlDesc extends ScheduledProducerDesc {
 	private String url;
 	private String connectTimeout;
 	private String readTimeout;
-	private Boolean insecure;
+	private Boolean insecure = false;
 
 	public String getUrl() {
 		return url;

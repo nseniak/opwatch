@@ -52,7 +52,7 @@ public abstract class ProcessorFactory<D extends ProcessorDesc, P extends Proces
 		}
 	}
 
-	public <T> T optionaPropertyValue(String property, T value, T defaultValue) {
+	protected <T> T optionalPropertyValue(String property, T value, T defaultValue) {
 		if (value == null) {
 			return defaultValue;
 		} else {
@@ -60,7 +60,7 @@ public abstract class ProcessorFactory<D extends ProcessorDesc, P extends Proces
 		}
 	}
 
-	public long durationValue(String fieldName, String delayString) {
+	protected long durationValue(String fieldName, String delayString) {
 		checkPropertyValue(fieldName, delayString);
 		String duration;
 		int start;

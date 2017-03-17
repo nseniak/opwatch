@@ -23,7 +23,7 @@ public class TrailFactory extends ScheduledExecutorFactory<TrailDesc, Trail> {
 	@Override
 	public Trail make(Object scriptObject) {
 		TrailDesc descriptor = convertProcessorDescriptor(scriptObject);
-		JavascriptTransformer transformer = optionaPropertyValue("transformer", descriptor.getTransformer(), null);
+		JavascriptTransformer transformer = descriptor.getTransformer();
 		long duration = durationValue("duration", descriptor.getDuration());
 		Trail trail = new Trail(getProcessorService(), descriptor, type(), makeScheduledExecutor(descriptor), transformer, duration);
 		return trail;

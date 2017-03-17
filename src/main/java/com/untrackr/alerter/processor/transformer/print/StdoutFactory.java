@@ -22,7 +22,7 @@ public class StdoutFactory extends ActiveProcessorFactory<StdoutDesc, Stdout> {
 	@Override
 	public Stdout make(Object scriptObject) {
 		StdoutDesc descriptor = convertProcessorDescriptor(scriptObject);
-		boolean displayPayload = optionaPropertyValue("payload", descriptor.getPayload(), Boolean.FALSE);
+		boolean displayPayload = optionalPropertyValue("payload", descriptor.getPayload(), false);
 		Stdout stdout = new Stdout(getProcessorService(), descriptor, type(), displayPayload);
 		return stdout;
 	}

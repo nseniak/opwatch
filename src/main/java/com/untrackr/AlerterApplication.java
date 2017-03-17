@@ -30,6 +30,8 @@ public class AlerterApplication implements CommandLineRunner {
 			// TODO: Script option for starting with another port
 			System.err.println("Cannot start http server. Port already is use: " + e.getPort());
 			throw e;
+		} catch (Throwable t) {
+			System.err.println("Startup failed.");
 		}
 	}
 

@@ -14,9 +14,9 @@ import com.untrackr.alerter.processor.producer.stat.StatFactory;
 import com.untrackr.alerter.processor.producer.tail.TailFactory;
 import com.untrackr.alerter.processor.producer.top.TopFactory;
 import com.untrackr.alerter.processor.producer.trail.TrailFactory;
+import com.untrackr.alerter.processor.special.alias.AliasFactory;
 import com.untrackr.alerter.processor.special.parallel.ParallelFactory;
 import com.untrackr.alerter.processor.special.pipe.PipeFactory;
-import com.untrackr.alerter.processor.special.alias.AliasFactory;
 import com.untrackr.alerter.processor.transformer.collect.CollectFactory;
 import com.untrackr.alerter.processor.transformer.grep.GrepFactory;
 import com.untrackr.alerter.processor.transformer.js.JSFactory;
@@ -25,6 +25,8 @@ import com.untrackr.alerter.processor.transformer.jstack.JstackFactory;
 import com.untrackr.alerter.processor.transformer.once.OnceFactory;
 import com.untrackr.alerter.processor.transformer.print.StdoutFactory;
 import com.untrackr.alerter.processor.transformer.sh.ShFactory;
+import com.untrackr.alerter.tools.DocumentationService;
+import com.untrackr.alerter.tools.ProcessorDoc;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import jdk.nashorn.api.scripting.ScriptUtils;
@@ -43,7 +45,6 @@ import javax.script.*;
 import java.beans.PropertyDescriptor;
 import java.io.*;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +59,9 @@ public class ScriptService {
 
 	@Autowired
 	private ApplicationContext applicationContext;
+
+	@Autowired
+	private DocumentationService documentationService;
 
 	private static NashornScriptEngine scriptEngine;
 
@@ -91,6 +95,8 @@ public class ScriptService {
 			createFactoryFunction(new JSCronFactory(processorService));
 			createFactoryFunction(new ShFactory(processorService));
 			createFactoryFunction(new JstackFactory(processorService));
+			ProcessorDoc doc = documentationService.documentation(new CurlFactory(processorService));
+			logger.info("Doc");
 		} catch (ScriptException e) {
 			throw new AlerterException(e, ExceptionContext.makeToplevel());
 		}
@@ -142,32 +148,24 @@ public class ScriptService {
 	}
 
 	private <D extends ProcessorDesc, T extends Processor> void createFactoryFunction(ProcessorFactory<D, T> processorFactory) throws ScriptException {
-		createSimplePrimitiveFunction(processorFactory.type(), javascriptFunction(processorFactory::make));
+		createWrappedPrimitiveFunction(processorFactory.type(), javascriptFunction(processorFactory::make), "factory_wrapper");
 	}
 
 	private void createSimplePrimitiveFunction(String name, JavascriptFunction function) throws ScriptException {
-		createPrimitiveFunction(name, javascriptFunction(function),
-				"function %1$s (descriptor) { return __%1$s(descriptor); }");
+		ScriptContext context = scriptEngine.getContext();
+		Bindings bindings = context.getBindings(ScriptContext.ENGINE_SCOPE);
+		bindings.put(name, function);
 	}
 
 	private <D extends ProcessorDesc, T extends Processor> void createFactoryProcessorVarargFunction(ProcessorFactory<D, T> processorFactory) throws ScriptException {
-		createPrimitiveFunction(processorFactory.type(), javascriptFunction(processorFactory::make),
-				"function %1$s () {\n" +
-						" if (arguments.length == 1) {\n" +
-						"   var arg = arguments[0];\n" +
-						"   if (arg && arg['processors']) {\n" +
-						"     return __%1$s(arg)\n" +
-						"   }\n" +
-						" }\n" +
-						" return __%1$s({processors: Array.prototype.slice.call(arguments)});\n" +
-						"}\n");
+		createWrappedPrimitiveFunction(processorFactory.type(), javascriptFunction(processorFactory::make), "vararg_factory_wrapper");
 	}
 
-	private void createPrimitiveFunction(String name, JavascriptFunction function, String wrapperFormat) throws ScriptException {
+	private void createWrappedPrimitiveFunction(String name, JavascriptFunction function, String wrapperName) throws ScriptException {
 		ScriptContext context = scriptEngine.getContext();
 		Bindings bindings = context.getBindings(ScriptContext.ENGINE_SCOPE);
 		bindings.put("__" + name, function);
-		scriptEngine.eval(String.format(wrapperFormat, name));
+		scriptEngine.eval(String.format("%1$s = %2$s(__%1$s)", name, wrapperName));
 	}
 
 	public void executeConsoleInput(String script) {
@@ -230,7 +228,7 @@ public class ScriptService {
 				}
 			}
 		} else {
-			Type listType = parameterizedListType(type);
+			Type listType = documentationService.parameterizedListType(type);
 			if (listType != null) {
 				try {
 					ScriptObjectMirror scriptObject = (ScriptObjectMirror) scriptValue;
@@ -245,7 +243,7 @@ public class ScriptService {
 				}
 			}
 		}
-		throw new AlerterException("invalid " + valueLocation.describeAsValue() + ", expected " + typeName(type) + ", got: " + scriptValue,
+		throw new AlerterException("invalid " + valueLocation.describeAsValue() + ", expected " + documentationService.typeName(type) + ", got: " + scriptValue,
 				contextFactory.make());
 	}
 
@@ -253,47 +251,6 @@ public class ScriptService {
 
 		ExceptionContext make();
 
-	}
-
-	private String typeName(Type type) {
-		if (type instanceof Class) {
-			return simpleClassName((Class) type);
-		}
-		Type listType = parameterizedListType(type);
-		if (listType != null) {
-			return typeName(listType) + " array";
-		} else {
-			return type.toString();
-		}
-	}
-
-	private String simpleClassName(Class<?> clazz) {
-		if (String.class.isAssignableFrom(clazz)) {
-			return "a string";
-		} else if (Integer.class.isAssignableFrom(clazz)) {
-			return "an integer";
-		} else if (Number.class.isAssignableFrom(clazz)) {
-			return "a number";
-		} else if (JavascriptFunction.class.isAssignableFrom(clazz)) {
-			return "a function";
-		} else if (ProcessorDesc.class.isAssignableFrom(clazz)) {
-			return "a processor descriptor";
-		} else if (StringValue.class.isAssignableFrom(clazz)) {
-			return "a string or a function";
-		} else {
-			return "a " + clazz.getSimpleName();
-		}
-	}
-
-	private Type parameterizedListType(Type type) {
-		if (type instanceof ParameterizedType) {
-			ParameterizedType paramType = (ParameterizedType) type;
-			Type[] args = paramType.getActualTypeArguments();
-			if ((paramType.getRawType() == List.class) && (args.length == 1)) {
-				return args[0];
-			}
-		}
-		return null;
 	}
 
 	/**

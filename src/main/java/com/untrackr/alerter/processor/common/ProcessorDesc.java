@@ -19,6 +19,9 @@ public class ProcessorDesc {
 		this.name = name;
 	}
 
+	/**
+	 * For scripting purposes
+	 */
 	public List<String> properties() {
 		List<String> result = new ArrayList<>();
 		try {

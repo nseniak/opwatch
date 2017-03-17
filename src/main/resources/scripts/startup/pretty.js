@@ -1,3 +1,5 @@
+// Largely copied from https://github.com/cvadillo/js-object-pretty-print
+
 pretty = function (jsObject, expandAlias, indentLength) {
 	var indentString,
 			fullFunction = true,
@@ -24,6 +26,7 @@ pretty = function (jsObject, expandAlias, indentLength) {
 		'[object Function]': 'function',
 		'[object RegExp]': 'regexp',
 		'[object Array]': 'array',
+		'[object java.util.ArrayList]': 'array',
 		'[object Date]': 'date',
 		'[object Error]': 'error'
 	};
@@ -97,15 +100,19 @@ pretty = function (jsObject, expandAlias, indentLength) {
 				i;
 
 		descriptor = processor.descriptor;
+		newIndent = indent + indentString;
 		if ((processor.type == "alias") && !expandAlias) {
-			return descriptor.name + '({' + newLine + prettyObjectPrint(descriptor.descriptor, indent) + indent + '})';
+			return descriptor.name + '({' + newLine + prettyObjectPrint(descriptor.descriptor, newIndent) + indent + '})';
 		} else {
-			indent += indentString;
 			properties = descriptor.properties();
-			for (i = 0; i < properties.length; i++) {
-				property = properties[i];
-				if ((property != "class") && descriptor[property]) {
-					value.push(indent + property + ': ' + pretty(descriptor[property], indent));
+			if (properties.length == 0) {
+				return descriptor.name + '()' + newLine;
+			} else {
+				for (i = 0; i < properties.length; i++) {
+					property = properties[i];
+					if ((property != "class") && descriptor[property]) {
+						value.push(newIndent + property + ': ' + pretty(descriptor[property], newIndent));
+					}
 				}
 			}
 			return processor.type + '({' + newLine + value.join(newLineJoin) + newLine + indent + '})';
@@ -170,10 +177,10 @@ pretty = function (jsObject, expandAlias, indentLength) {
 					return fromArray + functionSignature(element.function);
 
 				case 'stringConstant':
-					return fromArray  + JSON.stringify(element.constant);
+					return fromArray + JSON.stringify(element.constant);
 
 				case 'stringProducer':
-					return fromArray  + functionSignature(element.producer.function);
+					return fromArray + functionSignature(element.producer.function);
 
 				case 'undefined':
 					return fromArray + 'undefined';
