@@ -1,6 +1,6 @@
 package com.untrackr.alerter.service;
 
-import com.untrackr.alerter.common.ScriptObject;
+import com.untrackr.alerter.processor.payload.PayloadObjectValue;
 import com.untrackr.alerter.ioservice.LineReader;
 import com.untrackr.alerter.processor.common.ActiveProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +50,7 @@ public class ConsoleService {
 			try {
 				while ((line = reader.readLine()) != null) {
 					lineNumber = lineNumber + 1;
-					ConsoleLine consoleLine = new ConsoleLine(processorService, line, lineNumber);
+					ConsoleLine consoleLine = new ConsoleLine(line, lineNumber);
 					for (ConsoleLineConsumer consumer : consumers) {
 						consumer.consume(consoleLine);
 					}
@@ -67,13 +67,12 @@ public class ConsoleService {
 		consoleFuture.cancel(true);
 	}
 
-	public static class ConsoleLine extends ScriptObject {
+	public static class ConsoleLine extends PayloadObjectValue {
 
 		private String text;
 		private int line;
 
-		public ConsoleLine(ProcessorService processorService, String text, int line) {
-			super(processorService);
+		public ConsoleLine(String text, int line) {
 			this.text = text;
 			this.line = line;
 		}

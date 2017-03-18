@@ -1,6 +1,6 @@
 package com.untrackr.alerter.ioservice;
 
-import com.untrackr.alerter.model.common.AlerterProfile;
+import com.untrackr.alerter.service.AlerterProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

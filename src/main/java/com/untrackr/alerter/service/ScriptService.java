@@ -1,33 +1,34 @@
 package com.untrackr.alerter.service;
 
 import com.untrackr.alerter.processor.common.*;
-import com.untrackr.alerter.processor.consumer.alert.AlertGeneratorFactory;
-import com.untrackr.alerter.processor.consumer.post.PostFactory;
-import com.untrackr.alerter.processor.producer.console.StdinFactory;
-import com.untrackr.alerter.processor.producer.count.CountFactory;
-import com.untrackr.alerter.processor.producer.cron.CronFactory;
-import com.untrackr.alerter.processor.producer.curl.CurlFactory;
-import com.untrackr.alerter.processor.producer.df.DfFactory;
-import com.untrackr.alerter.processor.producer.jscron.JSCronFactory;
-import com.untrackr.alerter.processor.producer.receive.ReceiveFactory;
-import com.untrackr.alerter.processor.producer.stat.StatFactory;
-import com.untrackr.alerter.processor.producer.tail.TailFactory;
-import com.untrackr.alerter.processor.producer.top.TopFactory;
-import com.untrackr.alerter.processor.producer.trail.TrailFactory;
-import com.untrackr.alerter.processor.special.alias.AliasFactory;
-import com.untrackr.alerter.processor.special.parallel.ParallelFactory;
-import com.untrackr.alerter.processor.special.pipe.PipeFactory;
-import com.untrackr.alerter.processor.transformer.collect.CollectFactory;
-import com.untrackr.alerter.processor.transformer.grep.GrepFactory;
-import com.untrackr.alerter.processor.transformer.js.JSFactory;
-import com.untrackr.alerter.processor.transformer.jsgrep.JSGrepFactory;
-import com.untrackr.alerter.processor.transformer.json.JsonFactory;
-import com.untrackr.alerter.processor.transformer.jstack.JstackFactory;
-import com.untrackr.alerter.processor.transformer.once.OnceFactory;
-import com.untrackr.alerter.processor.transformer.print.StdoutFactory;
-import com.untrackr.alerter.processor.transformer.sh.ShFactory;
-import com.untrackr.alerter.tools.DocumentationService;
-import com.untrackr.alerter.tools.ProcessorDoc;
+import com.untrackr.alerter.processor.descriptor.*;
+import com.untrackr.alerter.processor.primitives.consumer.alert.AlertGeneratorFactory;
+import com.untrackr.alerter.processor.primitives.consumer.post.PostFactory;
+import com.untrackr.alerter.processor.primitives.producer.console.StdinFactory;
+import com.untrackr.alerter.processor.primitives.producer.count.CountFactory;
+import com.untrackr.alerter.processor.primitives.producer.cron.CronFactory;
+import com.untrackr.alerter.processor.primitives.producer.curl.CurlFactory;
+import com.untrackr.alerter.processor.primitives.producer.df.DfFactory;
+import com.untrackr.alerter.processor.primitives.producer.jscron.JSCronFactory;
+import com.untrackr.alerter.processor.primitives.producer.receive.ReceiveFactory;
+import com.untrackr.alerter.processor.primitives.producer.stat.StatFactory;
+import com.untrackr.alerter.processor.primitives.producer.tail.TailFactory;
+import com.untrackr.alerter.processor.primitives.producer.top.TopFactory;
+import com.untrackr.alerter.processor.primitives.producer.trail.TrailFactory;
+import com.untrackr.alerter.processor.primitives.special.alias.AliasFactory;
+import com.untrackr.alerter.processor.primitives.special.parallel.ParallelFactory;
+import com.untrackr.alerter.processor.primitives.special.pipe.PipeFactory;
+import com.untrackr.alerter.processor.primitives.transformer.collect.CollectFactory;
+import com.untrackr.alerter.processor.primitives.transformer.grep.GrepFactory;
+import com.untrackr.alerter.processor.primitives.transformer.js.JSFactory;
+import com.untrackr.alerter.processor.primitives.transformer.jsgrep.JSGrepFactory;
+import com.untrackr.alerter.processor.primitives.transformer.json.JsonFactory;
+import com.untrackr.alerter.processor.primitives.transformer.jstack.JstackFactory;
+import com.untrackr.alerter.processor.primitives.transformer.once.OnceFactory;
+import com.untrackr.alerter.processor.primitives.transformer.print.StdoutFactory;
+import com.untrackr.alerter.processor.primitives.transformer.sh.ShFactory;
+import com.untrackr.alerter.documentation.DocumentationService;
+import com.untrackr.alerter.documentation.ProcessorDoc;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import jdk.nashorn.api.scripting.ScriptUtils;
@@ -149,7 +150,7 @@ public class ScriptService {
 
 	}
 
-	private <D extends ProcessorDesc, T extends Processor> void createFactoryFunction(ProcessorFactory<D, T> processorFactory) throws ScriptException {
+	private <D extends ProcessorDescriptor, T extends Processor> void createFactoryFunction(ProcessorFactory<D, T> processorFactory) throws ScriptException {
 		createWrappedPrimitiveFunction(processorFactory.type(), javascriptFunction(processorFactory::make), "factory_wrapper");
 	}
 
@@ -159,7 +160,7 @@ public class ScriptService {
 		bindings.put(name, function);
 	}
 
-	private <D extends ProcessorDesc, T extends Processor> void createFactoryProcessorVarargFunction(ProcessorFactory<D, T> processorFactory) throws ScriptException {
+	private <D extends ProcessorDescriptor, T extends Processor> void createFactoryProcessorVarargFunction(ProcessorFactory<D, T> processorFactory) throws ScriptException {
 		createWrappedPrimitiveFunction(processorFactory.type(), javascriptFunction(processorFactory::make), "vararg_factory_wrapper");
 	}
 

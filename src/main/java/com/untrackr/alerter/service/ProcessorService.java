@@ -6,17 +6,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.untrackr.alerter.common.ThreadUtil;
 import com.untrackr.alerter.ioservice.FileTailingService;
-import com.untrackr.alerter.model.common.Alert;
-import com.untrackr.alerter.model.common.AlertData;
-import com.untrackr.alerter.model.common.AlerterProfile;
+import com.untrackr.alerter.alert.Alert;
+import com.untrackr.alerter.alert.AlertData;
 import com.untrackr.alerter.processor.common.*;
-import com.untrackr.alerter.processor.consumer.alert.AlertGenerator;
-import com.untrackr.alerter.processor.producer.console.Stdin;
-import com.untrackr.alerter.processor.producer.console.StdinDesc;
-import com.untrackr.alerter.processor.special.pipe.Pipe;
-import com.untrackr.alerter.processor.special.pipe.PipeDesc;
-import com.untrackr.alerter.processor.transformer.print.Stdout;
-import com.untrackr.alerter.processor.transformer.print.StdoutDesc;
+import com.untrackr.alerter.processor.primitives.consumer.alert.AlertGenerator;
+import com.untrackr.alerter.processor.payload.Payload;
+import com.untrackr.alerter.processor.primitives.producer.console.Stdin;
+import com.untrackr.alerter.processor.primitives.producer.console.StdinDescriptor;
+import com.untrackr.alerter.processor.primitives.special.pipe.Pipe;
+import com.untrackr.alerter.processor.primitives.special.pipe.PipeDescriptor;
+import com.untrackr.alerter.processor.primitives.transformer.print.Stdout;
+import com.untrackr.alerter.processor.primitives.transformer.print.StdoutDescriptor;
 import jdk.nashorn.api.scripting.NashornException;
 import jline.console.ConsoleReader;
 import jline.console.UserInterruptException;
@@ -228,17 +228,17 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		List<Processor> pipeProcessors = new ArrayList<>();
 		if (processor.getSignature().getInputRequirement() != ProcessorSignature.PipeRequirement.forbidden) {
 			logger.info("Adding \"stdin\" as input");
-			pipeProcessors.add(new Stdin(this, new StdinDesc(), "stdin"));
+			pipeProcessors.add(new Stdin(this, new StdinDescriptor(), "stdin"));
 		}
 		pipeProcessors.add(processor);
 		if (processor.getSignature().getOutputRequirement() != ProcessorSignature.PipeRequirement.forbidden) {
 			logger.info("Adding \"stdout\" as output");
-			pipeProcessors.add(new Stdout(this, new StdoutDesc(), "stdout", false));
+			pipeProcessors.add(new Stdout(this, new StdoutDescriptor(), "stdout", false));
 		}
 		if (pipeProcessors.size() == 1) {
 			return processor;
 		} else {
-			PipeDesc descriptor = new PipeDesc();
+			PipeDescriptor descriptor = new PipeDescriptor();
 			descriptor.setName("pipe");
 			descriptor.setProcessors(pipeProcessors);
 			return new Pipe(this, pipeProcessors, descriptor, "pipe");

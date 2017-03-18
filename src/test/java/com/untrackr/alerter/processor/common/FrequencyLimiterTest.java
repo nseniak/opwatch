@@ -1,5 +1,6 @@
 package com.untrackr.alerter.processor.common;
 
+import com.untrackr.alerter.common.FrequencyLimiter;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;

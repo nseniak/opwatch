@@ -1,7 +1,8 @@
 package com.untrackr.alerter.processor.common;
 
 import com.untrackr.alerter.common.ApplicationUtil;
-import com.untrackr.alerter.common.UndefinedSubstitutionVariable;
+import com.untrackr.alerter.common.UndefinedSubstitutionVariableException;
+import com.untrackr.alerter.processor.descriptor.ProcessorDescriptor;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.lang.reflect.Type;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-public abstract class ProcessorFactory<D extends ProcessorDesc, P extends Processor> {
+public abstract class ProcessorFactory<D extends ProcessorDescriptor, P extends Processor> {
 
 	protected ProcessorService processorService;
 
@@ -90,7 +91,7 @@ public abstract class ProcessorFactory<D extends ProcessorDesc, P extends Proces
 	public String checkVariableSubstitution(String property, String text) {
 		try {
 			return ApplicationUtil.substituteVariables(text);
-		} catch (UndefinedSubstitutionVariable e) {
+		} catch (UndefinedSubstitutionVariableException e) {
 			ValueLocation location = ValueLocation.makeProperty(type(), property);
 			throw new AlerterException("unknown variable in " + location.describeAsValue() + ": " + e.getName(),
 					ExceptionContext.makeProcessorFactory(type()));

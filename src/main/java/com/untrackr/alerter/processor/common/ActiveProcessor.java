@@ -1,5 +1,7 @@
 package com.untrackr.alerter.processor.common;
 
+import com.untrackr.alerter.processor.descriptor.ActiveProcessorDescriptor;
+import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.service.ProcessorService;
 import com.untrackr.alerter.service.ScriptService;
 import org.slf4j.Logger;
@@ -10,13 +12,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
+import java.util.concurrent.Future;
 
-public abstract class ActiveProcessor<D extends ActiveProcessorDesc> extends Processor<D> {
+public abstract class ActiveProcessor<D extends ActiveProcessorDescriptor> extends Processor<D> {
 
 	private static final Logger logger = LoggerFactory.getLogger(ActiveProcessor.class);
 
 	protected List<Processor> producers = new ArrayList<>();
 	protected List<Processor> consumers = new ArrayList<>();
+	private Future<?> consumerThreadFuture;
 	private long lastOutputTime = 0;
 	protected boolean started;
 

@@ -1,7 +1,7 @@
 package com.untrackr.alerter.ioservice;
 
 import com.untrackr.alerter.common.ThreadUtil;
-import com.untrackr.alerter.model.common.Alert;
+import com.untrackr.alerter.alert.Alert;
 import com.untrackr.alerter.service.ProcessorService;
 import com.untrackr.alerter.service.ProfileService;
 import org.apache.commons.io.input.TailerListenerAdapter;
@@ -11,7 +11,6 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.SynchronousQueue;

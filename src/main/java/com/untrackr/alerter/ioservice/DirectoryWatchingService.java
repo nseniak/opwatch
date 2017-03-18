@@ -1,7 +1,7 @@
 package com.untrackr.alerter.ioservice;
 
 import com.untrackr.alerter.common.ThreadUtil;
-import com.untrackr.alerter.model.common.Alert;
+import com.untrackr.alerter.alert.Alert;
 import com.untrackr.alerter.service.ProcessorService;
 import com.untrackr.alerter.service.ProfileService;
 import org.slf4j.Logger;

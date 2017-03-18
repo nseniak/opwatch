@@ -1,13 +1,13 @@
 package com.untrackr.alerter.service;
 
-import com.untrackr.alerter.model.common.Alert;
-import com.untrackr.alerter.model.common.PushoverKey;
-import com.untrackr.alerter.model.common.PushoverSettings;
+import com.untrackr.alerter.alert.Alert;
+import com.untrackr.alerter.alert.pushover.PushoverKey;
+import com.untrackr.alerter.alert.pushover.PushoverSettings;
 import com.untrackr.alerter.processor.common.AlerterException;
 import com.untrackr.alerter.processor.common.ExceptionContext;
-import com.untrackr.alerter.processor.common.FrequencyLimiter;
+import com.untrackr.alerter.common.FrequencyLimiter;
 import com.untrackr.alerter.processor.common.Processor;
-import com.untrackr.alerter.processor.consumer.alert.AlertGenerator;
+import com.untrackr.alerter.processor.primitives.consumer.alert.AlertGenerator;
 import net.pushover.client.*;
 import org.apache.commons.math3.util.Pair;
 import org.slf4j.Logger;

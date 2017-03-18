@@ -1,5 +1,7 @@
 package com.untrackr.alerter.processor.common;
 
+import com.untrackr.alerter.processor.payload.Payload;
+
 import javax.script.ScriptException;
 
 public class ExceptionContext {

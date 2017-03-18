@@ -1,6 +1,7 @@
 package com.untrackr.alerter.processor.common;
 
-import com.untrackr.alerter.model.common.Alert;
+import com.untrackr.alerter.alert.Alert;
+import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.service.ProcessorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,7 @@ public class ConsumerThreadRunner implements Runnable {
 
 	protected ProcessorService processorService;
 	protected Processor processor;
-	protected ArrayBlockingQueue<Payload> inputQueue;
+	protected ArrayBlockingQueue<Payload<?>> inputQueue;
 
 	public ConsumerThreadRunner(ProcessorService processorService, Processor processor) {
 		this.processorService = processorService;
@@ -23,7 +24,7 @@ public class ConsumerThreadRunner implements Runnable {
 		this.inputQueue = new ArrayBlockingQueue<>(inputQueueSize);
 	}
 
-	public void consume(Payload payload) {
+	public void consume(Payload<?> payload) {
 		try {
 			long timeout = processorService.getProfileService().profile().getProcessorInputQueueTimeout();
 			while (!inputQueue.offer(payload, timeout, TimeUnit.MILLISECONDS)) {

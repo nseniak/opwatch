@@ -91,7 +91,7 @@ public class ApplicationUtil {
 
 	private static Pattern variablePattern = Pattern.compile("\\$\\{([A-Za-z0-9_\\.]+)\\}");
 
-	public static String substituteVariables(String text) throws UndefinedSubstitutionVariable {
+	public static String substituteVariables(String text) throws UndefinedSubstitutionVariableException {
 		Matcher matcher = variablePattern.matcher(text);
 		StringBuffer stringBuffer = new StringBuffer();
 		while (matcher.find()) {
@@ -102,7 +102,7 @@ public class ApplicationUtil {
 		return stringBuffer.toString();
 	}
 
-	private static String variableValue(String name) throws UndefinedSubstitutionVariable {
+	private static String variableValue(String name) throws UndefinedSubstitutionVariableException {
 		String propertyValue = System.getProperty(name);
 		if (propertyValue != null) {
 			return propertyValue;
@@ -111,7 +111,7 @@ public class ApplicationUtil {
 		if (envValue != null) {
 			return envValue;
 		}
-		throw new UndefinedSubstitutionVariable(name);
+		throw new UndefinedSubstitutionVariableException(name);
 	}
 
 }

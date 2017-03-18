@@ -1,14 +1,16 @@
 package com.untrackr.alerter.processor.common;
 
+import com.untrackr.alerter.processor.descriptor.JavascriptFunction;
+import com.untrackr.alerter.processor.descriptor.ProcessorDescriptor;
+import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.service.ProcessorService;
 import org.javatuples.Pair;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Future;
 
-public abstract class Processor<D extends ProcessorDesc> {
+public abstract class Processor<D extends ProcessorDescriptor> {
 
 	protected ProcessorService processorService;
 	protected D descriptor;
@@ -17,7 +19,6 @@ public abstract class Processor<D extends ProcessorDesc> {
 	protected ProcessorSignature signature;
 	protected Processor container;
 	protected ConsumerThreadRunner consumerThreadRunner;
-	protected Future<?> consumerThreadFuture;
 	private Set<JavascriptFunction> scriptErrorSignaled = new HashSet<>();
 	private Set<Pair<Processor, String>> propertyErrorSignaled = new HashSet<>();
 	private boolean typeErrorSignaled = false;
