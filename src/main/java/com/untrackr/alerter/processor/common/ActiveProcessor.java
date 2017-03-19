@@ -8,35 +8,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 import java.util.concurrent.Future;
 
+/**
+ * A processor that runs in its own thread
+ */
 public abstract class ActiveProcessor<D extends ActiveProcessorDescriptor> extends Processor<D> {
 
 	private static final Logger logger = LoggerFactory.getLogger(ActiveProcessor.class);
 
-	protected List<Processor> producers = new ArrayList<>();
-	protected List<Processor> consumers = new ArrayList<>();
 	private Future<?> consumerThreadFuture;
 	private long lastOutputTime = 0;
-	protected boolean started;
+	private boolean started;
+	private ConsumerThreadRunner consumerThreadRunner;
 
 	public ActiveProcessor(ProcessorService processorService, D descriptor, String name) {
 		super(processorService, descriptor, name);
 	}
 
 	@Override
-	public void addProducer(Processor producer) {
-		producers.add(producer);
+	public void addProducer(Processor<?> producer) {
+		super.addProducer(producer);
 		producer.addConsumer(this);
-	}
-
-	@Override
-	public void addConsumer(Processor consumer) {
-		consumers.add(consumer);
 	}
 
 	@Override
@@ -49,6 +45,8 @@ public abstract class ActiveProcessor<D extends ActiveProcessorDescriptor> exten
 	}
 
 	protected abstract void doStart();
+
+	public abstract void doConsume(Payload<?> payload);
 
 	@Override
 	public void stop() {
@@ -77,31 +75,31 @@ public abstract class ActiveProcessor<D extends ActiveProcessorDescriptor> exten
 	public void check() {
 		StringJoiner joiner = new StringJoiner(", ");
 		switch (signature.getInputRequirement()) {
-			case required:
+			case Data:
 				if (producers.isEmpty()) {
 					joiner.add("consumer not receiving any input");
 				}
 				break;
-			case forbidden:
+			case NoData:
 				if (!producers.isEmpty()) {
 					joiner.add("non-consumer receives an input");
 				}
 				break;
-			case any:
+			case Any:
 				break;
 		}
 		switch (signature.getOutputRequirement()) {
-			case required:
+			case Data:
 				if (consumers.isEmpty()) {
 					joiner.add("producer's output doesn't have any consumers");
 				}
 				break;
-			case forbidden:
+			case NoData:
 				if (!consumers.isEmpty()) {
 					joiner.add("non-producer has consumers");
 				}
 				break;
-			case any:
+			case Any:
 				break;
 		}
 		if (joiner.length() != 0) {
@@ -119,11 +117,11 @@ public abstract class ActiveProcessor<D extends ActiveProcessorDescriptor> exten
 		output(consumers, payload);
 	}
 
-	public void output(Payload payload) {
+	public void output(Payload<?> payload) {
 		output(consumers, payload);
 	}
 
-	private void output(List<Processor> consumers, Payload payload) {
+	private void output(List<Processor<?>> consumers, Payload<?> payload) {
 		if (processorService.getProfileService().profile().isTrace()) {
 			logger.info("Output: " + location.descriptor() + " ==> " + processorService.json(payload));
 		}
@@ -138,8 +136,8 @@ public abstract class ActiveProcessor<D extends ActiveProcessorDescriptor> exten
 				return;
 			}
 		}
-		for (Processor consumer : consumers) {
-			consumer.getConsumerThreadRunner().consume(payload);
+		for (Processor<?> consumer : consumers) {
+			consumer.consume(payload);
 		}
 		lastOutputTime = System.currentTimeMillis();
 	}
@@ -156,6 +154,11 @@ public abstract class ActiveProcessor<D extends ActiveProcessorDescriptor> exten
 				throw new AlerterException("cannot stop consumer thread", ExceptionContext.makeProcessorNoPayload(this));
 			}
 		}
+	}
+
+	@Override
+	public void consume(Payload<?> payload) {
+		consumerThreadRunner.consume(payload);
 	}
 
 	public <T> T payloadValue(Payload payload, Class<?> clazz) {

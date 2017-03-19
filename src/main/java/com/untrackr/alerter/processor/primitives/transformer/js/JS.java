@@ -15,7 +15,7 @@ public class JS extends Transformer<JSDescriptor> {
 	}
 
 	@Override
-	public void consume(Payload payload) {
+	public void doConsume(Payload<?> payload) {
 		Object result = transformer.call(payload, this);
 		if (result != null) {
 			outputTransformed(result, payload);

@@ -7,7 +7,7 @@ import com.untrackr.alerter.processor.primitives.producer.Producer;
 import com.untrackr.alerter.service.HttpService;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class Receive extends Producer<ReceiveDescriptor> implements HttpService.PostBodyConsumer {
+public class Receive extends Producer<ReceiveDescriptor> implements HttpService.PostBodyHandle {
 
 	private String urlPath;
 
@@ -27,9 +27,9 @@ public class Receive extends Producer<ReceiveDescriptor> implements HttpService.
 	}
 
 	@Override
-	public void consume(Object input) {
+	public void handlePost(Object input) {
 		try {
-			Payload remotePayload = processorService.getObjectMapper().convertValue(input, Payload.class);
+			Payload<?> remotePayload = processorService.getObjectMapper().convertValue(input, Payload.class);
 			outputTransformed(remotePayload.getValue(), remotePayload);
 		} catch (IllegalArgumentException e) {
 			throw new AlerterException("invalid input: " + processorService.json(input),

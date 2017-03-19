@@ -11,7 +11,7 @@ public class Identity extends Transformer<IdentityDescriptor> {
 	}
 
 	@Override
-	public void consume(Payload input) {
+	public void doConsume(Payload<?> input) {
 		outputTransformed(input.getValue(), input);
 	}
 

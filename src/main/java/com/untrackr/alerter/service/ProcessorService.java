@@ -4,19 +4,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.untrackr.alerter.common.ThreadUtil;
-import com.untrackr.alerter.ioservice.FileTailingService;
 import com.untrackr.alerter.alert.Alert;
 import com.untrackr.alerter.alert.AlertData;
+import com.untrackr.alerter.common.ThreadUtil;
+import com.untrackr.alerter.ioservice.FileTailingService;
 import com.untrackr.alerter.processor.common.*;
-import com.untrackr.alerter.processor.primitives.consumer.alert.AlertGenerator;
 import com.untrackr.alerter.processor.payload.Payload;
-import com.untrackr.alerter.processor.primitives.producer.console.Stdin;
-import com.untrackr.alerter.processor.primitives.producer.console.StdinDescriptor;
-import com.untrackr.alerter.processor.primitives.special.pipe.Pipe;
-import com.untrackr.alerter.processor.primitives.special.pipe.PipeDescriptor;
-import com.untrackr.alerter.processor.primitives.transformer.print.Stdout;
-import com.untrackr.alerter.processor.primitives.transformer.print.StdoutDescriptor;
+import com.untrackr.alerter.processor.primitives.consumer.alert.AlertGenerator;
 import jdk.nashorn.api.scripting.NashornException;
 import jline.console.ConsoleReader;
 import jline.console.UserInterruptException;
@@ -41,8 +35,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -205,6 +197,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		String name = "run";
 		Processor processor = (Processor) scriptService.convertScriptValue(ValueLocation.makeArgument(name, "processor"), Processor.class, scriptObject,
 				() -> ExceptionContext.makeProcessorFactory(name));
+		processor.inferSignature();
 		processor.check();
 		processor.start();
 		infoAlert("alerter up and running");
@@ -222,27 +215,6 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		infoAlert("alerter stopped");
 		processor.stop();
 		return UNDEFINED;
-	}
-
-	public Processor wrapToplevelProcessor(Processor processor) {
-		List<Processor> pipeProcessors = new ArrayList<>();
-		if (processor.getSignature().getInputRequirement() != ProcessorSignature.PipeRequirement.forbidden) {
-			logger.info("Adding \"stdin\" as input");
-			pipeProcessors.add(new Stdin(this, new StdinDescriptor(), "stdin"));
-		}
-		pipeProcessors.add(processor);
-		if (processor.getSignature().getOutputRequirement() != ProcessorSignature.PipeRequirement.forbidden) {
-			logger.info("Adding \"stdout\" as output");
-			pipeProcessors.add(new Stdout(this, new StdoutDescriptor(), "stdout", false));
-		}
-		if (pipeProcessors.size() == 1) {
-			return processor;
-		} else {
-			PipeDescriptor descriptor = new PipeDescriptor();
-			descriptor.setName("pipe");
-			descriptor.setProcessors(pipeProcessors);
-			return new Pipe(this, pipeProcessors, descriptor, "pipe");
-		}
 	}
 
 	private void runFiles(CommandLineOptions options) {

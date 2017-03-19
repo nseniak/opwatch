@@ -17,35 +17,32 @@ import java.util.Collection;
 @RestController
 public class HttpService {
 
-	@Autowired
-	private ProcessorService processorService;
+	private Multimap<String, PostBodyHandle> consumers = HashMultimap.create();
 
-	private Multimap<String, PostBodyConsumer> consumers = HashMultimap.create();
-
-	public void addPostBodyConsumer(String path, PostBodyConsumer consumer) {
+	public void addPostBodyConsumer(String path, PostBodyHandle consumer) {
 		consumers.put(path, consumer);
 	}
 
-	public void removePostBodyConsumer(String urlPath, PostBodyConsumer consumer) {
+	public void removePostBodyConsumer(String urlPath, PostBodyHandle consumer) {
 		consumers.remove(urlPath, consumer);
 	}
 
 	@RequestMapping(value = "/processor/**", method = RequestMethod.POST)
 	public ResponseEntity<Void> put(HttpServletRequest request, @RequestBody Object body) throws JsonProcessingException {
 		String urlPath = request.getServletPath().substring("/processor".length());
-		Collection<PostBodyConsumer> pathConsumers = consumers.get(urlPath);
+		Collection<PostBodyHandle> pathConsumers = consumers.get(urlPath);
 		if (pathConsumers.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		for (PostBodyConsumer consumer : pathConsumers) {
-			consumer.consume(body);
+		for (PostBodyHandle consumer : pathConsumers) {
+			consumer.handlePost(body);
 		}
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	public interface PostBodyConsumer {
+	public interface PostBodyHandle {
 
-		void consume(Object object);
+		void handlePost(Object object);
 
 	}
 

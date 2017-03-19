@@ -7,13 +7,13 @@ import java.util.List;
 
 public class ParallelDescriptor extends ProcessorDescriptor {
 
-	private List<Processor> processors;
+	private List<Processor<?>> processors;
 
-	public List<Processor> getProcessors() {
+	public List<Processor<?>> getProcessors() {
 		return processors;
 	}
 
-	public void setProcessors(List<Processor> processors) {
+	public void setProcessors(List<Processor<?>> processors) {
 		this.processors = processors;
 	}
 

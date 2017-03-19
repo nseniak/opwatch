@@ -12,12 +12,16 @@ public class Stdout extends Transformer<StdoutDescriptor> {
 	public Stdout(ProcessorService processorService, StdoutDescriptor descriptor, String name, boolean displayPayload) {
 		super(processorService, descriptor, name);
 		this.displayPayload = displayPayload;
-		// Override signature
-		this.signature = new ProcessorSignature(ProcessorSignature.PipeRequirement.required, ProcessorSignature.PipeRequirement.any);
 	}
 
 	@Override
-	public void consume(Payload payload) {
+	public void inferSignature() {
+		// Override signature
+		this.signature = ProcessorSignature.makeSideEffectConsumer();
+	}
+
+	@Override
+	public void doConsume(Payload<?> payload) {
 		System.out.println(processorService.json(displayPayload ? payload : payload.getValue()));
 		outputTransformed(payload.getValue(), payload);
 	}

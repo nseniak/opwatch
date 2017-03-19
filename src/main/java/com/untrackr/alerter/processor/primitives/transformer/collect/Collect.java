@@ -22,7 +22,7 @@ public class Collect extends Transformer<CollectDescriptor> {
 	}
 
 	@Override
-	public void consume(Payload payload) {
+	public void doConsume(Payload<?> payload) {
 		Object result = (transformer == null) ? payload.getValue() : transformer.call(payload, this);
 		if (result != null) {
 			queue.add(result);

@@ -47,6 +47,7 @@ import javax.script.*;
 import java.beans.PropertyDescriptor;
 import java.io.*;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -196,57 +197,71 @@ public class ScriptService {
 		if (scriptValue == null) {
 			return null;
 		} else if (type instanceof Class) {
-			Class<?> clazz = (Class) type;
-			if (clazz.isAssignableFrom(scriptValue.getClass())) {
-				return scriptValue;
-			} else if ((type == StringValue.class) && (String.class.isAssignableFrom(scriptValue.getClass()))) {
-				return StringValue.makeConstant((String) scriptValue);
-			} else if (scriptValue instanceof ScriptObjectMirror) {
-				ScriptObjectMirror scriptObject = (ScriptObjectMirror) scriptValue;
-				if ((type == JavascriptTransformer.class) && scriptObject.isFunction()) {
-					return new JavascriptTransformer(scriptObject, valueLocation);
-				} else if (type == JavascriptPredicate.class) {
-					return new JavascriptPredicate(scriptObject, valueLocation);
-				} else if (type == JavascriptProducer.class) {
-					return new JavascriptProducer(scriptObject, valueLocation);
-				} else if (type == StringValue.class) {
-					return StringValue.makeFunctional(new JavascriptTransformer(scriptObject, valueLocation), valueLocation);
-				} else {
-					if (!Modifier.isAbstract(clazz.getModifiers())) {
-						Object value = BeanUtils.instantiate(clazz);
-						BeanWrapperImpl wrapper = new BeanWrapperImpl(value);
-						for (String propertyName : scriptObject.getOwnKeys(true)) {
-							try {
-								PropertyDescriptor descriptor = wrapper.getPropertyDescriptor(propertyName);
-								Type fieldType = descriptor.getReadMethod().getGenericReturnType();
-								String processorName = valueLocation.getFunctionName();
-								ValueLocation propertyValueSource = ValueLocation.makeProperty(processorName, propertyName);
-								wrapper.setPropertyValue(propertyName, convertScriptValue(propertyValueSource, fieldType, scriptObject.get(propertyName), contextFactory));
-							} catch (InvalidPropertyException e) {
-								throw new AlerterException("invalid property name \"" + propertyName + "\"", contextFactory.make());
-							}
-						}
-						return value;
-					}
-				}
-			}
+			return convertScriptValueToClass(valueLocation, (Class) type, scriptValue, contextFactory);
+		} else if (type instanceof ParameterizedType) {
+			return convertScriptValueToParameterizedType(valueLocation, (ParameterizedType) type, scriptValue, contextFactory);
+		}
+		throw new AlerterException("invalid " + valueLocation.describeAsValue() + ", expected " + documentationService.typeName(type) + ", got: " + scriptValue,
+				contextFactory.make());
+	}
+
+	private Object convertScriptValueToParameterizedType(ValueLocation valueLocation, ParameterizedType type, Object scriptValue, ExceptionContextFactory contextFactory) {
+		Type listType = documentationService.parameterizedListType(type);
+		if (listType == null) {
+			return convertScriptValue(valueLocation, type.getRawType(), scriptValue, contextFactory);
 		} else {
-			Type listType = documentationService.parameterizedListType(type);
-			if (listType != null) {
-				try {
-					ScriptObjectMirror scriptObject = (ScriptObjectMirror) scriptValue;
-					List<Object> scriptList = (List<Object>) ScriptUtils.convert(scriptObject, List.class);
-					List<Object> list = new ArrayList<>();
-					for (Object scriptListObject : scriptList) {
-						list.add(convertScriptValue(valueLocation.toListElement(), listType, scriptListObject, contextFactory));
-					}
-					return list;
-				} catch (ClassCastException e) {
-					// Nothing to do
+			try {
+				ScriptObjectMirror scriptObject = (ScriptObjectMirror) scriptValue;
+				List<Object> scriptList = (List<Object>) ScriptUtils.convert(scriptObject, List.class);
+				List<Object> list = new ArrayList<>();
+				for (Object scriptListObject : scriptList) {
+					list.add(convertScriptValue(valueLocation.toListElement(), listType, scriptListObject, contextFactory));
 				}
+				return list;
+			} catch (ClassCastException e) {
+				// Nothing to do
 			}
 		}
 		throw new AlerterException("invalid " + valueLocation.describeAsValue() + ", expected " + documentationService.typeName(type) + ", got: " + scriptValue,
+				contextFactory.make());
+	}
+
+
+	private Object convertScriptValueToClass(ValueLocation valueLocation, Class<?> clazz, Object scriptValue, ExceptionContextFactory contextFactory) {
+		if (clazz.isAssignableFrom(scriptValue.getClass())) {
+			return scriptValue;
+		} else if ((clazz == StringValue.class) && (String.class.isAssignableFrom(scriptValue.getClass()))) {
+			return StringValue.makeConstant((String) scriptValue);
+		} else if (scriptValue instanceof ScriptObjectMirror) {
+			ScriptObjectMirror scriptObject = (ScriptObjectMirror) scriptValue;
+			if ((clazz == JavascriptTransformer.class) && scriptObject.isFunction()) {
+				return new JavascriptTransformer(scriptObject, valueLocation);
+			} else if (clazz == JavascriptPredicate.class) {
+				return new JavascriptPredicate(scriptObject, valueLocation);
+			} else if (clazz == JavascriptProducer.class) {
+				return new JavascriptProducer(scriptObject, valueLocation);
+			} else if (clazz == StringValue.class) {
+				return StringValue.makeFunctional(new JavascriptTransformer(scriptObject, valueLocation), valueLocation);
+			} else {
+				if (!Modifier.isAbstract(clazz.getModifiers())) {
+					Object value = BeanUtils.instantiate(clazz);
+					BeanWrapperImpl wrapper = new BeanWrapperImpl(value);
+					for (String propertyName : scriptObject.getOwnKeys(true)) {
+						try {
+							PropertyDescriptor descriptor = wrapper.getPropertyDescriptor(propertyName);
+							Type fieldType = descriptor.getReadMethod().getGenericReturnType();
+							String processorName = valueLocation.getFunctionName();
+							ValueLocation propertyValueSource = ValueLocation.makeProperty(processorName, propertyName);
+							wrapper.setPropertyValue(propertyName, convertScriptValue(propertyValueSource, fieldType, scriptObject.get(propertyName), contextFactory));
+						} catch (InvalidPropertyException e) {
+							throw new AlerterException("invalid property name \"" + propertyName + "\"", contextFactory.make());
+						}
+					}
+					return value;
+				}
+			}
+		}
+		throw new AlerterException("invalid " + valueLocation.describeAsValue() + ", expected " + documentationService.typeName(clazz) + ", got: " + scriptValue,
 				contextFactory.make());
 	}
 

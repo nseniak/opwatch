@@ -14,10 +14,10 @@ public class ConsumerThreadRunner implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(ConsumerThreadRunner.class);
 
 	protected ProcessorService processorService;
-	protected Processor processor;
+	protected ActiveProcessor<?> processor;
 	protected ArrayBlockingQueue<Payload<?>> inputQueue;
 
-	public ConsumerThreadRunner(ProcessorService processorService, Processor processor) {
+	public ConsumerThreadRunner(ProcessorService processorService, ActiveProcessor<?> processor) {
 		this.processorService = processorService;
 		this.processor = processor;
 		int inputQueueSize = processorService.getProfileService().profile().getInputQueueSize();
@@ -39,8 +39,8 @@ public class ConsumerThreadRunner implements Runnable {
 	public void run() {
 		while (true) {
 			try {
-				Payload payload = inputQueue.take();
-				processorService.withProcessorErrorHandling(processor, () -> processor.consume(payload));
+				Payload<?> payload = inputQueue.take();
+				processorService.withProcessorErrorHandling(processor, () -> processor.doConsume(payload));
 			} catch (InterruptedException e) {
 				// Nothing to do: the application is exiting.
 				return;

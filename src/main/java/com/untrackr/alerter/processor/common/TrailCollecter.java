@@ -19,6 +19,10 @@ public abstract class TrailCollecter<D extends ScheduledProducerDescriptor> exte
 		super(processorService, descriptor, name, scheduledExecutor);
 		this.duration = duration;
 		this.queue = new LinkedBlockingQueue<>();
+	}
+
+	@Override
+	public void inferSignature() {
 		this.signature = ProcessorSignature.makeTransformer();
 	}
 

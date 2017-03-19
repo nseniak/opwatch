@@ -11,26 +11,28 @@ import java.util.List;
 
 public class Parallel extends Processor<ParallelDescriptor> {
 
-	private List<Processor> processors;
+	private List<Processor<?>> processors;
 
-	public Parallel(ProcessorService processorService, List<Processor> processors, ParallelDescriptor descriptor, String name) {
+	public Parallel(ProcessorService processorService, List<Processor<?>> processors, ParallelDescriptor descriptor, String name) {
 		super(processorService, descriptor, name);
 		this.processors = processors;
-		for (Processor processor : processors) {
+		for (Processor<?> processor : processors) {
 			processor.assignContainer(this);
 		}
 	}
 
 	@Override
-	public void addProducer(Processor producer) {
-		for (Processor processor : processors) {
+	public void addProducer(Processor<?> producer) {
+		super.addProducer(producer);
+		for (Processor<?> processor : processors) {
 			processor.addProducer(producer);
 		}
 	}
 
 	@Override
-	public void addConsumer(Processor consumer) {
-		for (Processor processor : processors) {
+	public void addConsumer(Processor<?> consumer) {
+		super.addConsumer(consumer);
+		for (Processor<?> processor : processors) {
 			processor.addConsumer(consumer);
 		}
 	}
@@ -67,15 +69,29 @@ public class Parallel extends Processor<ParallelDescriptor> {
 		// Nothing to do. Producers and consumers are already connected.
 	}
 
+	@Override
 	public void inferSignature() {
-		signature = new ProcessorSignature(ProcessorSignature.PipeRequirement.any, ProcessorSignature.PipeRequirement.any);
-		for (Processor processor : processors) {
+		for (Processor<?> processor : processors) {
+			processor.inferSignature();
+		}
+		signature = new ProcessorSignature(ProcessorSignature.PipeRequirement.Any, ProcessorSignature.PipeRequirement.Any);
+		Processor<?> previousProcessor = null;
+		int index = 1;
+		for (Processor<?> processor : processors) {
 			ProcessorSignature bottomSignature = signature.bottom(processor.getSignature());
-			if (bottomSignature == null) {
-				String message = "signature of " + processor.getType() + " is " + processor.getSignature().describe() + " and is inconsistent with previous processors in parallel group: " + signature.describe();
-				throw new AlerterException(message, ExceptionContext.makeProcessorFactory(processor.getType()));
+			String incompatible = null;
+			if (bottomSignature.getInputRequirement() == ProcessorSignature.PipeRequirement.None) {
+				incompatible = "inputs";
+			} else if (bottomSignature.getOutputRequirement() == ProcessorSignature.PipeRequirement.None) {
+				incompatible = "outputs";
+			}
+			if (incompatible != null) {
+				String message = incompatible + " of processors #" + (index - 1) + " (" + previousProcessor.getType() + ") and #" + index + " (" + processor.getType() + ") are incompatible";
+				throw new AlerterException(message, ExceptionContext.makeProcessorFactory(this.getType()));
 			}
 			signature = bottomSignature;
+			previousProcessor = processor;
+			index = index + 1;
 		}
 	}
 

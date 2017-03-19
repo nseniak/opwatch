@@ -13,7 +13,7 @@ public class Json extends Transformer<JsonDescriptor> {
 	}
 
 	@Override
-	public void consume(Payload payload) {
+	public void doConsume(Payload<?> payload) {
 		try {
 			String value = payloadValue(payload, String.class);
 			Object result = processorService.parseJson(value);
@@ -23,7 +23,6 @@ public class Json extends Transformer<JsonDescriptor> {
 			// would be caught by this thread. We display the error.
 			processorService.displayAlerterException(new AlerterException("cannot parse json: " + t.getMessage(),
 					ExceptionContext.makeProcessorPayload(this, payload)));
-			return;
 		}
 	}
 

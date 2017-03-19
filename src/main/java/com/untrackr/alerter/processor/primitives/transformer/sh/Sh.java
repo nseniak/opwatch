@@ -16,7 +16,11 @@ public class Sh extends Transformer<ShDescriptor> {
 	public Sh(ProcessorService processorService, ShDescriptor descriptor, String name, CommandRunner commandRunner) {
 		super(processorService, descriptor, name);
 		this.commandRunner = commandRunner;
-		this.signature = new ProcessorSignature(ProcessorSignature.PipeRequirement.any, ProcessorSignature.PipeRequirement.any);
+	}
+
+	@Override
+	public void inferSignature() {
+		this.signature = ProcessorSignature.makeAny();
 	}
 
 	@Override
@@ -38,7 +42,7 @@ public class Sh extends Transformer<ShDescriptor> {
 	}
 
 	@Override
-	public void consume(Payload payload) {
+	public void doConsume(Payload<?> payload) {
 		commandRunner.consume(this, payload);
 	}
 

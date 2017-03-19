@@ -24,7 +24,7 @@ public class Jstack extends Transformer<JstackDescriptor> {
 	}
 
 	@Override
-	public void consume(Payload input) {
+	public void doConsume(Payload<?> input) {
 		String text = payloadPropertyValue(input, propertyName, String.class);
 		String[] lines = text.split("\n");
 		for (String line : lines) {

@@ -15,7 +15,7 @@ public class Once extends Transformer<OnceDescriptor> {
 	}
 
 	@Override
-	public void consume(Payload payload) {
+	public void doConsume(Payload<?> payload) {
 		if ((payload.getTimestamp() - lastInputTimestamp) > delay) {
 			outputTransformed(payload.getValue(), payload);
 		}

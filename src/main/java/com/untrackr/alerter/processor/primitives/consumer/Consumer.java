@@ -9,6 +9,10 @@ public abstract class Consumer<D extends ActiveProcessorDescriptor> extends Acti
 
 	public Consumer(ProcessorService processorService, D descriptor, String name) {
 		super(processorService, descriptor, name);
+	}
+
+	@Override
+	public void inferSignature() {
 		this.signature = ProcessorSignature.makeConsumer();
 	}
 

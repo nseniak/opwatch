@@ -48,12 +48,19 @@ public class DocumentationService {
 	public String typeName(Type type) {
 		if (type instanceof Class) {
 			return simpleClassName((Class) type);
+		} else if (type instanceof ParameterizedType) {
+			return parameterizedTypeName((ParameterizedType) type);
+		} else {
+			return type.toString();
 		}
+	}
+
+	public String parameterizedTypeName(ParameterizedType type) {
 		Type listType = parameterizedListType(type);
 		if (listType != null) {
 			return typeName(listType) + " array";
 		} else {
-			return type.toString();
+			return typeName(type.getRawType());
 		}
 	}
 
@@ -77,15 +84,14 @@ public class DocumentationService {
 		}
 	}
 
-	public Type parameterizedListType(Type type) {
-		if (type instanceof ParameterizedType) {
-			ParameterizedType paramType = (ParameterizedType) type;
-			Type[] args = paramType.getActualTypeArguments();
-			if ((paramType.getRawType() == List.class) && (args.length == 1)) {
-				return args[0];
-			}
+	public Type parameterizedListType(ParameterizedType type) {
+		ParameterizedType paramType = (ParameterizedType) type;
+		Type[] args = paramType.getActualTypeArguments();
+		if ((paramType.getRawType() == List.class) && (args.length == 1)) {
+			return args[0];
+		} else {
+			return null;
 		}
-		return null;
 	}
 
 }

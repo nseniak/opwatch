@@ -25,10 +25,8 @@ public class ParallelFactory extends ProcessorFactory<ParallelDescriptor, Parall
 	@Override
 	public Parallel make(Object scriptObject) {
 		ParallelDescriptor descriptor = convertProcessorDescriptor(scriptObject);
-		List<Processor> processors = descriptor.getProcessors();
-		Parallel parallel = new Parallel(getProcessorService(), processors, descriptor, type());
-		parallel.inferSignature();
-		return parallel;
+		List<Processor<?>> processors = descriptor.getProcessors();
+		return new Parallel(getProcessorService(), processors, descriptor, type());
 	}
 
 }

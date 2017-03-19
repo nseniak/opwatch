@@ -9,7 +9,7 @@ public class RemotePayload {
 	private RemotePayload() {
 	}
 
-	public RemotePayload(Payload payload) {
+	public RemotePayload(Payload<?> payload) {
 		this.scriptObject = payload.getValue();
 		this.timestamp = payload.getTimestamp();
 		this.hostname = payload.getHostname();

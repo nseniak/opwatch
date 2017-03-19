@@ -11,7 +11,7 @@ public abstract class ConditionalTransformer<D extends ActiveProcessorDescriptor
 	}
 
 	@Override
-	public void consume(Payload input) {
+	public void doConsume(Payload<?> input) {
 		if (predicateValue(input)) {
 			outputTransformed(input.getValue(), input);
 		}

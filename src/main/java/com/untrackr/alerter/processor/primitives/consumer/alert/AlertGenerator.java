@@ -29,7 +29,7 @@ public class AlertGenerator extends Consumer<AlertGeneratorDescriptor> {
 	}
 
 	@Override
-	public void consume(Payload payload) {
+	public void doConsume(Payload<?> payload) {
 		boolean alert = (predicate == null) || predicate.call(payload, this);
 		if (!toggle) {
 			if (alert) {

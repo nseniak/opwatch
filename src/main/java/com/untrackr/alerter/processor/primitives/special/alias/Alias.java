@@ -11,17 +11,18 @@ public class Alias extends Processor<AliasDescriptor> {
 	public Alias(ProcessorService processorService, Processor processor, AliasDescriptor descriptor, String name) {
 		super(processorService, descriptor, name);
 		this.processor = processor;
-		this.signature = processor.getSignature();
 		processor.assignContainer(this);
 	}
 
 	@Override
 	public void addProducer(Processor producer) {
+		super.addProducer(producer);
 		processor.addProducer(producer);
 	}
 
 	@Override
 	public void addConsumer(Processor consumer) {
+		super.addConsumer(consumer);
 		processor.addConsumer(consumer);
 	}
 
@@ -53,6 +54,11 @@ public class Alias extends Processor<AliasDescriptor> {
 	@Override
 	public void consume(Payload payload) {
 		// Nothing to do. The processor is already connected.
+	}
+
+	@Override
+	public void inferSignature() {
+		this.signature = processor.getSignature();
 	}
 
 }
