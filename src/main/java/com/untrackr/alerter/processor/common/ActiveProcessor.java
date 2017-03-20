@@ -77,12 +77,12 @@ public abstract class ActiveProcessor<D extends ActiveProcessorDescriptor> exten
 		switch (signature.getInputRequirement()) {
 			case Data:
 				if (producers.isEmpty()) {
-					joiner.add("consumer not receiving any input");
+					joiner.add("input is missing");
 				}
 				break;
 			case NoData:
 				if (!producers.isEmpty()) {
-					joiner.add("non-consumer receives an input");
+					joiner.add("should not have an input");
 				}
 				break;
 			case Any:
@@ -91,19 +91,19 @@ public abstract class ActiveProcessor<D extends ActiveProcessorDescriptor> exten
 		switch (signature.getOutputRequirement()) {
 			case Data:
 				if (consumers.isEmpty()) {
-					joiner.add("producer's output doesn't have any consumers");
+					joiner.add("output is ignored");
 				}
 				break;
 			case NoData:
 				if (!consumers.isEmpty()) {
-					joiner.add("non-producer has consumers");
+					joiner.add("has no output but expected to have one");
 				}
 				break;
 			case Any:
 				break;
 		}
 		if (joiner.length() != 0) {
-			throw new AlerterException("incorrect pipeline: " + joiner.toString(), ExceptionContext.makeProcessorNoPayload(this));
+			throw new AlerterException(joiner.toString(), ExceptionContext.makeProcessorNoPayload(this));
 		}
 	}
 
