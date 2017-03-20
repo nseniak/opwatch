@@ -11,7 +11,7 @@ public class CollectFactory extends ActiveProcessorFactory<CollectDescriptor, Co
 	}
 
 	@Override
-	public String type() {
+	public String name() {
 		return "collect";
 	}
 
@@ -25,7 +25,7 @@ public class CollectFactory extends ActiveProcessorFactory<CollectDescriptor, Co
 		CollectDescriptor descriptor = convertProcessorDescriptor(scriptObject);
 		JavascriptTransformer transformer = descriptor.getTransformer();
 		int count = checkPropertyValue("count", descriptor.getCount());
-		Collect collect = new Collect(getProcessorService(), descriptor, type(), transformer, count);
+		Collect collect = new Collect(getProcessorService(), descriptor, name(), transformer, count);
 		return collect;
 	}
 

@@ -11,7 +11,7 @@ public class JSGrepFactory extends ActiveProcessorFactory<JSGrepDescriptor, JSGr
 	}
 
 	@Override
-	public String type() {
+	public String name() {
 		return "jsgrep";
 	}
 
@@ -24,7 +24,7 @@ public class JSGrepFactory extends ActiveProcessorFactory<JSGrepDescriptor, JSGr
 	public JSGrep make(Object scriptObject) {
 		JSGrepDescriptor descriptor = convertProcessorDescriptor(scriptObject);
 		JavascriptPredicate predicate = checkPropertyValue("predicate", descriptor.getPredicate());
-		JSGrep jsgrep = new JSGrep(getProcessorService(), descriptor, type(), predicate);
+		JSGrep jsgrep = new JSGrep(getProcessorService(), descriptor, name(), predicate);
 		return jsgrep;
 	}
 

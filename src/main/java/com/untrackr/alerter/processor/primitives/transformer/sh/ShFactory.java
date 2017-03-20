@@ -11,7 +11,7 @@ public class ShFactory extends ActiveProcessorFactory<ShDescriptor, Sh> {
 	}
 
 	@Override
-	public String type() {
+	public String name() {
 		return "sh";
 	}
 
@@ -24,7 +24,7 @@ public class ShFactory extends ActiveProcessorFactory<ShDescriptor, Sh> {
 	public Sh make(Object scriptObject) {
 		ShDescriptor descriptor = convertProcessorDescriptor(scriptObject);
 		CommandRunner producer = makeCommandOutputProducer(descriptor);
-		Sh sh = new Sh(getProcessorService(), descriptor, type(), producer);
+		Sh sh = new Sh(getProcessorService(), descriptor, name(), producer);
 		return sh;
 	}
 

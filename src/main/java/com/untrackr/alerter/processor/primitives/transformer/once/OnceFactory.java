@@ -10,7 +10,7 @@ public class OnceFactory extends ActiveProcessorFactory<OnceDescriptor, Once> {
 	}
 
 	@Override
-	public String type() {
+	public String name() {
 		return "once";
 	}
 
@@ -23,7 +23,7 @@ public class OnceFactory extends ActiveProcessorFactory<OnceDescriptor, Once> {
 	public Once make(Object scriptObject) {
 		OnceDescriptor descriptor = convertProcessorDescriptor(scriptObject);
 		long delay = durationValue("delay", descriptor.getDelay());
-		Once once = new Once(getProcessorService(), descriptor, type(), delay);
+		Once once = new Once(getProcessorService(), descriptor, name(), delay);
 		return once;
 	}
 

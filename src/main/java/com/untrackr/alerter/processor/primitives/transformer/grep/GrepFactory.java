@@ -15,7 +15,7 @@ public class GrepFactory extends ActiveProcessorFactory<GrepDescriptor, Grep> {
 	}
 
 	@Override
-	public String type() {
+	public String name() {
 		return "grep";
 	}
 
@@ -30,7 +30,7 @@ public class GrepFactory extends ActiveProcessorFactory<GrepDescriptor, Grep> {
 		List<String> regexes = descriptor.getRegexes();
 		String regex = descriptor.getRegex();
 		if ((regex != null) && (regexes != null)) {
-			throw new AlerterException("either \"regex\" or \"regexes\" must be defined", ExceptionContext.makeProcessorFactory(type()));
+			throw new AlerterException("either \"regex\" or \"regexes\" must be defined", ExceptionContext.makeProcessorFactory(name()));
 		}
 		Pattern pattern = null;
 		if (regex != null) {
@@ -48,10 +48,10 @@ public class GrepFactory extends ActiveProcessorFactory<GrepDescriptor, Grep> {
 			pattern = compilePattern("regexes", builder.toString());
 		}
 		if (pattern == null) {
-			throw new AlerterException("either \"regex\" or \"regexes\" must be defined", ExceptionContext.makeProcessorFactory(type()));
+			throw new AlerterException("either \"regex\" or \"regexes\" must be defined", ExceptionContext.makeProcessorFactory(name()));
 		}
 		boolean invert = descriptor.getInvert();
-		Grep grep = new Grep(getProcessorService(), descriptor, type(), pattern, invert);
+		Grep grep = new Grep(getProcessorService(), descriptor, name(), pattern, invert);
 		return grep;
 	}
 

@@ -11,7 +11,7 @@ public class AliasFactory extends ProcessorFactory<AliasDescriptor, Alias> {
 	}
 
 	@Override
-	public String type() {
+	public String name() {
 		return "alias";
 	}
 
@@ -23,9 +23,8 @@ public class AliasFactory extends ProcessorFactory<AliasDescriptor, Alias> {
 	@Override
 	public Alias make(Object scriptObject) {
 		AliasDescriptor descriptor = convertProcessorDescriptor(scriptObject);
-		String name = checkPropertyValue("name", descriptor.getName());
 		Processor processor = checkPropertyValue("processor", descriptor.getProcessor());
-		return new Alias(getProcessorService(), processor, descriptor, type());
+		return new Alias(getProcessorService(), processor, descriptor, name());
 	}
 
 }

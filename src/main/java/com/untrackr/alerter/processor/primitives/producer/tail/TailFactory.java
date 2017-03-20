@@ -12,7 +12,7 @@ public class TailFactory extends ActiveProcessorFactory<TailDescriptor, Tail> {
 	}
 
 	@Override
-	public String type() {
+	public String name() {
 		return "tail";
 	}
 
@@ -26,7 +26,7 @@ public class TailFactory extends ActiveProcessorFactory<TailDescriptor, Tail> {
 		TailDescriptor descriptor = convertProcessorDescriptor(scriptObject);
 		String file = checkVariableSubstitution("file", checkPropertyValue("file", descriptor.getFile()));
 		boolean ignoreBlankLine = optionalPropertyValue("ignoreBlankLine", descriptor.getIgnoreBlankLine(), false);
-		Tail tail = new Tail(getProcessorService(), descriptor, type(), FileSystems.getDefault().getPath(file), ignoreBlankLine);
+		Tail tail = new Tail(getProcessorService(), descriptor, name(), FileSystems.getDefault().getPath(file), ignoreBlankLine);
 		return tail;
 	}
 

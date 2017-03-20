@@ -10,7 +10,7 @@ public class StdoutFactory extends ActiveProcessorFactory<StdoutDescriptor, Stdo
 	}
 
 	@Override
-	public String type() {
+	public String name() {
 		return "stdout";
 	}
 
@@ -23,7 +23,7 @@ public class StdoutFactory extends ActiveProcessorFactory<StdoutDescriptor, Stdo
 	public Stdout make(Object scriptObject) {
 		StdoutDescriptor descriptor = convertProcessorDescriptor(scriptObject);
 		boolean displayPayload = optionalPropertyValue("payload", descriptor.getPayload(), false);
-		Stdout stdout = new Stdout(getProcessorService(), descriptor, type(), displayPayload);
+		Stdout stdout = new Stdout(getProcessorService(), descriptor, name(), displayPayload);
 		return stdout;
 	}
 

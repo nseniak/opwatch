@@ -9,16 +9,6 @@ import java.util.List;
 
 public abstract class ProcessorDescriptor {
 
-	private String name;
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	/**
 	 * For scripting purposes
 	 */

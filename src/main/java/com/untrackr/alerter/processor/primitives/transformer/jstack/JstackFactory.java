@@ -12,7 +12,7 @@ public class JstackFactory extends ActiveProcessorFactory<JstackDescriptor, Jsta
 	}
 
 	@Override
-	public String type() {
+	public String name() {
 		return "jstack";
 	}
 
@@ -27,7 +27,7 @@ public class JstackFactory extends ActiveProcessorFactory<JstackDescriptor, Jsta
 		String fieldName = optionalPropertyValue("field", descriptor.getField(), "text");
 		String methodRegex = descriptor.getMethodRegex();
 		Pattern methodPattern = (methodRegex == null) ? null : compilePattern("regex", methodRegex);
-		Jstack jstack = new Jstack(getProcessorService(), descriptor, type(), fieldName, methodPattern);
+		Jstack jstack = new Jstack(getProcessorService(), descriptor, name(), fieldName, methodPattern);
 		return jstack;
 	}
 

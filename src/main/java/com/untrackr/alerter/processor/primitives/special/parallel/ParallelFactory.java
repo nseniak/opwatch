@@ -13,7 +13,7 @@ public class ParallelFactory extends ProcessorFactory<ParallelDescriptor, Parall
 	}
 
 	@Override
-	public String type() {
+	public String name() {
 		return "parallel";
 	}
 
@@ -26,7 +26,7 @@ public class ParallelFactory extends ProcessorFactory<ParallelDescriptor, Parall
 	public Parallel make(Object scriptObject) {
 		ParallelDescriptor descriptor = convertProcessorDescriptor(scriptObject);
 		List<Processor<?>> processors = descriptor.getProcessors();
-		return new Parallel(getProcessorService(), processors, descriptor, type());
+		return new Parallel(getProcessorService(), processors, descriptor, name());
 	}
 
 }

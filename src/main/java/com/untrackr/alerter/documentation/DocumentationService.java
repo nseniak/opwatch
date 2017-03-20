@@ -38,7 +38,7 @@ public class DocumentationService {
 				String typeName = typeName(type);
 				fieldDocList.add(new ProcessorDescFieldDoc(name, typeName, null, "doc"));
 			}
-			return new ProcessorDoc(factory.type(), fieldDocList, "processor doc");
+			return new ProcessorDoc(factory.name(), fieldDocList, "processor doc");
 		} catch (IntrospectionException e) {
 			logger.error("Exception while generation documentation: " + descClass.getName(), e);
 			return null;

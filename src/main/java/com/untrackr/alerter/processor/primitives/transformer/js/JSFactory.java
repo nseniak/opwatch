@@ -11,7 +11,7 @@ public class JSFactory extends ActiveProcessorFactory<JSDescriptor, JS> {
 	}
 
 	@Override
-	public String type() {
+	public String name() {
 		return "js";
 	}
 
@@ -24,7 +24,7 @@ public class JSFactory extends ActiveProcessorFactory<JSDescriptor, JS> {
 	public JS make(Object scriptObject) {
 		JSDescriptor descriptor = convertProcessorDescriptor(scriptObject);
 		JavascriptTransformer transformer = checkPropertyValue("transformer", descriptor.getTransformer());
-		JS js = new JS(getProcessorService(), descriptor, type(), transformer);
+		JS js = new JS(getProcessorService(), descriptor, name(), transformer);
 		return js;
 	}
 

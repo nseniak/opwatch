@@ -152,7 +152,7 @@ public class ScriptService {
 	}
 
 	private <D extends ProcessorDescriptor, T extends Processor> void createFactoryFunction(ProcessorFactory<D, T> processorFactory) throws ScriptException {
-		createWrappedPrimitiveFunction(processorFactory.type(), javascriptFunction(processorFactory::make), "factory_wrapper");
+		createWrappedPrimitiveFunction(processorFactory.name(), javascriptFunction(processorFactory::make), "factory_wrapper");
 	}
 
 	private void createSimplePrimitiveFunction(String name, JavascriptFunction function) throws ScriptException {
@@ -162,7 +162,7 @@ public class ScriptService {
 	}
 
 	private <D extends ProcessorDescriptor, T extends Processor> void createFactoryProcessorVarargFunction(ProcessorFactory<D, T> processorFactory) throws ScriptException {
-		createWrappedPrimitiveFunction(processorFactory.type(), javascriptFunction(processorFactory::make), "vararg_factory_wrapper");
+		createWrappedPrimitiveFunction(processorFactory.name(), javascriptFunction(processorFactory::make), "vararg_factory_wrapper");
 	}
 
 	private void createWrappedPrimitiveFunction(String name, JavascriptFunction function, String wrapperName) throws ScriptException {

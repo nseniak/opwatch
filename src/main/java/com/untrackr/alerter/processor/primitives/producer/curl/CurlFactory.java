@@ -15,7 +15,7 @@ public class CurlFactory extends ScheduledExecutorFactory<CurlDescriptor, Curl> 
 	}
 
 	@Override
-	public String type() {
+	public String name() {
 		return "curl";
 	}
 
@@ -33,14 +33,14 @@ public class CurlFactory extends ScheduledExecutorFactory<CurlDescriptor, Curl> 
 			uri = new URI(urlString);
 		} catch (URISyntaxException e) {
 			throw new AlerterException("invalid \"url\": " + e.getLocalizedMessage() + ": \"" + urlString + "\"",
-					ExceptionContext.makeProcessorFactory(type()));
+					ExceptionContext.makeProcessorFactory(name()));
 		}
 		long defaultConnectTimeout = processorService.getProfileService().profile().getDefaultHttpConnectTimeout();
 		long connectTimeout = optionalDurationValue("connectTimeout", descriptor.getConnectTimeout(), defaultConnectTimeout);
 		long defaultReadTimeout = processorService.getProfileService().profile().getDefaultHttpReadTimeout();
 		long readTimeout = optionalDurationValue("readTimeout", descriptor.getReadTimeout(), defaultReadTimeout);
 		boolean insecure = optionalPropertyValue("insecure", descriptor.getInsecure(), false);
-		Curl curl = new Curl(getProcessorService(), descriptor, type(), makeScheduledExecutor(descriptor), uri,
+		Curl curl = new Curl(getProcessorService(), descriptor, name(), makeScheduledExecutor(descriptor), uri,
 				(int) connectTimeout, (int) readTimeout, insecure);
 		return curl;
 	}

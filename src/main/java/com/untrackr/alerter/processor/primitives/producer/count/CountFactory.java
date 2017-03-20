@@ -11,7 +11,7 @@ public class CountFactory extends ScheduledExecutorFactory<CountDescriptor, Coun
 	}
 
 	@Override
-	public String type() {
+	public String name() {
 		return "count";
 	}
 
@@ -25,7 +25,7 @@ public class CountFactory extends ScheduledExecutorFactory<CountDescriptor, Coun
 		CountDescriptor descriptor = convertProcessorDescriptor(scriptObject);
 		JavascriptPredicate predicate = descriptor.getPredicate();
 		long duration = durationValue("duration", descriptor.getDuration());
-		Count count = new Count(getProcessorService(), descriptor, type(), makeScheduledExecutor(descriptor), predicate, duration);
+		Count count = new Count(getProcessorService(), descriptor, name(), makeScheduledExecutor(descriptor), predicate, duration);
 		return count;
 	}
 

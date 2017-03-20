@@ -10,7 +10,7 @@ public class ReceiveFactory extends ActiveProcessorFactory<ReceiveDescriptor, Re
 	}
 
 	@Override
-	public String type() {
+	public String name() {
 		return "receive";
 	}
 
@@ -23,7 +23,7 @@ public class ReceiveFactory extends ActiveProcessorFactory<ReceiveDescriptor, Re
 	public Receive make(Object scriptObject) {
 		ReceiveDescriptor descriptor = convertProcessorDescriptor(scriptObject);
 		String urlPath = checkPropertyValue("url", descriptor.getPath());
-		Receive receive = new Receive(getProcessorService(), descriptor, type(), urlPath);
+		Receive receive = new Receive(getProcessorService(), descriptor, name(), urlPath);
 		return receive;
 	}
 

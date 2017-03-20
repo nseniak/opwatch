@@ -5,29 +5,28 @@ import com.untrackr.alerter.processor.primitives.producer.ScheduledExecutor;
 import com.untrackr.alerter.processor.primitives.producer.ScheduledExecutorFactory;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class JSCronFactory extends ScheduledExecutorFactory<JSCronDescriptor, JSCron> {
+public class JSCronFactory extends ScheduledExecutorFactory<RepeatDescriptor, Repeat> {
 
 	public JSCronFactory(ProcessorService processorService) {
 		super(processorService);
 	}
 
 	@Override
-	public String type() {
-		return "jscron";
+	public String name() {
+		return "repeat";
 	}
 
 	@Override
-	public Class<JSCronDescriptor> descriptorClass() {
-		return JSCronDescriptor.class;
+	public Class<RepeatDescriptor> descriptorClass() {
+		return RepeatDescriptor.class;
 	}
 
 	@Override
-	public JSCron make(Object scriptObject) {
-		JSCronDescriptor descriptor = convertProcessorDescriptor(scriptObject);
+	public Repeat make(Object scriptObject) {
+		RepeatDescriptor descriptor = convertProcessorDescriptor(scriptObject);
 		ScheduledExecutor executor = makeScheduledExecutor(descriptor);
 		JavascriptProducer producer = checkPropertyValue("producer", descriptor.getProducer());
-		JSCron JSCron = new JSCron(getProcessorService(), descriptor, type(), executor, producer);
-		return JSCron;
+		return new Repeat(getProcessorService(), descriptor, name(), executor, producer);
 	}
 
 }

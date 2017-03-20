@@ -15,7 +15,7 @@ public class PipeFactory extends ProcessorFactory<PipeDescriptor, Pipe> {
 	}
 
 	@Override
-	public String type() {
+	public String name() {
 		return "pipe";
 	}
 
@@ -29,9 +29,9 @@ public class PipeFactory extends ProcessorFactory<PipeDescriptor, Pipe> {
 		PipeDescriptor descriptor = convertProcessorDescriptor(scriptObject);
 		List<Processor<?>> processors = descriptor.getProcessors();
 		if (processors.isEmpty()) {
-			throw new AlerterException("empty pipe", ExceptionContext.makeProcessorFactory(type()));
+			throw new AlerterException("empty pipe", ExceptionContext.makeProcessorFactory(name()));
 		}
-		return new Pipe(getProcessorService(), processors, descriptor, type());
+		return new Pipe(getProcessorService(), processors, descriptor, name());
 	}
 
 }

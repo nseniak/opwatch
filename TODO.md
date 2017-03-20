@@ -6,13 +6,7 @@
 * Extension mechanism for adding processors in Java
 * Tests
 * Better handling of internal errors: deactivate processor
-
-jscron => repeat
-
-make processors non-repeating except repeat
-repeat({processor:df(), period:"1s"})
-repeat(producer)
-
-producer
-consumer
-transformer
+* Way to list the alarms currently toggled on
+* Link in alarms for more info
+* Persistence?
+* Packaging with apt-get and/or others
