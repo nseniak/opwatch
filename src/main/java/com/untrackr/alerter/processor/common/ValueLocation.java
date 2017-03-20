@@ -62,7 +62,7 @@ public class ValueLocation {
 	public String describeAsValue() {
 		switch (sourceType) {
 			case property:
-				return "\"" + propertyName + "\" value";
+				return "value for property \"" + propertyName + "\"";
 			case list_property_element:
 				return "element in \"" + propertyName + "\" array";
 			case list_argument_element:

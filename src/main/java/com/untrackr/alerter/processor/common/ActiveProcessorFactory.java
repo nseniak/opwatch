@@ -14,7 +14,7 @@ public abstract class ActiveProcessorFactory<D extends ActiveProcessorDescriptor
 	}
 
 	protected CommandRunner makeCommandOutputProducer(CommandExecutorDesc descriptor) {
-		String command = checkVariableSubstitution("command", checkPropertyValue("command", descriptor.getGenerator()));
+		String command = checkVariableSubstitution("command", checkPropertyValue("command", descriptor.getCommand()));
 		ScriptStack.ScriptStackElement top = ScriptStack.currentStack().top();
 		File directory = new File(".");
 		if (top != null) {

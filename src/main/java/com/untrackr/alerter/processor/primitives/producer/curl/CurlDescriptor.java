@@ -1,5 +1,6 @@
 package com.untrackr.alerter.processor.primitives.producer.curl;
 
+import com.untrackr.alerter.processor.descriptor.DefaultOption;
 import com.untrackr.alerter.processor.descriptor.ScheduledProducerDescriptor;
 
 public class CurlDescriptor extends ScheduledProducerDescriptor {
@@ -9,6 +10,7 @@ public class CurlDescriptor extends ScheduledProducerDescriptor {
 	private String readTimeout;
 	private Boolean insecure = false;
 
+	@DefaultOption
 	public String getUrl() {
 		return url;
 	}

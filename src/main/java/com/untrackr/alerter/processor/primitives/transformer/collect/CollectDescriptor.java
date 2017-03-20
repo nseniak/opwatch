@@ -1,6 +1,7 @@
 package com.untrackr.alerter.processor.primitives.transformer.collect;
 
 import com.untrackr.alerter.processor.descriptor.ActiveProcessorDescriptor;
+import com.untrackr.alerter.processor.descriptor.DefaultOption;
 import com.untrackr.alerter.processor.descriptor.JavascriptTransformer;
 
 public class CollectDescriptor extends ActiveProcessorDescriptor {
@@ -16,6 +17,7 @@ public class CollectDescriptor extends ActiveProcessorDescriptor {
 		this.transformer = transformer;
 	}
 
+	@DefaultOption
 	public Integer getCount() {
 		return count;
 	}

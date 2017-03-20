@@ -1,5 +1,6 @@
 package com.untrackr.alerter.processor.primitives.producer.cron;
 
+import com.untrackr.alerter.processor.descriptor.DefaultOption;
 import com.untrackr.alerter.processor.descriptor.ScheduledProducerDescriptor;
 import com.untrackr.alerter.processor.primitives.producer.CommandExecutorDesc;
 
@@ -7,7 +8,8 @@ public class CronDescriptor extends ScheduledProducerDescriptor implements Comma
 
 	private String command;
 
-	public String getGenerator() {
+	@DefaultOption
+	public String getCommand() {
 		return command;
 	}
 

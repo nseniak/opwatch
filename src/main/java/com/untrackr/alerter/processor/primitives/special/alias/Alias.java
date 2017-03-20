@@ -6,22 +6,22 @@ import com.untrackr.alerter.service.ProcessorService;
 
 public class Alias extends Processor<AliasDescriptor> {
 
-	Processor processor;
+	Processor<?> processor;
 
-	public Alias(ProcessorService processorService, Processor processor, AliasDescriptor descriptor, String name) {
+	public Alias(ProcessorService processorService, Processor<?> processor, AliasDescriptor descriptor, String name) {
 		super(processorService, descriptor, name);
 		this.processor = processor;
 		processor.assignContainer(this);
 	}
 
 	@Override
-	public void addProducer(Processor producer) {
+	public void addProducer(Processor<?> producer) {
 		super.addProducer(producer);
 		processor.addProducer(producer);
 	}
 
 	@Override
-	public void addConsumer(Processor consumer) {
+	public void addConsumer(Processor<?> consumer) {
 		super.addConsumer(consumer);
 		processor.addConsumer(consumer);
 	}

@@ -73,32 +73,32 @@ public class ScriptService {
 		loadScriptResources();
 		try {
 			createSimplePrimitiveFunction("run", processorService::runProcessor);
-			createFactoryProcessorVarargFunction(new ParallelFactory(processorService));
-			createFactoryProcessorVarargFunction(new PipeFactory(processorService));
-			createFactoryFunction(new AliasFactory(processorService));
-			createFactoryFunction(new StdinFactory(processorService));
-			createFactoryFunction(new GrepFactory(processorService));
-			createFactoryFunction(new JSGrepFactory(processorService));
-			createFactoryFunction(new JSFactory(processorService));
-			createFactoryFunction(new CollectFactory(processorService));
-			createFactoryFunction(new TailFactory(processorService));
-			createFactoryFunction(new StdoutFactory(processorService));
-			createFactoryFunction(new StatFactory(processorService));
-			createFactoryFunction(new DfFactory(processorService));
-			createFactoryFunction(new DfFactory(processorService));
-			createFactoryFunction(new TopFactory(processorService));
-			createFactoryFunction(new AlertGeneratorFactory(processorService));
-			createFactoryFunction(new OnceFactory(processorService));
-			createFactoryFunction(new CurlFactory(processorService));
-			createFactoryFunction(new CountFactory(processorService));
-			createFactoryFunction(new TrailFactory(processorService));
-			createFactoryFunction(new ReceiveFactory(processorService));
-			createFactoryFunction(new PostFactory(processorService));
-			createFactoryFunction(new CronFactory(processorService));
-			createFactoryFunction(new JSCronFactory(processorService));
-			createFactoryFunction(new ShFactory(processorService));
-			createFactoryFunction(new JstackFactory(processorService));
-			createFactoryFunction(new JsonFactory(processorService));
+			createVarargFactoryFunction(new ParallelFactory(processorService));
+			createVarargFactoryFunction(new PipeFactory(processorService));
+			createSimpleFactoryFunction(new AliasFactory(processorService));
+			createSimpleFactoryFunction(new StdinFactory(processorService));
+			createSimpleFactoryFunction(new GrepFactory(processorService));
+			createSimpleFactoryFunction(new JSGrepFactory(processorService));
+			createSimpleFactoryFunction(new JSFactory(processorService));
+			createSimpleFactoryFunction(new CollectFactory(processorService));
+			createSimpleFactoryFunction(new TailFactory(processorService));
+			createSimpleFactoryFunction(new StdoutFactory(processorService));
+			createSimpleFactoryFunction(new StatFactory(processorService));
+			createSimpleFactoryFunction(new DfFactory(processorService));
+			createSimpleFactoryFunction(new DfFactory(processorService));
+			createSimpleFactoryFunction(new TopFactory(processorService));
+			createSimpleFactoryFunction(new AlertGeneratorFactory(processorService));
+			createSimpleFactoryFunction(new OnceFactory(processorService));
+			createSimpleFactoryFunction(new CurlFactory(processorService));
+			createSimpleFactoryFunction(new CountFactory(processorService));
+			createSimpleFactoryFunction(new TrailFactory(processorService));
+			createSimpleFactoryFunction(new ReceiveFactory(processorService));
+			createSimpleFactoryFunction(new PostFactory(processorService));
+			createSimpleFactoryFunction(new CronFactory(processorService));
+			createSimpleFactoryFunction(new JSCronFactory(processorService));
+			createSimpleFactoryFunction(new ShFactory(processorService));
+			createSimpleFactoryFunction(new JstackFactory(processorService));
+			createSimpleFactoryFunction(new JsonFactory(processorService));
 			ProcessorDoc doc = documentationService.documentation(new CurlFactory(processorService));
 			logger.info("Doc");
 		} catch (ScriptException e) {
@@ -151,25 +151,26 @@ public class ScriptService {
 
 	}
 
-	private <D extends ProcessorDescriptor, T extends Processor> void createFactoryFunction(ProcessorFactory<D, T> processorFactory) throws ScriptException {
-		createWrappedPrimitiveFunction(processorFactory.name(), javascriptFunction(processorFactory::make), "factory_wrapper");
+	private <D extends ProcessorDescriptor, T extends Processor> void createSimpleFactoryFunction(ProcessorFactory<D, T> processorFactory) throws ScriptException {
+		createFactoryFunction(processorFactory, "factory_wrapper");
+	}
+
+	private <D extends ProcessorDescriptor, T extends Processor> void createVarargFactoryFunction(ProcessorFactory<D, T> processorFactory) throws ScriptException {
+		createFactoryFunction(processorFactory, "vararg_factory_wrapper");
+	}
+
+	private <D extends ProcessorDescriptor, T extends Processor> void createFactoryFunction(ProcessorFactory<D, T> processorFactory, String wrapperName) throws ScriptException {
+		ScriptContext context = scriptEngine.getContext();
+		Bindings bindings = context.getBindings(ScriptContext.ENGINE_SCOPE);
+		String name = processorFactory.name();
+		bindings.put("__" + name + "_factory", processorFactory);
+		scriptEngine.eval(String.format("%1$s = %2$s(__%1$s_factory)", name, wrapperName));
 	}
 
 	private void createSimplePrimitiveFunction(String name, JavascriptFunction function) throws ScriptException {
 		ScriptContext context = scriptEngine.getContext();
 		Bindings bindings = context.getBindings(ScriptContext.ENGINE_SCOPE);
 		bindings.put(name, function);
-	}
-
-	private <D extends ProcessorDescriptor, T extends Processor> void createFactoryProcessorVarargFunction(ProcessorFactory<D, T> processorFactory) throws ScriptException {
-		createWrappedPrimitiveFunction(processorFactory.name(), javascriptFunction(processorFactory::make), "vararg_factory_wrapper");
-	}
-
-	private void createWrappedPrimitiveFunction(String name, JavascriptFunction function, String wrapperName) throws ScriptException {
-		ScriptContext context = scriptEngine.getContext();
-		Bindings bindings = context.getBindings(ScriptContext.ENGINE_SCOPE);
-		bindings.put("__" + name, function);
-		scriptEngine.eval(String.format("%1$s = %2$s(__%1$s)", name, wrapperName));
 	}
 
 	public void executeConsoleInput(String script) {
@@ -230,18 +231,22 @@ public class ScriptService {
 	private Object convertScriptValueToClass(ValueLocation valueLocation, Class<?> clazz, Object scriptValue, ExceptionContextFactory contextFactory) {
 		if (clazz.isAssignableFrom(scriptValue.getClass())) {
 			return scriptValue;
-		} else if ((clazz == StringValue.class) && (String.class.isAssignableFrom(scriptValue.getClass()))) {
-			return StringValue.makeConstant((String) scriptValue);
+		} else if (clazz == StringValue.class) {
+			if (String.class.isAssignableFrom(scriptValue.getClass())) {
+				return StringValue.makeConstant((String) scriptValue);
+			}
 		} else if (scriptValue instanceof ScriptObjectMirror) {
 			ScriptObjectMirror scriptObject = (ScriptObjectMirror) scriptValue;
-			if ((clazz == JavascriptTransformer.class) && scriptObject.isFunction()) {
-				return new JavascriptTransformer(scriptObject, valueLocation);
-			} else if (clazz == JavascriptPredicate.class) {
-				return new JavascriptPredicate(scriptObject, valueLocation);
-			} else if (clazz == JavascriptProducer.class) {
-				return new JavascriptProducer(scriptObject, valueLocation);
-			} else if (clazz == StringValue.class) {
-				return StringValue.makeFunctional(new JavascriptTransformer(scriptObject, valueLocation), valueLocation);
+			if (scriptObject.isFunction()) {
+				if (clazz == JavascriptTransformer.class) {
+					return new JavascriptTransformer(scriptObject, valueLocation);
+				} else if (clazz == JavascriptPredicate.class) {
+					return new JavascriptPredicate(scriptObject, valueLocation);
+				} else if (clazz == JavascriptProducer.class) {
+					return new JavascriptProducer(scriptObject, valueLocation);
+				} else if (clazz == StringValue.class) {
+					return StringValue.makeFunctional(new JavascriptTransformer(scriptObject, valueLocation), valueLocation);
+				}
 			} else {
 				if (!Modifier.isAbstract(clazz.getModifiers())) {
 					Object value = BeanUtils.instantiate(clazz);
@@ -254,7 +259,7 @@ public class ScriptService {
 							ValueLocation propertyValueSource = ValueLocation.makeProperty(processorName, propertyName);
 							wrapper.setPropertyValue(propertyName, convertScriptValue(propertyValueSource, fieldType, scriptObject.get(propertyName), contextFactory));
 						} catch (InvalidPropertyException e) {
-							throw new AlerterException("invalid property name \"" + propertyName + "\"", contextFactory.make());
+							throw new AlerterException("invalid property \"" + propertyName + "\"", contextFactory.make());
 						}
 					}
 					return value;

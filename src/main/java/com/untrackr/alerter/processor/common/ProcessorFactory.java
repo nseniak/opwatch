@@ -2,15 +2,26 @@ package com.untrackr.alerter.processor.common;
 
 import com.untrackr.alerter.common.ApplicationUtil;
 import com.untrackr.alerter.common.UndefinedSubstitutionVariableException;
+import com.untrackr.alerter.processor.descriptor.DefaultOption;
 import com.untrackr.alerter.processor.descriptor.ProcessorDescriptor;
 import com.untrackr.alerter.service.ProcessorService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.time.Duration;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 public abstract class ProcessorFactory<D extends ProcessorDescriptor, P extends Processor> {
+
+	private static final Logger logger = LoggerFactory.getLogger(ProcessorFactory.class);
 
 	protected ProcessorService processorService;
 
@@ -23,6 +34,41 @@ public abstract class ProcessorFactory<D extends ProcessorDescriptor, P extends 
 	public abstract Class<D> descriptorClass();
 
 	public abstract P make(Object scriptObject);
+
+	public List<String> properties() {
+		try {
+			List<String> props = new ArrayList<>();
+			BeanInfo info = Introspector.getBeanInfo(descriptorClass());
+			for (PropertyDescriptor pd : info.getPropertyDescriptors()) {
+				String name = pd.getName();
+				if (!name.equals("class")) {
+					props.add(name);
+				}
+			}
+			return props;
+		} catch (IntrospectionException e) {
+			logger.error("Exception while fetching properties: " + descriptorClass(), e);
+			throw new AlerterException("cannot fetch properties", ExceptionContext.makeProcessorFactory(name()));
+		}
+	}
+
+	public String defaultProperty() {
+		try {
+			BeanInfo info = Introspector.getBeanInfo(descriptorClass());
+			for (PropertyDescriptor pd : info.getPropertyDescriptors()) {
+				if (pd.getReadMethod().getAnnotation(DefaultOption.class) != null) {
+					return pd.getName();
+				}
+			}
+		} catch (IntrospectionException e) {
+			// Nothing to do
+		}
+		return null;
+	}
+
+	public void error(String message) {
+		throw new AlerterException(message, ExceptionContext.makeProcessorFactory(name()));
+	}
 
 	protected D convertProcessorDescriptor(Object scriptObject) {
 		return (D) processorService.getScriptService().convertScriptValue(ValueLocation.makeArgument(name(), "descriptor"), descriptorClass(), scriptObject,

@@ -2,24 +2,36 @@
 Packages.com.untrackr.alerter.service.ScriptService.logInfo("JavaScript module path: " + require.paths());
 //
 function factory_wrapper(factory) {
-	return function (descriptor) {
-		if (descriptor) {
-			return factory(descriptor);
+	return function (arg) {
+		var options;
+		if (!arg) {
+			options = {};
+		} else if (arg.constructor == Object) {
+			options = arg;
+		} else if (factory.defaultProperty()) {
+			options = {};
+			options[factory.defaultProperty()] = arg;
 		} else {
-			return factory({});
+			factory.error("doesn't have a default option; you must pass an object");
 		}
+		return factory.make(options);
 	}
 }
 //
 function vararg_factory_wrapper(factory) {
 	return function () {
+		var options;
 		if (arguments.length == 1) {
 			var arg = arguments[0];
-			if (arg && arg['processors']) {
-				return factory(arg);
+			if (arg.constructor == Array) {
+				options = { processors: arg };
+			} else {
+				options = arg;
 			}
+		} else {
+			options = {processors: Array.prototype.slice.call(arguments)};
 		}
-		return factory({processors: Array.prototype.slice.call(arguments)});
+		return factory.make(options);
 	}
 }
 //

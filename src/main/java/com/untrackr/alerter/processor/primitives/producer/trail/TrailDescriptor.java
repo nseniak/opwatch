@@ -1,5 +1,6 @@
 package com.untrackr.alerter.processor.primitives.producer.trail;
 
+import com.untrackr.alerter.processor.descriptor.DefaultOption;
 import com.untrackr.alerter.processor.descriptor.JavascriptTransformer;
 import com.untrackr.alerter.processor.descriptor.ScheduledProducerDescriptor;
 
@@ -16,6 +17,7 @@ public class TrailDescriptor extends ScheduledProducerDescriptor {
 		this.transformer = transformer;
 	}
 
+	@DefaultOption
 	public String getDuration() {
 		return duration;
 	}

@@ -1,13 +1,15 @@
 package com.untrackr.alerter.processor.primitives.transformer.sh;
 
 import com.untrackr.alerter.processor.descriptor.ActiveProcessorDescriptor;
+import com.untrackr.alerter.processor.descriptor.DefaultOption;
 import com.untrackr.alerter.processor.primitives.producer.CommandExecutorDesc;
 
 public class ShDescriptor extends ActiveProcessorDescriptor implements CommandExecutorDesc {
 
 	private String command;
 
-	public String getGenerator() {
+	@DefaultOption
+	public String getCommand() {
 		return command;
 	}
 

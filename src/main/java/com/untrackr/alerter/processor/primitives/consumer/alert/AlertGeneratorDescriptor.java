@@ -1,6 +1,7 @@
 package com.untrackr.alerter.processor.primitives.consumer.alert;
 
 import com.untrackr.alerter.processor.descriptor.ActiveProcessorDescriptor;
+import com.untrackr.alerter.processor.descriptor.DefaultOption;
 import com.untrackr.alerter.processor.descriptor.JavascriptPredicate;
 import com.untrackr.alerter.processor.descriptor.StringValue;
 
@@ -21,6 +22,7 @@ public class AlertGeneratorDescriptor extends ActiveProcessorDescriptor {
 		this.priority = priority;
 	}
 
+	@DefaultOption
 	public StringValue getMessage() {
 		return message;
 	}

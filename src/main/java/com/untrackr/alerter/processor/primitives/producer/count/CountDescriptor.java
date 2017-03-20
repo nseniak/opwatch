@@ -1,5 +1,6 @@
 package com.untrackr.alerter.processor.primitives.producer.count;
 
+import com.untrackr.alerter.processor.descriptor.DefaultOption;
 import com.untrackr.alerter.processor.descriptor.JavascriptPredicate;
 import com.untrackr.alerter.processor.descriptor.ScheduledProducerDescriptor;
 
@@ -8,6 +9,7 @@ public class CountDescriptor extends ScheduledProducerDescriptor {
 	private JavascriptPredicate predicate;
 	private String duration;
 
+	@DefaultOption
 	public JavascriptPredicate getPredicate() {
 		return predicate;
 	}

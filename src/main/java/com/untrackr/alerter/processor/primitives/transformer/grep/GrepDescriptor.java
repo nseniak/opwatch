@@ -1,6 +1,7 @@
 package com.untrackr.alerter.processor.primitives.transformer.grep;
 
 import com.untrackr.alerter.processor.descriptor.ActiveProcessorDescriptor;
+import com.untrackr.alerter.processor.descriptor.DefaultOption;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class GrepDescriptor extends ActiveProcessorDescriptor {
 	 */
 	private Boolean invert = false;
 
+	@DefaultOption
 	public String getRegex() {
 		return regex;
 	}

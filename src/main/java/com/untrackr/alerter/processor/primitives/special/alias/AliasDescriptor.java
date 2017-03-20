@@ -5,8 +5,17 @@ import com.untrackr.alerter.processor.descriptor.ProcessorDescriptor;
 
 public class AliasDescriptor extends ProcessorDescriptor {
 
+	private String name;
 	private Processor processor;
 	private Object descriptor;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 
 	public Processor getProcessor() {
 		return processor;
