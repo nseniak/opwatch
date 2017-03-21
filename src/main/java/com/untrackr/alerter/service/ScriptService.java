@@ -12,14 +12,14 @@ import com.untrackr.alerter.processor.primitives.filter.json.JsonFactory;
 import com.untrackr.alerter.processor.primitives.filter.jstack.JstackFactory;
 import com.untrackr.alerter.processor.primitives.filter.sh.ShFactory;
 import com.untrackr.alerter.processor.primitives.filter.stdout.StdoutFactory;
-import com.untrackr.alerter.processor.primitives.filter.transform.TransformFactory;
+import com.untrackr.alerter.processor.primitives.filter.apply.ApplyFactory;
 import com.untrackr.alerter.processor.primitives.producer.console.StdinFactory;
 import com.untrackr.alerter.processor.primitives.producer.count.CountFactory;
 import com.untrackr.alerter.processor.primitives.producer.cron.CronFactory;
 import com.untrackr.alerter.processor.primitives.producer.curl.CurlFactory;
 import com.untrackr.alerter.processor.primitives.producer.df.DfFactory;
-import com.untrackr.alerter.processor.primitives.producer.repeat.RepeatFactory;
 import com.untrackr.alerter.processor.primitives.producer.receive.ReceiveFactory;
+import com.untrackr.alerter.processor.primitives.producer.repeat.RepeatFactory;
 import com.untrackr.alerter.processor.primitives.producer.stat.StatFactory;
 import com.untrackr.alerter.processor.primitives.producer.tail.TailFactory;
 import com.untrackr.alerter.processor.primitives.producer.top.TopFactory;
@@ -30,6 +30,7 @@ import com.untrackr.alerter.processor.primitives.special.pipe.PipeFactory;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import jdk.nashorn.api.scripting.ScriptUtils;
+import jdk.nashorn.internal.runtime.Context;
 import jdk.nashorn.internal.runtime.JSType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +77,7 @@ public class ScriptService {
 			createSimpleFactoryFunction(new AliasFactory(processorService));
 			createSimpleFactoryFunction(new StdinFactory(processorService));
 			createSimpleFactoryFunction(new GrepFactory(processorService));
-			createSimpleFactoryFunction(new TransformFactory(processorService));
+			createSimpleFactoryFunction(new ApplyFactory(processorService));
 			createSimpleFactoryFunction(new CollectFactory(processorService));
 			createSimpleFactoryFunction(new TailFactory(processorService));
 			createSimpleFactoryFunction(new StdoutFactory(processorService));
@@ -244,6 +245,10 @@ public class ScriptService {
 					return StringValue.makeFunctional(new JavascriptFilter(scriptObject, valueLocation), valueLocation);
 				}
 			} else {
+				Object sobj = ScriptObjectMirror.unwrap(scriptValue, Context.getGlobal());
+				if (clazz.isAssignableFrom(sobj.getClass())) {
+					return sobj;
+				}
 				if (!Modifier.isAbstract(clazz.getModifiers())) {
 					Object value = BeanUtils.instantiate(clazz);
 					BeanWrapperImpl wrapper = new BeanWrapperImpl(value);

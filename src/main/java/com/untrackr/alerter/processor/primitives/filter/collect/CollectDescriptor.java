@@ -6,16 +6,7 @@ import com.untrackr.alerter.processor.descriptor.JavascriptFilter;
 
 public class CollectDescriptor extends ActiveProcessorDescriptor {
 
-	private JavascriptFilter transformer;
 	private Integer count;
-
-	public JavascriptFilter getTransformer() {
-		return transformer;
-	}
-
-	public void setTransformer(JavascriptFilter transformer) {
-		this.transformer = transformer;
-	}
 
 	@DefaultOption
 	public Integer getCount() {

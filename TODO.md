@@ -1,7 +1,9 @@
+* Make it possible to use a wrapper function for a processor definition
 * Find name
 * Getting started
 * Reference documentation generation
 * [x] Remove "js" prefix of processor names -- should be implicit
+* [x] Make grep use Javascript regexes
 * Generify alert channels (email, other alerters, etc)
 * Make JS initialization external files instead of resources, so they can be hacked by the user
 * Extension mechanism for adding processors in Java
