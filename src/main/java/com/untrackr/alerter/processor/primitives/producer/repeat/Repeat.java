@@ -1,4 +1,4 @@
-package com.untrackr.alerter.processor.primitives.producer.jscron;
+package com.untrackr.alerter.processor.primitives.producer.repeat;
 
 import com.untrackr.alerter.processor.descriptor.JavascriptProducer;
 import com.untrackr.alerter.processor.primitives.producer.ScheduledExecutor;
