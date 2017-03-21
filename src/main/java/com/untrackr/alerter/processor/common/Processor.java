@@ -24,6 +24,7 @@ public abstract class Processor<D extends ProcessorDescriptor> {
 	private Set<JavascriptFunction> scriptErrorSignaled = new HashSet<>();
 	private Set<Pair<Processor, String>> propertyErrorSignaled = new HashSet<>();
 	private boolean typeErrorSignaled = false;
+	private boolean started;
 
 	public Processor(ProcessorService processorService, D descriptor, String type) {
 		this.processorService = processorService;
@@ -34,7 +35,7 @@ public abstract class Processor<D extends ProcessorDescriptor> {
 
 	public void assignContainer(Processor<?> processor) {
 		if (container != null) {
-			throw new AlerterException("processor already used by " + container.getLocation().descriptor(), ExceptionContext.makeProcessorNoPayload(this));
+			throw new AlerterException("a processor can only be used once; this one is already used in " + container.getLocation().descriptor(), ExceptionContext.makeProcessorNoPayload(this));
 		}
 		container = processor;
 	}
@@ -51,23 +52,11 @@ public abstract class Processor<D extends ProcessorDescriptor> {
 
 	public abstract void stop();
 
-	public abstract boolean started();
-
-	public abstract boolean stopped();
-
 	public abstract void consume(Payload<?> payload);
 
 	public abstract void inferSignature();
 
 	public abstract void check();
-
-	public boolean allStarted(List<Processor<?>> processors) {
-		return processors.stream().allMatch(Processor::started);
-	}
-
-	public boolean allStopped(List<Processor<?>> processors) {
-		return processors.stream().allMatch(Processor::stopped);
-	}
 
 	public boolean scriptErrorSignaled(JavascriptFunction function) {
 		return !scriptErrorSignaled.add(function);

@@ -58,16 +58,6 @@ public class Pipe extends Processor<PipeDescriptor> {
 		}
 	}
 
-	@Override
-	public boolean started() {
-		return allStarted(processors);
-	}
-
-	@Override
-	public boolean stopped() {
-		return allStopped(processors);
-	}
-
 	private Processor<?> first() {
 		return processors.get(0);
 	}

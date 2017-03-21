@@ -1,9 +1,9 @@
 package com.untrackr.alerter.processor.primitives.producer.curl;
 
 import com.untrackr.alerter.processor.descriptor.DefaultOption;
-import com.untrackr.alerter.processor.descriptor.ScheduledProducerDescriptor;
+import com.untrackr.alerter.processor.descriptor.ScheduledProcessorDescriptor;
 
-public class CurlDescriptor extends ScheduledProducerDescriptor {
+public class CurlDescriptor extends ScheduledProcessorDescriptor {
 
 	private String url;
 	private String connectTimeout;

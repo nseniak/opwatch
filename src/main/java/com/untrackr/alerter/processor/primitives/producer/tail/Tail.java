@@ -21,7 +21,7 @@ public class Tail extends Producer<TailDescriptor> {
 	}
 
 	@Override
-	public void doStart() {
+	public void start() {
 		AlerterProfile profile = getProcessorService().getProfileService().profile();
 		tailedFile = new TailedFile(profile, file, (line, lineNumber) -> {
 			if (ignoreBlankLine && line.trim().isEmpty()) {
@@ -35,7 +35,7 @@ public class Tail extends Producer<TailDescriptor> {
 	}
 
 	@Override
-	public void doStop() {
+	public void stop() {
 		getProcessorService().getFileTailingService().removeTailedFile(tailedFile);
 	}
 

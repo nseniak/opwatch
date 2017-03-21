@@ -29,7 +29,7 @@ public class Post extends Consumer<PostDescriptor> {
 	}
 
 	@Override
-	public void doConsume(Payload<?> payload) {
+	public void consumeInOwnThread(Payload<?> payload) {
 		String uri = UriComponentsBuilder.newInstance().scheme("http").host(hostname).port(port).path("/processor" + urlPath).toUriString();
 		RestTemplate restTemplate = new RestTemplate();
 		RemotePayload remotePayload = new RemotePayload(payload);

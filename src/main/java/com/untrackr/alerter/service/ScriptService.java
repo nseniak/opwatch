@@ -1,15 +1,24 @@
 package com.untrackr.alerter.service;
 
+import com.untrackr.alerter.documentation.DocumentationService;
+import com.untrackr.alerter.documentation.ProcessorDoc;
 import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.processor.descriptor.*;
 import com.untrackr.alerter.processor.primitives.consumer.alert.AlertGeneratorFactory;
 import com.untrackr.alerter.processor.primitives.consumer.post.PostFactory;
+import com.untrackr.alerter.processor.primitives.filter.collect.CollectFactory;
+import com.untrackr.alerter.processor.primitives.filter.grep.GrepFactory;
+import com.untrackr.alerter.processor.primitives.filter.json.JsonFactory;
+import com.untrackr.alerter.processor.primitives.filter.jstack.JstackFactory;
+import com.untrackr.alerter.processor.primitives.filter.sh.ShFactory;
+import com.untrackr.alerter.processor.primitives.filter.stdout.StdoutFactory;
+import com.untrackr.alerter.processor.primitives.filter.transform.TransformFactory;
 import com.untrackr.alerter.processor.primitives.producer.console.StdinFactory;
 import com.untrackr.alerter.processor.primitives.producer.count.CountFactory;
 import com.untrackr.alerter.processor.primitives.producer.cron.CronFactory;
 import com.untrackr.alerter.processor.primitives.producer.curl.CurlFactory;
 import com.untrackr.alerter.processor.primitives.producer.df.DfFactory;
-import com.untrackr.alerter.processor.primitives.producer.jscron.JSCronFactory;
+import com.untrackr.alerter.processor.primitives.producer.jscron.RepeatFactory;
 import com.untrackr.alerter.processor.primitives.producer.receive.ReceiveFactory;
 import com.untrackr.alerter.processor.primitives.producer.stat.StatFactory;
 import com.untrackr.alerter.processor.primitives.producer.tail.TailFactory;
@@ -18,17 +27,6 @@ import com.untrackr.alerter.processor.primitives.producer.trail.TrailFactory;
 import com.untrackr.alerter.processor.primitives.special.alias.AliasFactory;
 import com.untrackr.alerter.processor.primitives.special.parallel.ParallelFactory;
 import com.untrackr.alerter.processor.primitives.special.pipe.PipeFactory;
-import com.untrackr.alerter.processor.primitives.transformer.collect.CollectFactory;
-import com.untrackr.alerter.processor.primitives.transformer.grep.GrepFactory;
-import com.untrackr.alerter.processor.primitives.transformer.js.JSFactory;
-import com.untrackr.alerter.processor.primitives.transformer.jsgrep.JSGrepFactory;
-import com.untrackr.alerter.processor.primitives.transformer.json.JsonFactory;
-import com.untrackr.alerter.processor.primitives.transformer.jstack.JstackFactory;
-import com.untrackr.alerter.processor.primitives.transformer.once.OnceFactory;
-import com.untrackr.alerter.processor.primitives.transformer.print.StdoutFactory;
-import com.untrackr.alerter.processor.primitives.transformer.sh.ShFactory;
-import com.untrackr.alerter.documentation.DocumentationService;
-import com.untrackr.alerter.documentation.ProcessorDoc;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import jdk.nashorn.api.scripting.ScriptUtils;
@@ -78,8 +76,7 @@ public class ScriptService {
 			createSimpleFactoryFunction(new AliasFactory(processorService));
 			createSimpleFactoryFunction(new StdinFactory(processorService));
 			createSimpleFactoryFunction(new GrepFactory(processorService));
-			createSimpleFactoryFunction(new JSGrepFactory(processorService));
-			createSimpleFactoryFunction(new JSFactory(processorService));
+			createSimpleFactoryFunction(new TransformFactory(processorService));
 			createSimpleFactoryFunction(new CollectFactory(processorService));
 			createSimpleFactoryFunction(new TailFactory(processorService));
 			createSimpleFactoryFunction(new StdoutFactory(processorService));
@@ -88,14 +85,13 @@ public class ScriptService {
 			createSimpleFactoryFunction(new DfFactory(processorService));
 			createSimpleFactoryFunction(new TopFactory(processorService));
 			createSimpleFactoryFunction(new AlertGeneratorFactory(processorService));
-			createSimpleFactoryFunction(new OnceFactory(processorService));
 			createSimpleFactoryFunction(new CurlFactory(processorService));
 			createSimpleFactoryFunction(new CountFactory(processorService));
 			createSimpleFactoryFunction(new TrailFactory(processorService));
 			createSimpleFactoryFunction(new ReceiveFactory(processorService));
 			createSimpleFactoryFunction(new PostFactory(processorService));
 			createSimpleFactoryFunction(new CronFactory(processorService));
-			createSimpleFactoryFunction(new JSCronFactory(processorService));
+			createSimpleFactoryFunction(new RepeatFactory(processorService));
 			createSimpleFactoryFunction(new ShFactory(processorService));
 			createSimpleFactoryFunction(new JstackFactory(processorService));
 			createSimpleFactoryFunction(new JsonFactory(processorService));
@@ -238,14 +234,14 @@ public class ScriptService {
 		} else if (scriptValue instanceof ScriptObjectMirror) {
 			ScriptObjectMirror scriptObject = (ScriptObjectMirror) scriptValue;
 			if (scriptObject.isFunction()) {
-				if (clazz == JavascriptTransformer.class) {
-					return new JavascriptTransformer(scriptObject, valueLocation);
+				if (clazz == JavascriptFilter.class) {
+					return new JavascriptFilter(scriptObject, valueLocation);
 				} else if (clazz == JavascriptPredicate.class) {
 					return new JavascriptPredicate(scriptObject, valueLocation);
 				} else if (clazz == JavascriptProducer.class) {
 					return new JavascriptProducer(scriptObject, valueLocation);
 				} else if (clazz == StringValue.class) {
-					return StringValue.makeFunctional(new JavascriptTransformer(scriptObject, valueLocation), valueLocation);
+					return StringValue.makeFunctional(new JavascriptFilter(scriptObject, valueLocation), valueLocation);
 				}
 			} else {
 				if (!Modifier.isAbstract(clazz.getModifiers())) {

@@ -14,7 +14,7 @@ public class StringValue extends DescriptorFieldValue {
 
 	private ProducerType type;
 	private String constant;
-	private JavascriptTransformer producer;
+	private JavascriptFilter producer;
 	private ValueLocation valueLocation;
 
 	private StringValue() {
@@ -27,7 +27,7 @@ public class StringValue extends DescriptorFieldValue {
 		return producer;
 	}
 
-	public static StringValue makeFunctional(JavascriptTransformer function, ValueLocation valueLocation) {
+	public static StringValue makeFunctional(JavascriptFilter function, ValueLocation valueLocation) {
 		StringValue producer = new StringValue();
 		producer.type = ProducerType.functional;
 		producer.producer = function;
@@ -49,7 +49,7 @@ public class StringValue extends DescriptorFieldValue {
 		return constant;
 	}
 
-	public JavascriptTransformer getProducer() {
+	public JavascriptFilter getProducer() {
 		return producer;
 	}
 

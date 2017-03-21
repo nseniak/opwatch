@@ -17,12 +17,12 @@ public abstract class Consumer<D extends ActiveProcessorDescriptor> extends Acti
 	}
 
 	@Override
-	public void doStart() {
+	public void start() {
 		createConsumerThread();
 	}
 
 	@Override
-	public void doStop() {
+	public void stop() {
 		stopConsumerThread();
 	}
 

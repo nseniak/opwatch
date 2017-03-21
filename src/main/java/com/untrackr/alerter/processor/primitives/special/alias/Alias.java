@@ -37,16 +37,6 @@ public class Alias extends Processor<AliasDescriptor> {
 	}
 
 	@Override
-	public boolean started() {
-		return processor.started();
-	}
-
-	@Override
-	public boolean stopped() {
-		return processor.stopped();
-	}
-
-	@Override
 	public void check() {
 		processor.check();
 	}

@@ -48,16 +48,6 @@ public class Parallel extends Processor<ParallelDescriptor> {
 	}
 
 	@Override
-	public boolean started() {
-		return allStarted(processors);
-	}
-
-	@Override
-	public boolean stopped() {
-		return allStopped(processors);
-	}
-
-	@Override
 	public void check() {
 		for (Processor processor : processors) {
 			processor.check();

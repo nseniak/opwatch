@@ -2,9 +2,9 @@ package com.untrackr.alerter.processor.primitives.producer.jscron;
 
 import com.untrackr.alerter.processor.descriptor.DefaultOption;
 import com.untrackr.alerter.processor.descriptor.JavascriptProducer;
-import com.untrackr.alerter.processor.descriptor.ScheduledProducerDescriptor;
+import com.untrackr.alerter.processor.descriptor.ScheduledProcessorDescriptor;
 
-public class RepeatDescriptor extends ScheduledProducerDescriptor {
+public class RepeatDescriptor extends ScheduledProcessorDescriptor {
 
 	private JavascriptProducer producer;
 

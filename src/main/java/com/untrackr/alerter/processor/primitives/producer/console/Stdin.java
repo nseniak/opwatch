@@ -12,12 +12,12 @@ public class Stdin extends Producer<StdinDescriptor> implements ConsoleService.C
 	}
 
 	@Override
-	public void doStart() {
+	public void start() {
 		processorService.getConsoleService().addConsumer(this);
 	}
 
 	@Override
-	protected void doStop() {
+	public void stop() {
 		processorService.getConsoleService().removeConsumer(this);
 	}
 

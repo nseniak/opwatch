@@ -19,7 +19,7 @@ public abstract class Producer<D extends ActiveProcessorDescriptor> extends Acti
 	}
 
 	@Override
-	public void doConsume(Payload payload) {
+	public void consumeInOwnThread(Payload<?> payload) {
 		processorService.infrastructureAlert(Alert.Priority.high, "Producer should not receive input", getLocation().descriptor());
 	}
 

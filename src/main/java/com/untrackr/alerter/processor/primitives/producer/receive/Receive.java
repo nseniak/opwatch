@@ -17,12 +17,12 @@ public class Receive extends Producer<ReceiveDescriptor> implements HttpService.
 	}
 
 	@Override
-	public void doStart() {
+	public void start() {
 		processorService.getHttpService().addPostBodyConsumer(urlPath, this);
 	}
 
 	@Override
-	protected void doStop() {
+	public void stop() {
 		processorService.getHttpService().removePostBodyConsumer(urlPath, this);
 	}
 

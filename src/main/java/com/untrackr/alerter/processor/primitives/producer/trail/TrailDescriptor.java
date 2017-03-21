@@ -1,19 +1,19 @@
 package com.untrackr.alerter.processor.primitives.producer.trail;
 
 import com.untrackr.alerter.processor.descriptor.DefaultOption;
-import com.untrackr.alerter.processor.descriptor.JavascriptTransformer;
-import com.untrackr.alerter.processor.descriptor.ScheduledProducerDescriptor;
+import com.untrackr.alerter.processor.descriptor.JavascriptFilter;
+import com.untrackr.alerter.processor.descriptor.ScheduledProcessorDescriptor;
 
-public class TrailDescriptor extends ScheduledProducerDescriptor {
+public class TrailDescriptor extends ScheduledProcessorDescriptor {
 
-	private JavascriptTransformer transformer;
+	private JavascriptFilter transformer;
 	private String duration;
 
-	public JavascriptTransformer getTransformer() {
+	public JavascriptFilter getTransformer() {
 		return transformer;
 	}
 
-	public void setTransformer(JavascriptTransformer transformer) {
+	public void setTransformer(JavascriptFilter transformer) {
 		this.transformer = transformer;
 	}
 

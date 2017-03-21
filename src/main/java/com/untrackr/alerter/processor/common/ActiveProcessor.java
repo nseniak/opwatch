@@ -22,7 +22,6 @@ public abstract class ActiveProcessor<D extends ActiveProcessorDescriptor> exten
 
 	private Future<?> consumerThreadFuture;
 	private long lastOutputTime = 0;
-	private boolean started;
 	private ConsumerThreadRunner consumerThreadRunner;
 
 	public ActiveProcessor(ProcessorService processorService, D descriptor, String name) {
@@ -34,42 +33,6 @@ public abstract class ActiveProcessor<D extends ActiveProcessorDescriptor> exten
 		super.addProducer(producer);
 		producer.addConsumer(this);
 	}
-
-	@Override
-	public void start() {
-		if (started) {
-			throw new AlerterException("processor already running", ExceptionContext.makeProcessorNoPayload(this));
-		}
-		doStart();
-		started = true;
-	}
-
-	protected abstract void doStart();
-
-	public abstract void doConsume(Payload<?> payload);
-
-	@Override
-	public void stop() {
-		if (started) {
-			try {
-				doStop();
-			} finally {
-				started = false;
-			}
-		}
-	}
-
-	@Override
-	public boolean started() {
-		return started;
-	}
-
-	@Override
-	public boolean stopped() {
-		return !started;
-	}
-
-	protected abstract void doStop();
 
 	@Override
 	public void check() {
@@ -116,6 +79,8 @@ public abstract class ActiveProcessor<D extends ActiveProcessorDescriptor> exten
 		Payload payload = Payload.makeRoot(processorService, this, value);
 		output(consumers, payload);
 	}
+
+	public abstract void consumeInOwnThread(Payload<?> payload);
 
 	public void output(Payload<?> payload) {
 		output(consumers, payload);

@@ -1,9 +1,9 @@
 package com.untrackr.alerter.processor.primitives.producer.stat;
 
 import com.untrackr.alerter.processor.descriptor.DefaultOption;
-import com.untrackr.alerter.processor.descriptor.ScheduledProducerDescriptor;
+import com.untrackr.alerter.processor.descriptor.ScheduledProcessorDescriptor;
 
-public class StatDescriptor extends ScheduledProducerDescriptor {
+public class StatDescriptor extends ScheduledProcessorDescriptor {
 
 	private String file;
 

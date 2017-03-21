@@ -18,3 +18,4 @@
 * Javascript port
 * System alarms
 * Static verification
+* Fix "pretty"
