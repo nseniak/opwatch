@@ -9,7 +9,7 @@ import com.untrackr.alerter.service.ProcessorService;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class PostFactory extends ActiveProcessorFactory<PostDescriptor, Post> {
+public class PostFactory extends ActiveProcessorFactory<PostConfig, Post> {
 
 	public PostFactory(ProcessorService processorService) {
 		super(processorService);
@@ -21,15 +21,15 @@ public class PostFactory extends ActiveProcessorFactory<PostDescriptor, Post> {
 	}
 
 	@Override
-	public Class<PostDescriptor> descriptorClass() {
-		return PostDescriptor.class;
+	public Class<PostConfig> descriptorClass() {
+		return PostConfig.class;
 	}
 
 	private static Pattern pathPattern = Pattern.compile("(?<hostname>[^:/]+)?(?::(?<port>[0-9]+))?(?<stack>/.*)");
 
 	@Override
 	public Post make(Object scriptObject) {
-		PostDescriptor descriptor = convertProcessorDescriptor(scriptObject);
+		PostConfig descriptor = convertProcessorDescriptor(scriptObject);
 		String pathString = checkVariableSubstitution("path", checkPropertyValue("path", descriptor.getPath()));
 		Matcher matcher = pathPattern.matcher(pathString);
 		if (!matcher.matches()) {

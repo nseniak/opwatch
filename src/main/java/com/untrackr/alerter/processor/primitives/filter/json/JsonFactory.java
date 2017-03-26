@@ -3,7 +3,7 @@ package com.untrackr.alerter.processor.primitives.filter.json;
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class JsonFactory extends ActiveProcessorFactory<JsonDescriptor, Json> {
+public class JsonFactory extends ActiveProcessorFactory<JsonConfig, Json> {
 
 	public JsonFactory(ProcessorService processorService) {
 		super(processorService);
@@ -15,13 +15,13 @@ public class JsonFactory extends ActiveProcessorFactory<JsonDescriptor, Json> {
 	}
 
 	@Override
-	public Class<JsonDescriptor> descriptorClass() {
-		return JsonDescriptor.class;
+	public Class<JsonConfig> descriptorClass() {
+		return JsonConfig.class;
 	}
 
 	@Override
 	public Json make(Object scriptObject) {
-		JsonDescriptor descriptor = convertProcessorDescriptor(scriptObject);
+		JsonConfig descriptor = convertProcessorDescriptor(scriptObject);
 		Json json = new Json(getProcessorService(), descriptor, name());
 		return json;
 	}

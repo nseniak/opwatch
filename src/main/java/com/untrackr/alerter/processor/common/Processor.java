@@ -1,7 +1,7 @@
 package com.untrackr.alerter.processor.common;
 
-import com.untrackr.alerter.processor.descriptor.JavascriptFunction;
-import com.untrackr.alerter.processor.descriptor.ProcessorDescriptor;
+import com.untrackr.alerter.processor.config.JavascriptFunction;
+import com.untrackr.alerter.processor.config.ProcessorConfig;
 import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.service.ProcessorService;
 import org.javatuples.Pair;
@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public abstract class Processor<D extends ProcessorDescriptor> {
+public abstract class Processor<D extends ProcessorConfig> {
 
 	protected ProcessorService processorService;
 	protected D descriptor;
@@ -24,7 +24,6 @@ public abstract class Processor<D extends ProcessorDescriptor> {
 	private Set<JavascriptFunction> scriptErrorSignaled = new HashSet<>();
 	private Set<Pair<Processor, String>> propertyErrorSignaled = new HashSet<>();
 	private boolean typeErrorSignaled = false;
-	private boolean started;
 
 	public Processor(ProcessorService processorService, D descriptor, String type) {
 		this.processorService = processorService;
@@ -38,6 +37,13 @@ public abstract class Processor<D extends ProcessorDescriptor> {
 			throw new AlerterException("a processor can only be used once; this one is already used in " + container.getLocation().descriptor(), ExceptionContext.makeProcessorNoPayload(this));
 		}
 		container = processor;
+	}
+
+	/**
+	 * For use in scripts
+	 */
+	public boolean isprocessor() {
+		return true;
 	}
 
 	public void addProducer(Processor<?> producer) {

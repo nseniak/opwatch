@@ -8,12 +8,12 @@ import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.concurrent.Future;
 
-public class Sh extends Filter<ShDescriptor> {
+public class Sh extends Filter<ShConfig> {
 
 	protected Future<?> commandConsumerThreadFuture;
 	private CommandRunner commandRunner;
 
-	public Sh(ProcessorService processorService, ShDescriptor descriptor, String name, CommandRunner commandRunner) {
+	public Sh(ProcessorService processorService, ShConfig descriptor, String name, CommandRunner commandRunner) {
 		super(processorService, descriptor, name);
 		this.commandRunner = commandRunner;
 	}

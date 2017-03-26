@@ -6,7 +6,7 @@ import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.List;
 
-public class ParallelFactory extends ProcessorFactory<ParallelDescriptor, Parallel> {
+public class ParallelFactory extends ProcessorFactory<ParallelConfig, Parallel> {
 
 	public ParallelFactory(ProcessorService processorService) {
 		super(processorService);
@@ -18,13 +18,13 @@ public class ParallelFactory extends ProcessorFactory<ParallelDescriptor, Parall
 	}
 
 	@Override
-	public Class<ParallelDescriptor> descriptorClass() {
-		return ParallelDescriptor.class;
+	public Class<ParallelConfig> descriptorClass() {
+		return ParallelConfig.class;
 	}
 
 	@Override
 	public Parallel make(Object scriptObject) {
-		ParallelDescriptor descriptor = convertProcessorDescriptor(scriptObject);
+		ParallelConfig descriptor = convertProcessorDescriptor(scriptObject);
 		List<Processor<?>> processors = descriptor.getProcessors();
 		return new Parallel(getProcessorService(), processors, descriptor, name());
 	}

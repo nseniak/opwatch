@@ -4,7 +4,7 @@ import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
 import com.untrackr.alerter.processor.primitives.producer.CommandRunner;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class ShFactory extends ActiveProcessorFactory<ShDescriptor, Sh> {
+public class ShFactory extends ActiveProcessorFactory<ShConfig, Sh> {
 
 	public ShFactory(ProcessorService processorService) {
 		super(processorService);
@@ -16,13 +16,13 @@ public class ShFactory extends ActiveProcessorFactory<ShDescriptor, Sh> {
 	}
 
 	@Override
-	public Class<ShDescriptor> descriptorClass() {
-		return ShDescriptor.class;
+	public Class<ShConfig> descriptorClass() {
+		return ShConfig.class;
 	}
 
 	@Override
 	public Sh make(Object scriptObject) {
-		ShDescriptor descriptor = convertProcessorDescriptor(scriptObject);
+		ShConfig descriptor = convertProcessorDescriptor(scriptObject);
 		CommandRunner producer = makeCommandOutputProducer(descriptor);
 		Sh sh = new Sh(getProcessorService(), descriptor, name(), producer);
 		return sh;

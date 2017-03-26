@@ -6,9 +6,9 @@ import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.processor.primitives.producer.ScheduledExecutor;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class Trail extends TrailCollecter<TrailDescriptor> {
+public class Trail extends TrailCollecter<TrailConfig> {
 
-	public Trail(ProcessorService processorService, TrailDescriptor descriptor, String name, ScheduledExecutor scheduledExecutor, long duration) {
+	public Trail(ProcessorService processorService, TrailConfig descriptor, String name, ScheduledExecutor scheduledExecutor, long duration) {
 		super(processorService, descriptor, name, scheduledExecutor, duration);
 	}
 

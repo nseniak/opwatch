@@ -7,11 +7,11 @@ import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.List;
 
-public class Pipe extends Processor<PipeDescriptor> {
+public class Pipe extends Processor<PipeConfig> {
 
 	private List<Processor<?>> processors;
 
-	public Pipe(ProcessorService processorService, List<Processor<?>> processors, PipeDescriptor descriptor, String name) {
+	public Pipe(ProcessorService processorService, List<Processor<?>> processors, PipeConfig descriptor, String name) {
 		super(processorService, descriptor, name);
 		this.processors = processors;
 		Processor<?> previous = null;

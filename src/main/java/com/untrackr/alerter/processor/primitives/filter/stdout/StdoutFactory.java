@@ -3,7 +3,7 @@ package com.untrackr.alerter.processor.primitives.filter.stdout;
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class StdoutFactory extends ActiveProcessorFactory<StdoutDescriptor, Stdout> {
+public class StdoutFactory extends ActiveProcessorFactory<StdoutConfig, Stdout> {
 
 	public StdoutFactory(ProcessorService processorService) {
 		super(processorService);
@@ -15,13 +15,13 @@ public class StdoutFactory extends ActiveProcessorFactory<StdoutDescriptor, Stdo
 	}
 
 	@Override
-	public Class<StdoutDescriptor> descriptorClass() {
-		return StdoutDescriptor.class;
+	public Class<StdoutConfig> descriptorClass() {
+		return StdoutConfig.class;
 	}
 
 	@Override
 	public Stdout make(Object scriptObject) {
-		StdoutDescriptor descriptor = convertProcessorDescriptor(scriptObject);
+		StdoutConfig descriptor = convertProcessorDescriptor(scriptObject);
 		boolean displayPayload = optionalPropertyValue("payload", descriptor.getPayload(), false);
 		Stdout stdout = new Stdout(getProcessorService(), descriptor, name(), displayPayload);
 		return stdout;

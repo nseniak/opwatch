@@ -3,7 +3,7 @@ package com.untrackr.alerter.processor.primitives.producer.top;
 import com.untrackr.alerter.processor.primitives.producer.ScheduledExecutorFactory;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class TopFactory extends ScheduledExecutorFactory<TopDescriptor, Top> {
+public class TopFactory extends ScheduledExecutorFactory<TopConfig, Top> {
 
 	public TopFactory(ProcessorService processorService) {
 		super(processorService);
@@ -15,13 +15,13 @@ public class TopFactory extends ScheduledExecutorFactory<TopDescriptor, Top> {
 	}
 
 	@Override
-	public Class<TopDescriptor> descriptorClass() {
-		return TopDescriptor.class;
+	public Class<TopConfig> descriptorClass() {
+		return TopConfig.class;
 	}
 
 	@Override
 	public Top make(Object scriptObject) {
-		TopDescriptor descriptor = convertProcessorDescriptor(scriptObject);
+		TopConfig descriptor = convertProcessorDescriptor(scriptObject);
 		Top top = new Top(getProcessorService(), descriptor, name(), makeScheduledExecutor(descriptor));
 		return top;
 	}

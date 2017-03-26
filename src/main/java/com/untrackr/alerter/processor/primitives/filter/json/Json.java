@@ -6,9 +6,9 @@ import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.processor.primitives.filter.Filter;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class Json extends Filter<JsonDescriptor> {
+public class Json extends Filter<JsonConfig> {
 
-	public Json(ProcessorService processorService, JsonDescriptor descriptor, String name) {
+	public Json(ProcessorService processorService, JsonConfig descriptor, String name) {
 		super(processorService, descriptor, name);
 	}
 

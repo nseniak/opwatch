@@ -1,10 +1,10 @@
 package com.untrackr.alerter.processor.primitives.filter;
 
-import com.untrackr.alerter.processor.descriptor.ActiveProcessorDescriptor;
+import com.untrackr.alerter.processor.config.ActiveProcessorConfig;
 import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.service.ProcessorService;
 
-public abstract class ConditionalFilter<D extends ActiveProcessorDescriptor> extends Filter<D> {
+public abstract class ConditionalFilter<D extends ActiveProcessorConfig> extends Filter<D> {
 
 	public ConditionalFilter(ProcessorService processorService, D descriptor, String name) {
 		super(processorService, descriptor, name);

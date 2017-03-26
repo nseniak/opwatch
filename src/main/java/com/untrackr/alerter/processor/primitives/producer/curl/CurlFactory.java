@@ -8,7 +8,7 @@ import com.untrackr.alerter.service.ProcessorService;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class CurlFactory extends ScheduledExecutorFactory<CurlDescriptor, Curl> {
+public class CurlFactory extends ScheduledExecutorFactory<CurlConfig, Curl> {
 
 	public CurlFactory(ProcessorService processorService) {
 		super(processorService);
@@ -20,13 +20,13 @@ public class CurlFactory extends ScheduledExecutorFactory<CurlDescriptor, Curl> 
 	}
 
 	@Override
-	public Class<CurlDescriptor> descriptorClass() {
-		return CurlDescriptor.class;
+	public Class<CurlConfig> descriptorClass() {
+		return CurlConfig.class;
 	}
 
 	@Override
 	public Curl make(Object scriptObject) {
-		CurlDescriptor descriptor = convertProcessorDescriptor(scriptObject);
+		CurlConfig descriptor = convertProcessorDescriptor(scriptObject);
 		String urlString = checkVariableSubstitution("url", checkPropertyValue("url", descriptor.getUrl()));
 		URI uri;
 		try {

@@ -3,7 +3,7 @@ package com.untrackr.alerter.processor.primitives.producer.console;
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class StdinFactory extends ActiveProcessorFactory<StdinDescriptor, Stdin> {
+public class StdinFactory extends ActiveProcessorFactory<StdinConfig, Stdin> {
 
 	public StdinFactory(ProcessorService processorService) {
 		super(processorService);
@@ -15,13 +15,13 @@ public class StdinFactory extends ActiveProcessorFactory<StdinDescriptor, Stdin>
 	}
 
 	@Override
-	public Class<StdinDescriptor> descriptorClass() {
-		return StdinDescriptor.class;
+	public Class<StdinConfig> descriptorClass() {
+		return StdinConfig.class;
 	}
 
 	@Override
 	public Stdin make(Object scriptObject) {
-		StdinDescriptor descriptor = convertProcessorDescriptor(scriptObject);
+		StdinConfig descriptor = convertProcessorDescriptor(scriptObject);
 		Stdin stdin = new Stdin(getProcessorService(), descriptor, name());
 		return stdin;
 	}

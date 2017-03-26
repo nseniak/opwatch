@@ -5,11 +5,11 @@ import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.processor.primitives.filter.Filter;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class Stdout extends Filter<StdoutDescriptor> {
+public class Stdout extends Filter<StdoutConfig> {
 
 	private boolean displayPayload;
 
-	public Stdout(ProcessorService processorService, StdoutDescriptor descriptor, String name, boolean displayPayload) {
+	public Stdout(ProcessorService processorService, StdoutConfig descriptor, String name, boolean displayPayload) {
 		super(processorService, descriptor, name);
 		this.displayPayload = displayPayload;
 	}

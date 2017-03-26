@@ -1,13 +1,13 @@
 package com.untrackr.alerter.processor.primitives.consumer.alert;
 
 import com.untrackr.alerter.alert.Alert;
-import com.untrackr.alerter.processor.descriptor.JavascriptPredicate;
-import com.untrackr.alerter.processor.descriptor.StringValue;
+import com.untrackr.alerter.processor.config.JavascriptPredicate;
+import com.untrackr.alerter.processor.config.StringValue;
 import com.untrackr.alerter.processor.primitives.consumer.Consumer;
 import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class AlertGenerator extends Consumer<AlertGeneratorDescriptor> {
+public class AlertGenerator extends Consumer<AlertGeneratorConfig> {
 
 	private Alert.Priority priority;
 	private StringValue message;
@@ -17,7 +17,7 @@ public class AlertGenerator extends Consumer<AlertGeneratorDescriptor> {
 	private String application;
 	private String group;
 
-	public AlertGenerator(ProcessorService processorService, AlertGeneratorDescriptor descriptor, String name, String application, String group, StringValue message,
+	public AlertGenerator(ProcessorService processorService, AlertGeneratorConfig descriptor, String name, String application, String group, StringValue message,
 												Alert.Priority priority, JavascriptPredicate predicate, boolean toggle) {
 		super(processorService, descriptor, name);
 		this.priority = priority;

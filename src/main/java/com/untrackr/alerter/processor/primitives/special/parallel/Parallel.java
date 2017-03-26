@@ -9,11 +9,11 @@ import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.List;
 
-public class Parallel extends Processor<ParallelDescriptor> {
+public class Parallel extends Processor<ParallelConfig> {
 
 	private List<Processor<?>> processors;
 
-	public Parallel(ProcessorService processorService, List<Processor<?>> processors, ParallelDescriptor descriptor, String name) {
+	public Parallel(ProcessorService processorService, List<Processor<?>> processors, ParallelConfig descriptor, String name) {
 		super(processorService, descriptor, name);
 		this.processors = processors;
 		for (Processor<?> processor : processors) {

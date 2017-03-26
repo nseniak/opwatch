@@ -12,7 +12,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-public class Post extends Consumer<PostDescriptor> {
+public class Post extends Consumer<PostConfig> {
 
 	private String pathString;
 	private String hostname;
@@ -20,7 +20,7 @@ public class Post extends Consumer<PostDescriptor> {
 	private String urlPath;
 	private boolean postErrorSignaled = false;
 
-	public Post(ProcessorService processorService, PostDescriptor descriptor, String name, String pathString, String hostname, int port, String urlPath) {
+	public Post(ProcessorService processorService, PostConfig descriptor, String name, String pathString, String hostname, int port, String urlPath) {
 		super(processorService, descriptor, name);
 		this.pathString = pathString;
 		this.hostname = hostname;

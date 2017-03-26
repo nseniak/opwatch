@@ -1,10 +1,9 @@
 package com.untrackr.alerter.processor.primitives.filter.collect;
 
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
-import com.untrackr.alerter.processor.descriptor.JavascriptFilter;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class CollectFactory extends ActiveProcessorFactory<CollectDescriptor, Collect> {
+public class CollectFactory extends ActiveProcessorFactory<CollectConfig, Collect> {
 
 	public CollectFactory(ProcessorService processorService) {
 		super(processorService);
@@ -16,13 +15,13 @@ public class CollectFactory extends ActiveProcessorFactory<CollectDescriptor, Co
 	}
 
 	@Override
-	public Class<CollectDescriptor> descriptorClass() {
-		return CollectDescriptor.class;
+	public Class<CollectConfig> descriptorClass() {
+		return CollectConfig.class;
 	}
 
 	@Override
 	public Collect make(Object scriptObject) {
-		CollectDescriptor descriptor = convertProcessorDescriptor(scriptObject);
+		CollectConfig descriptor = convertProcessorDescriptor(scriptObject);
 		int count = checkPropertyValue("count", descriptor.getCount());
 		Collect collect = new Collect(getProcessorService(), descriptor, name(), count);
 		return collect;

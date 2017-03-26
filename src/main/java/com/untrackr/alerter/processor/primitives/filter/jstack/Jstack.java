@@ -9,7 +9,7 @@ import com.untrackr.alerter.service.ProcessorService;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Jstack extends Filter<JstackDescriptor> {
+public class Jstack extends Filter<JstackConfig> {
 
 	private String propertyName;
 	private Pattern methodPattern;
@@ -17,7 +17,7 @@ public class Jstack extends Filter<JstackDescriptor> {
 
 	private final static int MAX_EXCEPTION_LINES = 500;
 
-	public Jstack(ProcessorService processorService, JstackDescriptor descriptor, String name, String propertyName, Pattern methodPattern) {
+	public Jstack(ProcessorService processorService, JstackConfig descriptor, String name, String propertyName, Pattern methodPattern) {
 		super(processorService, descriptor, name);
 		this.propertyName = propertyName;
 		this.methodPattern = methodPattern;

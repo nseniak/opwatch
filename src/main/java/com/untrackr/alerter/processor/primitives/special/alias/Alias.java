@@ -4,11 +4,11 @@ import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class Alias extends Processor<AliasDescriptor> {
+public class Alias extends Processor<AliasConfig> {
 
 	Processor<?> processor;
 
-	public Alias(ProcessorService processorService, Processor<?> processor, AliasDescriptor descriptor, String name) {
+	public Alias(ProcessorService processorService, Processor<?> processor, AliasConfig descriptor, String name) {
 		super(processorService, descriptor, name);
 		this.processor = processor;
 		processor.assignContainer(this);

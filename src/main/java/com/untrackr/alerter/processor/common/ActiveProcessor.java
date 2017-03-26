@@ -1,6 +1,6 @@
 package com.untrackr.alerter.processor.common;
 
-import com.untrackr.alerter.processor.descriptor.ActiveProcessorDescriptor;
+import com.untrackr.alerter.processor.config.ActiveProcessorConfig;
 import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.service.ProcessorService;
 import com.untrackr.alerter.service.ScriptService;
@@ -16,7 +16,7 @@ import java.util.concurrent.Future;
 /**
  * A processor that runs in its own thread
  */
-public abstract class ActiveProcessor<D extends ActiveProcessorDescriptor> extends Processor<D> {
+public abstract class ActiveProcessor<D extends ActiveProcessorConfig> extends Processor<D> {
 
 	private static final Logger logger = LoggerFactory.getLogger(ActiveProcessor.class);
 

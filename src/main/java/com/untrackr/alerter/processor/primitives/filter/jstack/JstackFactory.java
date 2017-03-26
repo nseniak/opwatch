@@ -5,7 +5,7 @@ import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.regex.Pattern;
 
-public class JstackFactory extends ActiveProcessorFactory<JstackDescriptor, Jstack> {
+public class JstackFactory extends ActiveProcessorFactory<JstackConfig, Jstack> {
 
 	public JstackFactory(ProcessorService processorService) {
 		super(processorService);
@@ -17,13 +17,13 @@ public class JstackFactory extends ActiveProcessorFactory<JstackDescriptor, Jsta
 	}
 
 	@Override
-	public Class<JstackDescriptor> descriptorClass() {
-		return JstackDescriptor.class;
+	public Class<JstackConfig> descriptorClass() {
+		return JstackConfig.class;
 	}
 
 	@Override
 	public Jstack make(Object scriptObject) {
-		JstackDescriptor descriptor = convertProcessorDescriptor(scriptObject);
+		JstackConfig descriptor = convertProcessorDescriptor(scriptObject);
 		String fieldName = optionalPropertyValue("field", descriptor.getField(), "text");
 		String methodRegex = descriptor.getMethodRegex();
 		Pattern methodPattern = (methodRegex == null) ? null : compilePattern("regex", methodRegex);

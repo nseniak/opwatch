@@ -4,7 +4,7 @@ import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ProcessorFactory;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class AliasFactory extends ProcessorFactory<AliasDescriptor, Alias> {
+public class AliasFactory extends ProcessorFactory<AliasConfig, Alias> {
 
 	public AliasFactory(ProcessorService processorService) {
 		super(processorService);
@@ -16,13 +16,13 @@ public class AliasFactory extends ProcessorFactory<AliasDescriptor, Alias> {
 	}
 
 	@Override
-	public Class<AliasDescriptor> descriptorClass() {
-		return AliasDescriptor.class;
+	public Class<AliasConfig> descriptorClass() {
+		return AliasConfig.class;
 	}
 
 	@Override
 	public Alias make(Object scriptObject) {
-		AliasDescriptor descriptor = convertProcessorDescriptor(scriptObject);
+		AliasConfig descriptor = convertProcessorDescriptor(scriptObject);
 		Processor processor = checkPropertyValue("processor", descriptor.getProcessor());
 		String name = checkPropertyValue("name", descriptor.getName());
 		return new Alias(getProcessorService(), processor, descriptor, name);

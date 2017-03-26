@@ -8,9 +8,9 @@ import com.untrackr.alerter.service.ProcessorService;
 
 import java.lang.management.ManagementFactory;
 
-public class Top extends ScheduledProducer<TopDescriptor> {
+public class Top extends ScheduledProducer<TopConfig> {
 
-	public Top(ProcessorService processorService, TopDescriptor descriptor, String name, ScheduledExecutor scheduledExecutor) {
+	public Top(ProcessorService processorService, TopConfig descriptor, String name, ScheduledExecutor scheduledExecutor) {
 		super(processorService, descriptor, name, scheduledExecutor);
 	}
 

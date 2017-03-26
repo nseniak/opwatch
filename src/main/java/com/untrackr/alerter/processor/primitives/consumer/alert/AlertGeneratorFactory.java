@@ -2,11 +2,11 @@ package com.untrackr.alerter.processor.primitives.consumer.alert;
 
 import com.untrackr.alerter.alert.Alert;
 import com.untrackr.alerter.processor.common.*;
-import com.untrackr.alerter.processor.descriptor.JavascriptPredicate;
-import com.untrackr.alerter.processor.descriptor.StringValue;
+import com.untrackr.alerter.processor.config.JavascriptPredicate;
+import com.untrackr.alerter.processor.config.StringValue;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class AlertGeneratorFactory extends ActiveProcessorFactory<AlertGeneratorDescriptor, AlertGenerator> {
+public class AlertGeneratorFactory extends ActiveProcessorFactory<AlertGeneratorConfig, AlertGenerator> {
 
 	public AlertGeneratorFactory(ProcessorService processorService) {
 		super(processorService);
@@ -18,13 +18,13 @@ public class AlertGeneratorFactory extends ActiveProcessorFactory<AlertGenerator
 	}
 
 	@Override
-	public Class<AlertGeneratorDescriptor> descriptorClass() {
-		return AlertGeneratorDescriptor.class;
+	public Class<AlertGeneratorConfig> descriptorClass() {
+		return AlertGeneratorConfig.class;
 	}
 
 	@Override
 	public AlertGenerator make(Object scriptObject) {
-		AlertGeneratorDescriptor descriptor = convertProcessorDescriptor(scriptObject);
+		AlertGeneratorConfig descriptor = convertProcessorDescriptor(scriptObject);
 		String priorityName = optionalPropertyValue("priority", descriptor.getPriority(),  "normal");
 		Alert.Priority priority;
 		try {

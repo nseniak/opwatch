@@ -7,12 +7,12 @@ import com.untrackr.alerter.processor.payload.SeriesObject;
 import com.untrackr.alerter.processor.primitives.filter.Filter;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class Collect extends Filter<CollectDescriptor> {
+public class Collect extends Filter<CollectConfig> {
 
 	private int count;
 	private EvictingQueue<Object> queue;
 
-	public Collect(ProcessorService processorService, CollectDescriptor descriptor, String name, int count) {
+	public Collect(ProcessorService processorService, CollectConfig descriptor, String name, int count) {
 		super(processorService, descriptor, name);
 		this.count = count;
 		this.queue = EvictingQueue.create(count);

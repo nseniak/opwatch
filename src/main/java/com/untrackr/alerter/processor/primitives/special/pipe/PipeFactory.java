@@ -8,7 +8,7 @@ import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.List;
 
-public class PipeFactory extends ProcessorFactory<PipeDescriptor, Pipe> {
+public class PipeFactory extends ProcessorFactory<PipeConfig, Pipe> {
 
 	public PipeFactory(ProcessorService processorService) {
 		super(processorService);
@@ -20,16 +20,16 @@ public class PipeFactory extends ProcessorFactory<PipeDescriptor, Pipe> {
 	}
 
 	@Override
-	public Class<PipeDescriptor> descriptorClass() {
-		return PipeDescriptor.class;
+	public Class<PipeConfig> descriptorClass() {
+		return PipeConfig.class;
 	}
 
 	@Override
 	public Pipe make(Object scriptObject) {
-		PipeDescriptor descriptor = convertProcessorDescriptor(scriptObject);
+		PipeConfig descriptor = convertProcessorDescriptor(scriptObject);
 		List<Processor<?>> processors = descriptor.getProcessors();
 		if (processors.isEmpty()) {
-			throw new AlerterException("empty pipe", ExceptionContext.makeProcessorFactory(name()));
+			throw new AlerterException("a pipe cannot be empty", ExceptionContext.makeProcessorFactory(name()));
 		}
 		return new Pipe(getProcessorService(), processors, descriptor, name());
 	}

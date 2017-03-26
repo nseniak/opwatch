@@ -1,10 +1,10 @@
 package com.untrackr.alerter.processor.primitives.filter.apply;
 
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
-import com.untrackr.alerter.processor.descriptor.JavascriptFilter;
+import com.untrackr.alerter.processor.config.JavascriptFilter;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class ApplyFactory extends ActiveProcessorFactory<ApplyDescriptor, Apply> {
+public class ApplyFactory extends ActiveProcessorFactory<ApplyConfig, Apply> {
 
 	public ApplyFactory(ProcessorService processorService) {
 		super(processorService);
@@ -16,13 +16,13 @@ public class ApplyFactory extends ActiveProcessorFactory<ApplyDescriptor, Apply>
 	}
 
 	@Override
-	public Class<ApplyDescriptor> descriptorClass() {
-		return ApplyDescriptor.class;
+	public Class<ApplyConfig> descriptorClass() {
+		return ApplyConfig.class;
 	}
 
 	@Override
 	public Apply make(Object scriptObject) {
-		ApplyDescriptor descriptor = convertProcessorDescriptor(scriptObject);
+		ApplyConfig descriptor = convertProcessorDescriptor(scriptObject);
 		JavascriptFilter transformer = checkPropertyValue("transformer", descriptor.getLambda());
 		Apply apply = new Apply(getProcessorService(), descriptor, name(), transformer);
 		return apply;

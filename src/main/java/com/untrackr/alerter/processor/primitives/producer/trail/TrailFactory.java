@@ -1,10 +1,9 @@
 package com.untrackr.alerter.processor.primitives.producer.trail;
 
-import com.untrackr.alerter.processor.descriptor.JavascriptFilter;
 import com.untrackr.alerter.processor.primitives.producer.ScheduledExecutorFactory;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class TrailFactory extends ScheduledExecutorFactory<TrailDescriptor, Trail> {
+public class TrailFactory extends ScheduledExecutorFactory<TrailConfig, Trail> {
 
 	public TrailFactory(ProcessorService processorService) {
 		super(processorService);
@@ -16,13 +15,13 @@ public class TrailFactory extends ScheduledExecutorFactory<TrailDescriptor, Trai
 	}
 
 	@Override
-	public Class<TrailDescriptor> descriptorClass() {
-		return TrailDescriptor.class;
+	public Class<TrailConfig> descriptorClass() {
+		return TrailConfig.class;
 	}
 
 	@Override
 	public Trail make(Object scriptObject) {
-		TrailDescriptor descriptor = convertProcessorDescriptor(scriptObject);
+		TrailConfig descriptor = convertProcessorDescriptor(scriptObject);
 		long duration = durationValue("duration", descriptor.getDuration());
 		Trail trail = new Trail(getProcessorService(), descriptor, name(), makeScheduledExecutor(descriptor), duration);
 		return trail;

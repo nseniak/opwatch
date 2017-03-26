@@ -2,9 +2,9 @@ package com.untrackr.alerter.documentation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.untrackr.alerter.processor.common.Processor;
-import com.untrackr.alerter.processor.descriptor.ProcessorDescriptor;
+import com.untrackr.alerter.processor.config.ProcessorConfig;
 import com.untrackr.alerter.processor.common.ProcessorFactory;
-import com.untrackr.alerter.processor.descriptor.StringValue;
+import com.untrackr.alerter.processor.config.StringValue;
 import com.untrackr.alerter.service.ScriptService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ public class DocumentationService {
 
 	private ObjectMapper objectMapper = new ObjectMapper();
 
-	public <D extends ProcessorDescriptor, P extends Processor> ProcessorDoc documentation(ProcessorFactory<D, P> factory) {
+	public <D extends ProcessorConfig, P extends Processor> ProcessorDoc documentation(ProcessorFactory<D, P> factory) {
 		Class<D> descClass = factory.descriptorClass();
 		try {
 			BeanInfo info = Introspector.getBeanInfo(descClass);
@@ -73,8 +73,8 @@ public class DocumentationService {
 			return "a number";
 		} else if (ScriptService.JavascriptFunction.class.isAssignableFrom(clazz)) {
 			return "a function";
-		} else if (ProcessorDescriptor.class.isAssignableFrom(clazz)) {
-			return "a processor descriptor";
+		} else if (ProcessorConfig.class.isAssignableFrom(clazz)) {
+			return "a processor configuration";
 		} else if (StringValue.class.isAssignableFrom(clazz)) {
 			return "a string or function";
 		} else if (Processor.class.isAssignableFrom(clazz)) {

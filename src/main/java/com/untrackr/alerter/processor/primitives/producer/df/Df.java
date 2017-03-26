@@ -9,12 +9,12 @@ import com.untrackr.alerter.service.ProcessorService;
 
 import java.io.File;
 
-public class Df extends ScheduledProducer<DfDescriptor> {
+public class Df extends ScheduledProducer<DfConfig> {
 
 	private File file;
 	private boolean fileNotFoundErrorSignaled = false;
 
-	public Df(ProcessorService processorService, DfDescriptor descriptor, String name, ScheduledExecutor scheduledExecutor, File file) {
+	public Df(ProcessorService processorService, DfConfig descriptor, String name, ScheduledExecutor scheduledExecutor, File file) {
 		super(processorService, descriptor, name, scheduledExecutor);
 		this.file = file;
 	}

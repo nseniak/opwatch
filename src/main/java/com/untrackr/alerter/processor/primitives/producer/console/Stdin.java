@@ -5,9 +5,9 @@ import com.untrackr.alerter.processor.primitives.producer.Producer;
 import com.untrackr.alerter.service.ConsoleService;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class Stdin extends Producer<StdinDescriptor> implements ConsoleService.ConsoleLineConsumer {
+public class Stdin extends Producer<StdinConfig> implements ConsoleService.ConsoleLineConsumer {
 
-	public Stdin(ProcessorService processorService, StdinDescriptor descriptor, String name) {
+	public Stdin(ProcessorService processorService, StdinConfig descriptor, String name) {
 		super(processorService, descriptor, name);
 	}
 

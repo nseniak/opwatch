@@ -8,11 +8,11 @@ import com.untrackr.alerter.service.ProcessorService;
 import java.io.File;
 import java.util.Date;
 
-public class Stat extends ScheduledProducer<StatDescriptor> {
+public class Stat extends ScheduledProducer<StatConfig> {
 
 	private File file;
 
-	public Stat(ProcessorService processorService, StatDescriptor descriptor, String name, ScheduledExecutor scheduledExecutor, File file) {
+	public Stat(ProcessorService processorService, StatConfig descriptor, String name, ScheduledExecutor scheduledExecutor, File file) {
 		super(processorService, descriptor, name, scheduledExecutor);
 		this.file = file;
 	}

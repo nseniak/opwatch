@@ -3,7 +3,7 @@ package com.untrackr.alerter.service;
 import com.untrackr.alerter.documentation.DocumentationService;
 import com.untrackr.alerter.documentation.ProcessorDoc;
 import com.untrackr.alerter.processor.common.*;
-import com.untrackr.alerter.processor.descriptor.*;
+import com.untrackr.alerter.processor.config.*;
 import com.untrackr.alerter.processor.primitives.consumer.alert.AlertGeneratorFactory;
 import com.untrackr.alerter.processor.primitives.consumer.post.PostFactory;
 import com.untrackr.alerter.processor.primitives.filter.collect.CollectFactory;
@@ -148,20 +148,21 @@ public class ScriptService {
 
 	}
 
-	private <D extends ProcessorDescriptor, T extends Processor> void createSimpleFactoryFunction(ProcessorFactory<D, T> processorFactory) throws ScriptException {
+	private <D extends ProcessorConfig, T extends Processor> void createSimpleFactoryFunction(ProcessorFactory<D, T> processorFactory) throws ScriptException {
 		createFactoryFunction(processorFactory, "factory_wrapper");
 	}
 
-	private <D extends ProcessorDescriptor, T extends Processor> void createVarargFactoryFunction(ProcessorFactory<D, T> processorFactory) throws ScriptException {
+	private <D extends ProcessorConfig, T extends Processor> void createVarargFactoryFunction(ProcessorFactory<D, T> processorFactory) throws ScriptException {
 		createFactoryFunction(processorFactory, "vararg_factory_wrapper");
 	}
 
-	private <D extends ProcessorDescriptor, T extends Processor> void createFactoryFunction(ProcessorFactory<D, T> processorFactory, String wrapperName) throws ScriptException {
+	private <D extends ProcessorConfig, T extends Processor> void createFactoryFunction(ProcessorFactory<D, T> processorFactory, String wrapperName) throws ScriptException {
 		ScriptContext context = scriptEngine.getContext();
 		Bindings bindings = context.getBindings(ScriptContext.ENGINE_SCOPE);
 		String name = processorFactory.name();
-		bindings.put("__" + name + "_factory", processorFactory);
-		scriptEngine.eval(String.format("%1$s = %2$s(__%1$s_factory)", name, wrapperName));
+		String factoryName = "__" + name + "_factory";
+		bindings.put(factoryName, processorFactory);
+		scriptEngine.eval(String.format("%1$s = %2$s(%3$s)", name, wrapperName, factoryName));
 	}
 
 	private void createSimplePrimitiveFunction(String name, JavascriptFunction function) throws ScriptException {
@@ -228,11 +229,13 @@ public class ScriptService {
 	private Object convertScriptValueToClass(ValueLocation valueLocation, Class<?> clazz, Object scriptValue, ExceptionContextFactory contextFactory) {
 		if (clazz.isAssignableFrom(scriptValue.getClass())) {
 			return scriptValue;
-		} else if (clazz == StringValue.class) {
+		}
+		if (clazz == StringValue.class) {
 			if (String.class.isAssignableFrom(scriptValue.getClass())) {
 				return StringValue.makeConstant((String) scriptValue);
 			}
-		} else if (scriptValue instanceof ScriptObjectMirror) {
+		}
+		if (scriptValue instanceof ScriptObjectMirror) {
 			ScriptObjectMirror scriptObject = (ScriptObjectMirror) scriptValue;
 			if (scriptObject.isFunction()) {
 				if (clazz == JavascriptFilter.class) {

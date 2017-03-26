@@ -4,7 +4,7 @@ import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
 import com.untrackr.alerter.service.ProcessorService;
 import jdk.nashorn.internal.objects.NativeRegExp;
 
-public class GrepFactory extends ActiveProcessorFactory<GrepDescriptor, Grep> {
+public class GrepFactory extends ActiveProcessorFactory<GrepConfig, Grep> {
 
 	public GrepFactory(ProcessorService processorService) {
 		super(processorService);
@@ -16,13 +16,13 @@ public class GrepFactory extends ActiveProcessorFactory<GrepDescriptor, Grep> {
 	}
 
 	@Override
-	public Class<GrepDescriptor> descriptorClass() {
-		return GrepDescriptor.class;
+	public Class<GrepConfig> descriptorClass() {
+		return GrepConfig.class;
 	}
 
 	@Override
 	public Grep make(Object scriptObject) {
-		GrepDescriptor descriptor = convertProcessorDescriptor(scriptObject);
+		GrepConfig descriptor = convertProcessorDescriptor(scriptObject);
 		NativeRegExp regexp = checkPropertyValue("regexp", descriptor.getRegexp());
 		boolean invert = descriptor.getInvert();
 		Grep grep = new Grep(getProcessorService(), descriptor, name(), regexp, invert);

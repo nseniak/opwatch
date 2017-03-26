@@ -64,11 +64,11 @@ public class ValueLocation {
 			case property:
 				return "value for property \"" + propertyName + "\"";
 			case list_property_element:
-				return "element in \"" + propertyName + "\" array";
+				return "array element for property \"" + propertyName + "\"";
 			case list_argument_element:
-				return "element in array argument";
+				return "array element";
 			case argument:
-				return propertyName + " argument";
+				return "argument";
 			default:
 				return "object";
 		}

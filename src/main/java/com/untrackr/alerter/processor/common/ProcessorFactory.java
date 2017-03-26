@@ -2,13 +2,11 @@ package com.untrackr.alerter.processor.common;
 
 import com.untrackr.alerter.common.ApplicationUtil;
 import com.untrackr.alerter.common.UndefinedSubstitutionVariableException;
-import com.untrackr.alerter.processor.descriptor.DefaultOption;
-import com.untrackr.alerter.processor.descriptor.ProcessorDescriptor;
+import com.untrackr.alerter.processor.config.*;
 import com.untrackr.alerter.service.ProcessorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -19,7 +17,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-public abstract class ProcessorFactory<D extends ProcessorDescriptor, P extends Processor> {
+public abstract class ProcessorFactory<D extends ProcessorConfig, P extends Processor> {
 
 	private static final Logger logger = LoggerFactory.getLogger(ProcessorFactory.class);
 
@@ -35,35 +33,26 @@ public abstract class ProcessorFactory<D extends ProcessorDescriptor, P extends 
 
 	public abstract P make(Object scriptObject);
 
-	public List<String> properties() {
+	public ConfigSchema config() {
 		try {
-			List<String> props = new ArrayList<>();
-			BeanInfo info = Introspector.getBeanInfo(descriptorClass());
-			for (PropertyDescriptor pd : info.getPropertyDescriptors()) {
+			List<ConfigPropertySchema> properties = new ArrayList<>();
+			for (PropertyDescriptor pd : Introspector.getBeanInfo(descriptorClass()).getPropertyDescriptors()) {
 				String name = pd.getName();
 				if (!name.equals("class")) {
-					props.add(name);
+					ConfigPropertySchema schema = new ConfigPropertySchema();
+					schema.setName(name);
+					schema.setImplicit(pd.getReadMethod().getAnnotation(ImplicitProperty.class) != null);
+					schema.setOptional(pd.getReadMethod().getAnnotation(OptionalProperty.class) != null);
+					properties.add(schema);
 				}
 			}
-			return props;
+			ConfigSchema config = new ConfigSchema();
+			config.setProperties(properties);
+			return config;
 		} catch (IntrospectionException e) {
 			logger.error("Exception while fetching properties: " + descriptorClass(), e);
 			throw new AlerterException("cannot fetch properties", ExceptionContext.makeProcessorFactory(name()));
 		}
-	}
-
-	public String defaultProperty() {
-		try {
-			BeanInfo info = Introspector.getBeanInfo(descriptorClass());
-			for (PropertyDescriptor pd : info.getPropertyDescriptors()) {
-				if (pd.getReadMethod().getAnnotation(DefaultOption.class) != null) {
-					return pd.getName();
-				}
-			}
-		} catch (IntrospectionException e) {
-			// Nothing to do
-		}
-		return null;
 	}
 
 	public void error(String message) {
@@ -71,7 +60,7 @@ public abstract class ProcessorFactory<D extends ProcessorDescriptor, P extends 
 	}
 
 	protected D convertProcessorDescriptor(Object scriptObject) {
-		return (D) processorService.getScriptService().convertScriptValue(ValueLocation.makeArgument(name(), "descriptor"), descriptorClass(), scriptObject,
+		return (D) processorService.getScriptService().convertScriptValue(ValueLocation.makeArgument(name(), "configuration"), descriptorClass(), scriptObject,
 				() -> ExceptionContext.makeProcessorFactory(name()));
 	}
 
@@ -92,8 +81,8 @@ public abstract class ProcessorFactory<D extends ProcessorDescriptor, P extends 
 		}
 	}
 
-	protected long durationValue(String fieldName, String delayString) {
-		checkPropertyValue(fieldName, delayString);
+	protected long durationValue(String property, String delayString) {
+		checkPropertyValue(property, delayString);
 		String duration;
 		int start;
 		if (delayString.startsWith("P") || delayString.startsWith("p")) {
@@ -111,11 +100,11 @@ public abstract class ProcessorFactory<D extends ProcessorDescriptor, P extends 
 		}
 	}
 
-	public long optionalDurationValue(String fieldName, String delayString, long defaultValue) {
+	public long optionalDurationValue(String property, String delayString, long defaultValue) {
 		if (delayString == null) {
 			return defaultValue;
 		} else {
-			return durationValue(fieldName, delayString);
+			return durationValue(property, delayString);
 		}
 	}
 

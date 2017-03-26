@@ -5,12 +5,12 @@ import com.untrackr.alerter.processor.primitives.filter.ConditionalFilter;
 import com.untrackr.alerter.service.ProcessorService;
 import jdk.nashorn.internal.objects.NativeRegExp;
 
-public class Grep extends ConditionalFilter<GrepDescriptor> {
+public class Grep extends ConditionalFilter<GrepConfig> {
 
 	private NativeRegExp regexp;
 	private boolean invert;
 
-	public Grep(ProcessorService processorService, GrepDescriptor descriptor, String name, NativeRegExp regexp, boolean invert) {
+	public Grep(ProcessorService processorService, GrepConfig descriptor, String name, NativeRegExp regexp, boolean invert) {
 		super(processorService, descriptor, name);
 		this.regexp = regexp;
 		this.invert = invert;

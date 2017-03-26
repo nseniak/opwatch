@@ -1,6 +1,6 @@
 package com.untrackr.alerter.processor.common;
 
-import com.untrackr.alerter.processor.descriptor.ScheduledProcessorDescriptor;
+import com.untrackr.alerter.processor.config.ScheduledProcessorConfig;
 import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.processor.payload.SeriesObject;
 import com.untrackr.alerter.processor.primitives.producer.ScheduledExecutor;
@@ -8,7 +8,7 @@ import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-public abstract class TrailCollecter<D extends ScheduledProcessorDescriptor> extends ScheduledProcessor<D> {
+public abstract class TrailCollecter<D extends ScheduledProcessorConfig> extends ScheduledProcessor<D> {
 
 	private long duration;
 	protected LinkedBlockingQueue<SeriesObject> queue;

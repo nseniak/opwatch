@@ -7,11 +7,11 @@ import com.untrackr.alerter.processor.primitives.producer.Producer;
 import com.untrackr.alerter.service.HttpService;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class Receive extends Producer<ReceiveDescriptor> implements HttpService.PostBodyHandle {
+public class Receive extends Producer<ReceiveConfig> implements HttpService.PostBodyHandle {
 
 	private String urlPath;
 
-	public Receive(ProcessorService processorService, ReceiveDescriptor descriptor, String name, String urlPath) {
+	public Receive(ProcessorService processorService, ReceiveConfig descriptor, String name, String urlPath) {
 		super(processorService, descriptor, name);
 		this.urlPath = urlPath;
 	}

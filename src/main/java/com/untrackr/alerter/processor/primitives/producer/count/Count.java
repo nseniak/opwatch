@@ -1,16 +1,16 @@
 package com.untrackr.alerter.processor.primitives.producer.count;
 
-import com.untrackr.alerter.processor.descriptor.JavascriptPredicate;
+import com.untrackr.alerter.processor.config.JavascriptPredicate;
 import com.untrackr.alerter.processor.common.TrailCollecter;
 import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.processor.primitives.producer.ScheduledExecutor;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class Count extends TrailCollecter<CountDescriptor> {
+public class Count extends TrailCollecter<CountConfig> {
 
 	private JavascriptPredicate predicate;
 
-	public Count(ProcessorService processorService, CountDescriptor descriptor, String name, ScheduledExecutor scheduledExecutor, JavascriptPredicate predicate, long duration) {
+	public Count(ProcessorService processorService, CountConfig descriptor, String name, ScheduledExecutor scheduledExecutor, JavascriptPredicate predicate, long duration) {
 		super(processorService, descriptor, name, scheduledExecutor, duration);
 		this.predicate = predicate;
 	}

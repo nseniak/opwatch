@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 
-public class Curl extends ScheduledProducer<CurlDescriptor> {
+public class Curl extends ScheduledProducer<CurlConfig> {
 
 	private final boolean insecure;
 	private URI uri;
@@ -29,7 +29,7 @@ public class Curl extends ScheduledProducer<CurlDescriptor> {
 	private MediaType anyText = MediaType.valueOf("text/*");
 
 	public Curl(ProcessorService processorService,
-							CurlDescriptor descriptor,
+							CurlConfig descriptor,
 							String name,
 							ScheduledExecutor scheduledExecutor,
 							URI uri,

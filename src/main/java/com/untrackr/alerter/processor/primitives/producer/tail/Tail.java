@@ -8,13 +8,13 @@ import com.untrackr.alerter.service.ProcessorService;
 
 import java.nio.file.Path;
 
-public class Tail extends Producer<TailDescriptor> {
+public class Tail extends Producer<TailConfig> {
 
 	private Path file;
 	private boolean ignoreBlankLine;
 	private TailedFile tailedFile;
 
-	public Tail(ProcessorService processorService, TailDescriptor descriptor, String name, Path file, boolean ignoreBlankLine) {
+	public Tail(ProcessorService processorService, TailConfig descriptor, String name, Path file, boolean ignoreBlankLine) {
 		super(processorService, descriptor, name);
 		this.file = file;
 		this.ignoreBlankLine = ignoreBlankLine;
