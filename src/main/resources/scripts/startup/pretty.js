@@ -94,24 +94,24 @@ pretty = function (jsObject, expandAlias, indentLength) {
 
 	prettyProcessorPrint = function (processor, indent) {
 		var value = [],
-				descriptor,
+				config,
 				properties,
 				property,
 				i;
 
-		descriptor = processor.descriptor;
+		config = processor.configuration;
 		newIndent = indent + indentString;
-		if ((processor.type == "alias") && !expandAlias) {
-			return descriptor.name + '({' + newLine + prettyObjectPrint(descriptor.descriptor, newIndent) + indent + '})';
+		if ((config.name == "alias") && !expandAlias) {
+			return config.name + '({' + newLine + prettyObjectPrint(config, newIndent) + indent + '})';
 		} else {
-			properties = descriptor.properties();
+			properties = config.properties();
 			if (properties.length == 0) {
-				return descriptor.name + '()' + newLine;
+				return config.name + '()' + newLine;
 			} else {
 				for (i = 0; i < properties.length; i++) {
 					property = properties[i];
-					if ((property != "class") && descriptor[property]) {
-						value.push(newIndent + property + ': ' + pretty(descriptor[property], newIndent));
+					if (config[property]) {
+						value.push(newIndent + property + ': ' + pretty(config[property], newIndent));
 					}
 				}
 			}

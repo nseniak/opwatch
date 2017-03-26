@@ -18,7 +18,10 @@ public abstract class ProcessorConfig {
 			BeanInfo info = Introspector.getBeanInfo(this.getClass());
 			PropertyDescriptor[] props = info.getPropertyDescriptors();
 			for (PropertyDescriptor pd : props) {
-				result.add(pd.getName());
+				String name = pd.getName();
+				if (!name.equals("class")) {
+					result.add(pd.getName());
+				}
 			}
 		} catch (IntrospectionException e) {
 			// Do nothing

@@ -11,10 +11,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public abstract class Processor<D extends ProcessorConfig> {
+public abstract class Processor<C extends ProcessorConfig> {
 
 	protected ProcessorService processorService;
-	protected D descriptor;
+	protected C configuration;
 	protected String type;
 	protected List<Processor<?>> producers = new ArrayList<>();
 	protected List<Processor<?>> consumers = new ArrayList<>();
@@ -25,10 +25,10 @@ public abstract class Processor<D extends ProcessorConfig> {
 	private Set<Pair<Processor, String>> propertyErrorSignaled = new HashSet<>();
 	private boolean typeErrorSignaled = false;
 
-	public Processor(ProcessorService processorService, D descriptor, String type) {
+	public Processor(ProcessorService processorService, C configuration, String type) {
 		this.processorService = processorService;
 		this.type = type;
-		this.descriptor = descriptor;
+		this.configuration = configuration;
 		this.location = new ProcessorLocation(type);
 	}
 
@@ -99,8 +99,8 @@ public abstract class Processor<D extends ProcessorConfig> {
 		return type;
 	}
 
-	public D getDescriptor() {
-		return descriptor;
+	public C getConfiguration() {
+		return configuration;
 	}
 
 }

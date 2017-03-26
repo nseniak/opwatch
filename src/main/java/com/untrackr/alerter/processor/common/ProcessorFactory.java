@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-public abstract class ProcessorFactory<D extends ProcessorConfig, P extends Processor> {
+public abstract class ProcessorFactory<C extends ProcessorConfig, P extends Processor> {
 
 	private static final Logger logger = LoggerFactory.getLogger(ProcessorFactory.class);
 
@@ -31,7 +31,7 @@ public abstract class ProcessorFactory<D extends ProcessorConfig, P extends Proc
 
 	public abstract String name();
 
-	public abstract Class<D> configurationClass();
+	public abstract Class<C> configurationClass();
 
 	public abstract Class<P> processorClass();
 
@@ -76,8 +76,8 @@ public abstract class ProcessorFactory<D extends ProcessorConfig, P extends Proc
 		throw new AlerterException(message, ExceptionContext.makeProcessorFactory(name()));
 	}
 
-	protected D convertProcessorDescriptor(Object scriptObject) {
-		return (D) processorService.getScriptService().convertScriptValue(ValueLocation.makeArgument(name(), "configuration"), configurationClass(), scriptObject,
+	protected C convertProcessorDescriptor(Object scriptObject) {
+		return (C) processorService.getScriptService().convertScriptValue(ValueLocation.makeArgument(name(), "configuration"), configurationClass(), scriptObject,
 				() -> ExceptionContext.makeProcessorFactory(name()));
 	}
 

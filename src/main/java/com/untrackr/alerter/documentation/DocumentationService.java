@@ -28,8 +28,8 @@ public class DocumentationService {
 
 	private ObjectMapper objectMapper = new ObjectMapper();
 
-	public <D extends ProcessorConfig, P extends Processor> ProcessorDoc documentation(ProcessorFactory<D, P> factory) {
-		Class<D> descClass = factory.configurationClass();
+	public <C extends ProcessorConfig, P extends Processor> ProcessorDoc documentation(ProcessorFactory<C, P> factory) {
+		Class<C> descClass = factory.configurationClass();
 		try {
 			BeanInfo info = Introspector.getBeanInfo(descClass);
 			PropertyDescriptor[] props = info.getPropertyDescriptors();

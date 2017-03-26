@@ -149,15 +149,15 @@ public class ScriptService {
 
 	}
 
-	private <D extends ProcessorConfig, T extends Processor> void createSimpleFactoryFunction(ProcessorFactory<D, T> processorFactory) throws ScriptException {
+	private <C extends ProcessorConfig, T extends Processor> void createSimpleFactoryFunction(ProcessorFactory<C, T> processorFactory) throws ScriptException {
 		createFactoryFunction(processorFactory, "factory_wrapper");
 	}
 
-	private <D extends ProcessorConfig, T extends Processor> void createVarargFactoryFunction(ProcessorFactory<D, T> processorFactory) throws ScriptException {
+	private <C extends ProcessorConfig, T extends Processor> void createVarargFactoryFunction(ProcessorFactory<C, T> processorFactory) throws ScriptException {
 		createFactoryFunction(processorFactory, "vararg_factory_wrapper");
 	}
 
-	private <D extends ProcessorConfig, T extends Processor> void createFactoryFunction(ProcessorFactory<D, T> processorFactory, String wrapperName) throws ScriptException {
+	private <C extends ProcessorConfig, T extends Processor> void createFactoryFunction(ProcessorFactory<C, T> processorFactory, String wrapperName) throws ScriptException {
 		factories.put(processorFactory.processorClass(), processorFactory);
 		ScriptContext context = scriptEngine.getContext();
 		Bindings bindings = context.getBindings(ScriptContext.ENGINE_SCOPE);
