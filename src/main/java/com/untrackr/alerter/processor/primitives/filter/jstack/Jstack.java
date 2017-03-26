@@ -11,21 +11,19 @@ import java.util.regex.Pattern;
 
 public class Jstack extends Filter<JstackConfig> {
 
-	private String propertyName;
 	private Pattern methodPattern;
 	private ParsingState state = new ParsingState();
 
 	private final static int MAX_EXCEPTION_LINES = 500;
 
-	public Jstack(ProcessorService processorService, JstackConfig descriptor, String name, String propertyName, Pattern methodPattern) {
+	public Jstack(ProcessorService processorService, JstackConfig descriptor, String name, Pattern methodPattern) {
 		super(processorService, descriptor, name);
-		this.propertyName = propertyName;
 		this.methodPattern = methodPattern;
 	}
 
 	@Override
 	public void consumeInOwnThread(Payload<?> input) {
-		String text = payloadPropertyValue(input, propertyName, String.class);
+		String text = payloadValue(input, String.class);
 		String[] lines = text.split("\n");
 		for (String line : lines) {
 			ParsedException exception = parseNextLine(line);
