@@ -1,6 +1,7 @@
 package com.untrackr.alerter.processor.primitives.filter.json;
 
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
+import com.untrackr.alerter.processor.common.ProcessorSignature;
 import com.untrackr.alerter.service.ProcessorService;
 
 public class JsonFactory extends ActiveProcessorFactory<JsonConfig, Json> {
@@ -25,10 +26,14 @@ public class JsonFactory extends ActiveProcessorFactory<JsonConfig, Json> {
 	}
 
 	@Override
+	public ProcessorSignature staticSignature() {
+		return ProcessorSignature.makeFilter();
+	}
+
+	@Override
 	public Json make(Object scriptObject) {
 		JsonConfig descriptor = convertProcessorDescriptor(scriptObject);
-		Json json = new Json(getProcessorService(), descriptor, name());
-		return json;
+		return new Json(getProcessorService(), descriptor, name());
 	}
 
 }

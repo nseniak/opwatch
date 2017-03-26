@@ -6,13 +6,13 @@ import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.processor.config.*;
 import com.untrackr.alerter.processor.primitives.consumer.alert.AlertGeneratorFactory;
 import com.untrackr.alerter.processor.primitives.consumer.post.PostFactory;
+import com.untrackr.alerter.processor.primitives.filter.apply.ApplyFactory;
 import com.untrackr.alerter.processor.primitives.filter.collect.CollectFactory;
 import com.untrackr.alerter.processor.primitives.filter.grep.GrepFactory;
 import com.untrackr.alerter.processor.primitives.filter.json.JsonFactory;
 import com.untrackr.alerter.processor.primitives.filter.jstack.JstackFactory;
 import com.untrackr.alerter.processor.primitives.filter.sh.ShFactory;
 import com.untrackr.alerter.processor.primitives.filter.stdout.StdoutFactory;
-import com.untrackr.alerter.processor.primitives.filter.apply.ApplyFactory;
 import com.untrackr.alerter.processor.primitives.producer.console.StdinFactory;
 import com.untrackr.alerter.processor.primitives.producer.count.CountFactory;
 import com.untrackr.alerter.processor.primitives.producer.cron.CronFactory;
@@ -48,8 +48,7 @@ import java.io.*;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class ScriptService {
@@ -65,7 +64,7 @@ public class ScriptService {
 	@Autowired
 	private DocumentationService documentationService;
 
-	private List<ProcessorFactory<?, ?>> factories = new ArrayList<>();
+	private Map<Class<? extends Processor>, ProcessorFactory<?, ? extends Processor>> factories = new LinkedHashMap<>();
 
 	private static NashornScriptEngine scriptEngine;
 
@@ -159,7 +158,7 @@ public class ScriptService {
 	}
 
 	private <D extends ProcessorConfig, T extends Processor> void createFactoryFunction(ProcessorFactory<D, T> processorFactory, String wrapperName) throws ScriptException {
-		factories.add(processorFactory);
+		factories.put(processorFactory.processorClass(), processorFactory);
 		ScriptContext context = scriptEngine.getContext();
 		Bindings bindings = context.getBindings(ScriptContext.ENGINE_SCOPE);
 		String name = processorFactory.name();
@@ -175,7 +174,11 @@ public class ScriptService {
 	}
 
 	private List<ProcessorFactory<?, ?>> factories(Object obj) {
-		return factories;
+		return new ArrayList<>(factories.values());
+	}
+
+	public ProcessorFactory<?, ?> factory(Class<?> processorClass) {
+		return factories.get(processorClass);
 	}
 
 	public void executeConsoleInput(String script) {
@@ -289,6 +292,10 @@ public class ScriptService {
 
 	public String typeName(Type type) {
 		return documentationService.typeName(type);
+	}
+
+	public String processorCategoryName(ProcessorFactory<?, ?> factory) {
+		return documentationService.processorCategoryName(factory);
 	}
 
 	/**

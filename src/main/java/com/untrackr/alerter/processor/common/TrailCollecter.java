@@ -21,11 +21,6 @@ public abstract class TrailCollecter<D extends ScheduledProcessorConfig> extends
 	}
 
 	@Override
-	public void inferSignature() {
-		this.signature = ProcessorSignature.makeFilter();
-	}
-
-	@Override
 	public void start() {
 		createConsumerThread();
 		startupTimestamp = System.currentTimeMillis();

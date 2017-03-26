@@ -29,6 +29,18 @@ public abstract class ActiveProcessor<D extends ActiveProcessorConfig> extends P
 	}
 
 	@Override
+	public void inferSignature() {
+		ActiveProcessorFactory<?, ?> factory = (ActiveProcessorFactory<?, ?>) processorService.getScriptService().factory(this.getClass());
+		if (factory == null) {
+			throw new IllegalStateException("cannot find factory for class " + this.getClass().getName());
+		}
+		signature = factory.staticSignature();
+		if (signature == null) {
+			throw new IllegalStateException("no static signature for class " + this.getClass().getName());
+		}
+	}
+
+	@Override
 	public void addProducer(Processor<?> producer) {
 		super.addProducer(producer);
 		producer.addConsumer(this);

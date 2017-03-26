@@ -1,9 +1,10 @@
 package com.untrackr.alerter.processor.primitives.consumer.post;
 
-import com.untrackr.alerter.service.AlerterProfile;
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
 import com.untrackr.alerter.processor.common.AlerterException;
 import com.untrackr.alerter.processor.common.ExceptionContext;
+import com.untrackr.alerter.processor.common.ProcessorSignature;
+import com.untrackr.alerter.service.AlerterProfile;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.regex.Matcher;
@@ -30,6 +31,11 @@ public class PostFactory extends ActiveProcessorFactory<PostConfig, Post> {
 		return Post.class;
 	}
 
+	@Override
+	public ProcessorSignature staticSignature() {
+		return ProcessorSignature.makeConsumer();
+	}
+
 	private static Pattern pathPattern = Pattern.compile("(?<hostname>[^:/]+)?(?::(?<port>[0-9]+))?(?<stack>/.*)");
 
 	@Override
@@ -44,8 +50,7 @@ public class PostFactory extends ActiveProcessorFactory<PostConfig, Post> {
 		String hostname = (matcher.group("hostname") != null) ? matcher.group("hostname") : profile.getDefaultPostHostname();
 		int port = (matcher.group("port") != null) ? Integer.parseInt(matcher.group("hostname")) : profile.getDefaultPostPort();
 		String urlPath = matcher.group("stack");
-		Post post = new Post(getProcessorService(), descriptor, name(), pathString, hostname, port, urlPath);
-		return post;
+		return new Post(getProcessorService(), descriptor, name(), pathString, hostname, port, urlPath);
 	}
 
 }

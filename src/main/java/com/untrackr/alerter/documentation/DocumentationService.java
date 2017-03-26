@@ -3,6 +3,7 @@ package com.untrackr.alerter.documentation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ProcessorFactory;
+import com.untrackr.alerter.processor.common.ProcessorSignature;
 import com.untrackr.alerter.processor.config.ProcessorConfig;
 import com.untrackr.alerter.processor.config.StringValue;
 import com.untrackr.alerter.service.ScriptService;
@@ -44,6 +45,65 @@ public class DocumentationService {
 			logger.error("Exception while generation documentation: " + descClass.getName(), e);
 			return null;
 		}
+	}
+
+	public String processorCategoryName(ProcessorFactory<?, ?> factory) {
+		ProcessorSignature signature = factory.staticSignature();
+		if (signature == null) {
+			return "special";
+		}
+		ProcessorSignature.PipeRequirement inputRequirement = signature.getInputRequirement();
+		ProcessorSignature.PipeRequirement outputRequirement = signature.getOutputRequirement();
+		switch (inputRequirement) {
+			case NoData:
+				switch (outputRequirement) {
+					case Data:
+						return "producer";
+				}
+				break;
+			case Data:
+				switch (outputRequirement) {
+					case NoData:
+						return "consumer";
+					case Data:
+						return "filter";
+					case Any:
+						return "filter with ignorable output";
+				}
+				break;
+			case Any:
+				switch (outputRequirement) {
+					case Any:
+						return "wildcard";
+				}
+		}
+		return signatureDescriptor(signature);
+	}
+
+	public String signatureDescriptor(ProcessorSignature signature) {
+		ProcessorSignature.PipeRequirement inputRequirement = signature.getInputRequirement();
+		ProcessorSignature.PipeRequirement outputRequirement = signature.getOutputRequirement();
+		StringBuilder builder = new StringBuilder();
+		builder.append("<input from processor: ");
+		builder.append(requirementName(inputRequirement));
+		builder.append("; output to processor: ");
+		builder.append(requirementName(outputRequirement));
+		builder.append(">");
+		return builder.toString();
+	}
+
+	private String requirementName(ProcessorSignature.PipeRequirement requirement) {
+		switch (requirement) {
+			case None:
+				return "undefined";
+			case NoData:
+				return "forbidden";
+			case Data:
+				return "required";
+			case Any:
+				return "optional";
+		}
+		throw new IllegalStateException("unknown pipe requirement: " + requirement.name());
 	}
 
 	public String typeName(Type type) {

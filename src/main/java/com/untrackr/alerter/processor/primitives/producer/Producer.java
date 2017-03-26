@@ -14,11 +14,6 @@ public abstract class Producer<D extends ActiveProcessorConfig> extends ActivePr
 	}
 
 	@Override
-	public void inferSignature() {
-		this.signature = ProcessorSignature.makeProducer();
-	}
-
-	@Override
 	public void consumeInOwnThread(Payload<?> payload) {
 		processorService.infrastructureAlert(Alert.Priority.high, "Producer should not receive input", getLocation().descriptor());
 	}

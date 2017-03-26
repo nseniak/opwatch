@@ -4,6 +4,7 @@ import com.untrackr.alerter.alert.Alert;
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
 import com.untrackr.alerter.processor.common.AlerterException;
 import com.untrackr.alerter.processor.common.ExceptionContext;
+import com.untrackr.alerter.processor.common.ProcessorSignature;
 import com.untrackr.alerter.processor.config.JavascriptPredicate;
 import com.untrackr.alerter.processor.config.StringValue;
 import com.untrackr.alerter.service.AlerterProfile;
@@ -31,6 +32,11 @@ public class AlertGeneratorFactory extends ActiveProcessorFactory<AlertGenerator
 	}
 
 	@Override
+	public ProcessorSignature staticSignature() {
+		return ProcessorSignature.makeConsumer();
+	}
+
+	@Override
 	public AlertGenerator make(Object scriptObject) {
 		AlertGeneratorConfig descriptor = convertProcessorDescriptor(scriptObject);
 		String priorityName = checkPropertyValue("priority", descriptor.getPriority());
@@ -46,9 +52,8 @@ public class AlertGeneratorFactory extends ActiveProcessorFactory<AlertGenerator
 		AlerterProfile profile = processorService.profile();
 		String applicationName = (descriptor.getApplication() != null) ? descriptor.getApplication() : profile.getDefaultPushoverApplication();
 		String groupName = (descriptor.getGroup() != null) ? descriptor.getGroup() : profile.getDefaultPushoverGroup();
-		AlertGenerator alertGenerator = new AlertGenerator(getProcessorService(), descriptor, name(), applicationName, groupName,
+		return new AlertGenerator(getProcessorService(), descriptor, name(), applicationName, groupName,
 				message, priority, predicate, toggle);
-		return alertGenerator;
 	}
 
 }

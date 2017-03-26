@@ -1,5 +1,6 @@
 package com.untrackr.alerter.processor.primitives.producer.df;
 
+import com.untrackr.alerter.processor.common.ProcessorSignature;
 import com.untrackr.alerter.processor.primitives.producer.ScheduledExecutorFactory;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -25,11 +26,15 @@ public class DfFactory extends ScheduledExecutorFactory<DfConfig, Df> {
 	}
 
 	@Override
+	public ProcessorSignature staticSignature() {
+		return ProcessorSignature.makeProducer();
+	}
+
+	@Override
 	public Df make(Object scriptObject) {
 		DfConfig descriptor = convertProcessorDescriptor(scriptObject);
 		String file = checkVariableSubstitution("file", checkPropertyValue("file", descriptor.getFile()));
-		Df df = new Df(getProcessorService(), descriptor, name(), makeScheduledExecutor(descriptor), new java.io.File(file));
-		return df;
+		return new Df(getProcessorService(), descriptor, name(), makeScheduledExecutor(descriptor), new java.io.File(file));
 	}
 
 }

@@ -14,11 +14,6 @@ public abstract class ScheduledProducer<D extends ScheduledProcessorConfig> exte
 	}
 
 	@Override
-	public void inferSignature() {
-		this.signature = ProcessorSignature.makeProducer();
-	}
-
-	@Override
 	public void consumeInOwnThread(Payload<?> payload) {
 		processorService.infrastructureAlert(Alert.Priority.high, "Producer should not receive input", getLocation().descriptor());
 	}

@@ -1,6 +1,7 @@
 package com.untrackr.alerter.processor.primitives.producer.console;
 
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
+import com.untrackr.alerter.processor.common.ProcessorSignature;
 import com.untrackr.alerter.service.ProcessorService;
 
 public class StdinFactory extends ActiveProcessorFactory<StdinConfig, Stdin> {
@@ -25,10 +26,14 @@ public class StdinFactory extends ActiveProcessorFactory<StdinConfig, Stdin> {
 	}
 
 	@Override
+	public ProcessorSignature staticSignature() {
+		return ProcessorSignature.makeProducer();
+	}
+
+	@Override
 	public Stdin make(Object scriptObject) {
 		StdinConfig descriptor = convertProcessorDescriptor(scriptObject);
-		Stdin stdin = new Stdin(getProcessorService(), descriptor, name());
-		return stdin;
+		return new Stdin(getProcessorService(), descriptor, name());
 	}
 
 }

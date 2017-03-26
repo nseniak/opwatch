@@ -1,6 +1,7 @@
 package com.untrackr.alerter.processor.primitives.producer.receive;
 
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
+import com.untrackr.alerter.processor.common.ProcessorSignature;
 import com.untrackr.alerter.service.ProcessorService;
 
 public class ReceiveFactory extends ActiveProcessorFactory<ReceiveConfig, Receive> {
@@ -25,11 +26,15 @@ public class ReceiveFactory extends ActiveProcessorFactory<ReceiveConfig, Receiv
 	}
 
 	@Override
+	public ProcessorSignature staticSignature() {
+		return ProcessorSignature.makeProducer();
+	}
+
+	@Override
 	public Receive make(Object scriptObject) {
 		ReceiveConfig descriptor = convertProcessorDescriptor(scriptObject);
 		String urlPath = checkPropertyValue("url", descriptor.getPath());
-		Receive receive = new Receive(getProcessorService(), descriptor, name(), urlPath);
-		return receive;
+		return new Receive(getProcessorService(), descriptor, name(), urlPath);
 	}
 
 }

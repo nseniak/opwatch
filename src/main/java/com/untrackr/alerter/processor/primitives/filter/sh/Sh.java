@@ -19,11 +19,6 @@ public class Sh extends Filter<ShConfig> {
 	}
 
 	@Override
-	public void inferSignature() {
-		this.signature = ProcessorSignature.makeAny();
-	}
-
-	@Override
 	public void start() {
 		super.start();
 		commandConsumerThreadFuture = processorService.getConsumerExecutor().submit(() -> {

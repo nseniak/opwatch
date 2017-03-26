@@ -2,6 +2,7 @@ package com.untrackr.alerter.processor.primitives.producer.curl;
 
 import com.untrackr.alerter.processor.common.AlerterException;
 import com.untrackr.alerter.processor.common.ExceptionContext;
+import com.untrackr.alerter.processor.common.ProcessorSignature;
 import com.untrackr.alerter.processor.primitives.producer.ScheduledExecutorFactory;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -30,6 +31,11 @@ public class CurlFactory extends ScheduledExecutorFactory<CurlConfig, Curl> {
 	}
 
 	@Override
+	public ProcessorSignature staticSignature() {
+		return ProcessorSignature.makeProducer();
+	}
+
+	@Override
 	public Curl make(Object scriptObject) {
 		CurlConfig descriptor = convertProcessorDescriptor(scriptObject);
 		String urlString = checkVariableSubstitution("url", checkPropertyValue("url", descriptor.getUrl()));
@@ -43,9 +49,8 @@ public class CurlFactory extends ScheduledExecutorFactory<CurlConfig, Curl> {
 		long connectTimeout = durationValue(descriptor.getConnectTimeout());
 		long readTimeout = durationValue(descriptor.getReadTimeout());
 		boolean insecure = descriptor.getInsecure();
-		Curl curl = new Curl(getProcessorService(), descriptor, name(), makeScheduledExecutor(descriptor), uri,
+		return new Curl(getProcessorService(), descriptor, name(), makeScheduledExecutor(descriptor), uri,
 				(int) connectTimeout, (int) readTimeout, insecure);
-		return curl;
 	}
 
 }

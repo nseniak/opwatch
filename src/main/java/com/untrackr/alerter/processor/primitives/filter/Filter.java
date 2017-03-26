@@ -12,11 +12,6 @@ public abstract class Filter<D extends ActiveProcessorConfig> extends ActiveProc
 	}
 
 	@Override
-	public void inferSignature() {
-		this.signature = ProcessorSignature.makeFilter();
-	}
-
-	@Override
 	public void start() {
 		createConsumerThread();
 	}

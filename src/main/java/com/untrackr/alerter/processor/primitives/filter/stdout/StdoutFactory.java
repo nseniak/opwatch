@@ -1,6 +1,7 @@
 package com.untrackr.alerter.processor.primitives.filter.stdout;
 
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
+import com.untrackr.alerter.processor.common.ProcessorSignature;
 import com.untrackr.alerter.service.ProcessorService;
 
 public class StdoutFactory extends ActiveProcessorFactory<StdoutConfig, Stdout> {
@@ -25,11 +26,15 @@ public class StdoutFactory extends ActiveProcessorFactory<StdoutConfig, Stdout> 
 	}
 
 	@Override
+	public ProcessorSignature staticSignature() {
+		return ProcessorSignature.makeSideEffectFilter();
+	}
+
+	@Override
 	public Stdout make(Object scriptObject) {
 		StdoutConfig descriptor = convertProcessorDescriptor(scriptObject);
 		boolean displayPayload = descriptor.getPayload();
-		Stdout stdout = new Stdout(getProcessorService(), descriptor, name(), displayPayload);
-		return stdout;
+		return new Stdout(getProcessorService(), descriptor, name(), displayPayload);
 	}
 
 }

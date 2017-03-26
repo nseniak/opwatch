@@ -1,6 +1,7 @@
 package com.untrackr.alerter.processor.primitives.filter.jstack;
 
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
+import com.untrackr.alerter.processor.common.ProcessorSignature;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.regex.Pattern;
@@ -27,12 +28,16 @@ public class JstackFactory extends ActiveProcessorFactory<JstackConfig, Jstack> 
 	}
 
 	@Override
+	public ProcessorSignature staticSignature() {
+		return ProcessorSignature.makeFilter();
+	}
+
+	@Override
 	public Jstack make(Object scriptObject) {
 		JstackConfig descriptor = convertProcessorDescriptor(scriptObject);
 		String methodRegex = descriptor.getMethodRegex();
 		Pattern methodPattern = (methodRegex == null) ? null : compilePattern("regex", methodRegex);
-		Jstack jstack = new Jstack(getProcessorService(), descriptor, name(), methodPattern);
-		return jstack;
+		return new Jstack(getProcessorService(), descriptor, name(), methodPattern);
 	}
 
 }

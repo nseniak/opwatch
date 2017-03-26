@@ -15,12 +15,6 @@ public class Stdout extends Filter<StdoutConfig> {
 	}
 
 	@Override
-	public void inferSignature() {
-		// Override signature
-		this.signature = ProcessorSignature.makeSideEffectConsumer();
-	}
-
-	@Override
 	public void consumeInOwnThread(Payload<?> payload) {
 		System.out.println(processorService.json(displayPayload ? payload : payload.getValue()));
 		outputTransformed(payload.getValue(), payload);

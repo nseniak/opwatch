@@ -39,7 +39,7 @@ public class ProcessorSignature {
 		return new ProcessorSignature(PipeRequirement.Data, PipeRequirement.NoData);
 	}
 
-	public static ProcessorSignature makeSideEffectConsumer() {
+	public static ProcessorSignature makeSideEffectFilter() {
 		return new ProcessorSignature(PipeRequirement.Data, PipeRequirement.Any);
 	}
 
@@ -67,36 +67,6 @@ public class ProcessorSignature {
 		PipeRequirement inputReq = bottom(inputRequirement, other.getInputRequirement());
 		PipeRequirement outputReq = bottom(outputRequirement, other.getOutputRequirement());
 		return new ProcessorSignature(inputReq, outputReq);
-	}
-
-	public String describe() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("{input='");
-		switch (inputRequirement) {
-			case Data:
-				builder.append("required");
-				break;
-			case NoData:
-				builder.append("ignored");
-				break;
-			case Any:
-				builder.append("optional");
-				break;
-		}
-		builder.append("', output='");
-		switch (outputRequirement) {
-			case Data:
-				builder.append("required");
-				break;
-			case NoData:
-				builder.append("none");
-				break;
-			case Any:
-				builder.append("optional");
-				break;
-		}
-		builder.append("'}");
-		return builder.toString();
 	}
 
 	public PipeRequirement getInputRequirement() {

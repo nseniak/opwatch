@@ -1,5 +1,6 @@
 package com.untrackr.alerter.processor.primitives.producer.top;
 
+import com.untrackr.alerter.processor.common.ProcessorSignature;
 import com.untrackr.alerter.processor.primitives.producer.ScheduledExecutorFactory;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -25,10 +26,14 @@ public class TopFactory extends ScheduledExecutorFactory<TopConfig, Top> {
 	}
 
 	@Override
+	public ProcessorSignature staticSignature() {
+		return ProcessorSignature.makeProducer();
+	}
+
+	@Override
 	public Top make(Object scriptObject) {
 		TopConfig descriptor = convertProcessorDescriptor(scriptObject);
-		Top top = new Top(getProcessorService(), descriptor, name(), makeScheduledExecutor(descriptor));
-		return top;
+		return new Top(getProcessorService(), descriptor, name(), makeScheduledExecutor(descriptor));
 	}
 
 }

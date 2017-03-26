@@ -35,9 +35,13 @@ public abstract class ProcessorFactory<D extends ProcessorConfig, P extends Proc
 
 	public abstract Class<P> processorClass();
 
+	public ProcessorSignature staticSignature() {
+		return null;
+	}
+
 	public abstract P make(Object scriptObject);
 
-	public ConfigSchema config() {
+	public ProcessorSchema schema() {
 		try {
 			ProcessorConfig instance = configurationClass().newInstance();
 			List<ConfigPropertySchema> properties = new ArrayList<>();
@@ -57,8 +61,10 @@ public abstract class ProcessorFactory<D extends ProcessorConfig, P extends Proc
 					properties.add(schema);
 				}
 			}
-			ConfigSchema config = new ConfigSchema();
+			ProcessorSchema config = new ProcessorSchema();
+			config.setName(name());
 			config.setProperties(properties);
+			config.setCategory(processorService.getScriptService().processorCategoryName(this));
 			return config;
 		} catch (InvocationTargetException | InstantiationException | IllegalAccessException | IntrospectionException e) {
 			logger.error("Exception while fetching properties: " + configurationClass(), e);

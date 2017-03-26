@@ -6,31 +6,31 @@ function factory_wrapper(factory) {
 		return make_processor(factory, arg);
 	}
 	ctor.help = function () {
-		printHelp(factory, false);
+		printHelp(factory.schema(), false);
 	}
 	return ctor;
 }
 
 function make_processor(factory, arg) {
-	var config;
+	var schema;
 	if (!arg) {
-		config = {};
+		schema = {};
 	} else if (arg.constructor == Object) {
-		config = arg;
+		schema = arg;
 	} else {
-		implicit = implicit_property(factory);
+		implicit = implicit_property(factory.schema());
 		if (implicit) {
-			config = {};
-			config[implicit.name] = arg;
+			schema = {};
+			schema[implicit.name] = arg;
 		} else {
 			factory.error("doesn't have an implicit property; you must pass a full configuration object");
 		}
 	}
-	return factory.make(config);
+	return factory.make(schema);
 }
 
-function implicit_property(factory) {
-	var props = factory.config().properties;
+function implicit_property(schema) {
+	var props = schema.properties;
 	for (var i = 0; i < props.length; i++) {
 		if (props[i].implicit) {
 			return props[i];
@@ -38,12 +38,12 @@ function implicit_property(factory) {
 	}
 }
 
-function printHelp(factory, varargs) {
-	var props = factory.config().properties;
+function printHelp(schema, varargs) {
+	var props = schema.properties;
 	if (varargs) {
-			print(factory.name() + "(<processor>, ...);");
+			print(schema.name + "(<processor>, ...);");
 	}
-	var implicit = implicit_property(factory);
+	var implicit = implicit_property(schema);
 	var mandatory = [];
 	var optional = [];
 	for (var i = 0; i < props.length; i++) {
@@ -59,7 +59,7 @@ function printHelp(factory, varargs) {
 	mandatory.sort(prop_compare);
 	optional.sort(prop_compare);
 	if (implicit) {
-		print(factory.name() + "(" + implicit.name + " <" + implicit.type + ">);");
+		print(schema.name + "(" + implicit.name + " <" + implicit.type + ">);");
 	}
 	var all = [];
 	if (implicit) {
@@ -67,7 +67,7 @@ function printHelp(factory, varargs) {
 	}
 	all = all.concat(mandatory);
 	all = all.concat(optional);
-	print(factory.name() + "({");
+	print(schema.name + "({");
 	for (var i = 0; i < all.length; i++) {
 		var prop = all[i];
 		print("   " + property_help(prop));
@@ -96,7 +96,7 @@ function vararg_factory_wrapper(factory) {
 		return vararg_make_processor(factory, arguments);
 	}
 	ctor.help = function () {
-		printHelp(factory, true);
+		printHelp(factory.schema(), true);
 	}
 	return ctor;
 }
@@ -123,17 +123,17 @@ function help() {
 	var factories = __factories(1);
 	for (var i = 0; i < factories.length; i++) {
 		var fact = factories[i];
-		print("   " + constructor_short_help(fact));
+		print("   " + constructor_short_help(fact.schema()));
 	}
 }
 
-function constructor_short_help(factory) {
+function constructor_short_help(schema) {
 	var all = [];
-	var props = factory.config().properties;
+	var props = schema.properties;
 	for (var i = 0; i < props.length; i++) {
 		all.push(props[i]);
 	}
 	all.sort(prop_compare);
 	var conf = "{ " + all.map(function (prop) { return prop.name; }).join(", ") + " }";
-	return factory.name() + "(" + conf + ")";
+	return schema.category + ": " + schema.name + "(" + conf + ")";
 }

@@ -1,6 +1,7 @@
 package com.untrackr.alerter.processor.primitives.filter.apply;
 
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
+import com.untrackr.alerter.processor.common.ProcessorSignature;
 import com.untrackr.alerter.processor.config.JavascriptFilter;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -12,7 +13,7 @@ public class ApplyFactory extends ActiveProcessorFactory<ApplyConfig, Apply> {
 
 	@Override
 	public String name() {
-		return "transform";
+		return "apply";
 	}
 
 	@Override
@@ -26,11 +27,15 @@ public class ApplyFactory extends ActiveProcessorFactory<ApplyConfig, Apply> {
 	}
 
 	@Override
+	public ProcessorSignature staticSignature() {
+		return ProcessorSignature.makeFilter();
+	}
+
+	@Override
 	public Apply make(Object scriptObject) {
 		ApplyConfig descriptor = convertProcessorDescriptor(scriptObject);
 		JavascriptFilter transformer = checkPropertyValue("lambda", descriptor.getLambda());
-		Apply apply = new Apply(getProcessorService(), descriptor, name(), transformer);
-		return apply;
+		return new Apply(getProcessorService(), descriptor, name(), transformer);
 	}
 
 }
