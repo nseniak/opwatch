@@ -22,7 +22,7 @@ public abstract class TrailCollecter<D extends ScheduledProcessorConfig> extends
 
 	@Override
 	public void inferSignature() {
-		this.signature = ProcessorSignature.makeTransformer();
+		this.signature = ProcessorSignature.makeFilter();
 	}
 
 	@Override

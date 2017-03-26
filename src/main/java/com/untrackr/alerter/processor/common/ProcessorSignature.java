@@ -43,7 +43,7 @@ public class ProcessorSignature {
 		return new ProcessorSignature(PipeRequirement.Data, PipeRequirement.Any);
 	}
 
-	public static ProcessorSignature makeTransformer() {
+	public static ProcessorSignature makeFilter() {
 		return new ProcessorSignature(PipeRequirement.Data, PipeRequirement.Data);
 	}
 

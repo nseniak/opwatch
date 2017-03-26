@@ -13,7 +13,7 @@ public abstract class Filter<D extends ActiveProcessorConfig> extends ActiveProc
 
 	@Override
 	public void inferSignature() {
-		this.signature = ProcessorSignature.makeTransformer();
+		this.signature = ProcessorSignature.makeFilter();
 	}
 
 	@Override
