@@ -6,7 +6,7 @@ import com.untrackr.alerter.processor.config.OptionalProperty;
 
 public class StdoutConfig extends ActiveProcessorConfig {
 
-	private Boolean payload;
+	private Boolean payload = false;
 
 	@OptionalProperty
 	@ImplicitProperty

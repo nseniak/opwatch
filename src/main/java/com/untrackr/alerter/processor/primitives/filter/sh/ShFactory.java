@@ -16,7 +16,7 @@ public class ShFactory extends ActiveProcessorFactory<ShConfig, Sh> {
 	}
 
 	@Override
-	public Class<ShConfig> descriptorClass() {
+	public Class<ShConfig> configurationClass() {
 		return ShConfig.class;
 	}
 

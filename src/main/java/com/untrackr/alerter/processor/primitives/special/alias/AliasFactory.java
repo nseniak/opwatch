@@ -16,7 +16,7 @@ public class AliasFactory extends ProcessorFactory<AliasConfig, Alias> {
 	}
 
 	@Override
-	public Class<AliasConfig> descriptorClass() {
+	public Class<AliasConfig> configurationClass() {
 		return AliasConfig.class;
 	}
 

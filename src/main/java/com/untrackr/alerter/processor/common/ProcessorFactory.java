@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.time.Duration;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -29,28 +31,35 @@ public abstract class ProcessorFactory<D extends ProcessorConfig, P extends Proc
 
 	public abstract String name();
 
-	public abstract Class<D> descriptorClass();
+	public abstract Class<D> configurationClass();
 
 	public abstract P make(Object scriptObject);
 
 	public ConfigSchema config() {
 		try {
+			ProcessorConfig instance = configurationClass().newInstance();
 			List<ConfigPropertySchema> properties = new ArrayList<>();
-			for (PropertyDescriptor pd : Introspector.getBeanInfo(descriptorClass()).getPropertyDescriptors()) {
+			for (PropertyDescriptor pd : Introspector.getBeanInfo(configurationClass()).getPropertyDescriptors()) {
 				String name = pd.getName();
 				if (!name.equals("class")) {
 					ConfigPropertySchema schema = new ConfigPropertySchema();
 					schema.setName(name);
-					schema.setImplicit(pd.getReadMethod().getAnnotation(ImplicitProperty.class) != null);
-					schema.setOptional(pd.getReadMethod().getAnnotation(OptionalProperty.class) != null);
+					Method readMethod = pd.getReadMethod();
+					schema.setType(processorService.getScriptService().typeName(readMethod.getGenericReturnType()));
+					schema.setImplicit(readMethod.getAnnotation(ImplicitProperty.class) != null);
+					boolean optional = readMethod.getAnnotation(OptionalProperty.class) != null;
+					if (optional) {
+						schema.setOptional(true);
+						schema.setDefaultValue(readMethod.invoke(instance));
+					}
 					properties.add(schema);
 				}
 			}
 			ConfigSchema config = new ConfigSchema();
 			config.setProperties(properties);
 			return config;
-		} catch (IntrospectionException e) {
-			logger.error("Exception while fetching properties: " + descriptorClass(), e);
+		} catch (InvocationTargetException | InstantiationException | IllegalAccessException | IntrospectionException e) {
+			logger.error("Exception while fetching properties: " + configurationClass(), e);
 			throw new AlerterException("cannot fetch properties", ExceptionContext.makeProcessorFactory(name()));
 		}
 	}
@@ -60,7 +69,7 @@ public abstract class ProcessorFactory<D extends ProcessorConfig, P extends Proc
 	}
 
 	protected D convertProcessorDescriptor(Object scriptObject) {
-		return (D) processorService.getScriptService().convertScriptValue(ValueLocation.makeArgument(name(), "configuration"), descriptorClass(), scriptObject,
+		return (D) processorService.getScriptService().convertScriptValue(ValueLocation.makeArgument(name(), "configuration"), configurationClass(), scriptObject,
 				() -> ExceptionContext.makeProcessorFactory(name()));
 	}
 
@@ -81,30 +90,21 @@ public abstract class ProcessorFactory<D extends ProcessorConfig, P extends Proc
 		}
 	}
 
-	protected long durationValue(String property, String delayString) {
-		checkPropertyValue(property, delayString);
+	protected long durationValue(String durationString) {
 		String duration;
 		int start;
-		if (delayString.startsWith("P") || delayString.startsWith("p")) {
-			duration = delayString;
+		if (durationString.startsWith("P") || durationString.startsWith("p")) {
+			duration = durationString;
 			start = 0;
 		} else {
-			duration = "pt" + delayString;
+			duration = "pt" + durationString;
 			start = 2;
 		}
 		try {
 			return Duration.parse(duration).toMillis();
 		} catch (DateTimeParseException e) {
-			throw new AlerterException(e.getLocalizedMessage() + " at index " + (e.getErrorIndex() - start) + ": \"" + delayString + "\"",
+			throw new AlerterException(e.getLocalizedMessage() + " at index " + (e.getErrorIndex() - start) + ": \"" + durationString + "\"",
 					ExceptionContext.makeProcessorFactory(name()));
-		}
-	}
-
-	public long optionalDurationValue(String property, String delayString, long defaultValue) {
-		if (delayString == null) {
-			return defaultValue;
-		} else {
-			return durationValue(property, delayString);
 		}
 	}
 

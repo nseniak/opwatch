@@ -16,7 +16,7 @@ public class ApplyFactory extends ActiveProcessorFactory<ApplyConfig, Apply> {
 	}
 
 	@Override
-	public Class<ApplyConfig> descriptorClass() {
+	public Class<ApplyConfig> configurationClass() {
 		return ApplyConfig.class;
 	}
 

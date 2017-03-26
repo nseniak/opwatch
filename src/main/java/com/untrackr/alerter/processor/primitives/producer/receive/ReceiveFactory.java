@@ -15,7 +15,7 @@ public class ReceiveFactory extends ActiveProcessorFactory<ReceiveConfig, Receiv
 	}
 
 	@Override
-	public Class<ReceiveConfig> descriptorClass() {
+	public Class<ReceiveConfig> configurationClass() {
 		return ReceiveConfig.class;
 	}
 

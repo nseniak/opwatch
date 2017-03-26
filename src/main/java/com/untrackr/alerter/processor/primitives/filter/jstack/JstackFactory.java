@@ -17,7 +17,7 @@ public class JstackFactory extends ActiveProcessorFactory<JstackConfig, Jstack> 
 	}
 
 	@Override
-	public Class<JstackConfig> descriptorClass() {
+	public Class<JstackConfig> configurationClass() {
 		return JstackConfig.class;
 	}
 

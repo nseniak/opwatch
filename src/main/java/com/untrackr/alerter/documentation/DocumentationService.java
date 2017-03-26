@@ -2,10 +2,11 @@ package com.untrackr.alerter.documentation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.untrackr.alerter.processor.common.Processor;
-import com.untrackr.alerter.processor.config.ProcessorConfig;
 import com.untrackr.alerter.processor.common.ProcessorFactory;
+import com.untrackr.alerter.processor.config.ProcessorConfig;
 import com.untrackr.alerter.processor.config.StringValue;
 import com.untrackr.alerter.service.ScriptService;
+import jdk.nashorn.internal.objects.NativeRegExp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ public class DocumentationService {
 	private ObjectMapper objectMapper = new ObjectMapper();
 
 	public <D extends ProcessorConfig, P extends Processor> ProcessorDoc documentation(ProcessorFactory<D, P> factory) {
-		Class<D> descClass = factory.descriptorClass();
+		Class<D> descClass = factory.configurationClass();
 		try {
 			BeanInfo info = Introspector.getBeanInfo(descClass);
 			PropertyDescriptor[] props = info.getPropertyDescriptors();
@@ -69,14 +70,20 @@ public class DocumentationService {
 			return "a string";
 		} else if (Integer.class.isAssignableFrom(clazz)) {
 			return "an integer";
+		} else if (Boolean.class.isAssignableFrom(clazz)) {
+			return "a boolean";
 		} else if (Number.class.isAssignableFrom(clazz)) {
 			return "a number";
 		} else if (ScriptService.JavascriptFunction.class.isAssignableFrom(clazz)) {
 			return "a function";
+		} else if (NativeRegExp.class.isAssignableFrom(clazz)) {
+			return "a RegExp";
 		} else if (ProcessorConfig.class.isAssignableFrom(clazz)) {
 			return "a processor configuration";
 		} else if (StringValue.class.isAssignableFrom(clazz)) {
 			return "a string or function";
+		} else if (com.untrackr.alerter.processor.config.JavascriptFunction.class.isAssignableFrom(clazz)) {
+			return "a function";
 		} else if (Processor.class.isAssignableFrom(clazz)) {
 			return "a processor";
 		} else {

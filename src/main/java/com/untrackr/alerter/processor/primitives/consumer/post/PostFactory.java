@@ -21,7 +21,7 @@ public class PostFactory extends ActiveProcessorFactory<PostConfig, Post> {
 	}
 
 	@Override
-	public Class<PostConfig> descriptorClass() {
+	public Class<PostConfig> configurationClass() {
 		return PostConfig.class;
 	}
 

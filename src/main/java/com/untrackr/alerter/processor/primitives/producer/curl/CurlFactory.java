@@ -20,7 +20,7 @@ public class CurlFactory extends ScheduledExecutorFactory<CurlConfig, Curl> {
 	}
 
 	@Override
-	public Class<CurlConfig> descriptorClass() {
+	public Class<CurlConfig> configurationClass() {
 		return CurlConfig.class;
 	}
 
@@ -35,11 +35,9 @@ public class CurlFactory extends ScheduledExecutorFactory<CurlConfig, Curl> {
 			throw new AlerterException("invalid \"url\": " + e.getLocalizedMessage() + ": \"" + urlString + "\"",
 					ExceptionContext.makeProcessorFactory(name()));
 		}
-		long defaultConnectTimeout = processorService.getProfileService().profile().getDefaultHttpConnectTimeout();
-		long connectTimeout = optionalDurationValue("connectTimeout", descriptor.getConnectTimeout(), defaultConnectTimeout);
-		long defaultReadTimeout = processorService.getProfileService().profile().getDefaultHttpReadTimeout();
-		long readTimeout = optionalDurationValue("readTimeout", descriptor.getReadTimeout(), defaultReadTimeout);
-		boolean insecure = optionalPropertyValue("insecure", descriptor.getInsecure(), false);
+		long connectTimeout = durationValue(descriptor.getConnectTimeout());
+		long readTimeout = durationValue(descriptor.getReadTimeout());
+		boolean insecure = descriptor.getInsecure();
 		Curl curl = new Curl(getProcessorService(), descriptor, name(), makeScheduledExecutor(descriptor), uri,
 				(int) connectTimeout, (int) readTimeout, insecure);
 		return curl;

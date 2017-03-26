@@ -15,7 +15,7 @@ public class CollectFactory extends ActiveProcessorFactory<CollectConfig, Collec
 	}
 
 	@Override
-	public Class<CollectConfig> descriptorClass() {
+	public Class<CollectConfig> configurationClass() {
 		return CollectConfig.class;
 	}
 

@@ -4,10 +4,10 @@ import com.untrackr.alerter.processor.config.*;
 
 public class AlertGeneratorConfig extends ActiveProcessorConfig {
 
-	private String priority;
+	private String priority = "normal";
 	private StringValue message;
 	private JavascriptPredicate predicate;
-	private Boolean toggle;
+	private Boolean toggle = false;
 	private String application;
 	private String group;
 

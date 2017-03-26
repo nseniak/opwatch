@@ -18,7 +18,7 @@ public class ParallelFactory extends ProcessorFactory<ParallelConfig, Parallel> 
 	}
 
 	@Override
-	public Class<ParallelConfig> descriptorClass() {
+	public Class<ParallelConfig> configurationClass() {
 		return ParallelConfig.class;
 	}
 

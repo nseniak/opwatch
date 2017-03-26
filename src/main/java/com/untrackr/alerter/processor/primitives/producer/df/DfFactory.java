@@ -15,7 +15,7 @@ public class DfFactory extends ScheduledExecutorFactory<DfConfig, Df> {
 	}
 
 	@Override
-	public Class<DfConfig> descriptorClass() {
+	public Class<DfConfig> configurationClass() {
 		return DfConfig.class;
 	}
 

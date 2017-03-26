@@ -15,7 +15,7 @@ public class TopFactory extends ScheduledExecutorFactory<TopConfig, Top> {
 	}
 
 	@Override
-	public Class<TopConfig> descriptorClass() {
+	public Class<TopConfig> configurationClass() {
 		return TopConfig.class;
 	}
 

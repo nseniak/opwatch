@@ -17,13 +17,10 @@ public class AlerterProfile {
 	private long tailPollInterval;
 	private Integer defaultEmergencyRetry;
 	private Integer defaultEmergencyExpire;
-	private long defaultScheduledProducerPeriod;
 	private boolean interactive;
 	private boolean trace;
 	private int alertGeneratorMaxAlertsPerMinute;
 	private int globalMaxAlertsPerMinute;
-	private long defaultHttpConnectTimeout;
-	private long defaultHttpReadTimeout;
 	private int lineBufferSize;
 	private int inputQueueSize;
 	private long processorInputQueueTimeout;
@@ -45,13 +42,10 @@ public class AlerterProfile {
 		this.tailPollInterval = TimeUnit.MILLISECONDS.toMillis(100);
 		this.defaultEmergencyRetry = 60;
 		this.defaultEmergencyExpire = 3600;
-		this.defaultScheduledProducerPeriod = TimeUnit.SECONDS.toMillis(1);
 		this.interactive = ApplicationUtil.property("alerter.interactive", false);
 		this.trace = ApplicationUtil.property("alerter.trace", false);
 		this.alertGeneratorMaxAlertsPerMinute = 10;
 		this.globalMaxAlertsPerMinute = 50;
-		this.defaultHttpConnectTimeout = TimeUnit.SECONDS.toMillis(5);
-		this.defaultHttpReadTimeout = TimeUnit.SECONDS.toMillis(10);
 		this.lineBufferSize = 8192 * 100;
 		this.inputQueueSize = 100;
 		this.processorInputQueueTimeout = TimeUnit.SECONDS.toMillis(60);
@@ -136,12 +130,8 @@ public class AlerterProfile {
 		this.defaultEmergencyExpire = defaultEmergencyExpire;
 	}
 
-	public long getDefaultScheduledProducerPeriod() {
-		return defaultScheduledProducerPeriod;
-	}
-
-	public void setDefaultScheduledProducerPeriod(long defaultScheduledProducerPeriod) {
-		this.defaultScheduledProducerPeriod = defaultScheduledProducerPeriod;
+	public static String defaultScheduledProducerPeriod() {
+		return "1s";
 	}
 
 	public boolean isInteractive() {
@@ -176,20 +166,12 @@ public class AlerterProfile {
 		this.globalMaxAlertsPerMinute = globalMaxAlertsPerMinute;
 	}
 
-	public long getDefaultHttpConnectTimeout() {
-		return defaultHttpConnectTimeout;
+	public static String defaultHttpConnectTimeout() {
+		return "5s";
 	}
 
-	public void setDefaultHttpConnectTimeout(long defaultHttpConnectTimeout) {
-		this.defaultHttpConnectTimeout = defaultHttpConnectTimeout;
-	}
-
-	public long getDefaultHttpReadTimeout() {
-		return defaultHttpReadTimeout;
-	}
-
-	public void setDefaultHttpReadTimeout(long defaultHttpReadTimeout) {
-		this.defaultHttpReadTimeout = defaultHttpReadTimeout;
+	public static String defaultHttpReadTimeout() {
+		return "10s";
 	}
 
 	public int getLineBufferSize() {

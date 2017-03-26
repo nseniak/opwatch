@@ -12,8 +12,7 @@ public abstract class ScheduledExecutorFactory<D extends ScheduledProcessorConfi
 	}
 
 	protected ScheduledExecutor makeScheduledExecutor(ScheduledProcessorConfig descriptor) {
-		long defaultPeriod = getProcessorService().getProfileService().profile().getDefaultScheduledProducerPeriod();
-		long period = optionalDurationValue("period", descriptor.getPeriod(), defaultPeriod);
+		long period = durationValue(descriptor.getPeriod());
 		return new ScheduledExecutor(processorService, period);
 	}
 

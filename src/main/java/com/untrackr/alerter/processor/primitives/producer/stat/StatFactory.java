@@ -15,7 +15,7 @@ public class StatFactory extends ScheduledExecutorFactory<StatConfig, Stat> {
 	}
 
 	@Override
-	public Class<StatConfig> descriptorClass() {
+	public Class<StatConfig> configurationClass() {
 		return StatConfig.class;
 	}
 

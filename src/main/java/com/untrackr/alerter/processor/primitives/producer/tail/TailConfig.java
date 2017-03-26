@@ -7,7 +7,7 @@ import com.untrackr.alerter.processor.config.OptionalProperty;
 public class TailConfig extends ActiveProcessorConfig {
 
 	private String file;
-	private Boolean ignoreBlankLine;
+	private Boolean ignoreBlankLine = false;
 
 	@ImplicitProperty
 	public String getFile() {

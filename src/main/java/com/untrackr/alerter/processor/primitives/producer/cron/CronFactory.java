@@ -17,7 +17,7 @@ public class CronFactory extends ScheduledExecutorFactory<CronConfig, Cron> {
 	}
 
 	@Override
-	public Class<CronConfig> descriptorClass() {
+	public Class<CronConfig> configurationClass() {
 		return CronConfig.class;
 	}
 

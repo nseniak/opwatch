@@ -65,6 +65,8 @@ public class ScriptService {
 	@Autowired
 	private DocumentationService documentationService;
 
+	private List<ProcessorFactory<?, ?>> factories = new ArrayList<>();
+
 	private static NashornScriptEngine scriptEngine;
 
 	public void initialize() {
@@ -72,6 +74,7 @@ public class ScriptService {
 		loadScriptResources();
 		try {
 			createSimplePrimitiveFunction("run", processorService::runProcessor);
+			createSimplePrimitiveFunction("__factories", this::factories);
 			createVarargFactoryFunction(new ParallelFactory(processorService));
 			createVarargFactoryFunction(new PipeFactory(processorService));
 			createSimpleFactoryFunction(new AliasFactory(processorService));
@@ -82,7 +85,6 @@ public class ScriptService {
 			createSimpleFactoryFunction(new TailFactory(processorService));
 			createSimpleFactoryFunction(new StdoutFactory(processorService));
 			createSimpleFactoryFunction(new StatFactory(processorService));
-			createSimpleFactoryFunction(new DfFactory(processorService));
 			createSimpleFactoryFunction(new DfFactory(processorService));
 			createSimpleFactoryFunction(new TopFactory(processorService));
 			createSimpleFactoryFunction(new AlertGeneratorFactory(processorService));
@@ -157,6 +159,7 @@ public class ScriptService {
 	}
 
 	private <D extends ProcessorConfig, T extends Processor> void createFactoryFunction(ProcessorFactory<D, T> processorFactory, String wrapperName) throws ScriptException {
+		factories.add(processorFactory);
 		ScriptContext context = scriptEngine.getContext();
 		Bindings bindings = context.getBindings(ScriptContext.ENGINE_SCOPE);
 		String name = processorFactory.name();
@@ -169,6 +172,10 @@ public class ScriptService {
 		ScriptContext context = scriptEngine.getContext();
 		Bindings bindings = context.getBindings(ScriptContext.ENGINE_SCOPE);
 		bindings.put(name, function);
+	}
+
+	private List<ProcessorFactory<?, ?>> factories(Object obj) {
+		return factories;
 	}
 
 	public void executeConsoleInput(String script) {

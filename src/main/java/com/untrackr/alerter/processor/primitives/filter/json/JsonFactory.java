@@ -15,7 +15,7 @@ public class JsonFactory extends ActiveProcessorFactory<JsonConfig, Json> {
 	}
 
 	@Override
-	public Class<JsonConfig> descriptorClass() {
+	public Class<JsonConfig> configurationClass() {
 		return JsonConfig.class;
 	}
 

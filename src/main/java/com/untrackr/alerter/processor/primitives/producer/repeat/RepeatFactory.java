@@ -17,7 +17,7 @@ public class RepeatFactory extends ScheduledExecutorFactory<RepeatConfig, Repeat
 	}
 
 	@Override
-	public Class<RepeatConfig> descriptorClass() {
+	public Class<RepeatConfig> configurationClass() {
 		return RepeatConfig.class;
 	}
 

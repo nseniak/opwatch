@@ -17,7 +17,7 @@ public class TailFactory extends ActiveProcessorFactory<TailConfig, Tail> {
 	}
 
 	@Override
-	public Class<TailConfig> descriptorClass() {
+	public Class<TailConfig> configurationClass() {
 		return TailConfig.class;
 	}
 
@@ -25,7 +25,7 @@ public class TailFactory extends ActiveProcessorFactory<TailConfig, Tail> {
 	public Tail make(Object scriptObject) {
 		TailConfig descriptor = convertProcessorDescriptor(scriptObject);
 		String file = checkVariableSubstitution("file", checkPropertyValue("file", descriptor.getFile()));
-		boolean ignoreBlankLine = optionalPropertyValue("ignoreBlankLine", descriptor.getIgnoreBlankLine(), false);
+		boolean ignoreBlankLine = descriptor.getIgnoreBlankLine();
 		Tail tail = new Tail(getProcessorService(), descriptor, name(), FileSystems.getDefault().getPath(file), ignoreBlankLine);
 		return tail;
 	}

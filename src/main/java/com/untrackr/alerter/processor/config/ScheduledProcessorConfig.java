@@ -1,8 +1,10 @@
 package com.untrackr.alerter.processor.config;
 
+import com.untrackr.alerter.service.AlerterProfile;
+
 public class ScheduledProcessorConfig extends ActiveProcessorConfig {
 
-	private String period;
+	private String period = AlerterProfile.defaultScheduledProducerPeriod();
 
 	@OptionalProperty
 	public String getPeriod() {

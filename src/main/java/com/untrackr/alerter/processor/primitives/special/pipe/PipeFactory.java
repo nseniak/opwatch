@@ -20,7 +20,7 @@ public class PipeFactory extends ProcessorFactory<PipeConfig, Pipe> {
 	}
 
 	@Override
-	public Class<PipeConfig> descriptorClass() {
+	public Class<PipeConfig> configurationClass() {
 		return PipeConfig.class;
 	}
 

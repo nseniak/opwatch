@@ -15,7 +15,7 @@ public class StdinFactory extends ActiveProcessorFactory<StdinConfig, Stdin> {
 	}
 
 	@Override
-	public Class<StdinConfig> descriptorClass() {
+	public Class<StdinConfig> configurationClass() {
 		return StdinConfig.class;
 	}
 

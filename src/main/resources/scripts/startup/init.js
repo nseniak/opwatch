@@ -41,25 +41,54 @@ function implicit_property(factory) {
 function printHelp(factory, varargs) {
 	var props = factory.config().properties;
 	if (varargs) {
-		print(factory.name() + "(<processor>);");
+			print(factory.name() + "(<processor>, ...);");
 	}
 	var implicit = implicit_property(factory);
-	if (implicit) {
-		print(factory.name() + "(<" + implicit.name + ">);");
-	}
-	print(factory.name() + "({");
+	var mandatory = [];
+	var optional = [];
 	for (var i = 0; i < props.length; i++) {
 		var prop = props[i];
-		var comma = (i < props.length -1) ? "," : "";
-		var opt_left = prop.optional ? "[ " : "";
-		var opt_right = prop.optional ? " ]" : "";
-		print("   " + opt_left + prop.name + ": <" + prop.name + ">" + opt_right + comma);
+		if (prop.implicit) {
+			implicit = prop;
+		} else if (prop.optional) {
+			optional.push(prop);
+		} else {
+			mandatory.push(prop);
+		}
+	}
+	mandatory.sort(prop_compare);
+	optional.sort(prop_compare);
+	if (implicit) {
+		print(factory.name() + "(" + implicit.name + " <" + implicit.type + ">);");
+	}
+	var all = [];
+	if (implicit) {
+		all.push(implicit);
+	}
+	all = all.concat(mandatory);
+	all = all.concat(optional);
+	print(factory.name() + "({");
+	for (var i = 0; i < all.length; i++) {
+		var prop = all[i];
+		print("   " + property_help(prop));
 	}
 	print("});");
 }
 
-function define_varargs_constructor(name, factory) {
-	name = vararg_factory_wrapper(factory);
+function prop_compare(p1, p2) {
+	if (p1.name < p2.name) {
+		return -1;
+	} else if (p1.name > p2.name) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+function property_help(prop) {
+	var opt_left = prop.optional ? "[ " : "";
+	var opt_right = prop.optional ? ((prop.defaultValue != null) ? " = " + JSON.stringify(prop.defaultValue) : "") + " ]" : "";
+	return opt_left + prop.name + " <" + prop.type + ">" + opt_right;
 }
 
 function vararg_factory_wrapper(factory) {
@@ -89,3 +118,22 @@ function vararg_make_processor(factory, args) {
 	return factory.make(config);
 }
 //
+function help() {
+	print("Processor constructors:");
+	var factories = __factories(1);
+	for (var i = 0; i < factories.length; i++) {
+		var fact = factories[i];
+		print("   " + constructor_short_help(fact));
+	}
+}
+
+function constructor_short_help(factory) {
+	var all = [];
+	var props = factory.config().properties;
+	for (var i = 0; i < props.length; i++) {
+		all.push(props[i]);
+	}
+	all.sort(prop_compare);
+	var conf = "{ " + all.map(function (prop) { return prop.name; }).join(", ") + " }";
+	return factory.name() + "(" + conf + ")";
+}

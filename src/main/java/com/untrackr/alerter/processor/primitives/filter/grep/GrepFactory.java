@@ -16,7 +16,7 @@ public class GrepFactory extends ActiveProcessorFactory<GrepConfig, Grep> {
 	}
 
 	@Override
-	public Class<GrepConfig> descriptorClass() {
+	public Class<GrepConfig> configurationClass() {
 		return GrepConfig.class;
 	}
 
