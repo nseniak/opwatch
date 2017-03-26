@@ -20,6 +20,11 @@ public class DfFactory extends ScheduledExecutorFactory<DfConfig, Df> {
 	}
 
 	@Override
+	public Class<Df> processorClass() {
+		return Df.class;
+	}
+
+	@Override
 	public Df make(Object scriptObject) {
 		DfConfig descriptor = convertProcessorDescriptor(scriptObject);
 		String file = checkVariableSubstitution("file", checkPropertyValue("file", descriptor.getFile()));

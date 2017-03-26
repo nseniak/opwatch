@@ -21,6 +21,11 @@ public class AliasFactory extends ProcessorFactory<AliasConfig, Alias> {
 	}
 
 	@Override
+	public Class<Alias> processorClass() {
+		return Alias.class;
+	}
+
+	@Override
 	public Alias make(Object scriptObject) {
 		AliasConfig descriptor = convertProcessorDescriptor(scriptObject);
 		Processor processor = checkPropertyValue("processor", descriptor.getProcessor());

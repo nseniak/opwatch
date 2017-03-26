@@ -22,6 +22,11 @@ public class RepeatFactory extends ScheduledExecutorFactory<RepeatConfig, Repeat
 	}
 
 	@Override
+	public Class<Repeat> processorClass() {
+		return Repeat.class;
+	}
+
+	@Override
 	public Repeat make(Object scriptObject) {
 		RepeatConfig descriptor = convertProcessorDescriptor(scriptObject);
 		ScheduledExecutor executor = makeScheduledExecutor(descriptor);

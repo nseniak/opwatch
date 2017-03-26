@@ -25,6 +25,11 @@ public class PostFactory extends ActiveProcessorFactory<PostConfig, Post> {
 		return PostConfig.class;
 	}
 
+	@Override
+	public Class<Post> processorClass() {
+		return Post.class;
+	}
+
 	private static Pattern pathPattern = Pattern.compile("(?<hostname>[^:/]+)?(?::(?<port>[0-9]+))?(?<stack>/.*)");
 
 	@Override

@@ -25,6 +25,11 @@ public class PipeFactory extends ProcessorFactory<PipeConfig, Pipe> {
 	}
 
 	@Override
+	public Class<Pipe> processorClass() {
+		return Pipe.class;
+	}
+
+	@Override
 	public Pipe make(Object scriptObject) {
 		PipeConfig descriptor = convertProcessorDescriptor(scriptObject);
 		List<Processor<?>> processors = descriptor.getProcessors();

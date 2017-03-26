@@ -21,6 +21,11 @@ public class ShFactory extends ActiveProcessorFactory<ShConfig, Sh> {
 	}
 
 	@Override
+	public Class<Sh> processorClass() {
+		return Sh.class;
+	}
+
+	@Override
 	public Sh make(Object scriptObject) {
 		ShConfig descriptor = convertProcessorDescriptor(scriptObject);
 		CommandRunner producer = makeCommandOutputProducer(descriptor);

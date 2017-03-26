@@ -20,6 +20,11 @@ public class TopFactory extends ScheduledExecutorFactory<TopConfig, Top> {
 	}
 
 	@Override
+	public Class<Top> processorClass() {
+		return Top.class;
+	}
+
+	@Override
 	public Top make(Object scriptObject) {
 		TopConfig descriptor = convertProcessorDescriptor(scriptObject);
 		Top top = new Top(getProcessorService(), descriptor, name(), makeScheduledExecutor(descriptor));

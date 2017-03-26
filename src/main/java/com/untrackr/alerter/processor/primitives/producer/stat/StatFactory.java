@@ -20,6 +20,11 @@ public class StatFactory extends ScheduledExecutorFactory<StatConfig, Stat> {
 	}
 
 	@Override
+	public Class<Stat> processorClass() {
+		return Stat.class;
+	}
+
+	@Override
 	public Stat make(Object scriptObject) {
 		StatConfig descriptor = convertProcessorDescriptor(scriptObject);
 		String file = checkVariableSubstitution("file", checkPropertyValue("file", descriptor.getFile()));

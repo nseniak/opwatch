@@ -22,6 +22,11 @@ public class CronFactory extends ScheduledExecutorFactory<CronConfig, Cron> {
 	}
 
 	@Override
+	public Class<Cron> processorClass() {
+		return Cron.class;
+	}
+
+	@Override
 	public Cron make(Object scriptObject) {
 		CronConfig descriptor = convertProcessorDescriptor(scriptObject);
 		ScheduledExecutor executor = makeScheduledExecutor(descriptor);

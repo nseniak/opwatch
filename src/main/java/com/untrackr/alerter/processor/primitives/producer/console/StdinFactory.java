@@ -20,6 +20,11 @@ public class StdinFactory extends ActiveProcessorFactory<StdinConfig, Stdin> {
 	}
 
 	@Override
+	public Class<Stdin> processorClass() {
+		return Stdin.class;
+	}
+
+	@Override
 	public Stdin make(Object scriptObject) {
 		StdinConfig descriptor = convertProcessorDescriptor(scriptObject);
 		Stdin stdin = new Stdin(getProcessorService(), descriptor, name());

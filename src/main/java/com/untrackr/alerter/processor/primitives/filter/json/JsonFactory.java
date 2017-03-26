@@ -20,6 +20,11 @@ public class JsonFactory extends ActiveProcessorFactory<JsonConfig, Json> {
 	}
 
 	@Override
+	public Class<Json> processorClass() {
+		return Json.class;
+	}
+
+	@Override
 	public Json make(Object scriptObject) {
 		JsonConfig descriptor = convertProcessorDescriptor(scriptObject);
 		Json json = new Json(getProcessorService(), descriptor, name());

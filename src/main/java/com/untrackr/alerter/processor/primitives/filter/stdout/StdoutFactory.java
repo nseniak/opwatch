@@ -20,6 +20,11 @@ public class StdoutFactory extends ActiveProcessorFactory<StdoutConfig, Stdout> 
 	}
 
 	@Override
+	public Class<Stdout> processorClass() {
+		return Stdout.class;
+	}
+
+	@Override
 	public Stdout make(Object scriptObject) {
 		StdoutConfig descriptor = convertProcessorDescriptor(scriptObject);
 		boolean displayPayload = descriptor.getPayload();

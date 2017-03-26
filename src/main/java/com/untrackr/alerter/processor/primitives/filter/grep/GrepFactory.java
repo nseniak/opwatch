@@ -21,6 +21,11 @@ public class GrepFactory extends ActiveProcessorFactory<GrepConfig, Grep> {
 	}
 
 	@Override
+	public Class<Grep> processorClass() {
+		return Grep.class;
+	}
+
+	@Override
 	public Grep make(Object scriptObject) {
 		GrepConfig descriptor = convertProcessorDescriptor(scriptObject);
 		NativeRegExp regexp = checkPropertyValue("regexp", descriptor.getRegexp());

@@ -22,6 +22,11 @@ public class JstackFactory extends ActiveProcessorFactory<JstackConfig, Jstack> 
 	}
 
 	@Override
+	public Class<Jstack> processorClass() {
+		return Jstack.class;
+	}
+
+	@Override
 	public Jstack make(Object scriptObject) {
 		JstackConfig descriptor = convertProcessorDescriptor(scriptObject);
 		String methodRegex = descriptor.getMethodRegex();

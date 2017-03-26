@@ -21,6 +21,11 @@ public class CountFactory extends ScheduledExecutorFactory<CountConfig, Count> {
 	}
 
 	@Override
+	public Class<Count> processorClass() {
+		return Count.class;
+	}
+
+	@Override
 	public Count make(Object scriptObject) {
 		CountConfig descriptor = convertProcessorDescriptor(scriptObject);
 		JavascriptPredicate predicate = descriptor.getPredicate();

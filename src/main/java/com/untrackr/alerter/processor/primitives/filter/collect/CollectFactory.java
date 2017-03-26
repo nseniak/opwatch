@@ -20,6 +20,11 @@ public class CollectFactory extends ActiveProcessorFactory<CollectConfig, Collec
 	}
 
 	@Override
+	public Class<Collect> processorClass() {
+		return Collect.class;
+	}
+
+	@Override
 	public Collect make(Object scriptObject) {
 		CollectConfig descriptor = convertProcessorDescriptor(scriptObject);
 		int count = checkPropertyValue("count", descriptor.getCount());

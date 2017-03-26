@@ -23,6 +23,11 @@ public class ParallelFactory extends ProcessorFactory<ParallelConfig, Parallel> 
 	}
 
 	@Override
+	public Class<Parallel> processorClass() {
+		return Parallel.class;
+	}
+
+	@Override
 	public Parallel make(Object scriptObject) {
 		ParallelConfig descriptor = convertProcessorDescriptor(scriptObject);
 		List<Processor<?>> processors = descriptor.getProcessors();

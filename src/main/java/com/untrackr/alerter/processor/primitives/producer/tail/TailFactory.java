@@ -22,6 +22,11 @@ public class TailFactory extends ActiveProcessorFactory<TailConfig, Tail> {
 	}
 
 	@Override
+	public Class<Tail> processorClass() {
+		return Tail.class;
+	}
+
+	@Override
 	public Tail make(Object scriptObject) {
 		TailConfig descriptor = convertProcessorDescriptor(scriptObject);
 		String file = checkVariableSubstitution("file", checkPropertyValue("file", descriptor.getFile()));

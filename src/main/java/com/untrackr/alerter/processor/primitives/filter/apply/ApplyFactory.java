@@ -21,6 +21,11 @@ public class ApplyFactory extends ActiveProcessorFactory<ApplyConfig, Apply> {
 	}
 
 	@Override
+	public Class<Apply> processorClass() {
+		return Apply.class;
+	}
+
+	@Override
 	public Apply make(Object scriptObject) {
 		ApplyConfig descriptor = convertProcessorDescriptor(scriptObject);
 		JavascriptFilter transformer = checkPropertyValue("lambda", descriptor.getLambda());

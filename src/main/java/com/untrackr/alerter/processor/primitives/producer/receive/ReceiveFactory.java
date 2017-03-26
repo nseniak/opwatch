@@ -20,6 +20,11 @@ public class ReceiveFactory extends ActiveProcessorFactory<ReceiveConfig, Receiv
 	}
 
 	@Override
+	public Class<Receive> processorClass() {
+		return Receive.class;
+	}
+
+	@Override
 	public Receive make(Object scriptObject) {
 		ReceiveConfig descriptor = convertProcessorDescriptor(scriptObject);
 		String urlPath = checkPropertyValue("url", descriptor.getPath());

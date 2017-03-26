@@ -33,6 +33,8 @@ public abstract class ProcessorFactory<D extends ProcessorConfig, P extends Proc
 
 	public abstract Class<D> configurationClass();
 
+	public abstract Class<P> processorClass();
+
 	public abstract P make(Object scriptObject);
 
 	public ConfigSchema config() {

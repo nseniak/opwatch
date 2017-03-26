@@ -26,6 +26,11 @@ public class AlertGeneratorFactory extends ActiveProcessorFactory<AlertGenerator
 	}
 
 	@Override
+	public Class<AlertGenerator> processorClass() {
+		return AlertGenerator.class;
+	}
+
+	@Override
 	public AlertGenerator make(Object scriptObject) {
 		AlertGeneratorConfig descriptor = convertProcessorDescriptor(scriptObject);
 		String priorityName = checkPropertyValue("priority", descriptor.getPriority());
