@@ -38,10 +38,15 @@ function implicit_property(schema) {
 	}
 }
 
+var tab1 = "   ";
+var tab2 = tab1 + tab1;
+
 function printHelp(schema, varargs) {
+	print("Category: " + schema.category);
+	print("Invocations:");
 	var props = schema.properties;
 	if (varargs) {
-			print(schema.name + "(<processor>, ...);");
+			print(tab1 + schema.name + "(<processor>, ...);");
 	}
 	var implicit = implicit_property(schema);
 	var mandatory = [];
@@ -59,7 +64,7 @@ function printHelp(schema, varargs) {
 	mandatory.sort(prop_compare);
 	optional.sort(prop_compare);
 	if (implicit) {
-		print(schema.name + "(" + implicit.name + " <" + implicit.type + ">);");
+		print(tab1 + schema.name + "(" + implicit.name + " <" + implicit.type + ">);");
 	}
 	var all = [];
 	if (implicit) {
@@ -67,12 +72,12 @@ function printHelp(schema, varargs) {
 	}
 	all = all.concat(mandatory);
 	all = all.concat(optional);
-	print(schema.name + "({");
+	print(tab1 + schema.name + "({");
 	for (var i = 0; i < all.length; i++) {
 		var prop = all[i];
-		print("   " + property_help(prop));
+		print(tab2 + property_help(prop));
 	}
-	print("});");
+	print(tab1 + "});");
 }
 
 function prop_compare(p1, p2) {
@@ -119,12 +124,24 @@ function vararg_make_processor(factory, args) {
 }
 //
 function help() {
-	print("Processor constructors:");
+	print("Processor constructors, by category:");
 	var factories = __factories(1);
+	var by_category = {};
 	for (var i = 0; i < factories.length; i++) {
 		var fact = factories[i];
-		print("   " + constructor_short_help(fact.schema()));
+		var schema = fact.schema();
+		var category = schema.category;
+		if (by_category[category]) {
+			by_category[category].push(schema);
+		} else {
+			by_category[category] = [schema];
+		}
 	}
+	for (category in by_category) {
+		print(tab1 + capitalizeFirstLetter(category) + ":");
+		by_category[category].map(function (schema) { print(tab2 + constructor_short_help(schema)); })
+	}
+	print("Type constructor.help() for help about a scpecific constructor");
 }
 
 function constructor_short_help(schema) {
@@ -135,5 +152,9 @@ function constructor_short_help(schema) {
 	}
 	all.sort(prop_compare);
 	var conf = "{ " + all.map(function (prop) { return prop.name; }).join(", ") + " }";
-	return schema.category + ": " + schema.name + "(" + conf + ")";
+	return schema.name + "(" + conf + ")";
+}
+
+function capitalizeFirstLetter(string) {
+	return string.charAt(0).toUpperCase() + string.slice(1);
 }
