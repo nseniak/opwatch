@@ -36,7 +36,7 @@ public class TailFactory extends ActiveProcessorFactory<TailConfig, Tail> {
 	public Tail make(Object scriptObject) {
 		TailConfig descriptor = convertProcessorDescriptor(scriptObject);
 		String file = checkVariableSubstitution("file", checkPropertyValue("file", descriptor.getFile()));
-		boolean ignoreBlankLine = descriptor.getIgnoreBlankLine();
+		boolean ignoreBlankLine = checkPropertyValue("ignoreBlank", descriptor.getIgnoreBlank());
 		return new Tail(getProcessorService(), descriptor, name(), FileSystems.getDefault().getPath(file), ignoreBlankLine);
 	}
 

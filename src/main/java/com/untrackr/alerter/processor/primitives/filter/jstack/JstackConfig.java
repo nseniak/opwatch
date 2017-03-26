@@ -6,22 +6,9 @@ import com.untrackr.alerter.processor.config.OptionalProperty;
 public class JstackConfig extends ActiveProcessorConfig {
 
 	/**
-	 * Field name. Defaults to "text".
-	 */
-	private String field;
-	/**
 	 * Regex for the method name we look for in the stack. Optional.
 	 */
 	private String methodRegex;
-
-	@OptionalProperty
-	public String getField() {
-		return field;
-	}
-
-	public void setField(String field) {
-		this.field = field;
-	}
 
 	@OptionalProperty
 	public String getMethodRegex() {

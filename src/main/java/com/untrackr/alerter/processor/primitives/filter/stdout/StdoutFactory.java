@@ -33,7 +33,7 @@ public class StdoutFactory extends ActiveProcessorFactory<StdoutConfig, Stdout> 
 	@Override
 	public Stdout make(Object scriptObject) {
 		StdoutConfig descriptor = convertProcessorDescriptor(scriptObject);
-		boolean displayPayload = descriptor.getPayload();
+		boolean displayPayload = checkPropertyValue("payload", descriptor.getPayload());
 		return new Stdout(getProcessorService(), descriptor, name(), displayPayload);
 	}
 

@@ -48,6 +48,7 @@ public class Alias extends Processor<AliasConfig> {
 
 	@Override
 	public void inferSignature() {
+		processor.inferSignature();
 		this.signature = processor.getSignature();
 	}
 

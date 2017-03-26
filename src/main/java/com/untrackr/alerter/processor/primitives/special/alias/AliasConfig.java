@@ -7,7 +7,7 @@ public class AliasConfig extends ProcessorConfig {
 
 	private String name;
 	private Processor processor;
-	private Object descriptor;
+	private Object configuration;
 
 	public String getName() {
 		return name;
@@ -25,12 +25,12 @@ public class AliasConfig extends ProcessorConfig {
 		this.processor = processor;
 	}
 
-	public Object getDescriptor() {
-		return descriptor;
+	public Object getConfiguration() {
+		return configuration;
 	}
 
-	public void setDescriptor(Object descriptor) {
-		this.descriptor = descriptor;
+	public void setConfiguration(Object configuration) {
+		this.configuration = configuration;
 	}
 
 }

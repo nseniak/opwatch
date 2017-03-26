@@ -12,7 +12,7 @@ public abstract class ScheduledExecutorFactory<D extends ScheduledProcessorConfi
 	}
 
 	protected ScheduledExecutor makeScheduledExecutor(ScheduledProcessorConfig descriptor) {
-		long period = durationValue(descriptor.getPeriod());
+		long period = durationValue(checkPropertyValue("period", descriptor.getPeriod()));
 		return new ScheduledExecutor(processorService, period);
 	}
 

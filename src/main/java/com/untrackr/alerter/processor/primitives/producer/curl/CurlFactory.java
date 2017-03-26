@@ -46,8 +46,8 @@ public class CurlFactory extends ScheduledExecutorFactory<CurlConfig, Curl> {
 			throw new AlerterException("invalid \"url\": " + e.getLocalizedMessage() + ": \"" + urlString + "\"",
 					ExceptionContext.makeProcessorFactory(name()));
 		}
-		long connectTimeout = durationValue(descriptor.getConnectTimeout());
-		long readTimeout = durationValue(descriptor.getReadTimeout());
+		long connectTimeout = durationValue(checkPropertyValue("connectTimeout", descriptor.getConnectTimeout()));
+		long readTimeout = durationValue(checkPropertyValue("readTimeout", descriptor.getReadTimeout()));
 		boolean insecure = descriptor.getInsecure();
 		return new Curl(getProcessorService(), descriptor, name(), makeScheduledExecutor(descriptor), uri,
 				(int) connectTimeout, (int) readTimeout, insecure);

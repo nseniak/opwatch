@@ -278,7 +278,8 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		}
 		Payload payload = context.getPayload();
 		if (payload != null) {
-			data.add("payload", json(payload));
+			data.add("input value", json(payload.getValue()));
+			data.add("input payload", json(payload));
 		}
 		Throwable cause = rootException.getCause();
 		if ((cause != null) && !((cause instanceof ScriptException) || (cause instanceof IOException) || (cause instanceof NashornException))) {

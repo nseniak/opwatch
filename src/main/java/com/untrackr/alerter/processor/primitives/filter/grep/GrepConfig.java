@@ -7,13 +7,7 @@ import jdk.nashorn.internal.objects.NativeRegExp;
 
 public class GrepConfig extends ActiveProcessorConfig {
 
-	/**
-	 * Regex. Mutually exclusive with regexes.
-	 */
 	private NativeRegExp regexp;
-	/**
-	 * Exclude regex. Defaults to false.
-	 */
 	private Boolean invert = false;
 
 	@ImplicitProperty
