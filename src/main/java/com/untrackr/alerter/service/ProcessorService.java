@@ -4,14 +4,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.untrackr.alerter.alert.Alert;
-import com.untrackr.alerter.alert.AlertData;
+import com.untrackr.alerter.channel.MessageServiceService;
+import com.untrackr.alerter.channel.common.Channel;
+import com.untrackr.alerter.channel.common.Channels;
 import com.untrackr.alerter.common.ThreadUtil;
 import com.untrackr.alerter.ioservice.FileTailingService;
 import com.untrackr.alerter.processor.common.*;
-import com.untrackr.alerter.processor.payload.Payload;
-import com.untrackr.alerter.processor.primitives.consumer.alert.AlertGenerator;
-import jdk.nashorn.api.scripting.NashornException;
 import jline.console.ConsoleReader;
 import jline.console.UserInterruptException;
 import joptsimple.OptionException;
@@ -28,30 +26,28 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import sun.misc.Signal;
 
-import javax.script.ScriptException;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.UUID;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import static com.untrackr.alerter.channel.console.ConsoleMessageService.CONSOLE_CHANNEL_NAME;
 import static jdk.nashorn.internal.runtime.ScriptRuntime.UNDEFINED;
 
 @Service
 public class ProcessorService implements InitializingBean, DisposableBean {
 
-	private static final Logger logger = LoggerFactory.getLogger(AlertService.class);
+	private static final Logger logger = LoggerFactory.getLogger(ProcessorService.class);
 
 	@Autowired
 	private ProfileService profileService;
-
-	@Autowired
-	private AlertService alertService;
 
 	@Autowired
 	private ScriptService scriptService;
@@ -68,7 +64,16 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	@Autowired
 	private ApplicationContext applicationContext;
 
+	@Autowired
+	private MessageServiceService messageServiceService;
+
+	private static String DEFAULT_DEFAULT_CHANNEL = "console";
+
+	private String id;
+
 	private String hostName;
+
+	private Channels channels;
 
 	private ObjectMapper objectMapper;
 
@@ -86,6 +91,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
+		id = uuid();
 		// Object mapper
 		objectMapper = new ObjectMapper();
 		objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
@@ -101,21 +107,46 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		ThreadUtil.safeExecutorShutdownNow(scheduledExecutor, "ScheduledExecutor", profileService.profile().getExecutorTerminationTimeout());
 	}
 
-	public void runCommandLine(String[] argStrings) {
+	public void run(String[] argStrings) {
 		mainThread = Thread.currentThread();
 		Signal.handle(new Signal("INT"), this::userInterruptHandler);
 		scriptService.initialize();
 		try {
 			CommandLineOptions options = parseOptions(argStrings);
 			initialize(options);
+			initializeChannels(options);
 			if (options.getFiles().isEmpty()) {
-				runShell(options);
+				runRepl(options);
 			} else {
 				runFiles(options);
 			}
 		} catch (Exception e) {
-			printError(e.getMessage());
+			printStderr(e.getMessage());
 		}
+	}
+
+	private void initializeChannels(CommandLineOptions options) {
+		channels = messageServiceService.createChannels(options, this);
+		logger.info("Default channel: " + channels.getDefaultChannel().name());
+		logger.info("Error channel: " + channels.getErrorChannel().name());
+		printStdout("Default channel: " + channels.getDefaultChannel().name());
+		printStdout("Error channel: " + channels.getErrorChannel().name());
+	}
+
+	public Channel findChannel(String name) {
+		return channels.getChannelMap().get(name);
+	}
+
+	public Channel consoleChannel() {
+		return findChannel(CONSOLE_CHANNEL_NAME);
+	}
+
+	public Channel defaultChannel() {
+		return channels.getDefaultChannel();
+	}
+
+	public Channel errorChannel() {
+		return channels.getErrorChannel();
 	}
 
 	private void userInterruptHandler(Signal signal) {
@@ -126,15 +157,19 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	private CommandLineOptions parseOptions(String[] argStrings) {
 		OptionParser parser = new OptionParser();
 		OptionSpec<String> hostname = parser.accepts("hostname").withRequiredArg().ofType(String.class);
+		OptionSpec<String> defaultChannel = parser.accepts("default-channel").withRequiredArg().ofType(String.class);
+		OptionSpec<String> errorChannel = parser.accepts("error-channel").withRequiredArg().ofType(String.class);
 		OptionSpec<File> files = parser.nonOptions().ofType(File.class);
 		OptionSet optionSet;
 		try {
 			optionSet = parser.parse(argStrings);
 		} catch (OptionException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeError("cannot parse options: " + e.getMessage(), e);
 		}
 		CommandLineOptions options = new CommandLineOptions();
 		options.setHostname(optionSet.valueOf(hostname));
+		options.setDefaultChannel(optionSet.valueOf(defaultChannel));
+		options.setErrorChannel(optionSet.valueOf(errorChannel));
 		options.setFiles(optionSet.valuesOf(files));
 		return options;
 	}
@@ -151,14 +186,15 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		}
 	}
 
-	public void runShell(CommandLineOptions options) {
+	public void runRepl(CommandLineOptions options) {
 		ConsoleReader reader;
 		try {
 			reader = new ConsoleReader();
 		} catch (IOException e) {
-			printError("Cannot read from console.");
+			printStderr("Cannot read from console: " + e.getMessage());
 			return;
 		}
+		reader.setExpandEvents(false);
 		reader.setHandleUserInterrupt(true);
 		reader.setPrompt("> ");
 		String line;
@@ -169,11 +205,11 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		}
 	}
 
-	public void printError(String message) {
+	public void printStderr(String message) {
 		System.err.println(message);
 	}
 
-	public void printMessage(String message) {
+	public void printStdout(String message) {
 		System.out.println(message);
 	}
 
@@ -196,23 +232,22 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	public Object runProcessor(Object scriptObject) {
 		String name = "run";
 		Processor processor = (Processor) scriptService.convertScriptValue(ValueLocation.makeArgument(name, "processor"), Processor.class, scriptObject,
-				() -> ExceptionContext.makeProcessorFactory(name));
+				(message) -> new RuntimeError(message));
 		processor.inferSignature();
 		processor.check();
 		processor.start();
-		infoAlert("alerter up and running");
+		signalInfo("alerter up and running");
 		runningProcessor = processor;
 		try {
 			while (true) {
 				Thread.sleep(TimeUnit.DAYS.toMillis(1));
 			}
 		} catch (InterruptedException e) {
-			printError("Processor interrupted");
+			printStderr("Processor interrupted");
 		} finally {
 			runningProcessor = null;
 		}
-		// TODO Make sure this is called!
-		infoAlert("alerter stopped");
+		signalInfo("alerter stopped");
 		processor.stop();
 		return UNDEFINED;
 	}
@@ -227,119 +262,85 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		mainThread.interrupt();
 	}
 
-	public void processorAlert(Alert.Priority priority, String title, AlertGenerator emitter) {
-		Alert alert = makeProcessorAlert(priority, title, emitter);
-		alertService.alert(alert);
+	public void signalInfo(String title) {
+		ExecutionContext context = new GlobalExecutionContext();
+		MessageScope scope = context.makeMessageScope(this);
+		Message message = new Message(Message.Type.info, Message.Level.medium, title, null, scope, null);
+		publish(defaultChannel(), message);
 	}
 
-	public void processorAlertEnd(Alert.Priority priority, String title, AlertGenerator emitter) {
-		Alert alert = makeProcessorAlert(priority, title, emitter);
-		alert.setEnd(true);
-		alertService.alert(alert);
-	}
-
-	public void infoAlert(String title) {
-		Alert alert = new Alert(Alert.Priority.info, title, null, null, null);
-		alertService.alert(alert);
-	}
-
-	private Alert makeProcessorAlert(Alert.Priority priority, String title, AlertGenerator emitter) {
-		AlertData data = new AlertData();
-		data.add("hostname", getHostName());
-		Alert alert = new Alert(priority, title, null, emitter, data);
-		return alert;
-	}
-
-	public void displayAlerterException(AlerterException e) {
-		AlerterException rootException = e;
-		while ((rootException.getCause() != null) && (rootException.getCause() instanceof AlerterException)) {
-			rootException = (AlerterException) rootException.getCause();
-		}
-		AlertData data = new AlertData();
-		data.add("hostname", getHostName());
-		ExceptionContext context = rootException.getExceptionContext();
-		ProcessorLocation processorLocation = context.getProcessorLocation();
-		CallbackErrorLocation callbackLocation = context.getCallbackErrorLocation();
-		String title = (callbackLocation != null) ? "Scripting error" : "Execution error";
-		String message = rootException.getLocalizedMessage();
-		if (message.startsWith(SCRIPT_EXCEPTION_MESSAGE_PREFIX)) {
+	public void signalException(RuntimeError e) {
+		String title = e.getMessage();
+		if (title.startsWith(SCRIPT_EXCEPTION_MESSAGE_PREFIX)) {
 			// Script exception messages contain the exception name, which is ugly
-			message = message.substring(SCRIPT_EXCEPTION_MESSAGE_PREFIX.length());
+			title = title.substring(SCRIPT_EXCEPTION_MESSAGE_PREFIX.length());
 		}
-		if (processorLocation != null) {
-			data.add("processor", processorLocation.descriptor());
-			message = processorLocation.getName() + ": " + message;
+		String emitterName = e.getContext().emitterName();
+		if (emitterName != null) {
+			title = emitterName + ": " + title;
 		}
-		if (callbackLocation != null) {
-			String descriptor = callbackLocation.descriptor();
-			if (descriptor != null) {
-				data.add("stack", descriptor);
+		ExecutionContext context = e.getContext();
+		MessageScope scope = context.makeMessageScope(this);
+		MessageData messageData = new MessageData();
+		ScriptStack stack = new ScriptStack(e);
+		if (!stack.empty()) {
+			messageData.put("stack", stack.asString());
+		}
+		context.addContextData(messageData, this);
+		Message message = new Message(Message.Type.error, e.getLevel(), title, null, scope, messageData);
+		publish(errorChannel(), message);
+	}
+
+	public void publish(Channel channel, Message message) {
+		try {
+			channel.publish(message);
+		} catch (Throwable t) {
+			String logMessage = "Error trying to publish to channel \"" + channel.name() + "\": " + t.getMessage();
+			logger.error(logMessage, t);
+			try {
+				printStdout(logMessage);
+				printStdout("Publishing to console instead:");
+				consoleChannel().publish(message);
+			} catch (Throwable t2) {
+				logger.error("Error trying to publish to console", t2);
 			}
 		}
-		Payload payload = context.getPayload();
-		if (payload != null) {
-			data.add("input value", json(payload.getValue()));
-			data.add("input payload", json(payload));
-		}
-		Throwable cause = rootException.getCause();
-		if ((cause != null) && !((cause instanceof ScriptException) || (cause instanceof IOException) || (cause instanceof NashornException))) {
-			addStack(data, rootException);
-			logger.error(title, rootException);
-		}
-		if (!rootException.isSilent()) {
-			Alert alert = new Alert(Alert.Priority.emergency, title, message, null, data);
-			alertService.alert(alert);
-		}
 	}
 
-	public void infrastructureAlert(Alert.Priority priority, String title, String details) {
-		infrastructureAlert(priority, title, details, null);
-	}
-
-	public void infrastructureAlert(Alert.Priority priority, String message, String details, Throwable t) {
-		String title = "Internal error";
-		AlertData data = new AlertData();
-		data.add("hostname", getHostName());
-		data.add("details", details);
-		String logMessage = message + ": " + details;
-		if (t != null) {
-			addStack(data, t);
-		} else {
-			logger.error(logMessage);
-		}
-		alertService.alert(new Alert(priority, title, message, null, data));
-	}
-
-	private void addStack(AlertData data, Throwable t) {
+	private void addStack(MessageData data, Throwable t) {
 		StringWriter writer = new StringWriter();
 		t.printStackTrace(new PrintWriter(writer));
-		data.add("stack", writer.toString());
+		data.put("stack", writer.toString());
 	}
 
-	public boolean withToplevelErrorHandling(Runnable runnable) {
+	public boolean withExceptionHandling(String messagePrefix, ExecutionContext context, ThrowingRunnable runnable) {
 		boolean error = true;
 		try {
 			runnable.run();
 			error = false;
+		} catch (InterruptedException e) {
+			// The application is exiting; rethrow
+			throw new ApplicationInterruptedException(ApplicationInterruptedException.INTERRUPTION);
+		} catch (ApplicationInterruptedException e) {
+			// The application is exiting; rethrow
+			throw e;
+		} catch (RuntimeError e) {
+			signalException(e);
 		} catch (Throwable t) {
-			displayAlerterException(new AlerterException(t, ExceptionContext.makeToplevel()));
+			String message = ((messagePrefix != null) ? messagePrefix + ": " : "") + t.getMessage();
+			signalException(new RuntimeError(message, t, context));
 		}
 		return error;
 	}
 
-	public boolean withProcessorErrorHandling(Processor processor, Runnable runnable) {
-		boolean error = true;
-		try {
-			try {
-				runnable.run();
-				error = false;
-			} catch (Throwable t) {
-				displayAlerterException(new AlerterException(t, ExceptionContext.makeProcessorNoPayload(processor)));
-			}
-		} catch (Throwable t) {
-			logger.error("Error while displaying error", t);
-		}
-		return error;
+	public interface ThrowingRunnable {
+
+		void run() throws Throwable;
+
+	}
+
+	public String uuid() {
+		return UUID.randomUUID().toString();
 	}
 
 	public String json(Object value) {
@@ -350,12 +351,16 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		}
 	}
 
-	public Object parseJson(String text) {
+	public String prettyJson(Object value) {
 		try {
-			return objectMapper.readValue(text, Object.class);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+			return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(value);
+		} catch (JsonProcessingException e) {
+			return "<cannot convert to string>";
 		}
+	}
+
+	public Object parseJson(String text) throws IOException {
+		return objectMapper.readValue(text, Object.class);
 	}
 
 	public void exit() {
@@ -367,12 +372,12 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		return new HealthcheckInfo(hostName, runningProcessorDesc);
 	}
 
-	public AlerterProfile profile() {
-		return profileService.profile();
+	public String getId() {
+		return id;
 	}
 
-	public AlertService getAlertService() {
-		return alertService;
+	public AlerterProfile profile() {
+		return profileService.profile();
 	}
 
 	public ProfileService getProfileService() {

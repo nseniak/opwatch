@@ -33,10 +33,10 @@ public class GrepFactory extends ActiveProcessorFactory<GrepConfig, Grep> {
 
 	@Override
 	public Grep make(Object scriptObject) {
-		GrepConfig descriptor = convertProcessorDescriptor(scriptObject);
-		NativeRegExp regexp = checkPropertyValue("regexp", descriptor.getRegexp());
-		boolean invert = checkPropertyValue("invert", descriptor.getInvert());
-		return new Grep(getProcessorService(), descriptor, name(), regexp, invert);
+		GrepConfig config = convertProcessorDescriptor(scriptObject);
+		NativeRegExp regexp = checkPropertyValue("regexp", config.getRegexp());
+		boolean invert = checkPropertyValue("invert", config.getInvert());
+		return new Grep(getProcessorService(), config, name(), regexp, invert);
 	}
 
 }

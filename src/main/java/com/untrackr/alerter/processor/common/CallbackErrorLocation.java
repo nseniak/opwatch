@@ -7,13 +7,13 @@ import javax.script.ScriptException;
 public class CallbackErrorLocation {
 
 	/**
-	 * Location of the callback
-	 */
-	private ValueLocation callbackLocation;
-	/**
 	 * Stack at the moment where the error occurs in the callback
 	 */
 	private ScriptStack scriptStack;
+	/**
+	 * Location of the callback
+	 */
+	private ValueLocation callbackLocation;
 
 	public CallbackErrorLocation(ValueLocation callbackLocation, ScriptException exception) {
 		this.callbackLocation = callbackLocation;

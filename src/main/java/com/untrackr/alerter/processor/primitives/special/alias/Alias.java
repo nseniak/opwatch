@@ -1,10 +1,11 @@
 package com.untrackr.alerter.processor.primitives.special.alias;
 
 import com.untrackr.alerter.processor.common.Processor;
+import com.untrackr.alerter.processor.common.SpecialProcessor;
 import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class Alias extends Processor<AliasConfig> {
+public class Alias extends SpecialProcessor<AliasConfig> {
 
 	Processor<?> processor;
 

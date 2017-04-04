@@ -27,10 +27,10 @@ public class AliasFactory extends ProcessorFactory<AliasConfig, Alias> {
 
 	@Override
 	public Alias make(Object scriptObject) {
-		AliasConfig descriptor = convertProcessorDescriptor(scriptObject);
-		Processor processor = checkPropertyValue("processor", descriptor.getProcessor());
-		String name = checkPropertyValue("name", descriptor.getName());
-		return new Alias(getProcessorService(), processor, descriptor, name);
+		AliasConfig config = convertProcessorDescriptor(scriptObject);
+		Processor processor = checkPropertyValue("processor", config.getProcessor());
+		String name = checkPropertyValue("name", config.getName());
+		return new Alias(getProcessorService(), processor, config, name);
 	}
 
 }

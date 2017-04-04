@@ -19,7 +19,7 @@ public class AlerterApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		processorService.runCommandLine(args);
+		processorService.run(args);
 		SpringApplication.exit(applicationContext);
 	}
 

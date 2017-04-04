@@ -1,11 +1,8 @@
 package com.untrackr.alerter.processor.primitives.producer;
 
 import com.untrackr.alerter.ioservice.LineReader;
+import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.service.AlerterProfile;
-import com.untrackr.alerter.processor.common.ActiveProcessor;
-import com.untrackr.alerter.processor.common.AlerterException;
-import com.untrackr.alerter.processor.common.ExceptionContext;
-import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.service.ProcessorService;
 import org.apache.commons.io.IOUtils;
@@ -20,26 +17,22 @@ public class CommandRunner {
 	private ProcessorService processorService;
 	private String command;
 	private File directory;
-	private boolean commandExecutionErrorSignaled;
 	private Process process;
 
 	public CommandRunner(ProcessorService processorService, String command, File directory) {
 		this.processorService = processorService;
 		this.command = command;
 		this.directory = directory;
-		this.commandExecutionErrorSignaled = false;
 	}
 
 	public void startProcess(ActiveProcessor processor) {
 		try {
 			String[] cmdArray = {"/bin/sh", "-c", command};
 			process = Runtime.getRuntime().exec(cmdArray, null, directory);
-		} catch (Throwable t) {
-			AlerterException error = new AlerterException(t, ExceptionContext.makeProcessorNoPayload(processor));
-			error.setSilent(commandExecutionErrorSignaled);
-			commandExecutionErrorSignaled = true;
+		} catch (Exception e) {
+			throw new RuntimeError("cannot run command: " + e.getMessage(), e,
+					new ProcessorVoidExecutionContext(processor));
 		}
-		commandExecutionErrorSignaled = false;
 	}
 
 	public void stopProcess() {
@@ -54,25 +47,26 @@ public class CommandRunner {
 			long start = System.currentTimeMillis();
 			while (process == null) {
 				if ((System.currentTimeMillis() - start) > profile.getCommandStartTimeout()) {
-					throw new AlerterException("command process not started", ExceptionContext.makeProcessorPayload(processor, payload));
+					throw new RuntimeError("command process not started", new ProcessorVoidExecutionContext(processor));
 				}
 				try {
 					Thread.sleep(profile.getCommandStartSleepTime());
 				} catch (InterruptedException e) {
-					// Shutting dowm
-					return;
+					// Shutting down.
+					throw new ApplicationInterruptedException(ApplicationInterruptedException.INTERRUPTION);
 				}
 			}
 		}
 		if (!checkAlive(processor)) {
-			throw new AlerterException("command process has exited", ExceptionContext.makeProcessorPayload(processor, payload));
+			throw new RuntimeError("command process has exited", new ProcessorPayloadExecutionContext(processor, payload));
 		}
 		try {
 			process.getOutputStream().write(processorService.json(payload).getBytes());
 			process.getOutputStream().write('\n');
 			process.getOutputStream().flush();
 		} catch (IOException e) {
-			throw new AlerterException(e, ExceptionContext.makeProcessorPayload(processor, payload));
+			throw new RuntimeError("cannot write data to command process", e,
+					new ProcessorPayloadExecutionContext(processor, payload));
 		}
 	}
 
@@ -88,25 +82,27 @@ public class CommandRunner {
 						return;
 					}
 					if ((exitTimeout >= 0) && ((System.currentTimeMillis() - t0) > exitTimeout)) {
-						throw new AlerterException("timeout waiting for script output", ExceptionContext.makeProcessorNoPayload(processor));
+						throw new RuntimeError("timeout waiting for command output",
+								new ProcessorVoidExecutionContext(processor));
 					}
 					Thread.sleep(profile.getCronScriptOutputCheckDelay());
 				}
 				CommandOutput output = new CommandOutput();
-				output.script = command;
-				output.text = line;
+				output.command = command;
+				output.line = line;
 				processor.outputProduced(output);
 			}
 		} catch (IOException e) {
 			if (e.getMessage().equals("Stream closed")) {
 				// The processor is being stopped. Just exit.
-				return;
+				throw new ApplicationInterruptedException(ApplicationInterruptedException.STREAM_CLOSED);
 			} else {
-				throw new AlerterException(e, ExceptionContext.makeProcessorNoPayload(processor));
+				throw new RuntimeError("cannot read from command output", e,
+						new ProcessorVoidExecutionContext(processor));
 			}
 		} catch (InterruptedException e) {
-			// Nothing to do: exiting
-			return;
+			// Shutting down.
+			throw new ApplicationInterruptedException(ApplicationInterruptedException.INTERRUPTION);
 		} finally {
 			process.destroyForcibly();
 			process = null;
@@ -131,23 +127,23 @@ public class CommandRunner {
 			} catch (IOException e) {
 				// Nothing to do
 			}
-			throw new AlerterException("command exited with error status: " + process.exitValue() + output,
-					ExceptionContext.makeProcessorNoPayload(processor));
+			throw new RuntimeError("command exited with error status: " + process.exitValue() + output,
+					new ProcessorVoidExecutionContext(processor));
 		}
 		return false;
 	}
 
 	public static class CommandOutput {
 
-		private String script;
-		private String text;
+		private String command;
+		private String line;
 
-		public String getScript() {
-			return script;
+		public String getCommand() {
+			return command;
 		}
 
-		public String getText() {
-			return text;
+		public String getLine() {
+			return line;
 		}
 
 	}

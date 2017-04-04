@@ -1,15 +1,12 @@
 package com.untrackr.alerter.processor.primitives.special.parallel;
 
-import com.untrackr.alerter.processor.common.AlerterException;
-import com.untrackr.alerter.processor.common.ExceptionContext;
-import com.untrackr.alerter.processor.common.Processor;
-import com.untrackr.alerter.processor.common.ProcessorSignature;
+import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.List;
 
-public class Parallel extends Processor<ParallelConfig> {
+public class Parallel extends SpecialProcessor<ParallelConfig> {
 
 	private List<Processor<?>> processors;
 
@@ -39,12 +36,14 @@ public class Parallel extends Processor<ParallelConfig> {
 
 	@Override
 	public void start() {
-		processors.forEach(processor -> processorService.withProcessorErrorHandling(processor, processor::start));
+		for (Processor processor : processors) {
+			processor.start();
+		}
 	}
 
 	@Override
 	public void stop() {
-		processors.forEach(processor -> processorService.withProcessorErrorHandling(processor, processor::stop));
+		stop(processors);
 	}
 
 	@Override
@@ -76,8 +75,8 @@ public class Parallel extends Processor<ParallelConfig> {
 				incompatible = "outputs";
 			}
 			if (incompatible != null) {
-				String message = incompatible + " of processors #" + (index - 1) + " (" + previousProcessor.getType() + ") and #" + index + " (" + processor.getType() + ") are incompatible";
-				throw new AlerterException(message, ExceptionContext.makeProcessorFactory(this.getType()));
+				String message = incompatible + " of processors #" + (index - 1) + " (" + previousProcessor.getName() + ") and #" + index + " (" + processor.getName() + ") are incompatible";
+				throw new RuntimeError(message, new ProcessorVoidExecutionContext(this));
 			}
 			signature = bottomSignature;
 			previousProcessor = processor;

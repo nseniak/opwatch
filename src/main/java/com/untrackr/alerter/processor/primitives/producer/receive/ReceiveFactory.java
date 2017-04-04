@@ -32,9 +32,9 @@ public class ReceiveFactory extends ActiveProcessorFactory<ReceiveConfig, Receiv
 
 	@Override
 	public Receive make(Object scriptObject) {
-		ReceiveConfig descriptor = convertProcessorDescriptor(scriptObject);
-		String urlPath = checkPropertyValue("url", descriptor.getPath());
-		return new Receive(getProcessorService(), descriptor, name(), urlPath);
+		ReceiveConfig config = convertProcessorDescriptor(scriptObject);
+		String urlPath = checkPropertyValue("url", config.getPath());
+		return new Receive(getProcessorService(), config, name(), urlPath);
 	}
 
 }

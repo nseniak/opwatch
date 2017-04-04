@@ -1,5 +1,8 @@
 package com.untrackr.alerter.service;
 
+import com.untrackr.alerter.processor.common.ApplicationInterruptedException;
+import com.untrackr.alerter.processor.common.RuntimeError;
+import com.untrackr.alerter.processor.common.GlobalExecutionContext;
 import com.untrackr.alerter.processor.payload.PayloadObjectValue;
 import com.untrackr.alerter.ioservice.LineReader;
 import com.untrackr.alerter.processor.common.ActiveProcessor;
@@ -56,9 +59,10 @@ public class ConsoleService {
 					}
 				}
 			} catch (IOException e) {
-				throw new RuntimeException(e);
+				throw new RuntimeError("error reading from console: " + e.getMessage(), e);
 			} catch (InterruptedException e) {
-				// Exiting.. Nothing to do.
+				// Shutting down.
+				throw new ApplicationInterruptedException(ApplicationInterruptedException.INTERRUPTION);
 			}
 		});
 	}

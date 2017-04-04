@@ -32,8 +32,8 @@ public class StdinFactory extends ActiveProcessorFactory<StdinConfig, Stdin> {
 
 	@Override
 	public Stdin make(Object scriptObject) {
-		StdinConfig descriptor = convertProcessorDescriptor(scriptObject);
-		return new Stdin(getProcessorService(), descriptor, name());
+		StdinConfig config = convertProcessorDescriptor(scriptObject);
+		return new Stdin(getProcessorService(), config, name());
 	}
 
 }

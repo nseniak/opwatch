@@ -1,7 +1,6 @@
 package com.untrackr.alerter.processor.primitives.producer.receive;
 
-import com.untrackr.alerter.processor.common.AlerterException;
-import com.untrackr.alerter.processor.common.ExceptionContext;
+import com.untrackr.alerter.processor.common.ProcessorVoidExecutionContext;
 import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.processor.primitives.producer.Producer;
 import com.untrackr.alerter.service.HttpService;
@@ -28,13 +27,12 @@ public class Receive extends Producer<ReceiveConfig> implements HttpService.Post
 
 	@Override
 	public void handlePost(Object input) {
-		try {
-			Payload<?> remotePayload = processorService.getObjectMapper().convertValue(input, Payload.class);
-			outputTransformed(remotePayload.getValue(), remotePayload);
-		} catch (IllegalArgumentException e) {
-			throw new AlerterException("invalid input: " + processorService.json(input),
-					ExceptionContext.makeProcessorNoPayload(this));
-		}
+		processorService.withExceptionHandling("error consuming http post",
+				new ProcessorVoidExecutionContext(this),
+				() -> {
+					Payload<?> remotePayload = processorService.getObjectMapper().convertValue(input, Payload.class);
+					outputTransformed(remotePayload.getValue(), remotePayload);
+				});
 	}
 
 }

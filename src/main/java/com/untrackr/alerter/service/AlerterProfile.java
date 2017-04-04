@@ -1,7 +1,6 @@
 package com.untrackr.alerter.service;
 
 import com.untrackr.alerter.common.ApplicationUtil;
-import com.untrackr.alerter.alert.pushover.PushoverSettings;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -10,9 +9,6 @@ public class AlerterProfile {
 
 	private long fileWatchingCheckDelay;
 	private long executorTerminationTimeout;
-	private PushoverSettings pushoverSettings;
-	private String defaultPushoverApplication;
-	private String defaultPushoverGroup;
 	private long tailedFileWatchingCheckDelay;
 	private long tailPollInterval;
 	private Integer defaultEmergencyRetry;
@@ -35,9 +31,6 @@ public class AlerterProfile {
 	public AlerterProfile() throws IOException {
 		this.fileWatchingCheckDelay = TimeUnit.SECONDS.toMillis(1);
 		this.executorTerminationTimeout = TimeUnit.SECONDS.toMillis(30);
-		this.pushoverSettings = ApplicationUtil.jsonEnvironmentVariable("PUSHOVER_SETTINGS", PushoverSettings.class);
-		this.defaultPushoverApplication = ApplicationUtil.property("alerter.pushover.application");
-		this.defaultPushoverGroup = ApplicationUtil.property("alerter.pushover.group");
 		this.tailedFileWatchingCheckDelay = TimeUnit.SECONDS.toMillis(1);
 		this.tailPollInterval = TimeUnit.MILLISECONDS.toMillis(100);
 		this.defaultEmergencyRetry = 60;
@@ -72,30 +65,6 @@ public class AlerterProfile {
 
 	public void setExecutorTerminationTimeout(long executorTerminationTimeout) {
 		this.executorTerminationTimeout = executorTerminationTimeout;
-	}
-
-	public PushoverSettings getPushoverSettings() {
-		return pushoverSettings;
-	}
-
-	public void setPushoverSettings(PushoverSettings pushoverSettings) {
-		this.pushoverSettings = pushoverSettings;
-	}
-
-	public String getDefaultPushoverApplication() {
-		return defaultPushoverApplication;
-	}
-
-	public void setDefaultPushoverApplication(String defaultPushoverApplication) {
-		this.defaultPushoverApplication = defaultPushoverApplication;
-	}
-
-	public String getDefaultPushoverGroup() {
-		return defaultPushoverGroup;
-	}
-
-	public void setDefaultPushoverGroup(String defaultPushoverGroup) {
-		this.defaultPushoverGroup = defaultPushoverGroup;
 	}
 
 	public long getTailedFileWatchingCheckDelay() {

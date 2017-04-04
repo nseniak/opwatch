@@ -23,6 +23,10 @@
 * Fix "pretty"
 * Automatically load processors from Github
 * ready() method
+* Integrations: see list in https://www.statuscake.com/kb/knowledge-base/getting-alerts-from-an-integration/
+* mute/downgrade alarms by UI
+* display alias name instead of processor as source
+* display root payload of alerts
 
 ------
 
@@ -32,3 +36,20 @@ Design goals
 * Versatile
 * Few dependencies with databases
 * State not saved in database
+
+p = pipe(top(), stdout())
+run(p)
+
+Here,
+top is a producer. It takes no input and generates an output.
+stdout is a consumer. It takes an input and generates no output.
+
+Here's another example:
+
+run(pipe(tail("/tmp/foo.log"), grep(/ERROR/), stdout()))
+
+grep is a filter
+
+Most useful purpose is to raise alarms
+
+run(pipe(tail("/tmp/foo.log"), grep(/ERROR/), alarm("error in the log!)))

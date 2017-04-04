@@ -1,4 +1,4 @@
-package com.untrackr.alerter.processor.primitives.filter.stdout;
+package com.untrackr.alerter.processor.primitives.consumer.stdout;
 
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
 import com.untrackr.alerter.processor.common.ProcessorSignature;
@@ -27,14 +27,13 @@ public class StdoutFactory extends ActiveProcessorFactory<StdoutConfig, Stdout> 
 
 	@Override
 	public ProcessorSignature staticSignature() {
-		return ProcessorSignature.makeSideEffectFilter();
+		return ProcessorSignature.makeConsumer();
 	}
 
 	@Override
 	public Stdout make(Object scriptObject) {
-		StdoutConfig descriptor = convertProcessorDescriptor(scriptObject);
-		boolean displayPayload = checkPropertyValue("payload", descriptor.getPayload());
-		return new Stdout(getProcessorService(), descriptor, name(), displayPayload);
+		StdoutConfig config = convertProcessorDescriptor(scriptObject);
+		return new Stdout(getProcessorService(), config, name());
 	}
 
 }

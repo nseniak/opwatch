@@ -7,20 +7,20 @@ public class ProcessorLocation {
 	 */
 	private String name;
 	/**
-	 * Stack when the processor was built; empty if it was built by code
+	 * Script stack captured when the processor was built
 	 */
 	private ScriptStack stack;
 
-	public ProcessorLocation(String name) {
+	public ProcessorLocation(String name, ScriptStack stack) {
 		this.name = name;
-		this.stack = ScriptStack.currentStack();
+		this.stack = stack;
 	}
 
 	public String descriptor() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(getName());
 		if (!stack.empty()) {
-			builder.append(" processor built at ").append(stack.asString());
+			builder.append(" built ").append(stack.asString());
 		}
 		return builder.toString();
 	}

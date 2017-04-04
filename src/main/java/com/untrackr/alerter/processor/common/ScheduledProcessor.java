@@ -15,7 +15,9 @@ public abstract class ScheduledProcessor<D extends ScheduledProcessorConfig> ext
 
 	@Override
 	public void start() {
-		scheduledExecutor.schedule(() -> processorService.withProcessorErrorHandling(this, this::produce));
+		scheduledExecutor.schedule(() -> processorService.withExceptionHandling("error running scheduled processor",
+				new ProcessorVoidExecutionContext(this),
+				this::produce));
 	}
 
 	@Override

@@ -14,7 +14,7 @@ public class ScriptStack {
 	private ScriptStack() {
 	}
 
-	private ScriptStack(Throwable t) {
+	public ScriptStack(Throwable t) {
 		Throwable cause = t;
 		while (cause.getCause() != null) {
 			cause = cause.getCause();
@@ -55,7 +55,7 @@ public class ScriptStack {
 
 	private void initFromStack(StackTraceElement[] javaStack) {
 		for (StackTraceElement element : javaStack) {
-			if (element.getMethodName().equals(":program")) {
+			if (!element.getFileName().endsWith(".java")) {
 				addElement(element.getFileName(), element.getLineNumber());
 			}
 		}
@@ -80,8 +80,11 @@ public class ScriptStack {
 	}
 
 	public String asString() {
-		StringJoiner joiner = new StringJoiner(" > ");
-		elements.forEach(element -> joiner.add(element.getFileName() + ":" + element.getLineNumber()));
+		StringJoiner joiner = new StringJoiner("\n");
+		for (int i = elements.size() - 1; i >= 0; i--) {
+			ScriptStackElement element = elements.get(i);
+			joiner.add("at " + element.getFileName() + ":" + element.getLineNumber());
+		}
 		return joiner.toString();
 	}
 

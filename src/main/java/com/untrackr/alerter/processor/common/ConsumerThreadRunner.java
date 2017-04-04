@@ -1,6 +1,5 @@
 package com.untrackr.alerter.processor.common;
 
-import com.untrackr.alerter.alert.Alert;
 import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.service.ProcessorService;
 import org.slf4j.Logger;
@@ -25,26 +24,28 @@ public class ConsumerThreadRunner implements Runnable {
 	}
 
 	public void consume(Payload<?> payload) {
+		long timeout = processorService.getProfileService().profile().getProcessorInputQueueTimeout();
 		try {
-			long timeout = processorService.getProfileService().profile().getProcessorInputQueueTimeout();
 			while (!inputQueue.offer(payload, timeout, TimeUnit.MILLISECONDS)) {
-				processorService.infrastructureAlert(Alert.Priority.high, "Processor queue is full", processor.getLocation().descriptor());
+				processorService.signalException(new RuntimeError("pipe full", new ProcessorPayloadExecutionContext(processor, payload)));
 			}
 		} catch (InterruptedException e) {
-			// Nothing to do: the application is exiting.
+			// Shutting down.
+			throw new ApplicationInterruptedException(ApplicationInterruptedException.INTERRUPTION);
 		}
 	}
 
 	@Override
 	public void run() {
 		while (true) {
-			try {
-				Payload<?> payload = inputQueue.take();
-				processorService.withProcessorErrorHandling(processor, () -> processor.consumeInOwnThread(payload));
-			} catch (InterruptedException e) {
-				// Nothing to do: the application is exiting.
-				return;
-			}
+			processorService.withExceptionHandling("error reading input",
+					new ProcessorVoidExecutionContext(processor),
+					() -> {
+						Payload<?> payload = inputQueue.take();
+						processorService.withExceptionHandling("error processing input",
+								new ProcessorPayloadExecutionContext(processor, payload),
+								() -> processor.consumeInOwnThread(payload));
+					});
 		}
 	}
 

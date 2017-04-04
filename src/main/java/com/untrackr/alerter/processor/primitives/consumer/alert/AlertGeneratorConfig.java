@@ -4,12 +4,12 @@ import com.untrackr.alerter.processor.config.*;
 
 public class AlertGeneratorConfig extends ActiveProcessorConfig {
 
-	private String priority = "normal";
+	// TODO Make StringValue
+	private String priority = "medium";
 	private StringValue message;
-	private JavascriptPredicate predicate;
+	private JavascriptPredicate trigger;
 	private Boolean toggle = false;
-	private String application;
-	private String group;
+	private String channel;
 
 	@OptionalProperty
 	public String getPriority() {
@@ -30,12 +30,12 @@ public class AlertGeneratorConfig extends ActiveProcessorConfig {
 	}
 
 	@OptionalProperty
-	public JavascriptPredicate getPredicate() {
-		return predicate;
+	public JavascriptPredicate getTrigger() {
+		return trigger;
 	}
 
-	public void setPredicate(JavascriptPredicate predicate) {
-		this.predicate = predicate;
+	public void setTrigger(JavascriptPredicate trigger) {
+		this.trigger = trigger;
 	}
 
 	@OptionalProperty
@@ -48,21 +48,12 @@ public class AlertGeneratorConfig extends ActiveProcessorConfig {
 	}
 
 	@OptionalProperty
-	public String getApplication() {
-		return application;
+	public String getChannel() {
+		return channel;
 	}
 
-	public void setApplication(String application) {
-		this.application = application;
-	}
-
-	@OptionalProperty
-	public String getGroup() {
-		return group;
-	}
-
-	public void setGroup(String group) {
-		this.group = group;
+	public void setChannel(String channel) {
+		this.channel = channel;
 	}
 
 }

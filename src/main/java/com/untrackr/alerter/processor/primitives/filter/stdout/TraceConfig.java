@@ -4,7 +4,7 @@ import com.untrackr.alerter.processor.config.ActiveProcessorConfig;
 import com.untrackr.alerter.processor.config.ImplicitProperty;
 import com.untrackr.alerter.processor.config.OptionalProperty;
 
-public class StdoutConfig extends ActiveProcessorConfig {
+public class TraceConfig extends ActiveProcessorConfig {
 
 	private Boolean payload = false;
 

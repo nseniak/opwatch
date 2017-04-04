@@ -1,9 +1,6 @@
 package com.untrackr.alerter.processor.config;
 
-import com.untrackr.alerter.processor.common.CallbackErrorLocation;
-import com.untrackr.alerter.processor.common.ExceptionContext;
-import com.untrackr.alerter.processor.common.Processor;
-import com.untrackr.alerter.processor.common.ValueLocation;
+import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.processor.payload.Payload;
 
 public class StringValue extends ConfigPropertyValue {
@@ -41,7 +38,7 @@ public class StringValue extends ConfigPropertyValue {
 		} else {
 			Object value = producer.call(payload, processor);
 			return (String) processor.getProcessorService().getScriptService().convertScriptValue(producer.getValueLocation(), String.class, value,
-					() -> ExceptionContext.makeProcessorPayloadScriptCallback(processor, new CallbackErrorLocation(valueLocation), payload));
+					(message) -> new RuntimeError(message, new ProcessorPayloadExecutionContext(processor, payload)));
 		}
 	}
 

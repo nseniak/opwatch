@@ -1,8 +1,8 @@
 package com.untrackr.alerter.processor.primitives.producer.df;
 
+import com.untrackr.alerter.processor.common.RuntimeError;
+import com.untrackr.alerter.processor.common.ProcessorVoidExecutionContext;
 import com.untrackr.alerter.processor.payload.PayloadObjectValue;
-import com.untrackr.alerter.processor.common.AlerterException;
-import com.untrackr.alerter.processor.common.ExceptionContext;
 import com.untrackr.alerter.processor.primitives.producer.ScheduledExecutor;
 import com.untrackr.alerter.processor.primitives.producer.ScheduledProducer;
 import com.untrackr.alerter.service.ProcessorService;
@@ -28,7 +28,7 @@ public class Df extends ScheduledProducer<DfConfig> {
 				return;
 			} else {
 				fileNotFoundErrorSignaled = true;
-				throw new AlerterException("file not found: " + file, ExceptionContext.makeProcessorNoPayload(this));
+				throw new RuntimeError("file not found: " + file, new ProcessorVoidExecutionContext(this));
 			}
 		}
 		fileNotFoundErrorSignaled = false;

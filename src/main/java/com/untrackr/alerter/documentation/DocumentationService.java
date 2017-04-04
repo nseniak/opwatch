@@ -1,9 +1,7 @@
 package com.untrackr.alerter.documentation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.untrackr.alerter.processor.common.Processor;
-import com.untrackr.alerter.processor.common.ProcessorFactory;
-import com.untrackr.alerter.processor.common.ProcessorSignature;
+import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.processor.config.ProcessorConfig;
 import com.untrackr.alerter.processor.config.StringValue;
 import com.untrackr.alerter.service.ScriptService;
@@ -42,8 +40,8 @@ public class DocumentationService {
 			}
 			return new ProcessorDoc(factory.name(), fieldDocList, "processor doc");
 		} catch (IntrospectionException e) {
-			logger.error("Exception while generation documentation: " + descClass.getName(), e);
-			return null;
+			throw new RuntimeError("error while generation documentation: " + descClass.getName() + ": " + e.getMessage(), e,
+					new GlobalExecutionContext());
 		}
 	}
 

@@ -1,7 +1,7 @@
 package com.untrackr.alerter.processor.primitives.producer.curl;
 
-import com.untrackr.alerter.processor.common.AlerterException;
-import com.untrackr.alerter.processor.common.ExceptionContext;
+import com.untrackr.alerter.processor.common.FactoryExecutionContext;
+import com.untrackr.alerter.processor.common.RuntimeError;
 import com.untrackr.alerter.processor.common.ProcessorSignature;
 import com.untrackr.alerter.processor.primitives.producer.ScheduledExecutorFactory;
 import com.untrackr.alerter.service.ProcessorService;
@@ -37,19 +37,19 @@ public class CurlFactory extends ScheduledExecutorFactory<CurlConfig, Curl> {
 
 	@Override
 	public Curl make(Object scriptObject) {
-		CurlConfig descriptor = convertProcessorDescriptor(scriptObject);
-		String urlString = checkVariableSubstitution("url", checkPropertyValue("url", descriptor.getUrl()));
+		CurlConfig config = convertProcessorDescriptor(scriptObject);
+		String urlString = checkVariableSubstitution("url", checkPropertyValue("url", config.getUrl()));
 		URI uri;
 		try {
 			uri = new URI(urlString);
 		} catch (URISyntaxException e) {
-			throw new AlerterException("invalid \"url\": " + e.getLocalizedMessage() + ": \"" + urlString + "\"",
-					ExceptionContext.makeProcessorFactory(name()));
+			throw new RuntimeError("invalid \"url\": " + e.getLocalizedMessage() + ": \"" + urlString + "\"",
+					new FactoryExecutionContext(this));
 		}
-		long connectTimeout = durationValue(checkPropertyValue("connectTimeout", descriptor.getConnectTimeout()));
-		long readTimeout = durationValue(checkPropertyValue("readTimeout", descriptor.getReadTimeout()));
-		boolean insecure = descriptor.getInsecure();
-		return new Curl(getProcessorService(), descriptor, name(), makeScheduledExecutor(descriptor), uri,
+		long connectTimeout = durationValue(checkPropertyValue("connectTimeout", config.getConnectTimeout()));
+		long readTimeout = durationValue(checkPropertyValue("readTimeout", config.getReadTimeout()));
+		boolean insecure = config.getInsecure();
+		return new Curl(getProcessorService(), config, name(), makeScheduledExecutor(config), uri,
 				(int) connectTimeout, (int) readTimeout, insecure);
 	}
 

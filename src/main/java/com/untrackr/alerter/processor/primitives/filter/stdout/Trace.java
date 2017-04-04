@@ -1,15 +1,14 @@
 package com.untrackr.alerter.processor.primitives.filter.stdout;
 
-import com.untrackr.alerter.processor.common.ProcessorSignature;
 import com.untrackr.alerter.processor.payload.Payload;
-import com.untrackr.alerter.processor.primitives.filter.Filter;
+import com.untrackr.alerter.processor.primitives.consumer.Consumer;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class Stdout extends Filter<StdoutConfig> {
+public class Trace extends Consumer<TraceConfig> {
 
 	private boolean displayPayload;
 
-	public Stdout(ProcessorService processorService, StdoutConfig descriptor, String name, boolean displayPayload) {
+	public Trace(ProcessorService processorService, TraceConfig descriptor, String name, boolean displayPayload) {
 		super(processorService, descriptor, name);
 		this.displayPayload = displayPayload;
 	}

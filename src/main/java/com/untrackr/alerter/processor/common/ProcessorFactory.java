@@ -23,9 +23,12 @@ public abstract class ProcessorFactory<C extends ProcessorConfig, P extends Proc
 
 	private static final Logger logger = LoggerFactory.getLogger(ProcessorFactory.class);
 
+	private String id;
+
 	protected ProcessorService processorService;
 
 	public ProcessorFactory(ProcessorService processorService) {
+		this.id = processorService.uuid();
 		this.processorService = processorService;
 	}
 
@@ -68,17 +71,17 @@ public abstract class ProcessorFactory<C extends ProcessorConfig, P extends Proc
 			return config;
 		} catch (InvocationTargetException | InstantiationException | IllegalAccessException | IntrospectionException e) {
 			logger.error("Exception while fetching properties: " + configurationClass(), e);
-			throw new AlerterException("cannot fetch properties", ExceptionContext.makeProcessorFactory(name()));
+			throw new RuntimeError("cannot fetch properties", new FactoryExecutionContext(this));
 		}
 	}
 
 	public void error(String message) {
-		throw new AlerterException(message, ExceptionContext.makeProcessorFactory(name()));
+		throw new RuntimeError(message, new FactoryExecutionContext(this));
 	}
 
 	protected C convertProcessorDescriptor(Object scriptObject) {
 		return (C) processorService.getScriptService().convertScriptValue(ValueLocation.makeArgument(name(), "configuration"), configurationClass(), scriptObject,
-				() -> ExceptionContext.makeProcessorFactory(name()));
+				(message) -> new RuntimeError(message, new FactoryExecutionContext(this)));
 	}
 
 	public <T> T checkPropertyValue(String property, T value) {
@@ -86,7 +89,7 @@ public abstract class ProcessorFactory<C extends ProcessorConfig, P extends Proc
 			return value;
 		} else {
 			ValueLocation location = ValueLocation.makeProperty(name(), property);
-			throw new AlerterException("missing " + location.describeAsValue(), ExceptionContext.makeProcessorFactory(name()));
+			throw new RuntimeError("missing " + location.describeAsValue(), new FactoryExecutionContext(this));
 		}
 	}
 
@@ -111,8 +114,8 @@ public abstract class ProcessorFactory<C extends ProcessorConfig, P extends Proc
 		try {
 			return Duration.parse(duration).toMillis();
 		} catch (DateTimeParseException e) {
-			throw new AlerterException(e.getLocalizedMessage() + " at index " + (e.getErrorIndex() - start) + ": \"" + durationString + "\"",
-					ExceptionContext.makeProcessorFactory(name()));
+			throw new RuntimeError(e.getLocalizedMessage() + " at index " + (e.getErrorIndex() - start) + ": \"" + durationString + "\"",
+					new FactoryExecutionContext(this));
 		}
 	}
 
@@ -121,8 +124,7 @@ public abstract class ProcessorFactory<C extends ProcessorConfig, P extends Proc
 			return ApplicationUtil.substituteVariables(text);
 		} catch (UndefinedSubstitutionVariableException e) {
 			ValueLocation location = ValueLocation.makeProperty(name(), property);
-			throw new AlerterException("unknown variable in " + location.describeAsValue() + ": " + e.getName(),
-					ExceptionContext.makeProcessorFactory(name()));
+			throw new RuntimeError("unknown variable in " + location.describeAsValue() + ": " + e.getName(), new FactoryExecutionContext(this));
 		}
 	}
 
@@ -131,9 +133,13 @@ public abstract class ProcessorFactory<C extends ProcessorConfig, P extends Proc
 			return Pattern.compile(regex);
 		} catch (PatternSyntaxException e) {
 			ValueLocation location = ValueLocation.makeProperty(name(), property);
-			throw new AlerterException("invalid regex in " + location.describeAsValue() + ":" + e.getMessage(),
-					ExceptionContext.makeProcessorFactory(name()));
+			throw new RuntimeError("invalid regex in " + location.describeAsValue() + ":" + e.getMessage(),
+					new FactoryExecutionContext(this));
 		}
+	}
+
+	public String getId() {
+		return id;
 	}
 
 	public ProcessorService getProcessorService() {

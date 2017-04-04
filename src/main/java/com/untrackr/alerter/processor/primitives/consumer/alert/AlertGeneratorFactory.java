@@ -1,13 +1,8 @@
 package com.untrackr.alerter.processor.primitives.consumer.alert;
 
-import com.untrackr.alerter.alert.Alert;
-import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
-import com.untrackr.alerter.processor.common.AlerterException;
-import com.untrackr.alerter.processor.common.ExceptionContext;
-import com.untrackr.alerter.processor.common.ProcessorSignature;
+import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.processor.config.JavascriptPredicate;
 import com.untrackr.alerter.processor.config.StringValue;
-import com.untrackr.alerter.service.AlerterProfile;
 import com.untrackr.alerter.service.ProcessorService;
 
 public class AlertGeneratorFactory extends ActiveProcessorFactory<AlertGeneratorConfig, AlertGenerator> {
@@ -38,22 +33,22 @@ public class AlertGeneratorFactory extends ActiveProcessorFactory<AlertGenerator
 
 	@Override
 	public AlertGenerator make(Object scriptObject) {
-		AlertGeneratorConfig descriptor = convertProcessorDescriptor(scriptObject);
-		String priorityName = checkPropertyValue("priority", descriptor.getPriority());
-		Alert.Priority priority;
+		AlertGeneratorConfig config = convertProcessorDescriptor(scriptObject);
+		String priorityName = checkPropertyValue("priority", config.getPriority());
+		Message.Level level;
 		try {
-			priority = Alert.Priority.valueOf(priorityName);
+			level = Message.Level.valueOf(priorityName);
 		} catch (IllegalArgumentException e) {
-			throw new AlerterException("bad alert priority: \"" + priorityName + "\"", ExceptionContext.makeProcessorFactory(name()));
+			throw new RuntimeError("bad alert priority: \"" + priorityName + "\"", new FactoryExecutionContext(this));
 		}
-		StringValue message = checkPropertyValue("message", descriptor.getMessage());
-		JavascriptPredicate predicate = descriptor.getPredicate();
-		boolean toggle = checkPropertyValue("toggle", descriptor.getToggle());
-		AlerterProfile profile = processorService.profile();
-		String applicationName = (descriptor.getApplication() != null) ? descriptor.getApplication() : profile.getDefaultPushoverApplication();
-		String groupName = (descriptor.getGroup() != null) ? descriptor.getGroup() : profile.getDefaultPushoverGroup();
-		return new AlertGenerator(getProcessorService(), descriptor, name(), applicationName, groupName,
-				message, priority, predicate, toggle);
+		StringValue message = checkPropertyValue("message", config.getMessage());
+		JavascriptPredicate predicate = config.getTrigger();
+		boolean toggle = checkPropertyValue("toggle", config.getToggle());
+		String channelName = config.getChannel();
+		if ((channelName != null) && (processorService.findChannel(channelName) == null)) {
+			throw new RuntimeError("channel not found: \"" + channelName + "\"", new FactoryExecutionContext(this));
+		}
+		return new AlertGenerator(getProcessorService(), config, name(), message, level, predicate, toggle, channelName);
 	}
 
 }

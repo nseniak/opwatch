@@ -2,12 +2,13 @@ package com.untrackr.alerter.processor.primitives.special.pipe;
 
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ProcessorSignature;
+import com.untrackr.alerter.processor.common.SpecialProcessor;
 import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.List;
 
-public class Pipe extends Processor<PipeConfig> {
+public class Pipe extends SpecialProcessor<PipeConfig> {
 
 	private List<Processor<?>> processors;
 
@@ -47,15 +48,13 @@ public class Pipe extends Processor<PipeConfig> {
 	public void start() {
 		for (int i = processors.size() - 1; i >= 0; i--) {
 			Processor processor = processors.get(i);
-			processorService.withProcessorErrorHandling(processor, processor::start);
+			processor.start();
 		}
 	}
 
 	@Override
 	public void stop() {
-		for (Processor processor : processors) {
-			processorService.withProcessorErrorHandling(processor, processor::stop);
-		}
+		stop(processors);
 	}
 
 	private Processor<?> first() {

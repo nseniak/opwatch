@@ -33,10 +33,10 @@ public class CountFactory extends ScheduledExecutorFactory<CountConfig, Count> {
 
 	@Override
 	public Count make(Object scriptObject) {
-		CountConfig descriptor = convertProcessorDescriptor(scriptObject);
-		JavascriptPredicate predicate = descriptor.getPredicate();
-		long duration = durationValue(checkPropertyValue("duration", descriptor.getDuration()));
-		return new Count(getProcessorService(), descriptor, name(), makeScheduledExecutor(descriptor), predicate, duration);
+		CountConfig config = convertProcessorDescriptor(scriptObject);
+		JavascriptPredicate predicate = config.getPredicate();
+		long duration = durationValue(checkPropertyValue("duration", config.getDuration()));
+		return new Count(getProcessorService(), config, name(), makeScheduledExecutor(config), predicate, duration);
 	}
 
 }

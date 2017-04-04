@@ -32,9 +32,9 @@ public class TrailFactory extends ScheduledExecutorFactory<TrailConfig, Trail> {
 
 	@Override
 	public Trail make(Object scriptObject) {
-		TrailConfig descriptor = convertProcessorDescriptor(scriptObject);
-		long duration = durationValue(checkPropertyValue("duration", descriptor.getDuration()));
-		return new Trail(getProcessorService(), descriptor, name(), makeScheduledExecutor(descriptor), duration);
+		TrailConfig config = convertProcessorDescriptor(scriptObject);
+		long duration = durationValue(checkPropertyValue("duration", config.getDuration()));
+		return new Trail(getProcessorService(), config, name(), makeScheduledExecutor(config), duration);
 	}
 
 }

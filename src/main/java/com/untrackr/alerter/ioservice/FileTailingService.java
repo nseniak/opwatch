@@ -1,7 +1,7 @@
 package com.untrackr.alerter.ioservice;
 
 import com.untrackr.alerter.common.ThreadUtil;
-import com.untrackr.alerter.alert.Alert;
+import com.untrackr.alerter.processor.common.GlobalExecutionContext;
 import com.untrackr.alerter.service.ProcessorService;
 import com.untrackr.alerter.service.ProfileService;
 import org.apache.commons.io.input.TailerListenerAdapter;
@@ -58,13 +58,9 @@ public class FileTailingService implements DisposableBean {
 	}
 
 	public void tailFile(TailedFile tailedFile) {
-		try {
-			tailedFile.tail();
-		} catch (InterruptedException e) {
-			// Nothing to do: the tail is being stopped
-		} catch (Throwable t) {
-			processorService.infrastructureAlert(Alert.Priority.emergency, "Exception while tailing file", tailedFile.getFile().toString(), t);
-		}
+		processorService.withExceptionHandling("error tailing file " + tailedFile.getFile().toString(),
+				new GlobalExecutionContext(),
+				tailedFile::tail);
 	}
 
 	public static class MyTailHandler extends TailerListenerAdapter {

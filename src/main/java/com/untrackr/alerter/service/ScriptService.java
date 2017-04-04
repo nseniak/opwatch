@@ -6,13 +6,14 @@ import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.processor.config.*;
 import com.untrackr.alerter.processor.primitives.consumer.alert.AlertGeneratorFactory;
 import com.untrackr.alerter.processor.primitives.consumer.post.PostFactory;
+import com.untrackr.alerter.processor.primitives.consumer.stdout.StdoutFactory;
 import com.untrackr.alerter.processor.primitives.filter.apply.ApplyFactory;
 import com.untrackr.alerter.processor.primitives.filter.collect.CollectFactory;
 import com.untrackr.alerter.processor.primitives.filter.grep.GrepFactory;
 import com.untrackr.alerter.processor.primitives.filter.json.JsonFactory;
 import com.untrackr.alerter.processor.primitives.filter.jstack.JstackFactory;
 import com.untrackr.alerter.processor.primitives.filter.sh.ShFactory;
-import com.untrackr.alerter.processor.primitives.filter.stdout.StdoutFactory;
+import com.untrackr.alerter.processor.primitives.filter.stdout.TraceFactory;
 import com.untrackr.alerter.processor.primitives.producer.console.StdinFactory;
 import com.untrackr.alerter.processor.primitives.producer.count.CountFactory;
 import com.untrackr.alerter.processor.primitives.producer.cron.CronFactory;
@@ -48,7 +49,10 @@ import java.io.*;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class ScriptService {
@@ -83,6 +87,7 @@ public class ScriptService {
 			createSimpleFactoryFunction(new CollectFactory(processorService));
 			createSimpleFactoryFunction(new TailFactory(processorService));
 			createSimpleFactoryFunction(new StdoutFactory(processorService));
+			createSimpleFactoryFunction(new TraceFactory(processorService));
 			createSimpleFactoryFunction(new StatFactory(processorService));
 			createSimpleFactoryFunction(new DfFactory(processorService));
 			createSimpleFactoryFunction(new TopFactory(processorService));
@@ -100,7 +105,7 @@ public class ScriptService {
 			ProcessorDoc doc = documentationService.documentation(new CurlFactory(processorService));
 			logger.info("Doc");
 		} catch (ScriptException e) {
-			throw new AlerterException(e, ExceptionContext.makeToplevel());
+			throw new RuntimeError("initialization error: " + e.getMessage(), e);
 		}
 	}
 
@@ -112,7 +117,7 @@ public class ScriptService {
 		try {
 			scriptResources = applicationContext.getResources("classpath:/scripts/startup/*.js");
 		} catch (IOException e) {
-			logger.error("Cannot determine javascript startup resources: " + e.getMessage(), e);
+			throw new IllegalStateException("Cannot find script resource: " + e.getMessage(), e);
 		}
 		for (Resource scriptResource : scriptResources) {
 			loadScriptResource(scriptResource);
@@ -128,19 +133,19 @@ public class ScriptService {
 	}
 
 	private void loadScript(ReaderSupplier readerSupplier, String location) {
-		processorService.withToplevelErrorHandling(() -> {
-			ScriptContext context = scriptEngine.getContext();
-			context.setAttribute(ScriptEngine.FILENAME, location, ScriptContext.ENGINE_SCOPE);
-			try {
-				scriptEngine.eval(readerSupplier.reader(), context);
-			} catch (FileNotFoundException e) {
-				throw new AlerterException("File not found: " + location, ExceptionContext.makeToplevel());
-			} catch (Exception e) {
-				throw new AlerterException(e, ExceptionContext.makeToplevel());
-			} finally {
-				context.removeAttribute(ScriptEngine.FILENAME, ScriptContext.ENGINE_SCOPE);
-			}
-		});
+		processorService.withExceptionHandling("error loading script",
+				new GlobalExecutionContext(),
+				() -> {
+					ScriptContext context = scriptEngine.getContext();
+					context.setAttribute(ScriptEngine.FILENAME, location, ScriptContext.ENGINE_SCOPE);
+					try {
+						scriptEngine.eval(readerSupplier.reader(), context);
+					} catch (FileNotFoundException e) {
+						throw new RuntimeError("file not found: " + location);
+					} finally {
+						context.removeAttribute(ScriptEngine.FILENAME, ScriptContext.ENGINE_SCOPE);
+					}
+				});
 	}
 
 	private interface ReaderSupplier {
@@ -183,14 +188,14 @@ public class ScriptService {
 
 	public void executeConsoleInput(String script) {
 		ScriptContext context = scriptEngine.getContext();
-		try {
-			Object value = scriptEngine.eval(script, context);
-			if (value != null) {
-				processorService.printMessage(JSType.toString(value));
-			}
-		} catch (Throwable t) {
-			processorService.displayAlerterException(new AlerterException(t, ExceptionContext.makeToplevel()));
-		}
+		processorService.withExceptionHandling(null,
+				new GlobalExecutionContext(),
+				() -> {
+					Object value = scriptEngine.eval(script, context);
+					if (value != null) {
+						processorService.printStdout(JSType.toString(value));
+					}
+				});
 	}
 
 	private <T> JavascriptFunction javascriptFunction(JavascriptFunction<Object, T> fun) {
@@ -202,41 +207,39 @@ public class ScriptService {
 		R apply(T t);
 	}
 
-	public Object convertScriptValue(ValueLocation valueLocation, Type type, Object scriptValue, ExceptionContextFactory contextFactory) {
+	public Object convertScriptValue(ValueLocation valueLocation, Type type, Object scriptValue, RuntimeExceptionFactory exceptionFactory) {
 		if (scriptValue == null) {
 			return null;
 		} else if (type instanceof Class) {
-			return convertScriptValueToClass(valueLocation, (Class) type, scriptValue, contextFactory);
+			return convertScriptValueToClass(valueLocation, (Class) type, scriptValue, exceptionFactory);
 		} else if (type instanceof ParameterizedType) {
-			return convertScriptValueToParameterizedType(valueLocation, (ParameterizedType) type, scriptValue, contextFactory);
+			return convertScriptValueToParameterizedType(valueLocation, (ParameterizedType) type, scriptValue, exceptionFactory);
 		}
-		throw new AlerterException("invalid " + valueLocation.describeAsValue() + ", expected " + documentationService.typeName(type) + ", got: " + scriptValue,
-				contextFactory.make());
+		throw exceptionFactory.make("invalid " + valueLocation.describeAsValue() + ", expected " + documentationService.typeName(type) + ", got: " + scriptValue);
 	}
 
-	private Object convertScriptValueToParameterizedType(ValueLocation valueLocation, ParameterizedType type, Object scriptValue, ExceptionContextFactory contextFactory) {
+	private Object convertScriptValueToParameterizedType(ValueLocation valueLocation, ParameterizedType type, Object scriptValue, RuntimeExceptionFactory exceptionFactory) {
 		Type listType = documentationService.parameterizedListType(type);
 		if (listType == null) {
-			return convertScriptValue(valueLocation, type.getRawType(), scriptValue, contextFactory);
+			return convertScriptValue(valueLocation, type.getRawType(), scriptValue, exceptionFactory);
 		} else {
 			try {
 				ScriptObjectMirror scriptObject = (ScriptObjectMirror) scriptValue;
 				List<Object> scriptList = (List<Object>) ScriptUtils.convert(scriptObject, List.class);
 				List<Object> list = new ArrayList<>();
 				for (Object scriptListObject : scriptList) {
-					list.add(convertScriptValue(valueLocation.toListElement(), listType, scriptListObject, contextFactory));
+					list.add(convertScriptValue(valueLocation.toListElement(), listType, scriptListObject, exceptionFactory));
 				}
 				return list;
 			} catch (ClassCastException e) {
 				// Nothing to do
 			}
 		}
-		throw new AlerterException("invalid " + valueLocation.describeAsValue() + ", expected " + documentationService.typeName(type) + ", got: " + scriptValue,
-				contextFactory.make());
+		throw exceptionFactory.make("invalid " + valueLocation.describeAsValue() + ", expected " + documentationService.typeName(type) + ", got: " + scriptValue);
 	}
 
 
-	private Object convertScriptValueToClass(ValueLocation valueLocation, Class<?> clazz, Object scriptValue, ExceptionContextFactory contextFactory) {
+	private Object convertScriptValueToClass(ValueLocation valueLocation, Class<?> clazz, Object scriptValue, RuntimeExceptionFactory exceptionFactory) {
 		if (clazz.isAssignableFrom(scriptValue.getClass())) {
 			return scriptValue;
 		}
@@ -271,23 +274,16 @@ public class ScriptService {
 							Type fieldType = descriptor.getReadMethod().getGenericReturnType();
 							String processorName = valueLocation.getFunctionName();
 							ValueLocation propertyValueSource = ValueLocation.makeProperty(processorName, propertyName);
-							wrapper.setPropertyValue(propertyName, convertScriptValue(propertyValueSource, fieldType, scriptObject.get(propertyName), contextFactory));
+							wrapper.setPropertyValue(propertyName, convertScriptValue(propertyValueSource, fieldType, scriptObject.get(propertyName), exceptionFactory));
 						} catch (InvalidPropertyException e) {
-							throw new AlerterException("invalid property \"" + propertyName + "\"", contextFactory.make());
+							throw exceptionFactory.make("invalid property \"" + propertyName + "\"");
 						}
 					}
 					return value;
 				}
 			}
 		}
-		throw new AlerterException("invalid " + valueLocation.describeAsValue() + ", expected " + documentationService.typeName(clazz) + ", got: " + scriptValue,
-				contextFactory.make());
-	}
-
-	public interface ExceptionContextFactory {
-
-		ExceptionContext make();
-
+		throw exceptionFactory.make("invalid " + valueLocation.describeAsValue() + ", expected " + documentationService.typeName(clazz) + ", got: " + scriptValue);
 	}
 
 	public String typeName(Type type) {

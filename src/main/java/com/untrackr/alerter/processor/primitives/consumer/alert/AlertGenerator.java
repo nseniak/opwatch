@@ -1,64 +1,65 @@
 package com.untrackr.alerter.processor.primitives.consumer.alert;
 
-import com.untrackr.alerter.alert.Alert;
+import com.untrackr.alerter.channel.common.Channel;
+import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.processor.config.JavascriptPredicate;
 import com.untrackr.alerter.processor.config.StringValue;
-import com.untrackr.alerter.processor.primitives.consumer.Consumer;
 import com.untrackr.alerter.processor.payload.Payload;
+import com.untrackr.alerter.processor.primitives.consumer.Consumer;
 import com.untrackr.alerter.service.ProcessorService;
 
 public class AlertGenerator extends Consumer<AlertGeneratorConfig> {
 
-	private Alert.Priority priority;
+	private Message.Level level;
 	private StringValue message;
 	private JavascriptPredicate predicate;
 	private boolean toggle;
 	private boolean toggleUp;
-	private String application;
-	private String group;
+	private String channelName;
 
-	public AlertGenerator(ProcessorService processorService, AlertGeneratorConfig descriptor, String name, String application, String group, StringValue message,
-												Alert.Priority priority, JavascriptPredicate predicate, boolean toggle) {
+	public AlertGenerator(ProcessorService processorService, AlertGeneratorConfig descriptor, String name, StringValue message,
+												Message.Level level, JavascriptPredicate predicate, boolean toggle, String channelName) {
 		super(processorService, descriptor, name);
-		this.priority = priority;
+		this.level = level;
 		this.message = message;
 		this.predicate = predicate;
 		this.toggle = toggle;
-		this.application = application;
-		this.group = group;
+		this.channelName = channelName;
 	}
 
 	@Override
 	public void consumeInOwnThread(Payload<?> payload) {
 		boolean alert = (predicate == null) || predicate.call(payload, this);
+		Channel channel;
+		if (channelName == null) {
+			channel = processorService.defaultChannel();
+		} else {
+			channel = processorService.findChannel(channelName);
+			if (channel == null) {
+				throw new RuntimeError("channel not found: \"" + channelName + "\"", new ProcessorVoidExecutionContext(this));
+			}
+		}
 		if (!toggle) {
 			if (alert) {
-				processorService.processorAlert(priority, message.value(this, payload), this);
+				processorService.publish(channel, makeAlerterMessage(Message.Type.alert, payload));
 			}
 		} else {
 			if (!toggleUp && alert) {
-				processorService.processorAlert(priority, message.value(this, payload), this);
+				processorService.publish(channel, makeAlerterMessage(Message.Type.alertStart, payload));
 			} else if (toggleUp && !alert) {
-				processorService.processorAlertEnd(priority, message.value(this, payload), this);
+				processorService.publish(channel, makeAlerterMessage(Message.Type.alertEnd, payload));
 			}
 			toggleUp = alert;
 		}
 	}
 
-	public boolean isToggle() {
-		return toggle;
-	}
-
-	public void setToggle(boolean toggle) {
-		this.toggle = toggle;
-	}
-
-	public String getApplication() {
-		return application;
-	}
-
-	public String getGroup() {
-		return group;
+	private Message makeAlerterMessage(Message.Type type, Payload<?> payload) {
+		ExecutionContext context = new ProcessorPayloadExecutionContext(this, payload);
+		MessageScope scope = context.makeMessageScope(processorService);
+		String title = message.value(this, payload);
+		MessageData messageData = new MessageData();
+		context.addContextData(messageData, processorService);
+		return new Message(type, level, title, null, scope, messageData);
 	}
 
 }

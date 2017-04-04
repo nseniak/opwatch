@@ -39,7 +39,7 @@ public class ThreadUtil {
 		try {
 			terminated = executor.awaitTermination(timeout, TimeUnit.MILLISECONDS);
 		} catch (InterruptedException e) {
-			logger.error("Interruption while waiting for executor termination: " + name, e);
+			logger.warn("Interruption while waiting for executor termination: " + name, e);
 			return;
 		}
 		if (terminated) {
@@ -57,7 +57,7 @@ public class ThreadUtil {
 		try {
 			terminated = executor.awaitTermination(timeout, TimeUnit.MILLISECONDS);
 		} catch (InterruptedException e) {
-			logger.error("Interruption while waiting for forced executor termination: " + name, e);
+			logger.warn("Interruption while waiting for forced executor termination: " + name, e);
 			return;
 		}
 		if (terminated) {

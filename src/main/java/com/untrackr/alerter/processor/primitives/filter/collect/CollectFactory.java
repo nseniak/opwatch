@@ -32,9 +32,9 @@ public class CollectFactory extends ActiveProcessorFactory<CollectConfig, Collec
 
 	@Override
 	public Collect make(Object scriptObject) {
-		CollectConfig descriptor = convertProcessorDescriptor(scriptObject);
-		int count = checkPropertyValue("count", descriptor.getCount());
-		return new Collect(getProcessorService(), descriptor, name(), count);
+		CollectConfig config = convertProcessorDescriptor(scriptObject);
+		int count = checkPropertyValue("count", config.getCount());
+		return new Collect(getProcessorService(), config, name(), count);
 	}
 
 }

@@ -1,6 +1,7 @@
 package com.untrackr.alerter.processor.primitives.filter.jstack;
 
-import com.untrackr.alerter.alert.Alert;
+import com.untrackr.alerter.processor.common.RuntimeError;
+import com.untrackr.alerter.processor.common.ProcessorPayloadExecutionContext;
 import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.processor.payload.PayloadObjectValue;
 import com.untrackr.alerter.processor.primitives.filter.Filter;
@@ -26,7 +27,7 @@ public class Jstack extends Filter<JstackConfig> {
 		String text = payloadValue(input, String.class);
 		String[] lines = text.split("\n");
 		for (String line : lines) {
-			ParsedException exception = parseNextLine(line);
+			ParsedException exception = parseNextLine(line, input);
 			if (exception != null) {
 				outputTransformed(exception, input);
 				return;
@@ -41,7 +42,7 @@ public class Jstack extends Filter<JstackConfig> {
 	private static Pattern causedByPattern = Pattern.compile("^Caused by: " + exceptionDescription);
 	private static Pattern blankLine = Pattern.compile("^\\p{Space}*$");
 
-	public ParsedException parseNextLine(String line) {
+	public ParsedException parseNextLine(String line, Payload<?> input) {
 		if (!blankLine.matcher(line).matches()) {
 			state.setLatestNonBlankLine(line);
 		}
@@ -106,7 +107,7 @@ public class Jstack extends Filter<JstackConfig> {
 				currentException.setLocation("<unknown location>");
 			}
 			currentException.computeCombined();
-			processorService.infrastructureAlert(Alert.Priority.high, "Cannot parse exception trace", currentException.getCombined());
+			processorService.signalException(new RuntimeError("Cannot parse exception trace", new ProcessorPayloadExecutionContext(this, input)));
 			state.reset();
 			return currentException;
 		}

@@ -32,9 +32,9 @@ public class DfFactory extends ScheduledExecutorFactory<DfConfig, Df> {
 
 	@Override
 	public Df make(Object scriptObject) {
-		DfConfig descriptor = convertProcessorDescriptor(scriptObject);
-		String file = checkVariableSubstitution("file", checkPropertyValue("file", descriptor.getFile()));
-		return new Df(getProcessorService(), descriptor, name(), makeScheduledExecutor(descriptor), new java.io.File(file));
+		DfConfig config = convertProcessorDescriptor(scriptObject);
+		String file = checkVariableSubstitution("file", checkPropertyValue("file", config.getFile()));
+		return new Df(getProcessorService(), config, name(), makeScheduledExecutor(config), new java.io.File(file));
 	}
 
 }

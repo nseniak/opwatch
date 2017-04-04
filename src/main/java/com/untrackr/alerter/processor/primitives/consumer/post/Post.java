@@ -1,10 +1,10 @@
 package com.untrackr.alerter.processor.primitives.consumer.post;
 
-import com.untrackr.alerter.processor.common.AlerterException;
-import com.untrackr.alerter.processor.common.ExceptionContext;
-import com.untrackr.alerter.processor.primitives.consumer.Consumer;
+import com.untrackr.alerter.processor.common.RuntimeError;
+import com.untrackr.alerter.processor.common.ProcessorPayloadExecutionContext;
 import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.processor.payload.RemotePayload;
+import com.untrackr.alerter.processor.primitives.consumer.Consumer;
 import com.untrackr.alerter.service.ProcessorService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,15 +41,15 @@ public class Post extends Consumer<PostConfig> {
 				return;
 			} else {
 				postErrorSignaled = true;
-				throw new AlerterException("http error when posting to \"" + pathString + "\": " + e.getLocalizedMessage(),
-						ExceptionContext.makeProcessorPayload(this, payload));
+				throw new RuntimeError("http error when posting to \"" + pathString + "\": " + e.getLocalizedMessage(), e,
+						new ProcessorPayloadExecutionContext(this, payload));
 			}
 		}
 		HttpStatus status = response.getStatusCode();
 		if (status != HttpStatus.OK) {
 			postErrorSignaled = true;
-			throw new AlerterException("invalid response status when posting to \"" + pathString + "\": " + status.value() + " " + status.getReasonPhrase(),
-					ExceptionContext.makeProcessorPayload(this, payload));
+			throw new RuntimeError("invalid response status when posting to \"" + pathString + "\": " + status.value() + " " + status.getReasonPhrase(),
+					new ProcessorPayloadExecutionContext(this, payload));
 		}
 		postErrorSignaled = false;
 	}

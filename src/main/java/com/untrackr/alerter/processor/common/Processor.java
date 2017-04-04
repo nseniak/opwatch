@@ -1,40 +1,37 @@
 package com.untrackr.alerter.processor.common;
 
-import com.untrackr.alerter.processor.config.JavascriptFunction;
 import com.untrackr.alerter.processor.config.ProcessorConfig;
 import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.service.ProcessorService;
-import org.javatuples.Pair;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public abstract class Processor<C extends ProcessorConfig> {
 
+	private String id;
 	protected ProcessorService processorService;
 	protected C configuration;
-	protected String type;
+	protected String name;
 	protected List<Processor<?>> producers = new ArrayList<>();
 	protected List<Processor<?>> consumers = new ArrayList<>();
 	protected Processor<?> container;
 	protected ProcessorSignature signature;
 	protected ProcessorLocation location;
-	private Set<JavascriptFunction> scriptErrorSignaled = new HashSet<>();
-	private Set<Pair<Processor, String>> propertyErrorSignaled = new HashSet<>();
-	private boolean typeErrorSignaled = false;
 
-	public Processor(ProcessorService processorService, C configuration, String type) {
+	public Processor(ProcessorService processorService, C configuration, String name) {
+		this.id = processorService.uuid();
 		this.processorService = processorService;
-		this.type = type;
+		this.name = name;
 		this.configuration = configuration;
-		this.location = new ProcessorLocation(type);
+		this.location = new ProcessorLocation(name, ScriptStack.currentStack());
 	}
 
+	// TODO Signal error in factory instead
 	public void assignContainer(Processor<?> processor) {
 		if (container != null) {
-			throw new AlerterException("a processor can only be used once; this one is already used in " + container.getLocation().descriptor(), ExceptionContext.makeProcessorNoPayload(this));
+			throw new RuntimeError("a processor can only be used once; this one is already used in " + container.getLocation().descriptor(),
+					new ProcessorVoidExecutionContext(this));
 		}
 		container = processor;
 	}
@@ -64,23 +61,13 @@ public abstract class Processor<C extends ProcessorConfig> {
 
 	public abstract void check();
 
-	public boolean scriptErrorSignaled(JavascriptFunction function) {
-		return !scriptErrorSignaled.add(function);
-	}
-
-	public boolean propertyErrorSignaled(String propertyName) {
-		return !propertyErrorSignaled.add(new Pair<>(this, propertyName));
-	}
-
-	public boolean typeErrorSignaled() {
-		boolean signaled = typeErrorSignaled;
-		typeErrorSignaled = true;
-		return signaled;
-	}
-
 	@Override
 	public String toString() {
-		return "[object " + type + "]";
+		return "[object " + name + "]";
+	}
+
+	public String getId() {
+		return id;
 	}
 
 	public ProcessorService getProcessorService() {
@@ -95,8 +82,8 @@ public abstract class Processor<C extends ProcessorConfig> {
 		return signature;
 	}
 
-	public String getType() {
-		return type;
+	public String getName() {
+		return name;
 	}
 
 	public C getConfiguration() {

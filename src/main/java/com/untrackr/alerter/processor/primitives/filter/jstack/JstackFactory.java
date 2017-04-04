@@ -34,10 +34,10 @@ public class JstackFactory extends ActiveProcessorFactory<JstackConfig, Jstack> 
 
 	@Override
 	public Jstack make(Object scriptObject) {
-		JstackConfig descriptor = convertProcessorDescriptor(scriptObject);
-		String methodRegex = descriptor.getMethodRegex();
+		JstackConfig config = convertProcessorDescriptor(scriptObject);
+		String methodRegex = config.getMethodRegex();
 		Pattern methodPattern = (methodRegex == null) ? null : compilePattern("regex", methodRegex);
-		return new Jstack(getProcessorService(), descriptor, name(), methodPattern);
+		return new Jstack(getProcessorService(), config, name(), methodPattern);
 	}
 
 }

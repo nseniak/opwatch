@@ -46,6 +46,7 @@ public abstract class ActiveProcessor<D extends ActiveProcessorConfig> extends P
 		producer.addConsumer(this);
 	}
 
+	// TODO Signal error in factory?
 	@Override
 	public void check() {
 		StringJoiner joiner = new StringJoiner(", ");
@@ -78,7 +79,7 @@ public abstract class ActiveProcessor<D extends ActiveProcessorConfig> extends P
 				break;
 		}
 		if (joiner.length() != 0) {
-			throw new AlerterException(joiner.toString(), ExceptionContext.makeProcessorNoPayload(this));
+			throw new RuntimeError(joiner.toString(), new ProcessorVoidExecutionContext(this));
 		}
 	}
 
@@ -109,8 +110,7 @@ public abstract class ActiveProcessor<D extends ActiveProcessorConfig> extends P
 			try {
 				Thread.sleep(minElapsed - elapsedSinceLastOutput);
 			} catch (InterruptedException e) {
-				// Shutting down
-				return;
+				throw new ApplicationInterruptedException(ApplicationInterruptedException.INTERRUPTION);
 			}
 		}
 		for (Processor<?> consumer : consumers) {
@@ -128,7 +128,7 @@ public abstract class ActiveProcessor<D extends ActiveProcessorConfig> extends P
 		if (!consumerThreadFuture.isDone()) {
 			boolean stopped = consumerThreadFuture.cancel(true);
 			if (!stopped) {
-				throw new AlerterException("cannot stop consumer thread", ExceptionContext.makeProcessorNoPayload(this));
+				throw new RuntimeError("cannot stop consumer thread", new ProcessorVoidExecutionContext(this));
 			}
 		}
 	}
@@ -142,37 +142,8 @@ public abstract class ActiveProcessor<D extends ActiveProcessorConfig> extends P
 		Object value = payload.getValue();
 		if (!clazz.isAssignableFrom(value.getClass())) {
 			ScriptService sc = processorService.getScriptService();
-			AlerterException exception = new AlerterException("wrong input value: expected "
-					+ sc.typeName(clazz) + ", got " + sc.typeName(value.getClass()), ExceptionContext.makeProcessorPayload(this, payload));
-			exception.setSilent(typeErrorSignaled());
-			throw exception;
-		}
-		return (T) value;
-	}
-
-	public <T> T payloadPropertyValue(Payload payload, String propertyName, Class<?> clazz) {
-		Object jsonObject = payload.getValue();
-		Object value = null;
-		if (jsonObject instanceof Map) {
-			value = ((Map) jsonObject).get(propertyName);
-		} else {
-			try {
-				Field field = jsonObject.getClass().getDeclaredField(propertyName);
-				field.setAccessible(true);
-				value = field.get(jsonObject);
-			} catch (NoSuchFieldException | IllegalAccessException e) {
-				// Do nothing
-			}
-		}
-		if (value == null) {
-			AlerterException exception = new AlerterException("missing field value \"" + propertyName + "\"", ExceptionContext.makeProcessorPayload(this, payload));
-			exception.setSilent(propertyErrorSignaled(propertyName));
-			throw exception;
-		}
-		if (!clazz.isAssignableFrom(value.getClass())) {
-			AlerterException exception = new AlerterException("wrong type for field \"" + propertyName + "\"", ExceptionContext.makeProcessorPayload(this, payload));
-			exception.setSilent(propertyErrorSignaled(propertyName));
-			throw exception;
+			String message = "wrong input value: expected " + sc.typeName(clazz) + ", got " + sc.typeName(value.getClass());
+			throw new RuntimeError(message, new ProcessorPayloadExecutionContext(this, payload));
 		}
 		return (T) value;
 	}

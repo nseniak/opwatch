@@ -1,9 +1,6 @@
 package com.untrackr.alerter.processor.primitives.consumer.post;
 
-import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
-import com.untrackr.alerter.processor.common.AlerterException;
-import com.untrackr.alerter.processor.common.ExceptionContext;
-import com.untrackr.alerter.processor.common.ProcessorSignature;
+import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.service.AlerterProfile;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -44,7 +41,8 @@ public class PostFactory extends ActiveProcessorFactory<PostConfig, Post> {
 		String pathString = checkVariableSubstitution("path", checkPropertyValue("path", descriptor.getPath()));
 		Matcher matcher = pathPattern.matcher(pathString);
 		if (!matcher.matches()) {
-			throw new AlerterException("incorrect \"path\" syntax: \"" + pathString + "\"", ExceptionContext.makeProcessorFactory(name()));
+			throw new RuntimeError("incorrect \"path\" syntax: \"" + pathString + "\"",
+					new FactoryExecutionContext(this));
 		}
 		AlerterProfile profile = processorService.getProfileService().profile();
 		String hostname = (matcher.group("hostname") != null) ? matcher.group("hostname") : profile.getDefaultPostHostname();

@@ -32,8 +32,8 @@ public class TopFactory extends ScheduledExecutorFactory<TopConfig, Top> {
 
 	@Override
 	public Top make(Object scriptObject) {
-		TopConfig descriptor = convertProcessorDescriptor(scriptObject);
-		return new Top(getProcessorService(), descriptor, name(), makeScheduledExecutor(descriptor));
+		TopConfig config = convertProcessorDescriptor(scriptObject);
+		return new Top(getProcessorService(), config, name(), makeScheduledExecutor(config));
 	}
 
 }

@@ -1,9 +1,6 @@
 package com.untrackr.alerter.processor.primitives.special.pipe;
 
-import com.untrackr.alerter.processor.common.AlerterException;
-import com.untrackr.alerter.processor.common.ExceptionContext;
-import com.untrackr.alerter.processor.common.Processor;
-import com.untrackr.alerter.processor.common.ProcessorFactory;
+import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.List;
@@ -31,12 +28,12 @@ public class PipeFactory extends ProcessorFactory<PipeConfig, Pipe> {
 
 	@Override
 	public Pipe make(Object scriptObject) {
-		PipeConfig descriptor = convertProcessorDescriptor(scriptObject);
-		List<Processor<?>> processors = descriptor.getProcessors();
+		PipeConfig config = convertProcessorDescriptor(scriptObject);
+		List<Processor<?>> processors = config.getProcessors();
 		if (processors.isEmpty()) {
-			throw new AlerterException("a pipe cannot be empty", ExceptionContext.makeProcessorFactory(name()));
+			throw new RuntimeError("a pipe cannot be empty", new FactoryExecutionContext(this));
 		}
-		return new Pipe(getProcessorService(), processors, descriptor, name());
+		return new Pipe(getProcessorService(), processors, config, name());
 	}
 
 }
