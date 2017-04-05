@@ -1,7 +1,7 @@
 package com.untrackr.alerter.processor.primitives.producer.tail;
 
 import com.untrackr.alerter.ioservice.TailedFile;
-import com.untrackr.alerter.service.AlerterProfile;
+import com.untrackr.alerter.service.AlerterConfig;
 import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.processor.primitives.producer.Producer;
 import com.untrackr.alerter.service.ProcessorService;
@@ -22,7 +22,7 @@ public class Tail extends Producer<TailConfig> {
 
 	@Override
 	public void start() {
-		AlerterProfile profile = getProcessorService().getProfileService().profile();
+		AlerterConfig profile = getProcessorService().getProfileService().profile();
 		tailedFile = new TailedFile(profile, file, (line, lineNumber) -> {
 			if (ignoreBlankLine && line.trim().isEmpty()) {
 				return;

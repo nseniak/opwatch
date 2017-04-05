@@ -1,7 +1,7 @@
 package com.untrackr.alerter.processor.primitives.consumer.post;
 
 import com.untrackr.alerter.processor.common.*;
-import com.untrackr.alerter.service.AlerterProfile;
+import com.untrackr.alerter.service.AlerterConfig;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.regex.Matcher;
@@ -44,7 +44,7 @@ public class PostFactory extends ActiveProcessorFactory<PostConfig, Post> {
 			throw new RuntimeError("incorrect \"path\" syntax: \"" + pathString + "\"",
 					new FactoryExecutionContext(this));
 		}
-		AlerterProfile profile = processorService.getProfileService().profile();
+		AlerterConfig profile = processorService.getProfileService().profile();
 		String hostname = (matcher.group("hostname") != null) ? matcher.group("hostname") : profile.getDefaultPostHostname();
 		int port = (matcher.group("port") != null) ? Integer.parseInt(matcher.group("hostname")) : profile.getDefaultPostPort();
 		String urlPath = matcher.group("stack");

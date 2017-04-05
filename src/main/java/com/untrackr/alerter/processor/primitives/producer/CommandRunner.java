@@ -2,7 +2,7 @@ package com.untrackr.alerter.processor.primitives.producer;
 
 import com.untrackr.alerter.ioservice.LineReader;
 import com.untrackr.alerter.processor.common.*;
-import com.untrackr.alerter.service.AlerterProfile;
+import com.untrackr.alerter.service.AlerterConfig;
 import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.service.ProcessorService;
 import org.apache.commons.io.IOUtils;
@@ -43,7 +43,7 @@ public class CommandRunner {
 
 	public void consume(Processor processor, Payload payload) {
 		if (process == null) {
-			AlerterProfile profile = processorService.getProfileService().profile();
+			AlerterConfig profile = processorService.getProfileService().profile();
 			long start = System.currentTimeMillis();
 			while (process == null) {
 				if ((System.currentTimeMillis() - start) > profile.getCommandStartTimeout()) {
@@ -71,7 +71,7 @@ public class CommandRunner {
 	}
 
 	public void produce(ActiveProcessor processor, long exitTimeout) {
-		AlerterProfile profile = processorService.getProfileService().profile();
+		AlerterConfig profile = processorService.getProfileService().profile();
 		int bufferSize = profile.getLineBufferSize();
 		try (LineReader lineReader = new LineReader(new BufferedInputStream(process.getInputStream()), bufferSize, true)) {
 			while (true) {

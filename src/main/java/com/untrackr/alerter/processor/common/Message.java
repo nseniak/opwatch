@@ -8,10 +8,11 @@ public class Message {
 
 	public enum Level {
 
-		low(0),
-		medium(1),
-		high(2),
-		emergency(3);
+		lowest(0),
+		low(1),
+		medium(2),
+		high(3),
+		emergency(4);
 
 		int level;
 

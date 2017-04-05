@@ -5,18 +5,14 @@ import com.untrackr.alerter.common.ApplicationUtil;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-public class AlerterProfile {
+public class AlerterConfig {
 
 	private long fileWatchingCheckDelay;
 	private long executorTerminationTimeout;
 	private long tailedFileWatchingCheckDelay;
 	private long tailPollInterval;
-	private Integer defaultEmergencyRetry;
-	private Integer defaultEmergencyExpire;
-	private boolean interactive;
+	private boolean channelDebug;
 	private boolean trace;
-	private int alertGeneratorMaxAlertsPerMinute;
-	private int globalMaxAlertsPerMinute;
 	private int lineBufferSize;
 	private int inputQueueSize;
 	private long processorInputQueueTimeout;
@@ -28,21 +24,17 @@ public class AlerterProfile {
 	private long commandStartTimeout;
 	private long commandStartSleepTime;
 
-	public AlerterProfile() throws IOException {
+	public AlerterConfig() throws IOException {
 		this.fileWatchingCheckDelay = TimeUnit.SECONDS.toMillis(1);
 		this.executorTerminationTimeout = TimeUnit.SECONDS.toMillis(30);
 		this.tailedFileWatchingCheckDelay = TimeUnit.SECONDS.toMillis(1);
 		this.tailPollInterval = TimeUnit.MILLISECONDS.toMillis(100);
-		this.defaultEmergencyRetry = 60;
-		this.defaultEmergencyExpire = 3600;
-		this.interactive = ApplicationUtil.property("alerter.interactive", false);
+		this.channelDebug = ApplicationUtil.property("alerter.channel.debug", false);
 		this.trace = ApplicationUtil.property("alerter.trace", false);
-		this.alertGeneratorMaxAlertsPerMinute = 10;
-		this.globalMaxAlertsPerMinute = 50;
-		this.lineBufferSize = 8192 * 100;
-		this.inputQueueSize = 100;
-		this.processorInputQueueTimeout = TimeUnit.SECONDS.toMillis(60);
-		this.minimumOutputDelay = TimeUnit.MILLISECONDS.toMillis(0);
+		this.lineBufferSize = ApplicationUtil.property("alerter.line.buffer.size", 8192 * 100);
+		this.inputQueueSize = ApplicationUtil.property("alerter.input.queue.size", 100);
+		this.processorInputQueueTimeout = ApplicationUtil.property("alerter.input.queue.timeout", TimeUnit.SECONDS.toMillis(60));
+		this.minimumOutputDelay = ApplicationUtil.property("alerter.output.min.delay", TimeUnit.MILLISECONDS.toMillis(0));
 		this.defaultPostHostname = ApplicationUtil.property("alerter.post.hostname", "localhost");
 		this.defaultPostPort = ApplicationUtil.property("alerter.post.port", 28018);
 		this.cronScriptOutputCheckDelay = TimeUnit.SECONDS.toMillis(100);
@@ -83,32 +75,16 @@ public class AlerterProfile {
 		this.tailPollInterval = tailPollInterval;
 	}
 
-	public Integer getDefaultEmergencyRetry() {
-		return defaultEmergencyRetry;
-	}
-
-	public void setDefaultEmergencyRetry(Integer defaultEmergencyRetry) {
-		this.defaultEmergencyRetry = defaultEmergencyRetry;
-	}
-
-	public Integer getDefaultEmergencyExpire() {
-		return defaultEmergencyExpire;
-	}
-
-	public void setDefaultEmergencyExpire(Integer defaultEmergencyExpire) {
-		this.defaultEmergencyExpire = defaultEmergencyExpire;
-	}
-
 	public static String defaultScheduledProducerPeriod() {
 		return "1s";
 	}
 
-	public boolean isInteractive() {
-		return interactive;
+	public boolean isChannelDebug() {
+		return channelDebug;
 	}
 
-	public void setInteractive(boolean interactive) {
-		this.interactive = interactive;
+	public void setChannelDebug(boolean channelDebug) {
+		this.channelDebug = channelDebug;
 	}
 
 	public boolean isTrace() {
@@ -117,22 +93,6 @@ public class AlerterProfile {
 
 	public void setTrace(boolean trace) {
 		this.trace = trace;
-	}
-
-	public int getAlertGeneratorMaxAlertsPerMinute() {
-		return alertGeneratorMaxAlertsPerMinute;
-	}
-
-	public void setAlertGeneratorMaxAlertsPerMinute(int alertGeneratorMaxAlertsPerMinute) {
-		this.alertGeneratorMaxAlertsPerMinute = alertGeneratorMaxAlertsPerMinute;
-	}
-
-	public int getGlobalMaxAlertsPerMinute() {
-		return globalMaxAlertsPerMinute;
-	}
-
-	public void setGlobalMaxAlertsPerMinute(int globalMaxAlertsPerMinute) {
-		this.globalMaxAlertsPerMinute = globalMaxAlertsPerMinute;
 	}
 
 	public static String defaultHttpConnectTimeout() {

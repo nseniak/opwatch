@@ -1,6 +1,6 @@
 package com.untrackr.alerter.ioservice;
 
-import com.untrackr.alerter.service.AlerterProfile;
+import com.untrackr.alerter.service.AlerterConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,10 +15,10 @@ public class TailedFile {
 
 	private Path file;
 	private TailLineHandler handler;
-	private AlerterProfile alerterProfile;
+	private AlerterConfig alerterConfig;
 
-	public TailedFile(AlerterProfile alerterProfile, Path file, TailLineHandler handler) {
-		this.alerterProfile = alerterProfile;
+	public TailedFile(AlerterConfig alerterConfig, Path file, TailLineHandler handler) {
+		this.alerterConfig = alerterConfig;
 		this.file = file;
 		this.handler = handler;
 	}
@@ -32,7 +32,7 @@ public class TailedFile {
 				if (((currentAttributes = fileAttributes(file)) == null) || ((reader = openFile(file)) == null)) {
 					logger.info("Waiting for file: " + file);
 					while (((currentAttributes = fileAttributes(file)) == null) || ((reader = openFile(file)) == null)) {
-						Thread.sleep(alerterProfile.getTailedFileWatchingCheckDelay());
+						Thread.sleep(alerterConfig.getTailedFileWatchingCheckDelay());
 					}
 					logger.info("File created: " + file);
 				} else {
@@ -65,7 +65,7 @@ public class TailedFile {
 					String line = reader.readLine();
 					if (line == null) {
 						// end of file, start polling
-						Thread.sleep(alerterProfile.getTailPollInterval());
+						Thread.sleep(alerterConfig.getTailPollInterval());
 					} else {
 						lineNumber = lineNumber + 1;
 						handler.handle(line, lineNumber);
@@ -98,7 +98,7 @@ public class TailedFile {
 	private LineReader openFile(Path path) {
 		try {
 			InputStream in = Files.newInputStream(path);
-			return new LineReader(new BufferedInputStream(in), alerterProfile.getLineBufferSize(), false);
+			return new LineReader(new BufferedInputStream(in), alerterConfig.getLineBufferSize(), false);
 		} catch (IOException e) {
 			return null;
 		}

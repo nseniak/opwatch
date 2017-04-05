@@ -9,9 +9,13 @@ import com.untrackr.alerter.channel.pushover.PushoverMessageService;
 import com.untrackr.alerter.processor.common.RuntimeError;
 import com.untrackr.alerter.service.CommandLineOptions;
 import com.untrackr.alerter.service.ProcessorService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +25,8 @@ import static com.untrackr.alerter.channel.console.ConsoleMessageService.CONSOLE
 
 @Service
 public class MessageServiceService {
+
+	private static final Logger logger = LoggerFactory.getLogger(MessageServiceService.class);
 
 	public Channels createChannels(CommandLineOptions options, ProcessorService processorService) {
 		String serviceConfigFile = options.getServices();
@@ -43,12 +49,12 @@ public class MessageServiceService {
 		}
 		services.computeIfAbsent(CONSOLE_SERVICE_NAME, k -> new ConsoleConfiguration());
 		LinkedHashMap<String, Channel> channelMap = new LinkedHashMap<>();
-		addServiceChannels(services, channelMap, processorService, new ConsoleMessageService());
+		addServiceChannels(serviceConfigFile, services, channelMap, processorService, new ConsoleMessageService());
 		Channel consoleChannel = channelMap.get(CONSOLE_CHANNEL_NAME);
 		if (consoleChannel == null) {
-			throw new IllegalStateException("console channel not defined");
+			throw new IllegalStateException("console channel not defined in " + serviceConfigFile);
 		}
-		addServiceChannels(services, channelMap, processorService, new PushoverMessageService());
+		addServiceChannels(serviceConfigFile, services, channelMap, processorService, new PushoverMessageService());
 		Channel defaultChannel = null;
 		Channel errorChannel = null;
 		String defaultChannelName = (options.getDefaultChannel() != null) ? options.getDefaultChannel() : config.getDefaultChannel();
@@ -72,7 +78,8 @@ public class MessageServiceService {
 		return new Channels(channelMap, defaultChannel, errorChannel);
 	}
 
-	private <F extends ServiceConfiguration, C extends Channel> void addServiceChannels(Map<String, Object> services,
+	private <F extends ServiceConfiguration, C extends Channel> void addServiceChannels(String serviceConfigFile,
+																																											Map<String, Object> services,
 																																											LinkedHashMap<String, Channel> channelMap,
 																																											ProcessorService processorService,
 																																											MessageService<F, C> service) {
@@ -82,7 +89,14 @@ public class MessageServiceService {
 			return;
 		}
 		Class<F> configClass = service.configurationClass();
-		F config = processorService.getObjectMapper().convertValue(serviceConfig, configClass);
+		F config;
+		try {
+			config = processorService.getObjectMapper().convertValue(serviceConfig, configClass);
+		} catch (RuntimeException e) {
+			String message = "cannot parse configuration of service \"" + serviceName + "\" in file " + serviceConfigFile;
+			logger.error(message, e);
+			throw new RuntimeError(message + ": " + e.getMessage());
+		}
 		List<C> channels = service.createChannels(config, processorService);
 		for (C channel : channels) {
 			String name = channel.name();

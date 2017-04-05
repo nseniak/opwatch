@@ -49,39 +49,19 @@ public class PushoverChannel implements Channel {
 	}
 
 	private PushoverKey makeKey(String channelName) {
-		PushoverConfiguration.ChannelConfig channelConfig = findChannel(config, channelName);
-		if (channelConfig == null) {
+		if ((config.getChannels() == null) || (config.getChannels().get(channelName) == null)) {
 			throw new RuntimeError("Pushover channel configuration not found: " + channelName);
 		}
-		String applicationName = channelConfig.getApplication();
-		PushoverConfiguration.Application application = findApplication(config, applicationName);
-		if (application == null) {
-			throw new RuntimeError("Pushover application not found: " + applicationName);
+		PushoverConfiguration.ChannelConfig channelConfig = config.getChannels().get(channelName);
+		String apiToken = channelConfig.getApiToken();
+		if (apiToken == null) {
+			throw new RuntimeError("Pushover apiToken not defined for channel \"" + channelName + "\"");
 		}
-		String groupName = channelConfig.getUser();
-		PushoverConfiguration.User user = findUser(config, groupName);
-		if (user == null) {
-			throw new RuntimeError("Pushover user not found: " + groupName);
+		String userKey = channelConfig.getUserKey();
+		if (userKey == null) {
+			throw new RuntimeError("Pushover userKey not defined for channel \"" + channelName + "\"");
 		}
-		return new PushoverKey(application.getApiToken(), user.getUserKey());
-	}
-
-	private PushoverConfiguration.ChannelConfig findChannel(PushoverConfiguration config, String channelName) {
-		return config.getChannels().stream()
-				.filter(channel -> channel.getName().equals(channelName))
-				.findFirst().orElse(null);
-	}
-
-	private PushoverConfiguration.Application findApplication(PushoverConfiguration config, String applicationName) {
-		return config.getApplications().stream()
-				.filter(application -> application.getName().equals(applicationName))
-				.findFirst().orElse(null);
-	}
-
-	private PushoverConfiguration.User findUser(PushoverConfiguration config, String groupName) {
-		return config.getUsers().stream()
-				.filter(user -> user.getName().equals(groupName))
-				.findFirst().orElse(null);
+		return new PushoverKey(apiToken, userKey);
 	}
 
 	private void initializeFrequencyLimiters() {
@@ -121,7 +101,6 @@ public class PushoverChannel implements Channel {
 		body = truncate(body, MAX_MESSAGE_LENGTH);
 		Integer retry = null;
 		Integer expire = null;
-		;
 		if (message.getLevel() == Message.Level.emergency) {
 			retry = config.getEmergencyRetry();
 			expire = config.getEmergencyExpire();
@@ -135,6 +114,8 @@ public class PushoverChannel implements Channel {
 
 	private MessagePriority levelPriority(Message.Level level) {
 		switch (level) {
+			case lowest:
+				return MessagePriority.LOWEST;
 			case low:
 				return MessagePriority.LOW;
 			case medium:
@@ -148,10 +129,10 @@ public class PushoverChannel implements Channel {
 	}
 
 	private String alertTitle(Message message) {
-		return typePrefix(message.getType()) + levelSuffix(message.getLevel()) + ": " + message.getTitle();
+		return levelPrefix(message.getLevel()) + typeSuffix(message.getType()) + ": " + message.getTitle();
 	}
 
-	private String typePrefix(Message.Type type) {
+	private String typeSuffix(Message.Type type) {
 		switch (type) {
 			case error:
 				return "Error";
@@ -167,16 +148,16 @@ public class PushoverChannel implements Channel {
 		throw new IllegalStateException("unknown message type: " + type.name());
 	}
 
-	private String levelSuffix(Message.Level level) {
+	private String levelPrefix(Message.Level level) {
 		switch (level) {
+			case lowest:
 			case low:
-				return "";
 			case medium:
 				return "";
 			case high:
-				return "(High)";
+				return "High ";
 			case emergency:
-				return "(EMERGENCY)";
+				return "EMERGENCY ";
 		}
 		throw new IllegalStateException("unknown level: " + level.name());
 	}
@@ -237,10 +218,10 @@ public class PushoverChannel implements Channel {
 	}
 
 	private void send(PushoverMessage pushoverMessage) {
-		String logMessage = "Pushover[" + name + "] " + processorService.prettyJson(pushoverMessage);
+		String logMessage = "Message to Pushover[" + name + "] " + processorService.prettyJson(pushoverMessage);
 		logger.info(logMessage);
-		if (processorService.profile().isInteractive()) {
-			processorService.printStdout("(not sent) " + logMessage);
+		if (processorService.config().isChannelDebug()) {
+			processorService.printStdout("(debug) " + logMessage);
 			return;
 		}
 		PushoverClient pushoverClient = new PushoverRestClient();

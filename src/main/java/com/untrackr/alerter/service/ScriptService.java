@@ -78,6 +78,7 @@ public class ScriptService {
 		try {
 			createSimplePrimitiveFunction("run", processorService::runProcessor);
 			createSimplePrimitiveFunction("__factories", this::factories);
+			createSimpleBinding("config", processorService.config());
 			createVarargFactoryFunction(new ParallelFactory(processorService));
 			createVarargFactoryFunction(new PipeFactory(processorService));
 			createSimpleFactoryFunction(new AliasFactory(processorService));
@@ -170,6 +171,12 @@ public class ScriptService {
 		String factoryName = "__" + name + "_factory";
 		bindings.put(factoryName, processorFactory);
 		scriptEngine.eval(String.format("%1$s = %2$s(%3$s)", name, wrapperName, factoryName));
+	}
+
+	private void createSimpleBinding(String name, Object object) {
+		ScriptContext context = scriptEngine.getContext();
+		Bindings bindings = context.getBindings(ScriptContext.ENGINE_SCOPE);
+		bindings.put(name, object);
 	}
 
 	private void createSimplePrimitiveFunction(String name, JavascriptFunction function) throws ScriptException {

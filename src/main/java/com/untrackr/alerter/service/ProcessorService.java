@@ -3,7 +3,6 @@ package com.untrackr.alerter.service;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.untrackr.alerter.channel.MessageServiceService;
 import com.untrackr.alerter.channel.common.Channel;
 import com.untrackr.alerter.channel.common.Channels;
@@ -38,6 +37,9 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import static com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_COMMENTS;
+import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
+import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_NULL_MAP_VALUES;
 import static com.untrackr.alerter.channel.console.ConsoleMessageService.CONSOLE_CHANNEL_NAME;
 import static jdk.nashorn.internal.runtime.ScriptRuntime.UNDEFINED;
 
@@ -94,8 +96,9 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		id = uuid();
 		// Object mapper
 		objectMapper = new ObjectMapper();
-		objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-		objectMapper.configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
+		objectMapper.configure(WRITE_DATES_AS_TIMESTAMPS, false);
+		objectMapper.configure(WRITE_NULL_MAP_VALUES, false);
+		objectMapper.configure(ALLOW_COMMENTS, true);
 		objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 	}
 
@@ -110,18 +113,19 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	public void run(String[] argStrings) {
 		mainThread = Thread.currentThread();
 		Signal.handle(new Signal("INT"), this::userInterruptHandler);
-		scriptService.initialize();
 		try {
 			CommandLineOptions options = parseOptions(argStrings);
 			initialize(options);
 			initializeChannels(options);
+			scriptService.initialize();
 			if (options.getFiles().isEmpty()) {
 				runRepl(options);
 			} else {
 				runFiles(options);
 			}
 		} catch (Exception e) {
-			printStderr(e.getMessage());
+			logger.error("Initialization failed", e);
+			printStderr("Initialization failed: " + e.getMessage());
 		}
 	}
 
@@ -376,7 +380,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		return id;
 	}
 
-	public AlerterProfile profile() {
+	public AlerterConfig config() {
 		return profileService.profile();
 	}
 

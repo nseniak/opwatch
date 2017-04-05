@@ -34,22 +34,18 @@ public class ConsoleChannel implements Channel {
 
 	@Override
 	public void publish(Message message) {
-		switch (message.getType()) {
-			case error:
-				processorService.printStdout(message.getTitle());
+		String logMessage = "Message to Console " + processorService.prettyJson(message);
+		logger.info(logMessage);
+		if (processorService.config().isChannelDebug()) {
+			processorService.printStdout(logMessage);
+		} else {
+			processorService.printStdout(message.getType() + ": " + message.getTitle());
+			if (message.getData() != null) {
 				String stack = message.getData().get("stack");
 				if (stack != null) {
 					processorService.printStdout(stack);
 				}
-				break;
-			case info:
-				processorService.printStdout(message.getTitle());
-				break;
-			case alert:
-			case alertStart:
-			case alertEnd:
-				processorService.printStdout("Message " + processorService.prettyJson(message));
-				break;
+			}
 		}
 	}
 

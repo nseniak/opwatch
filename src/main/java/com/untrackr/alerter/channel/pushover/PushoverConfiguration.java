@@ -2,17 +2,16 @@ package com.untrackr.alerter.channel.pushover;
 
 import com.untrackr.alerter.channel.common.ServiceConfiguration;
 
-import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class PushoverConfiguration extends ServiceConfiguration {
 
-	private List<Application> applications;
-	private List<User> users;
-	private List<ChannelConfig> channels;
-	private Integer emergencyRetry;
-	private Integer emergencyExpire;
-	private Integer maxPerMinute;
-	private Integer globalMaxPerMinute;
+	private Map<String, ChannelConfig> channels;
+	private int maxPerMinute = 10;
+	private int globalMaxPerMinute = 30;
+	private int emergencyRetry = (int) TimeUnit.SECONDS.toSeconds(60);
+	private int emergencyExpire = (int) TimeUnit.SECONDS.toSeconds(3600);
 
 	public static class Application {
 
@@ -62,90 +61,64 @@ public class PushoverConfiguration extends ServiceConfiguration {
 
 	public static class ChannelConfig {
 
-		private String name;
-		private String application;
-		private String user;
+		private String apiToken;
+		private String userKey;
 
-		public String getName() {
-			return name;
+		public String getApiToken() {
+			return apiToken;
 		}
 
-		public void setName(String name) {
-			this.name = name;
+		public void setApiToken(String apiToken) {
+			this.apiToken = apiToken;
 		}
 
-		public String getApplication() {
-			return application;
+		public String getUserKey() {
+			return userKey;
 		}
 
-		public void setApplication(String application) {
-			this.application = application;
+		public void setUserKey(String userKey) {
+			this.userKey = userKey;
 		}
-
-		public String getUser() {
-			return user;
-		}
-
-		public void setUser(String user) {
-			this.user = user;
-		}
-
 	}
 
-	public List<Application> getApplications() {
-		return applications;
-	}
-
-	public void setApplications(List<Application> applications) {
-		this.applications = applications;
-	}
-
-	public List<User> getUsers() {
-		return users;
-	}
-
-	public void setUsers(List<User> users) {
-		this.users = users;
-	}
-
-	public List<ChannelConfig> getChannels() {
+	public Map<String, ChannelConfig> getChannels() {
 		return channels;
 	}
 
-	public void setChannels(List<ChannelConfig> channels) {
+	public void setChannels(Map<String, ChannelConfig> channels) {
 		this.channels = channels;
 	}
 
-	public Integer getEmergencyRetry() {
-		return emergencyRetry;
-	}
-
-	public void setEmergencyRetry(Integer emergencyRetry) {
-		this.emergencyRetry = emergencyRetry;
-	}
-
-	public Integer getEmergencyExpire() {
-		return emergencyExpire;
-	}
-
-	public void setEmergencyExpire(Integer emergencyExpire) {
-		this.emergencyExpire = emergencyExpire;
-	}
-
-	public Integer getMaxPerMinute() {
+	public int getMaxPerMinute() {
 		return maxPerMinute;
 	}
 
-	public void setMaxPerMinute(Integer maxPerMinute) {
+	public void setMaxPerMinute(int maxPerMinute) {
 		this.maxPerMinute = maxPerMinute;
 	}
 
-	public Integer getGlobalMaxPerMinute() {
+	public int getGlobalMaxPerMinute() {
 		return globalMaxPerMinute;
 	}
 
-	public void setGlobalMaxPerMinute(Integer globalMaxPerMinute) {
+	public void setGlobalMaxPerMinute(int globalMaxPerMinute) {
 		this.globalMaxPerMinute = globalMaxPerMinute;
+	}
+
+	public int getEmergencyRetry() {
+		return emergencyRetry;
+	}
+
+	public void setEmergencyRetry(int emergencyRetry) {
+		this.emergencyRetry = emergencyRetry;
+	}
+
+	public int getEmergencyExpire() {
+		return emergencyExpire;
+	}
+
+	public void setEmergencyExpire(int emergencyExpire) {
+		this.emergencyExpire = emergencyExpire;
 	}
 
 }

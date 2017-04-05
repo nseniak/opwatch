@@ -4,6 +4,7 @@ import com.untrackr.alerter.channel.common.MessageService;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class PushoverMessageService implements MessageService<PushoverConfiguration, PushoverChannel> {
@@ -21,9 +22,11 @@ public class PushoverMessageService implements MessageService<PushoverConfigurat
 	@Override
 	public List<PushoverChannel> createChannels(PushoverConfiguration config, ProcessorService processorService) {
 		List<PushoverChannel> channels = new ArrayList<>();
-		for (PushoverConfiguration.ChannelConfig channelConfig : config.getChannels()) {
-			String name = channelConfig.getName();
-			channels.add(new PushoverChannel(name, config, this, processorService));
+		if (config.getChannels() == null) {
+			return Collections.emptyList();
+		}
+		for (String channelName : config.getChannels().keySet()) {
+			channels.add(new PushoverChannel(channelName, config, this, processorService));
 		}
 		return channels;
 	}

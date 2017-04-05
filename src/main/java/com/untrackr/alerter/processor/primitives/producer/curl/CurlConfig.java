@@ -3,13 +3,13 @@ package com.untrackr.alerter.processor.primitives.producer.curl;
 import com.untrackr.alerter.processor.config.ImplicitProperty;
 import com.untrackr.alerter.processor.config.OptionalProperty;
 import com.untrackr.alerter.processor.config.ScheduledProcessorConfig;
-import com.untrackr.alerter.service.AlerterProfile;
+import com.untrackr.alerter.service.AlerterConfig;
 
 public class CurlConfig extends ScheduledProcessorConfig {
 
 	private String url;
-	private String connectTimeout = AlerterProfile.defaultHttpConnectTimeout();
-	private String readTimeout = AlerterProfile.defaultHttpReadTimeout();
+	private String connectTimeout = AlerterConfig.defaultHttpConnectTimeout();
+	private String readTimeout = AlerterConfig.defaultHttpReadTimeout();
 	private Boolean insecure = false;
 
 	@ImplicitProperty

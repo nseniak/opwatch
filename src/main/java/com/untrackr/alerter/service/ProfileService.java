@@ -8,15 +8,15 @@ import java.io.IOException;
 @Service
 public class ProfileService {
 
-	private AlerterProfile alerterProfile;
+	private AlerterConfig alerterConfig;
 
 	@PostConstruct
 	public void initAlerter() throws IOException {
-		alerterProfile = new AlerterProfile();
+		alerterConfig = new AlerterConfig();
 	}
 
-	public AlerterProfile profile() {
-		return alerterProfile;
+	public AlerterConfig profile() {
+		return alerterConfig;
 	}
 
 }
