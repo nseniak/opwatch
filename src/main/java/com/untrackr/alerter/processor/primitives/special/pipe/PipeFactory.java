@@ -28,7 +28,7 @@ public class PipeFactory extends ProcessorFactory<PipeConfig, Pipe> {
 
 	@Override
 	public Pipe make(Object scriptObject) {
-		PipeConfig config = convertProcessorDescriptor(scriptObject);
+		PipeConfig config = convertProcessorConfig(scriptObject);
 		List<Processor<?>> processors = config.getProcessors();
 		if (processors.isEmpty()) {
 			throw new RuntimeError("a pipe cannot be empty", new FactoryExecutionContext(this));

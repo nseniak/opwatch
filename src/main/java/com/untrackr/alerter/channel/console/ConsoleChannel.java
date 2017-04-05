@@ -36,7 +36,7 @@ public class ConsoleChannel implements Channel {
 	public void publish(Message message) {
 		String logMessage = "Message to Console " + processorService.prettyJson(message);
 		logger.info(logMessage);
-		if (processorService.config().isChannelDebug()) {
+		if (processorService.config().channelDebug()) {
 			processorService.printStdout(logMessage);
 		} else {
 			processorService.printStdout(message.getType() + ": " + message.getTitle());

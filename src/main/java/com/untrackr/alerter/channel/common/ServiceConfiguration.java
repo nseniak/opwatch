@@ -1,5 +1,5 @@
 package com.untrackr.alerter.channel.common;
 
-public class ServiceConfiguration {
+public abstract class ServiceConfiguration {
 
 }

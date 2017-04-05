@@ -79,7 +79,7 @@ public abstract class ProcessorFactory<C extends ProcessorConfig, P extends Proc
 		throw new RuntimeError(message, new FactoryExecutionContext(this));
 	}
 
-	protected C convertProcessorDescriptor(Object scriptObject) {
+	protected C convertProcessorConfig(Object scriptObject) {
 		return (C) processorService.getScriptService().convertScriptValue(ValueLocation.makeArgument(name(), "configuration"), configurationClass(), scriptObject,
 				(message) -> new RuntimeError(message, new FactoryExecutionContext(this)));
 	}

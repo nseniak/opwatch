@@ -33,7 +33,7 @@ public class ApplyFactory extends ActiveProcessorFactory<ApplyConfig, Apply> {
 
 	@Override
 	public Apply make(Object scriptObject) {
-		ApplyConfig config = convertProcessorDescriptor(scriptObject);
+		ApplyConfig config = convertProcessorConfig(scriptObject);
 		JavascriptFilter transformer = checkPropertyValue("lambda", config.getLambda());
 		return new Apply(getProcessorService(), config, name(), transformer);
 	}

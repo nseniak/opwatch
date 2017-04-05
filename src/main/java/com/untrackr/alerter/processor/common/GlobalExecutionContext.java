@@ -9,7 +9,7 @@ public class GlobalExecutionContext extends ExecutionContext {
 
 	@Override
 	public MessageScope makeMessageScope(ProcessorService processorService) {
-		return new MessageScope(processorService.getId(), null, MessageScope.Kind.global, processorService.getHostName());
+		return new MessageScope(processorService.getId(), null, MessageScope.Kind.global, processorService.config().hostName());
 	}
 
 	@Override

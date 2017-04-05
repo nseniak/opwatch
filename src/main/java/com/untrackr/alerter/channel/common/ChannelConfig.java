@@ -1,10 +1,11 @@
 package com.untrackr.alerter.channel.common;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class Configuration {
+public class ChannelConfig {
 
-	private Map<String, Object> services;
+	private Map<String, Object> services = new LinkedHashMap<>();
 	private String defaultChannel;
 	private String errorChannel;
 
@@ -12,7 +13,7 @@ public class Configuration {
 		return services;
 	}
 
-	public void setServices(Map<String, Object> services) {
+	public void setServices(LinkedHashMap<String, Object> services) {
 		this.services = services;
 	}
 

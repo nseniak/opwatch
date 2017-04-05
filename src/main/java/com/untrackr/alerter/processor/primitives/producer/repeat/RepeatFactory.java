@@ -34,7 +34,7 @@ public class RepeatFactory extends ScheduledExecutorFactory<RepeatConfig, Repeat
 
 	@Override
 	public Repeat make(Object scriptObject) {
-		RepeatConfig config = convertProcessorDescriptor(scriptObject);
+		RepeatConfig config = convertProcessorConfig(scriptObject);
 		ScheduledExecutor executor = makeScheduledExecutor(config);
 		JavascriptProducer producer = checkPropertyValue("producer", config.getProducer());
 		return new Repeat(getProcessorService(), config, name(), executor, producer);

@@ -84,6 +84,7 @@ public class PushoverChannel implements Channel {
 		StringWriter writer = new StringWriter();
 		MessageScope scope = message.getScope();
 		writer.append("Hostname: " + scope.getHostname());
+		writer.append("\n");
 		if (message.getBody() != null) {
 			writer.append(message.getBody()).append(FIELD_DELIMITER);
 		}
@@ -220,7 +221,7 @@ public class PushoverChannel implements Channel {
 	private void send(PushoverMessage pushoverMessage) {
 		String logMessage = "Message to Pushover[" + name + "] " + processorService.prettyJson(pushoverMessage);
 		logger.info(logMessage);
-		if (processorService.config().isChannelDebug()) {
+		if (processorService.config().channelDebug()) {
 			processorService.printStdout("(debug) " + logMessage);
 			return;
 		}

@@ -33,7 +33,7 @@ public class ShFactory extends ActiveProcessorFactory<ShConfig, Sh> {
 
 	@Override
 	public Sh make(Object scriptObject) {
-		ShConfig config = convertProcessorDescriptor(scriptObject);
+		ShConfig config = convertProcessorConfig(scriptObject);
 		CommandRunner producer = makeCommandOutputProducer(config);
 		return new Sh(getProcessorService(), config, name(), producer);
 	}

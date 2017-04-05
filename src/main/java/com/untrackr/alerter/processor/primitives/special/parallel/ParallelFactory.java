@@ -29,7 +29,7 @@ public class ParallelFactory extends ProcessorFactory<ParallelConfig, Parallel> 
 
 	@Override
 	public Parallel make(Object scriptObject) {
-		ParallelConfig config = convertProcessorDescriptor(scriptObject);
+		ParallelConfig config = convertProcessorConfig(scriptObject);
 		List<Processor<?>> processors = config.getProcessors();
 		return new Parallel(getProcessorService(), processors, config, name());
 	}

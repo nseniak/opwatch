@@ -3,7 +3,6 @@ package com.untrackr.alerter.ioservice;
 import com.untrackr.alerter.common.ThreadUtil;
 import com.untrackr.alerter.processor.common.GlobalExecutionContext;
 import com.untrackr.alerter.service.ProcessorService;
-import com.untrackr.alerter.service.ProfileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -23,9 +22,6 @@ public class DirectoryWatchingService implements InitializingBean, DisposableBea
 	private static final Logger logger = LoggerFactory.getLogger(DirectoryWatchingService.class);
 
 	@Autowired
-	private ProfileService profileService;
-
-	@Autowired
 	private ProcessorService processorService;
 
 	private ScheduledThreadPoolExecutor directoryMonitoringExecutor;
@@ -35,7 +31,7 @@ public class DirectoryWatchingService implements InitializingBean, DisposableBea
 	public void addWatchedDirectory(WatchedDirectory watchedDirectory) {
 		logger.info("Added watched directory: " + watchedDirectory.getDirectory());
 		ScheduledFuture<?> future = directoryMonitoringExecutor.scheduleAtFixedRate(() -> watchDirectory(watchedDirectory),
-				0, profileService.profile().getFileWatchingCheckDelay(), TimeUnit.MILLISECONDS);
+				0, processorService.config().fileWatchingCheckDelay(), TimeUnit.MILLISECONDS);
 		watchedDirectories.put(watchedDirectory, future);
 	}
 
@@ -54,7 +50,7 @@ public class DirectoryWatchingService implements InitializingBean, DisposableBea
 
 	@Override
 	public void destroy() throws Exception {
-		ThreadUtil.safeExecutorShutdown(directoryMonitoringExecutor, "DirectoryWatchingService", profileService.profile().getExecutorTerminationTimeout());
+		ThreadUtil.safeExecutorShutdown(directoryMonitoringExecutor, "DirectoryWatchingService", processorService.config().executorTerminationTimeout());
 	}
 
 	public void watchDirectory(WatchedDirectory watchedDirectory) {

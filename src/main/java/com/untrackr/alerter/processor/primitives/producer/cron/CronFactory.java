@@ -34,7 +34,7 @@ public class CronFactory extends ScheduledExecutorFactory<CronConfig, Cron> {
 
 	@Override
 	public Cron make(Object scriptObject) {
-		CronConfig config = convertProcessorDescriptor(scriptObject);
+		CronConfig config = convertProcessorConfig(scriptObject);
 		ScheduledExecutor executor = makeScheduledExecutor(config);
 		CommandRunner runner = makeCommandOutputProducer(config);
 		return new Cron(getProcessorService(), config, name(), executor, runner);

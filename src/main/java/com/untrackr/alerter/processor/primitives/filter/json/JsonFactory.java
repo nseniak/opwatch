@@ -32,7 +32,7 @@ public class JsonFactory extends ActiveProcessorFactory<JsonConfig, Json> {
 
 	@Override
 	public Json make(Object scriptObject) {
-		JsonConfig config = convertProcessorDescriptor(scriptObject);
+		JsonConfig config = convertProcessorConfig(scriptObject);
 		return new Json(getProcessorService(), config, name());
 	}
 

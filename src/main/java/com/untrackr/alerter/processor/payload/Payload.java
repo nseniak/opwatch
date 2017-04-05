@@ -41,11 +41,11 @@ public class Payload<V> {
 	}
 
 	public static <V> Payload makeRoot(ProcessorService processorService, Processor producer, V value) {
-		return new Payload<>(System.currentTimeMillis(), processorService.getHostName(), producer.getLocation(), null, value);
+		return new Payload<>(System.currentTimeMillis(), processorService.config().hostName(), producer.getLocation(), null, value);
 	}
 
 	public static <V> Payload makeTransformed(ProcessorService processorService, Processor producer, Payload previous, V value) {
-		return new Payload<>(System.currentTimeMillis(), processorService.getHostName(), producer.getLocation(), previous, value);
+		return new Payload<>(System.currentTimeMillis(), processorService.config().hostName(), producer.getLocation(), previous, value);
 	}
 
 	public long getTimestamp() {

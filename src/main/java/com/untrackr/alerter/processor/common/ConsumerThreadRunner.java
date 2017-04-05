@@ -19,12 +19,12 @@ public class ConsumerThreadRunner implements Runnable {
 	public ConsumerThreadRunner(ProcessorService processorService, ActiveProcessor<?> processor) {
 		this.processorService = processorService;
 		this.processor = processor;
-		int inputQueueSize = processorService.getProfileService().profile().getInputQueueSize();
+		int inputQueueSize = processorService.config().inputQueueSize();
 		this.inputQueue = new ArrayBlockingQueue<>(inputQueueSize);
 	}
 
 	public void consume(Payload<?> payload) {
-		long timeout = processorService.getProfileService().profile().getProcessorInputQueueTimeout();
+		long timeout = processorService.config().processorInputQueueTimeout();
 		try {
 			while (!inputQueue.offer(payload, timeout, TimeUnit.MILLISECONDS)) {
 				processorService.signalException(new RuntimeError("pipe full", new ProcessorPayloadExecutionContext(processor, payload)));

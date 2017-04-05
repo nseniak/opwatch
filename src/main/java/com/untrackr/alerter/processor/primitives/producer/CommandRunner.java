@@ -43,14 +43,14 @@ public class CommandRunner {
 
 	public void consume(Processor processor, Payload payload) {
 		if (process == null) {
-			AlerterConfig profile = processorService.getProfileService().profile();
+			AlerterConfig profile = processorService.config();
 			long start = System.currentTimeMillis();
 			while (process == null) {
-				if ((System.currentTimeMillis() - start) > profile.getCommandStartTimeout()) {
+				if ((System.currentTimeMillis() - start) > profile.commandStartTimeout()) {
 					throw new RuntimeError("command process not started", new ProcessorVoidExecutionContext(processor));
 				}
 				try {
-					Thread.sleep(profile.getCommandStartSleepTime());
+					Thread.sleep(profile.commandStartSleepTime());
 				} catch (InterruptedException e) {
 					// Shutting down.
 					throw new ApplicationInterruptedException(ApplicationInterruptedException.INTERRUPTION);
@@ -71,8 +71,8 @@ public class CommandRunner {
 	}
 
 	public void produce(ActiveProcessor processor, long exitTimeout) {
-		AlerterConfig profile = processorService.getProfileService().profile();
-		int bufferSize = profile.getLineBufferSize();
+		AlerterConfig profile = processorService.config();
+		int bufferSize = profile.lineBufferSize();
 		try (LineReader lineReader = new LineReader(new BufferedInputStream(process.getInputStream()), bufferSize, true)) {
 			while (true) {
 				String line;
@@ -85,7 +85,7 @@ public class CommandRunner {
 						throw new RuntimeError("timeout waiting for command output",
 								new ProcessorVoidExecutionContext(processor));
 					}
-					Thread.sleep(profile.getCronScriptOutputCheckDelay());
+					Thread.sleep(profile.cronScriptOutputCheckDelay());
 				}
 				CommandOutput output = new CommandOutput();
 				output.command = command;

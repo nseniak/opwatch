@@ -32,7 +32,7 @@ public class TailedFile {
 				if (((currentAttributes = fileAttributes(file)) == null) || ((reader = openFile(file)) == null)) {
 					logger.info("Waiting for file: " + file);
 					while (((currentAttributes = fileAttributes(file)) == null) || ((reader = openFile(file)) == null)) {
-						Thread.sleep(alerterConfig.getTailedFileWatchingCheckDelay());
+						Thread.sleep(alerterConfig.tailedFileWatchingCheckDelay());
 					}
 					logger.info("File created: " + file);
 				} else {
@@ -65,7 +65,7 @@ public class TailedFile {
 					String line = reader.readLine();
 					if (line == null) {
 						// end of file, start polling
-						Thread.sleep(alerterConfig.getTailPollInterval());
+						Thread.sleep(alerterConfig.tailPollInterval());
 					} else {
 						lineNumber = lineNumber + 1;
 						handler.handle(line, lineNumber);
@@ -98,7 +98,7 @@ public class TailedFile {
 	private LineReader openFile(Path path) {
 		try {
 			InputStream in = Files.newInputStream(path);
-			return new LineReader(new BufferedInputStream(in), alerterConfig.getLineBufferSize(), false);
+			return new LineReader(new BufferedInputStream(in), alerterConfig.lineBufferSize(), false);
 		} catch (IOException e) {
 			return null;
 		}

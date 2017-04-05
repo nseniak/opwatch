@@ -3,7 +3,6 @@ package com.untrackr.alerter.ioservice;
 import com.untrackr.alerter.common.ThreadUtil;
 import com.untrackr.alerter.processor.common.GlobalExecutionContext;
 import com.untrackr.alerter.service.ProcessorService;
-import com.untrackr.alerter.service.ProfileService;
 import org.apache.commons.io.input.TailerListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,9 +20,6 @@ import java.util.concurrent.TimeUnit;
 public class FileTailingService implements DisposableBean {
 
 	private static final Logger logger = LoggerFactory.getLogger(FileTailingService.class);
-
-	@Autowired
-	private ProfileService profileService;
 
 	@Autowired
 	private ProcessorService processorService;
@@ -54,7 +50,7 @@ public class FileTailingService implements DisposableBean {
 
 	@Override
 	public void destroy() throws Exception {
-		ThreadUtil.safeExecutorShutdown(tailingThreadPoolExecutor, "FileTailingService", profileService.profile().getExecutorTerminationTimeout());
+		ThreadUtil.safeExecutorShutdown(tailingThreadPoolExecutor, "FileTailingService", processorService.config().executorTerminationTimeout());
 	}
 
 	public void tailFile(TailedFile tailedFile) {

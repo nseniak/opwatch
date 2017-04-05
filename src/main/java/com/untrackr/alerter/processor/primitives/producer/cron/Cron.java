@@ -17,7 +17,7 @@ public class Cron extends ScheduledProducer<CronConfig> {
 	@Override
 	protected void produce() {
 		commandRunner.startProcess(this);
-		long exitTimeout = processorService.getProfileService().profile().getCronCommandExitTimeout();
+		long exitTimeout = processorService.config().cronCommandExitTimeout();
 		commandRunner.produce(this, exitTimeout);
 	}
 

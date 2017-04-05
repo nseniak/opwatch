@@ -2,7 +2,6 @@ package com.untrackr.alerter.service;
 
 import com.untrackr.alerter.processor.common.ApplicationInterruptedException;
 import com.untrackr.alerter.processor.common.RuntimeError;
-import com.untrackr.alerter.processor.common.GlobalExecutionContext;
 import com.untrackr.alerter.processor.payload.PayloadObjectValue;
 import com.untrackr.alerter.ioservice.LineReader;
 import com.untrackr.alerter.processor.common.ActiveProcessor;
@@ -45,7 +44,7 @@ public class ConsoleService {
 
 	private void startConsoleThread() {
 		consoleFuture = processorService.getConsumerExecutor().submit(() -> {
-			int bufsize = processorService.getProfileService().profile().getLineBufferSize();
+			int bufsize = processorService.config().lineBufferSize();
 			LineReader reader = new LineReader(new BufferedInputStream(System.in), bufsize, true);
 			// Since System.in.read() is not interruptible, we force its interruptibility using polling
 			String line;

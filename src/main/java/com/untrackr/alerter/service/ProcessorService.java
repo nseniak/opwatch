@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.untrackr.alerter.channel.MessageServiceService;
-import com.untrackr.alerter.channel.common.Channel;
-import com.untrackr.alerter.channel.common.Channels;
+import com.untrackr.alerter.channel.common.*;
+import com.untrackr.alerter.channel.console.ConsoleConfiguration;
+import com.untrackr.alerter.channel.console.ConsoleMessageService;
+import com.untrackr.alerter.channel.pushover.PushoverMessageService;
 import com.untrackr.alerter.common.ThreadUtil;
 import com.untrackr.alerter.ioservice.FileTailingService;
 import com.untrackr.alerter.processor.common.*;
@@ -31,6 +33,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.SynchronousQueue;
@@ -47,9 +51,6 @@ import static jdk.nashorn.internal.runtime.ScriptRuntime.UNDEFINED;
 public class ProcessorService implements InitializingBean, DisposableBean {
 
 	private static final Logger logger = LoggerFactory.getLogger(ProcessorService.class);
-
-	@Autowired
-	private ProfileService profileService;
 
 	@Autowired
 	private ScriptService scriptService;
@@ -72,15 +73,10 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	private static String DEFAULT_DEFAULT_CHANNEL = "console";
 
 	private String id;
-
-	private String hostName;
-
+	private AlerterConfig config;
 	private Channels channels;
-
 	private ObjectMapper objectMapper;
-
 	private Thread mainThread;
-
 	private Processor runningProcessor;
 
 	private static String SCRIPT_EXCEPTION_MESSAGE_PREFIX = "javax.script.ScriptException: ";
@@ -106,8 +102,8 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	public void destroy() throws Exception {
 		logger.info("Exiting");
 		mainThread.interrupt();
-		ThreadUtil.safeExecutorShutdownNow(consumerExecutor, "ConsumerExecutor", profileService.profile().getExecutorTerminationTimeout());
-		ThreadUtil.safeExecutorShutdownNow(scheduledExecutor, "ScheduledExecutor", profileService.profile().getExecutorTerminationTimeout());
+		ThreadUtil.safeExecutorShutdownNow(consumerExecutor, "ConsumerExecutor", config().executorTerminationTimeout());
+		ThreadUtil.safeExecutorShutdownNow(scheduledExecutor, "ScheduledExecutor", config().executorTerminationTimeout());
 	}
 
 	public void run(String[] argStrings) {
@@ -115,8 +111,10 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		Signal.handle(new Signal("INT"), this::userInterruptHandler);
 		try {
 			CommandLineOptions options = parseOptions(argStrings);
-			initialize(options);
-			initializeChannels(options);
+			createConfig(options);
+			initializeChannels(new ChannelConfig());
+			printStdout("Default channel: " + channels.getDefaultChannel().name());
+			printStdout("Error channel: " + channels.getErrorChannel().name());
 			scriptService.initialize();
 			if (options.getFiles().isEmpty()) {
 				runRepl(options);
@@ -129,12 +127,73 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		}
 	}
 
-	private void initializeChannels(CommandLineOptions options) {
-		channels = messageServiceService.createChannels(options, this);
+	public void initializeChannels(ChannelConfig channelConfig) {
+		LinkedHashMap<String, Channel> channelMap = new LinkedHashMap<>();
+		addServiceChannels(channelConfig, channelMap, new ConsoleMessageService());
+		addServiceChannels(channelConfig, channelMap, new PushoverMessageService());
+		Channel consoleChannel = channelMap.computeIfAbsent(CONSOLE_CHANNEL_NAME,
+				k -> new ConsoleMessageService().createChannels(new ConsoleConfiguration(), this).get(0));
+		Channel defaultChannel = null;
+		Channel errorChannel = null;
+		String defaultChannelName = channelConfig.getDefaultChannel();
+		if (defaultChannelName != null) {
+			defaultChannel = channelMap.get(defaultChannelName);
+			if (defaultChannel == null) {
+				throw new RuntimeError("the specified default channel does not exist: \"" + defaultChannelName + "\"");
+			}
+		} else {
+			defaultChannel = consoleChannel;
+		}
+		String errorChannelName = channelConfig.getErrorChannel();
+		if (errorChannelName != null) {
+			errorChannel = channelMap.get(errorChannelName);
+			if (errorChannel == null) {
+				throw new RuntimeError("the specified error channel does not exist: \"" + errorChannelName + "\"");
+			}
+		} else {
+			errorChannel = defaultChannel;
+		}
+		channels = new Channels(channelMap, defaultChannel, errorChannel);
 		logger.info("Default channel: " + channels.getDefaultChannel().name());
 		logger.info("Error channel: " + channels.getErrorChannel().name());
-		printStdout("Default channel: " + channels.getDefaultChannel().name());
-		printStdout("Error channel: " + channels.getErrorChannel().name());
+	}
+
+	private <F extends ServiceConfiguration, C extends Channel> void addServiceChannels(ChannelConfig channelConfig,
+																																											LinkedHashMap<String, Channel> channelMap,
+																																											MessageService<F, C> service) {
+		String serviceName = service.serviceName();
+		Object serviceConfig = channelConfig.getServices().get(serviceName);
+		if (serviceConfig == null) {
+			return;
+		}
+		Class<F> configClass = service.configurationClass();
+		F config;
+		try {
+			config = objectMapper.convertValue(serviceConfig, configClass);
+		} catch (RuntimeException e) {
+			String message = "invalid configuration for service \"" + serviceName + "\"";
+			logger.error(message, e);
+			throw new RuntimeError(message + ": " + e.getMessage());
+		}
+		List<C> channels = service.createChannels(config, this);
+		for (C channel : channels) {
+			String name = channel.name();
+			Channel previous = channelMap.put(name, channel);
+			if (previous != null) {
+				throw new RuntimeError("cannot create " + channel.serviceName() + " channel \"" + name + "\": a channel with the same name already exists");
+			}
+		}
+	}
+
+	private void createConfig(CommandLineOptions options) {
+		config = new AlerterConfig(this, options);
+		if (config.hostName() == null) {
+			try {
+				config.hostName(InetAddress.getLocalHost().getHostName());
+			} catch (UnknownHostException e) {
+				throw new RuntimeError("Cannot determine hostname; please pass the option --hostname=<hostname>");
+			}
+		}
 	}
 
 	public Channel findChannel(String name) {
@@ -161,8 +220,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	private CommandLineOptions parseOptions(String[] argStrings) {
 		OptionParser parser = new OptionParser();
 		OptionSpec<String> hostname = parser.accepts("hostname").withRequiredArg().ofType(String.class);
-		OptionSpec<String> defaultChannel = parser.accepts("default-channel").withRequiredArg().ofType(String.class);
-		OptionSpec<String> errorChannel = parser.accepts("error-channel").withRequiredArg().ofType(String.class);
+		OptionSpec<String> startup = parser.accepts("startup").withRequiredArg().ofType(String.class);
 		OptionSpec<File> files = parser.nonOptions().ofType(File.class);
 		OptionSet optionSet;
 		try {
@@ -172,22 +230,9 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		}
 		CommandLineOptions options = new CommandLineOptions();
 		options.setHostname(optionSet.valueOf(hostname));
-		options.setDefaultChannel(optionSet.valueOf(defaultChannel));
-		options.setErrorChannel(optionSet.valueOf(errorChannel));
+		options.setStartup(optionSet.valueOf(startup));
 		options.setFiles(optionSet.valuesOf(files));
 		return options;
-	}
-
-	private void initialize(CommandLineOptions options) {
-		if (options.getHostname() != null) {
-			hostName = options.getHostname();
-		} else {
-			try {
-				hostName = InetAddress.getLocalHost().getHostName();
-			} catch (UnknownHostException e) {
-				throw new IllegalStateException("Cannot determine hostname; please pass the option --hostname=<hostname>");
-			}
-		}
 	}
 
 	public void runRepl(CommandLineOptions options) {
@@ -373,7 +418,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	public HealthcheckInfo healthcheck() {
 		String runningProcessorDesc = (runningProcessor == null) ? null : runningProcessor.getLocation().descriptor();
-		return new HealthcheckInfo(hostName, runningProcessorDesc);
+		return new HealthcheckInfo(config.hostName(), runningProcessorDesc);
 	}
 
 	public String getId() {
@@ -381,11 +426,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	}
 
 	public AlerterConfig config() {
-		return profileService.profile();
-	}
-
-	public ProfileService getProfileService() {
-		return profileService;
+		return config;
 	}
 
 	public FileTailingService getFileTailingService() {
@@ -410,10 +451,6 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	public ObjectMapper getObjectMapper() {
 		return objectMapper;
-	}
-
-	public String getHostName() {
-		return hostName;
 	}
 
 	public ScriptService getScriptService() {

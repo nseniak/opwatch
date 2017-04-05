@@ -1,12 +1,17 @@
 package com.untrackr.alerter.service;
 
+import com.untrackr.alerter.channel.common.ChannelConfig;
 import com.untrackr.alerter.common.ApplicationUtil;
+import com.untrackr.alerter.processor.common.RuntimeError;
+import com.untrackr.alerter.processor.common.ValueLocation;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 public class AlerterConfig {
 
+	private ProcessorService processorService;
+	private ChannelConfig channels;
+	private String hostName;
 	private long fileWatchingCheckDelay;
 	private long executorTerminationTimeout;
 	private long tailedFileWatchingCheckDelay;
@@ -24,7 +29,9 @@ public class AlerterConfig {
 	private long commandStartTimeout;
 	private long commandStartSleepTime;
 
-	public AlerterConfig() throws IOException {
+	public AlerterConfig(ProcessorService processorService, CommandLineOptions options) {
+		this.processorService = processorService;
+		this.hostName = options.getHostname();
 		this.fileWatchingCheckDelay = TimeUnit.SECONDS.toMillis(1);
 		this.executorTerminationTimeout = TimeUnit.SECONDS.toMillis(30);
 		this.tailedFileWatchingCheckDelay = TimeUnit.SECONDS.toMillis(1);
@@ -43,35 +50,53 @@ public class AlerterConfig {
 		this.commandStartSleepTime = TimeUnit.MILLISECONDS.toMillis(200);
 	}
 
-	public long getFileWatchingCheckDelay() {
+	public void channels(Object scriptObject) {
+		ChannelConfig config = (ChannelConfig) processorService.getScriptService().convertScriptValue(ValueLocation.makeToplevel(), ChannelConfig.class, scriptObject, RuntimeError::new);
+		processorService.initializeChannels(config);
+		channels = config;
+	}
+
+	public ChannelConfig channels() {
+		return channels;
+	}
+
+	public String hostName() {
+		return hostName;
+	}
+
+	public void hostName(String hostName) {
+		this.hostName = hostName;
+	}
+
+	public long fileWatchingCheckDelay() {
 		return fileWatchingCheckDelay;
 	}
 
-	public void setFileWatchingCheckDelay(long fileWatchingCheckDelay) {
+	public void fileWatchingCheckDelay(long fileWatchingCheckDelay) {
 		this.fileWatchingCheckDelay = fileWatchingCheckDelay;
 	}
 
-	public long getExecutorTerminationTimeout() {
+	public long executorTerminationTimeout() {
 		return executorTerminationTimeout;
 	}
 
-	public void setExecutorTerminationTimeout(long executorTerminationTimeout) {
+	public void executorTerminationTimeout(long executorTerminationTimeout) {
 		this.executorTerminationTimeout = executorTerminationTimeout;
 	}
 
-	public long getTailedFileWatchingCheckDelay() {
+	public long tailedFileWatchingCheckDelay() {
 		return tailedFileWatchingCheckDelay;
 	}
 
-	public void setTailedFileWatchingCheckDelay(long tailedFileWatchingCheckDelay) {
+	public void tailedFileWatchingCheckDelay(long tailedFileWatchingCheckDelay) {
 		this.tailedFileWatchingCheckDelay = tailedFileWatchingCheckDelay;
 	}
 
-	public long getTailPollInterval() {
+	public long tailPollInterval() {
 		return tailPollInterval;
 	}
 
-	public void setTailPollInterval(long tailPollInterval) {
+	public void tailPollInterval(long tailPollInterval) {
 		this.tailPollInterval = tailPollInterval;
 	}
 
@@ -79,19 +104,19 @@ public class AlerterConfig {
 		return "1s";
 	}
 
-	public boolean isChannelDebug() {
+	public boolean channelDebug() {
 		return channelDebug;
 	}
 
-	public void setChannelDebug(boolean channelDebug) {
+	public void channelDebug(boolean channelDebug) {
 		this.channelDebug = channelDebug;
 	}
 
-	public boolean isTrace() {
+	public boolean trace() {
 		return trace;
 	}
 
-	public void setTrace(boolean trace) {
+	public void trace(boolean trace) {
 		this.trace = trace;
 	}
 
@@ -103,83 +128,83 @@ public class AlerterConfig {
 		return "10s";
 	}
 
-	public int getLineBufferSize() {
+	public int lineBufferSize() {
 		return lineBufferSize;
 	}
 
-	public void setLineBufferSize(int lineBufferSize) {
+	public void lineBufferSize(int lineBufferSize) {
 		this.lineBufferSize = lineBufferSize;
 	}
 
-	public int getInputQueueSize() {
+	public int inputQueueSize() {
 		return inputQueueSize;
 	}
 
-	public void setInputQueueSize(int inputQueueSize) {
+	public void inputQueueSize(int inputQueueSize) {
 		this.inputQueueSize = inputQueueSize;
 	}
 
-	public long getProcessorInputQueueTimeout() {
+	public long processorInputQueueTimeout() {
 		return processorInputQueueTimeout;
 	}
 
-	public void setProcessorInputQueueTimeout(long processorInputQueueTimeout) {
+	public void processorInputQueueTimeout(long processorInputQueueTimeout) {
 		this.processorInputQueueTimeout = processorInputQueueTimeout;
 	}
 
-	public long getMinimumOutputDelay() {
+	public long minimumOutputDelay() {
 		return minimumOutputDelay;
 	}
 
-	public void setMinimumOutputDelay(long minimumOutputDelay) {
+	public void minimumOutputDelay(long minimumOutputDelay) {
 		this.minimumOutputDelay = minimumOutputDelay;
 	}
 
-	public String getDefaultPostHostname() {
+	public String defaultPostHostname() {
 		return defaultPostHostname;
 	}
 
-	public void setDefaultPostHostname(String defaultPostHostname) {
+	public void defaultPostHostname(String defaultPostHostname) {
 		this.defaultPostHostname = defaultPostHostname;
 	}
 
-	public int getDefaultPostPort() {
+	public int defaultPostPort() {
 		return defaultPostPort;
 	}
 
-	public void setDefaultPostPort(int defaultPostPort) {
+	public void defaultPostPort(int defaultPostPort) {
 		this.defaultPostPort = defaultPostPort;
 	}
 
-	public long getCronScriptOutputCheckDelay() {
+	public long cronScriptOutputCheckDelay() {
 		return cronScriptOutputCheckDelay;
 	}
 
-	public void setCronScriptOutputCheckDelay(long cronScriptOutputCheckDelay) {
+	public void cronScriptOutputCheckDelay(long cronScriptOutputCheckDelay) {
 		this.cronScriptOutputCheckDelay = cronScriptOutputCheckDelay;
 	}
 
-	public long getCronCommandExitTimeout() {
+	public long cronCommandExitTimeout() {
 		return cronCommandExitTimeout;
 	}
 
-	public void setCronCommandExitTimeout(long cronCommandExitTimeout) {
+	public void cronCommandExitTimeout(long cronCommandExitTimeout) {
 		this.cronCommandExitTimeout = cronCommandExitTimeout;
 	}
 
-	public long getCommandStartTimeout() {
+	public long commandStartTimeout() {
 		return commandStartTimeout;
 	}
 
-	public void setCommandStartTimeout(long commandStartTimeout) {
+	public void commandStartTimeout(long commandStartTimeout) {
 		this.commandStartTimeout = commandStartTimeout;
 	}
 
-	public long getCommandStartSleepTime() {
+	public long commandStartSleepTime() {
 		return commandStartSleepTime;
 	}
 
-	public void setCommandStartSleepTime(long commandStartSleepTime) {
+	public void commandStartSleepTime(long commandStartSleepTime) {
 		this.commandStartSleepTime = commandStartSleepTime;
 	}
 

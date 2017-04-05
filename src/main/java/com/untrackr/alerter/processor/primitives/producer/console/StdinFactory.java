@@ -32,7 +32,7 @@ public class StdinFactory extends ActiveProcessorFactory<StdinConfig, Stdin> {
 
 	@Override
 	public Stdin make(Object scriptObject) {
-		StdinConfig config = convertProcessorDescriptor(scriptObject);
+		StdinConfig config = convertProcessorConfig(scriptObject);
 		return new Stdin(getProcessorService(), config, name());
 	}
 

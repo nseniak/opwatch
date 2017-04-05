@@ -37,16 +37,16 @@ public class PostFactory extends ActiveProcessorFactory<PostConfig, Post> {
 
 	@Override
 	public Post make(Object scriptObject) {
-		PostConfig descriptor = convertProcessorDescriptor(scriptObject);
+		PostConfig descriptor = convertProcessorConfig(scriptObject);
 		String pathString = checkVariableSubstitution("path", checkPropertyValue("path", descriptor.getPath()));
 		Matcher matcher = pathPattern.matcher(pathString);
 		if (!matcher.matches()) {
 			throw new RuntimeError("incorrect \"path\" syntax: \"" + pathString + "\"",
 					new FactoryExecutionContext(this));
 		}
-		AlerterConfig profile = processorService.getProfileService().profile();
-		String hostname = (matcher.group("hostname") != null) ? matcher.group("hostname") : profile.getDefaultPostHostname();
-		int port = (matcher.group("port") != null) ? Integer.parseInt(matcher.group("hostname")) : profile.getDefaultPostPort();
+		AlerterConfig profile = processorService.config();
+		String hostname = (matcher.group("hostname") != null) ? matcher.group("hostname") : profile.defaultPostHostname();
+		int port = (matcher.group("port") != null) ? Integer.parseInt(matcher.group("hostname")) : profile.defaultPostPort();
 		String urlPath = matcher.group("stack");
 		return new Post(getProcessorService(), descriptor, name(), pathString, hostname, port, urlPath);
 	}

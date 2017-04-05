@@ -19,12 +19,12 @@ public class ApiController {
 
 	@RequestMapping(value = "/trace/start", method = RequestMethod.POST)
 	public void startTrace() {
-		processorService.getProfileService().profile().setTrace(true);
+		processorService.config().trace(true);
 	}
 
 	@RequestMapping(value = "/trace/stop", method = RequestMethod.POST)
 	public void stopTrace() {
-		processorService.getProfileService().profile().setTrace(false);
+		processorService.config().trace(false);
 	}
 
 	@RequestMapping(value = "/exit", method = RequestMethod.POST)

@@ -30,12 +30,14 @@
 
 ------
 
-Design goals
-* Not replace sophisticated monitoring systems
+Design goals:
 * Easy to deploy and to use
+* Lightweight and standalone; no dependency on database or other logging systems
+* Extensible; ability to define reusable libraries
+* Can be used as a complement to more sophisticated systems
 * Versatile
-* Few dependencies with databases
-* State not saved in database
+Non design goals:
+* Not to replace sophisticated monitoring systems
 
 p = pipe(top(), stdout())
 run(p)

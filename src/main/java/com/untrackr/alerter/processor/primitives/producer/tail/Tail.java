@@ -22,12 +22,12 @@ public class Tail extends Producer<TailConfig> {
 
 	@Override
 	public void start() {
-		AlerterConfig profile = getProcessorService().getProfileService().profile();
+		AlerterConfig profile = getProcessorService().config();
 		tailedFile = new TailedFile(profile, file, (line, lineNumber) -> {
 			if (ignoreBlankLine && line.trim().isEmpty()) {
 				return;
 			}
-			Payload payload = new TailPayload(System.currentTimeMillis(), processorService.getHostName(), location, null,
+			Payload payload = new TailPayload(System.currentTimeMillis(), processorService.config().hostName(), location, null,
 					line, file.toAbsolutePath().toString(), lineNumber);
 			output(payload);
 		});

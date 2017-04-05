@@ -12,7 +12,7 @@ public class FactoryExecutionContext extends ExecutionContext {
 
 	@Override
 	public MessageScope makeMessageScope(ProcessorService processorService) {
-		return new MessageScope(processorService.getId(), factory.name(), MessageScope.Kind.factory, processorService.getHostName());
+		return new MessageScope(processorService.getId(), factory.name(), MessageScope.Kind.factory, processorService.config().hostName());
 	}
 
 	@Override

@@ -3,7 +3,6 @@ package com.untrackr.alerter.ioservice;
 import com.untrackr.alerter.common.ThreadUtil;
 import com.untrackr.alerter.processor.common.GlobalExecutionContext;
 import com.untrackr.alerter.service.ProcessorService;
-import com.untrackr.alerter.service.ProfileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -23,9 +22,6 @@ public class FileWatchingService implements InitializingBean, DisposableBean {
 	private static final Logger logger = LoggerFactory.getLogger(FileWatchingService.class);
 
 	@Autowired
-	private ProfileService profileService;
-
-	@Autowired
 	private ProcessorService processorService;
 
 	private ScheduledThreadPoolExecutor fileMonitoringExecutor;
@@ -35,7 +31,7 @@ public class FileWatchingService implements InitializingBean, DisposableBean {
 	public void addWatchedFile(WatchedFile watchedFile) {
 		logger.info("Added watched file: " + watchedFile.getFile());
 		ScheduledFuture<?> future = fileMonitoringExecutor.scheduleAtFixedRate(() -> watchFile(watchedFile),
-				0, profileService.profile().getFileWatchingCheckDelay(), TimeUnit.MILLISECONDS);
+				0, processorService.config().fileWatchingCheckDelay(), TimeUnit.MILLISECONDS);
 		watchedFiles.put(watchedFile, future);
 	}
 
@@ -54,7 +50,7 @@ public class FileWatchingService implements InitializingBean, DisposableBean {
 
 	@Override
 	public void destroy() throws Exception {
-		ThreadUtil.safeExecutorShutdown(fileMonitoringExecutor, "FileWatchingService", profileService.profile().getExecutorTerminationTimeout());
+		ThreadUtil.safeExecutorShutdown(fileMonitoringExecutor, "FileWatchingService", processorService.config().executorTerminationTimeout());
 	}
 
 	public void watchFile(WatchedFile watchedFile) {

@@ -12,7 +12,7 @@ public abstract class ProcessorExecutionContext extends ExecutionContext {
 
 	@Override
 	public MessageScope makeMessageScope(ProcessorService processorService) {
-		return new MessageScope(processorService.getId(), processor.getName(), MessageScope.Kind.processor, processorService.getHostName());
+		return new MessageScope(processorService.getId(), processor.getName(), MessageScope.Kind.processor, processorService.config().hostName());
 	}
 
 	@Override

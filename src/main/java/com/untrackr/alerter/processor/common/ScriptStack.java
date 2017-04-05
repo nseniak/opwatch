@@ -81,8 +81,7 @@ public class ScriptStack {
 
 	public String asString() {
 		StringJoiner joiner = new StringJoiner("\n");
-		for (int i = elements.size() - 1; i >= 0; i--) {
-			ScriptStackElement element = elements.get(i);
+		for (ScriptStackElement element : elements) {
 			joiner.add("at " + element.getFileName() + ":" + element.getLineNumber());
 		}
 		return joiner.toString();

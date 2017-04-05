@@ -7,9 +7,7 @@ import com.untrackr.alerter.service.ScriptService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Map;
 import java.util.StringJoiner;
 import java.util.concurrent.Future;
 
@@ -100,12 +98,12 @@ public abstract class ActiveProcessor<D extends ActiveProcessorConfig> extends P
 	}
 
 	private void output(List<Processor<?>> consumers, Payload<?> payload) {
-		if (processorService.getProfileService().profile().isTrace()) {
+		if (processorService.config().trace()) {
 			logger.info("Output: " + location.descriptor() + " ==> " + processorService.json(payload));
 		}
 		long now = System.currentTimeMillis();
 		long elapsedSinceLastOutput = now - lastOutputTime;
-		long minElapsed = processorService.getProfileService().profile().getMinimumOutputDelay();
+		long minElapsed = processorService.config().minimumOutputDelay();
 		if (elapsedSinceLastOutput < minElapsed) {
 			try {
 				Thread.sleep(minElapsed - elapsedSinceLastOutput);

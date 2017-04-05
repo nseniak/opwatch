@@ -32,7 +32,7 @@ public class StdoutFactory extends ActiveProcessorFactory<StdoutConfig, Stdout> 
 
 	@Override
 	public Stdout make(Object scriptObject) {
-		StdoutConfig config = convertProcessorDescriptor(scriptObject);
+		StdoutConfig config = convertProcessorConfig(scriptObject);
 		return new Stdout(getProcessorService(), config, name());
 	}
 
