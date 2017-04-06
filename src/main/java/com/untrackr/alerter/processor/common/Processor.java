@@ -90,4 +90,8 @@ public abstract class Processor<C extends ProcessorConfig> {
 		return configuration;
 	}
 
+	public ProcessorFactory<?, ?> getFactory() {
+		return processorService.getScriptService().factory(this.getClass());
+	}
+
 }

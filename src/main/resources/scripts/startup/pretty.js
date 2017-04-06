@@ -37,8 +37,8 @@ pretty = function (jsObject, expandAlias, indentLength) {
 	};
 
 	processor = function (d) {
-		if (d && d.type && d.descriptor) {
-			return "processor"
+		if (d.processor) {
+			return "processor";
 		} else {
 			return null;
 		}
@@ -95,18 +95,22 @@ pretty = function (jsObject, expandAlias, indentLength) {
 	prettyProcessorPrint = function (processor, indent) {
 		var value = [],
 				config,
+				factory,
+				name,
 				properties,
 				property,
 				i;
 
 		config = processor.configuration;
+		factory = processor.factory;
+		name = factory.name();
 		newIndent = indent + indentString;
-		if ((config.name == "alias") && !expandAlias) {
-			return config.name + '({' + newLine + prettyObjectPrint(config, newIndent) + indent + '})';
+		if ((name == "alias") && !expandAlias) {
+			return config.name + '({' + newLine + prettyObjectPrint(config.configuration, newIndent) + indent + '})';
 		} else {
 			properties = config.properties();
 			if (properties.length == 0) {
-				return config.name + '()' + newLine;
+				return name + '({})' + newLine;
 			} else {
 				for (i = 0; i < properties.length; i++) {
 					property = properties[i];
@@ -115,7 +119,7 @@ pretty = function (jsObject, expandAlias, indentLength) {
 					}
 				}
 			}
-			return processor.type + '({' + newLine + value.join(newLineJoin) + newLine + indent + '})';
+			return name + '({' + newLine + value.join(newLineJoin) + newLine + indent + '})';
 		}
 	}
 
@@ -123,13 +127,15 @@ pretty = function (jsObject, expandAlias, indentLength) {
 		var index,
 				length = array.length,
 				value = [];
-
-		indent += indentString;
+		if (length == 0) {
+			return "";
+		}
+		newIndent = indent + indentString;
 		for (index = 0; index < length; index += 1) {
-			value.push(pretty(array[index], indent, indent));
+			value.push(pretty(array[index], newIndent, newIndent));
 		}
 
-		return value.join(newLineJoin) + newLine;
+		return newLine + value.join(newLineJoin) + newLine + indent;
 	};
 
 	functionSignature = function (element) {
@@ -152,7 +158,7 @@ pretty = function (jsObject, expandAlias, indentLength) {
 			switch (type) {
 				case 'array':
 					visited.push(element);
-					return fromArray + '[' + newLine + prettyArray(element, indent) + indent + ']';
+					return fromArray + '[' + prettyArray(element, indent) + ']';
 
 				case 'boolean':
 					return fromArray + (element ? 'true' : 'false');
