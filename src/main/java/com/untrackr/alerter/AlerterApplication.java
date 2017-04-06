@@ -57,6 +57,7 @@ public class AlerterApplication implements CommandLineRunner {
 		OptionSpec<Void> noInit = parser.accepts("no-init");
 		OptionSpec<Void> noHttp = parser.accepts("no-http");
 		OptionSpec<Integer> port = parser.accepts("port").withRequiredArg().ofType(Integer.class);
+		OptionSpec<Void> traceChannels = parser.accepts("trace-channels");
 		OptionSpec<String> files = parser.nonOptions().ofType(String.class);
 		OptionSet optionSet  = parser.parse(argStrings);
 		CommandLineOptions options = new CommandLineOptions();
@@ -65,6 +66,7 @@ public class AlerterApplication implements CommandLineRunner {
 		options.setInitScript(optionSet.valueOf(initFile));
 		options.setNoInit(optionSet.has(noInit));
 		options.setPort(optionSet.valueOf(port));
+		options.setTraceChannels(optionSet.has(traceChannels));
 		options.setScripts(optionSet.valuesOf(files));
 		return options;
 	}

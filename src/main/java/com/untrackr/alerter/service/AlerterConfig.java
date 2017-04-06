@@ -20,8 +20,8 @@ public class AlerterConfig {
 	private long executorTerminationTimeout;
 	private long tailedFileWatchingCheckDelay;
 	private long tailPollInterval;
-	private boolean channelDebug;
-	private boolean trace;
+	private boolean traceChannels;
+	private boolean traceProcessors;
 	private int lineBufferSize;
 	private int inputQueueSize;
 	private long processorInputQueueTimeout;
@@ -39,12 +39,12 @@ public class AlerterConfig {
 		this.initFile = options.getInitScript();
 		this.noInit = options.isNoInit();
 		this.noHttp = options.isNoHttp();
+		this.traceChannels = options.isTraceChannels();
 		this.fileWatchingCheckDelay = TimeUnit.SECONDS.toMillis(1);
 		this.executorTerminationTimeout = TimeUnit.SECONDS.toMillis(30);
 		this.tailedFileWatchingCheckDelay = TimeUnit.SECONDS.toMillis(1);
 		this.tailPollInterval = TimeUnit.MILLISECONDS.toMillis(100);
-		this.channelDebug = ApplicationUtil.property("alerter.channel.debug", false);
-		this.trace = ApplicationUtil.property("alerter.trace", false);
+		this.traceProcessors = ApplicationUtil.property("alerter.trace", false);
 		this.lineBufferSize = ApplicationUtil.property("alerter.line.buffer.size", 8192 * 100);
 		this.inputQueueSize = ApplicationUtil.property("alerter.input.queue.size", 100);
 		this.processorInputQueueTimeout = ApplicationUtil.property("alerter.input.queue.timeout", TimeUnit.SECONDS.toMillis(60));
@@ -124,19 +124,19 @@ public class AlerterConfig {
 	}
 
 	public boolean channelDebug() {
-		return channelDebug;
+		return traceChannels;
 	}
 
 	public void channelDebug(boolean channelDebug) {
-		this.channelDebug = channelDebug;
+		this.traceChannels = channelDebug;
 	}
 
 	public boolean trace() {
-		return trace;
+		return traceProcessors;
 	}
 
 	public void trace(boolean trace) {
-		this.trace = trace;
+		this.traceProcessors = trace;
 	}
 
 	public static String defaultHttpConnectTimeout() {

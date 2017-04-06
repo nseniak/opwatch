@@ -9,6 +9,7 @@ public class CommandLineOptions {
 	private String initScript;
 	private boolean noInit;
 	private Integer port;
+	private boolean traceChannels;
 	private List<String> scripts;
 
 	public String getHostname() {
@@ -49,6 +50,14 @@ public class CommandLineOptions {
 
 	public void setPort(Integer port) {
 		this.port = port;
+	}
+
+	public boolean isTraceChannels() {
+		return traceChannels;
+	}
+
+	public void setTraceChannels(boolean traceChannels) {
+		this.traceChannels = traceChannels;
 	}
 
 	public List<String> getScripts() {

@@ -20,14 +20,14 @@
 * Javascript port
 * [x] System alarms
 * Static verification
-* Fix "pretty"
+* [x] Fix "pretty"
 * Automatically load processors from Github
 * ready() method
 * Integrations: see list in https://www.statuscake.com/kb/knowledge-base/getting-alerts-from-an-integration/
 * mute/downgrade alarms by UI
 * display alias name instead of processor as source
 * display root payload of alerts
-* new pushover4j version
+* new pushover4j versionc
 
 ------
 
