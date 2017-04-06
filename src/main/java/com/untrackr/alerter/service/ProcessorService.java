@@ -262,7 +262,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		processor.inferSignature();
 		processor.check();
 		processor.start();
-		signalSystemInfo("alerter up and running");
+		signalSystemInfo("processor up and running");
 		runningProcessor = processor;
 		try {
 			while (true) {
