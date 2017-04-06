@@ -3,7 +3,6 @@ package com.untrackr.alerter.ioservice;
 import com.untrackr.alerter.common.ThreadUtil;
 import com.untrackr.alerter.processor.common.GlobalExecutionContext;
 import com.untrackr.alerter.service.ProcessorService;
-import org.apache.commons.io.input.TailerListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -57,21 +56,6 @@ public class FileTailingService implements DisposableBean {
 		processorService.withExceptionHandling("error tailing file " + tailedFile.getFile().toString(),
 				new GlobalExecutionContext(),
 				tailedFile::tail);
-	}
-
-	public static class MyTailHandler extends TailerListenerAdapter {
-
-		private TailedFile tailedFile;
-
-		public MyTailHandler(TailedFile tailedFile) {
-			this.tailedFile = tailedFile;
-		}
-
-		@Override
-		public void handle(String line) {
-			tailedFile.getHandler().handle(line, 0);
-		}
-
 	}
 
 }

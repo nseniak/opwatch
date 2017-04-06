@@ -1,15 +1,16 @@
 package com.untrackr.alerter.processor.primitives.producer;
 
+import com.google.common.io.CharStreams;
 import com.untrackr.alerter.ioservice.LineReader;
 import com.untrackr.alerter.processor.common.*;
-import com.untrackr.alerter.service.AlerterConfig;
 import com.untrackr.alerter.processor.payload.Payload;
+import com.untrackr.alerter.service.AlerterConfig;
 import com.untrackr.alerter.service.ProcessorService;
-import org.apache.commons.io.IOUtils;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 
 public class CommandRunner {
@@ -116,7 +117,7 @@ public class CommandRunner {
 		if ((process.exitValue() != 0) && (process.exitValue() != 130)) {
 			String output = "";
 			try {
-				List<String> errorOutput = IOUtils.readLines(process.getErrorStream());
+				List<String> errorOutput = CharStreams.readLines(new InputStreamReader(process.getErrorStream()));
 				if (!errorOutput.isEmpty()) {
 					if (errorOutput.size() > 5) {
 						errorOutput = errorOutput.subList(0, 5);
