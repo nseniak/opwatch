@@ -32,7 +32,7 @@ public class AlertGenerator extends Consumer<AlertGeneratorConfig> {
 		boolean alert = (predicate == null) || predicate.call(payload, this);
 		Channel channel;
 		if (channelName == null) {
-			channel = processorService.defaultChannel();
+			channel = processorService.alertChannel();
 		} else {
 			channel = processorService.findChannel(channelName);
 			if (channel == null) {

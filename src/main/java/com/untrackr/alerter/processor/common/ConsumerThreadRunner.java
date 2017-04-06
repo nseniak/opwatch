@@ -27,7 +27,7 @@ public class ConsumerThreadRunner implements Runnable {
 		long timeout = processorService.config().processorInputQueueTimeout();
 		try {
 			while (!inputQueue.offer(payload, timeout, TimeUnit.MILLISECONDS)) {
-				processorService.signalException(new RuntimeError("pipe full", new ProcessorPayloadExecutionContext(processor, payload)));
+				processorService.signalSystemException(new RuntimeError("pipe full", new ProcessorPayloadExecutionContext(processor, payload)));
 			}
 		} catch (InterruptedException e) {
 			// Shutting down.

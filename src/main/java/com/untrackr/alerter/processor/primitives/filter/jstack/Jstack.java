@@ -107,7 +107,7 @@ public class Jstack extends Filter<JstackConfig> {
 				currentException.setLocation("<unknown location>");
 			}
 			currentException.computeCombined();
-			processorService.signalException(new RuntimeError("Cannot parse exception trace", new ProcessorPayloadExecutionContext(this, input)));
+			processorService.signalSystemException(new RuntimeError("Cannot parse exception trace", new ProcessorPayloadExecutionContext(this, input)));
 			state.reset();
 			return currentException;
 		}

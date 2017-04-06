@@ -6,14 +6,14 @@ public class Channels {
 
 	private Map<String, Channel> channelMap;
 
-	private Channel defaultChannel;
+	private Channel alertChannel;
 
-	private Channel errorChannel;
+	private Channel systemChannel;
 
-	public Channels(Map<String, Channel> channelMap, Channel defaultChannel, Channel errorChannel) {
+	public Channels(Map<String, Channel> channelMap, Channel alertChannel, Channel systemChannel) {
 		this.channelMap = channelMap;
-		this.defaultChannel = defaultChannel;
-		this.errorChannel = errorChannel;
+		this.alertChannel = alertChannel;
+		this.systemChannel = systemChannel;
 	}
 
 	public Map<String, Channel> getChannelMap() {
@@ -24,20 +24,20 @@ public class Channels {
 		this.channelMap = channelMap;
 	}
 
-	public Channel getDefaultChannel() {
-		return defaultChannel;
+	public Channel getAlertChannel() {
+		return alertChannel;
 	}
 
-	public void setDefaultChannel(Channel defaultChannel) {
-		this.defaultChannel = defaultChannel;
+	public void setAlertChannel(Channel alertChannel) {
+		this.alertChannel = alertChannel;
 	}
 
-	public Channel getErrorChannel() {
-		return errorChannel;
+	public Channel getSystemChannel() {
+		return systemChannel;
 	}
 
-	public void setErrorChannel(Channel errorChannel) {
-		this.errorChannel = errorChannel;
+	public void setSystemChannel(Channel systemChannel) {
+		this.systemChannel = systemChannel;
 	}
 
 }

@@ -109,8 +109,8 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			createConfig(options);
 			initializeChannels(new ChannelConfig());
 			scriptService.initialize();
-			printStdout("Default channel: " + channels.getDefaultChannel().name());
-			printStdout("Error channel: " + channels.getErrorChannel().name());
+			printStdout("Default alert channel: " + channels.getAlertChannel().name());
+			printStdout("System channel: " + channels.getSystemChannel().name());
 			if (options.getScripts().isEmpty()) {
 				runRepl(options);
 			} else {
@@ -149,8 +149,8 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			errorChannel = defaultChannel;
 		}
 		channels = new Channels(channelMap, defaultChannel, errorChannel);
-		logger.info("Default channel: " + channels.getDefaultChannel().name());
-		logger.info("Error channel: " + channels.getErrorChannel().name());
+		logger.info("Alert channel: " + channels.getAlertChannel().name());
+		logger.info("System channel: " + channels.getSystemChannel().name());
 	}
 
 	private <F extends ServiceConfiguration, C extends Channel> void addServiceChannels(ChannelConfig channelConfig,
@@ -199,12 +199,12 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		return findChannel(CONSOLE_CHANNEL_NAME);
 	}
 
-	public Channel defaultChannel() {
-		return channels.getDefaultChannel();
+	public Channel alertChannel() {
+		return channels.getAlertChannel();
 	}
 
-	public Channel errorChannel() {
-		return channels.getErrorChannel();
+	public Channel systemChannel() {
+		return channels.getSystemChannel();
 	}
 
 	private void userInterruptHandler(Signal signal) {
@@ -262,7 +262,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		processor.inferSignature();
 		processor.check();
 		processor.start();
-		signalInfo("alerter up and running");
+		signalSystemInfo("alerter up and running");
 		runningProcessor = processor;
 		try {
 			while (true) {
@@ -273,7 +273,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		} finally {
 			runningProcessor = null;
 		}
-		signalInfo("alerter stopped");
+		signalSystemInfo("alerter stopped");
 		processor.stop();
 		return UNDEFINED;
 	}
@@ -288,14 +288,14 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		mainThread.interrupt();
 	}
 
-	public void signalInfo(String title) {
+	public void signalSystemInfo(String title) {
 		ExecutionContext context = new GlobalExecutionContext();
 		MessageScope scope = context.makeMessageScope(this);
 		Message message = new Message(Message.Type.info, Message.Level.medium, title, null, scope, null);
-		publish(defaultChannel(), message);
+		publish(systemChannel(), message);
 	}
 
-	public void signalException(RuntimeError e) {
+	public void signalSystemException(RuntimeError e) {
 		logger.info("Error occurred", e);
 		String title = e.getMessage();
 		if (title.startsWith(SCRIPT_EXCEPTION_MESSAGE_PREFIX)) {
@@ -315,7 +315,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		}
 		context.addContextData(messageData, this);
 		Message message = new Message(Message.Type.error, e.getLevel(), title, null, scope, messageData);
-		publish(errorChannel(), message);
+		publish(systemChannel(), message);
 	}
 
 	public void publish(Channel channel, Message message) {
@@ -352,10 +352,10 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			// The application is exiting; rethrow
 			throw e;
 		} catch (RuntimeError e) {
-			signalException(e);
+			signalSystemException(e);
 		} catch (Throwable t) {
 			String message = ((messagePrefix != null) ? messagePrefix + ": " : "") + t.getMessage();
-			signalException(new RuntimeError(message, t, context));
+			signalSystemException(new RuntimeError(message, t, context));
 		}
 		return error;
 	}
