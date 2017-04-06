@@ -3,7 +3,6 @@ package com.untrackr.alerter.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
