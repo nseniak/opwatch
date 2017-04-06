@@ -49,6 +49,10 @@ import java.io.*;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -75,6 +79,7 @@ public class ScriptService {
 	public void initialize() {
 		scriptEngine = (NashornScriptEngine) new ScriptEngineManager().getEngineByName("nashorn");
 		loadScriptResources();
+		loadInitFile();
 		try {
 			createSimplePrimitiveFunction("run", processorService::runProcessor);
 			createSimplePrimitiveFunction("__factories", this::factories);
@@ -129,24 +134,55 @@ public class ScriptService {
 		loadScript(() -> new InputStreamReader(scriptResource.getInputStream()), scriptResource.toString());
 	}
 
-	public void loadScriptFile(File file) {
-		loadScript(() -> new FileReader(file), file.getPath());
+	private void loadInitFile() {
+		if (processorService.config().noInit()) {
+			return;
+		}
+		String initFile = new File(new File(System.getProperty("user.dir")), "init.js").getAbsolutePath();
+		if (processorService.config().initFile() != null) {
+			initFile = processorService.config().initFile();
+		}
+		loadScript(initFile);
+	}
+
+	public void loadScript(String fileOrUrl) {
+		loadScript(() -> {
+			String scheme = null;
+			try {
+				scheme = new URI(fileOrUrl).getScheme();
+			} catch (URISyntaxException e) {
+				throw new RuntimeError("malformed file or url: " + e.getMessage());
+			}
+			if ((scheme != null) && (scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https"))) {
+				try {
+					return new InputStreamReader(new URL(fileOrUrl).openStream());
+				} catch (MalformedURLException e) {
+					throw new RuntimeError("malformed url " + fileOrUrl + ": " + e.getMessage());
+				} catch (IOException e) {
+					throw new RuntimeError("cannot open " + fileOrUrl);
+				}
+			} else {
+				try {
+					return new FileReader(new File(fileOrUrl));
+				} catch (FileNotFoundException e) {
+					throw new RuntimeError("file not found: " + fileOrUrl);
+				}
+			}
+		}, fileOrUrl);
 	}
 
 	private void loadScript(ReaderSupplier readerSupplier, String location) {
-		processorService.withExceptionHandling("error loading script",
-				new GlobalExecutionContext(),
-				() -> {
-					ScriptContext context = scriptEngine.getContext();
-					context.setAttribute(ScriptEngine.FILENAME, location, ScriptContext.ENGINE_SCOPE);
-					try {
-						scriptEngine.eval(readerSupplier.reader(), context);
-					} catch (FileNotFoundException e) {
-						throw new RuntimeError("file not found: " + location);
-					} finally {
-						context.removeAttribute(ScriptEngine.FILENAME, ScriptContext.ENGINE_SCOPE);
-					}
-				});
+		ScriptContext context = scriptEngine.getContext();
+		context.setAttribute(ScriptEngine.FILENAME, location, ScriptContext.ENGINE_SCOPE);
+		try {
+			scriptEngine.eval(readerSupplier.reader(), context);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeError("file not found: " + location);
+		} catch (IOException | ScriptException e) {
+			throw new RuntimeError(e);
+		} finally {
+			context.removeAttribute(ScriptEngine.FILENAME, ScriptContext.ENGINE_SCOPE);
+		}
 	}
 
 	private interface ReaderSupplier {

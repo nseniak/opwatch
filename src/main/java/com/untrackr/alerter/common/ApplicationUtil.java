@@ -36,21 +36,10 @@ public class ApplicationUtil {
 		}
 	}
 
-	public static void checkProperty(String name) {
+	public static void checkProperty(String name, String value) {
 		if (System.getProperty(name) == null) {
-			throw new IllegalStateException("Property not defined: -D" + name);
+			throw new IllegalStateException("Missing Java parameter -D" + name + "=<" + value + ">");
 		}
-	}
-
-	public static String property(String name) {
-		checkProperty(name);
-		return System.getProperty(name);
-	}
-
-	public static <T> T objectProperty(String name, Class<T> clazz) throws IOException {
-		String jsonString = property(name);
-		ObjectMapper objectMapper = new ObjectMapper();
-		return objectMapper.readValue(jsonString, clazz);
 	}
 
 	public static String property(String name, String defaultValue) {

@@ -3,6 +3,7 @@ package com.untrackr.alerter.service;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.untrackr.alerter.CommandLineOptions;
 import com.untrackr.alerter.channel.MessageServiceService;
 import com.untrackr.alerter.channel.common.*;
 import com.untrackr.alerter.channel.console.ConsoleConfiguration;
@@ -13,10 +14,6 @@ import com.untrackr.alerter.ioservice.FileTailingService;
 import com.untrackr.alerter.processor.common.*;
 import jline.console.ConsoleReader;
 import jline.console.UserInterruptException;
-import joptsimple.OptionException;
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import joptsimple.OptionSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -27,7 +24,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import sun.misc.Signal;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -106,17 +102,16 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		ThreadUtil.safeExecutorShutdownNow(scheduledExecutor, "ScheduledExecutor", config().executorTerminationTimeout());
 	}
 
-	public void run(String[] argStrings) {
+	public void run(CommandLineOptions options) {
 		mainThread = Thread.currentThread();
 		Signal.handle(new Signal("INT"), this::userInterruptHandler);
 		try {
-			CommandLineOptions options = parseOptions(argStrings);
 			createConfig(options);
 			initializeChannels(new ChannelConfig());
+			scriptService.initialize();
 			printStdout("Default channel: " + channels.getDefaultChannel().name());
 			printStdout("Error channel: " + channels.getErrorChannel().name());
-			scriptService.initialize();
-			if (options.getFiles().isEmpty()) {
+			if (options.getScripts().isEmpty()) {
 				runRepl(options);
 			} else {
 				runFiles(options);
@@ -191,7 +186,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			try {
 				config.hostName(InetAddress.getLocalHost().getHostName());
 			} catch (UnknownHostException e) {
-				throw new RuntimeError("Cannot determine hostname; please pass the option --hostname=<hostname>");
+				throw new RuntimeError("Cannot determine hostname; please specify one with -hostname <hostname>");
 			}
 		}
 	}
@@ -215,24 +210,6 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	private void userInterruptHandler(Signal signal) {
 		printCtrlC();
 		mainThread.interrupt();
-	}
-
-	private CommandLineOptions parseOptions(String[] argStrings) {
-		OptionParser parser = new OptionParser();
-		OptionSpec<String> hostname = parser.accepts("hostname").withRequiredArg().ofType(String.class);
-		OptionSpec<String> startup = parser.accepts("startup").withRequiredArg().ofType(String.class);
-		OptionSpec<File> files = parser.nonOptions().ofType(File.class);
-		OptionSet optionSet;
-		try {
-			optionSet = parser.parse(argStrings);
-		} catch (OptionException e) {
-			throw new RuntimeError("cannot parse options: " + e.getMessage(), e);
-		}
-		CommandLineOptions options = new CommandLineOptions();
-		options.setHostname(optionSet.valueOf(hostname));
-		options.setStartup(optionSet.valueOf(startup));
-		options.setFiles(optionSet.valuesOf(files));
-		return options;
 	}
 
 	public void runRepl(CommandLineOptions options) {
@@ -302,8 +279,8 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	}
 
 	private void runFiles(CommandLineOptions options) {
-		for (File file : options.getFiles()) {
-			scriptService.loadScriptFile(file);
+		for (String file : options.getScripts()) {
+			scriptService.loadScript(file);
 		}
 	}
 
@@ -319,6 +296,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	}
 
 	public void signalException(RuntimeError e) {
+		logger.info("Error occurred", e);
 		String title = e.getMessage();
 		if (title.startsWith(SCRIPT_EXCEPTION_MESSAGE_PREFIX)) {
 			// Script exception messages contain the exception name, which is ugly

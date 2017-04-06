@@ -1,10 +1,12 @@
 #!/bin/sh
-dirname=$(dirname $0)
-mkdir -p ${dirname}/log
-java -Dlogging.file=${dirname}/log/alerter.log \
--Dalerter.interactive=true \
--Dalerter.pushover.application=test \
--Dalerter.pushover.group=nitsan \
--Dalerter.trace=false \
--jar ../target/alerter-1.0-SNAPSHOT.jar \
-$*
+DIR=$(dirname $0)
+cd ${DIR}
+
+LOG_DIR=${DIR}/log
+LOG_BASENAME=alerter
+mkdir -p ${LOG_DIR} || exit 1
+java \
+	-Dapp.log.dir=${LOG_DIR} \
+	-Dapp.log.basename=${LOG_BASENAME} \
+	-jar lib/alerter-*.jar \
+	$*

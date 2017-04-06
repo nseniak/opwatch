@@ -4,7 +4,7 @@
 * Reference documentation generation
 * [x] Remove "js" prefix of processor names -- should be implicit
 * [x] Make grep use Javascript regexes
-* Generify alert channels (email, other alerters, etc)
+* [x] Generify alert channels (email, other alerters, etc)
 * Make JS initialization external files instead of resources, so they can be hacked by the user
 * Extension mechanism for adding processors in Java, with a corresponding NPM module
 * Tests
@@ -13,12 +13,12 @@
 * Link in alarms to more info
 * Persistence?
 * Packaging with apt-get and/or others
-* Notifications rather than alarm?
-* System alerts are displayed as errors in interactive mode
+* [x] Notifications rather than alarm? => no
+* [x] System alerts are displayed as errors in interactive mode
 * Faster console startup
 * Centralized UI for muting alarms/listing current alarms/inspecting alarm details
 * Javascript port
-* System alarms
+* [x] System alarms
 * Static verification
 * Fix "pretty"
 * Automatically load processors from Github
@@ -27,6 +27,7 @@
 * mute/downgrade alarms by UI
 * display alias name instead of processor as source
 * display root payload of alerts
+* new pushover4j version
 
 ------
 
@@ -55,3 +56,8 @@ grep is a filter
 Most useful purpose is to raise alarms
 
 run(pipe(tail("/tmp/foo.log"), grep(/ERROR/), alarm("error in the log!)))
+
+help()
+grep.help()
+
+alerter -e "pipe(tail('/tmp/foo.log'), grep(/ERROR/), alert('Error found))"

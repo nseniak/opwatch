@@ -1,5 +1,6 @@
 package com.untrackr.alerter.service;
 
+import com.untrackr.alerter.CommandLineOptions;
 import com.untrackr.alerter.channel.common.ChannelConfig;
 import com.untrackr.alerter.common.ApplicationUtil;
 import com.untrackr.alerter.processor.common.RuntimeError;
@@ -12,6 +13,9 @@ public class AlerterConfig {
 	private ProcessorService processorService;
 	private ChannelConfig channels;
 	private String hostName;
+	private String initFile;
+	private boolean noInit;
+	private boolean noHttp;
 	private long fileWatchingCheckDelay;
 	private long executorTerminationTimeout;
 	private long tailedFileWatchingCheckDelay;
@@ -32,6 +36,9 @@ public class AlerterConfig {
 	public AlerterConfig(ProcessorService processorService, CommandLineOptions options) {
 		this.processorService = processorService;
 		this.hostName = options.getHostname();
+		this.initFile = options.getInitScript();
+		this.noInit = options.isNoInit();
+		this.noHttp = options.isNoHttp();
 		this.fileWatchingCheckDelay = TimeUnit.SECONDS.toMillis(1);
 		this.executorTerminationTimeout = TimeUnit.SECONDS.toMillis(30);
 		this.tailedFileWatchingCheckDelay = TimeUnit.SECONDS.toMillis(1);
@@ -66,6 +73,18 @@ public class AlerterConfig {
 
 	public void hostName(String hostName) {
 		this.hostName = hostName;
+	}
+
+	public String initFile() {
+		return initFile;
+	}
+
+	public boolean noInit() {
+		return noInit;
+	}
+
+	public boolean noHttp() {
+		return noHttp;
 	}
 
 	public long fileWatchingCheckDelay() {
