@@ -1,6 +1,6 @@
 package com.untrackr.alerter.processor.primitives.filter.sh;
 
-import com.untrackr.alerter.processor.common.ProcessorVoidExecutionContext;
+import com.untrackr.alerter.processor.common.ProcessorVoidExecutionScope;
 import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.processor.primitives.producer.CommandRunner;
 import com.untrackr.alerter.processor.primitives.filter.Filter;
@@ -23,7 +23,7 @@ public class Sh extends Filter<ShConfig> {
 		super.start();
 		commandConsumerThreadFuture = processorService.getConsumerExecutor().submit(() -> {
 			processorService.withExceptionHandling("error starting command",
-					new ProcessorVoidExecutionContext(this),
+					() -> new ProcessorVoidExecutionScope(this),
 					() -> {
 						commandRunner.startProcess(this);
 						commandRunner.produce(this, -1);

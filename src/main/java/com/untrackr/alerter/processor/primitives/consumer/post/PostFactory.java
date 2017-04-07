@@ -42,7 +42,7 @@ public class PostFactory extends ActiveProcessorFactory<PostConfig, Post> {
 		Matcher matcher = pathPattern.matcher(pathString);
 		if (!matcher.matches()) {
 			throw new RuntimeError("incorrect \"path\" syntax: \"" + pathString + "\"",
-					new FactoryExecutionContext(this));
+					new FactoryExecutionScope(this));
 		}
 		AlerterConfig profile = processorService.config();
 		String hostname = (matcher.group("hostname") != null) ? matcher.group("hostname") : profile.defaultPostHostname();

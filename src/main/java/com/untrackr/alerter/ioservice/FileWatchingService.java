@@ -1,7 +1,7 @@
 package com.untrackr.alerter.ioservice;
 
 import com.untrackr.alerter.common.ThreadUtil;
-import com.untrackr.alerter.processor.common.GlobalExecutionContext;
+import com.untrackr.alerter.processor.common.GlobalExecutionScope;
 import com.untrackr.alerter.service.ProcessorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +55,7 @@ public class FileWatchingService implements InitializingBean, DisposableBean {
 
 	public void watchFile(WatchedFile watchedFile) {
 		processorService.withExceptionHandling("error watching file " + watchedFile.getFile().toString(),
-				new GlobalExecutionContext(),
+				GlobalExecutionScope::new,
 				watchedFile::watch);
 	}
 

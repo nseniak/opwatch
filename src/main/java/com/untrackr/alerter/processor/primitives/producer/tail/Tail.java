@@ -27,7 +27,7 @@ public class Tail extends Producer<TailConfig> {
 			if (ignoreBlankLine && line.trim().isEmpty()) {
 				return;
 			}
-			Payload payload = new TailPayload(System.currentTimeMillis(), processorService.config().hostName(), location, null,
+			Payload payload = new TailPayload(System.currentTimeMillis(), processorService.config().hostName(), getName(), null,
 					line, file.toAbsolutePath().toString(), lineNumber);
 			output(payload);
 		});

@@ -31,8 +31,7 @@ public class CommandRunner {
 			String[] cmdArray = {"/bin/sh", "-c", command};
 			process = Runtime.getRuntime().exec(cmdArray, null, directory);
 		} catch (Exception e) {
-			throw new RuntimeError("cannot run command: " + e.getMessage(), e,
-					new ProcessorVoidExecutionContext(processor));
+			throw new RuntimeError("cannot run command: " + e.getMessage(), new ProcessorVoidExecutionScope(processor), e);
 		}
 	}
 
@@ -48,7 +47,7 @@ public class CommandRunner {
 			long start = System.currentTimeMillis();
 			while (process == null) {
 				if ((System.currentTimeMillis() - start) > profile.commandStartTimeout()) {
-					throw new RuntimeError("command process not started", new ProcessorVoidExecutionContext(processor));
+					throw new RuntimeError("command process not started", new ProcessorVoidExecutionScope(processor));
 				}
 				try {
 					Thread.sleep(profile.commandStartSleepTime());
@@ -59,15 +58,14 @@ public class CommandRunner {
 			}
 		}
 		if (!checkAlive(processor)) {
-			throw new RuntimeError("command process has exited", new ProcessorPayloadExecutionContext(processor, payload));
+			throw new RuntimeError("command process has exited", new ProcessorPayloadExecutionScope(processor, payload));
 		}
 		try {
 			process.getOutputStream().write(processorService.json(payload).getBytes());
 			process.getOutputStream().write('\n');
 			process.getOutputStream().flush();
 		} catch (IOException e) {
-			throw new RuntimeError("cannot write data to command process", e,
-					new ProcessorPayloadExecutionContext(processor, payload));
+			throw new RuntimeError("cannot write data to command process", new ProcessorPayloadExecutionScope(processor, payload), e);
 		}
 	}
 
@@ -84,7 +82,7 @@ public class CommandRunner {
 					}
 					if ((exitTimeout >= 0) && ((System.currentTimeMillis() - t0) > exitTimeout)) {
 						throw new RuntimeError("timeout waiting for command output",
-								new ProcessorVoidExecutionContext(processor));
+								new ProcessorVoidExecutionScope(processor));
 					}
 					Thread.sleep(profile.cronScriptOutputCheckDelay());
 				}
@@ -98,8 +96,7 @@ public class CommandRunner {
 				// The processor is being stopped. Just exit.
 				throw new ApplicationInterruptedException(ApplicationInterruptedException.STREAM_CLOSED);
 			} else {
-				throw new RuntimeError("cannot read from command output", e,
-						new ProcessorVoidExecutionContext(processor));
+				throw new RuntimeError("cannot read from command output", new ProcessorVoidExecutionScope(processor), e);
 			}
 		} catch (InterruptedException e) {
 			// Shutting down.
@@ -129,7 +126,7 @@ public class CommandRunner {
 				// Nothing to do
 			}
 			throw new RuntimeError("command exited with error status: " + process.exitValue() + output,
-					new ProcessorVoidExecutionContext(processor));
+					new ProcessorVoidExecutionScope(processor));
 		}
 		return false;
 	}

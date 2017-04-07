@@ -31,7 +31,7 @@ public class PipeFactory extends ProcessorFactory<PipeConfig, Pipe> {
 		PipeConfig config = convertProcessorConfig(scriptObject);
 		List<Processor<?>> processors = config.getProcessors();
 		if (processors.isEmpty()) {
-			throw new RuntimeError("a pipe cannot be empty", new FactoryExecutionContext(this));
+			throw new RuntimeError("a pipe cannot be empty", new FactoryExecutionScope(this));
 		}
 		return new Pipe(getProcessorService(), processors, config, name());
 	}

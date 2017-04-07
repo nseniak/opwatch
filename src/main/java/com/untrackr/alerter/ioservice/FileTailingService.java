@@ -1,7 +1,7 @@
 package com.untrackr.alerter.ioservice;
 
 import com.untrackr.alerter.common.ThreadUtil;
-import com.untrackr.alerter.processor.common.GlobalExecutionContext;
+import com.untrackr.alerter.processor.common.GlobalExecutionScope;
 import com.untrackr.alerter.service.ProcessorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +54,7 @@ public class FileTailingService implements DisposableBean {
 
 	public void tailFile(TailedFile tailedFile) {
 		processorService.withExceptionHandling("error tailing file " + tailedFile.getFile().toString(),
-				new GlobalExecutionContext(),
+				GlobalExecutionScope::new,
 				tailedFile::tail);
 	}
 

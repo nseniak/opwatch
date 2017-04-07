@@ -76,7 +76,7 @@ public class Parallel extends SpecialProcessor<ParallelConfig> {
 			}
 			if (incompatible != null) {
 				String message = incompatible + " of processors #" + (index - 1) + " (" + previousProcessor.getName() + ") and #" + index + " (" + processor.getName() + ") are incompatible";
-				throw new RuntimeError(message, new ProcessorVoidExecutionContext(this));
+				throw new RuntimeError(message, new ProcessorVoidExecutionScope(this));
 			}
 			signature = bottomSignature;
 			previousProcessor = processor;

@@ -71,17 +71,17 @@ public abstract class ProcessorFactory<C extends ProcessorConfig, P extends Proc
 			return config;
 		} catch (InvocationTargetException | InstantiationException | IllegalAccessException | IntrospectionException e) {
 			logger.error("Exception while fetching properties: " + configurationClass(), e);
-			throw new RuntimeError("cannot fetch properties", new FactoryExecutionContext(this));
+			throw new RuntimeError("cannot fetch properties", new FactoryExecutionScope(this), e);
 		}
 	}
 
 	public void error(String message) {
-		throw new RuntimeError(message, new FactoryExecutionContext(this));
+		throw new RuntimeError(message, new FactoryExecutionScope(this));
 	}
 
 	protected C convertProcessorConfig(Object scriptObject) {
 		return (C) processorService.getScriptService().convertScriptValue(ValueLocation.makeArgument(name(), "configuration"), configurationClass(), scriptObject,
-				(message) -> new RuntimeError(message, new FactoryExecutionContext(this)));
+				(message) -> new RuntimeError(message, new FactoryExecutionScope(this)));
 	}
 
 	public <T> T checkPropertyValue(String property, T value) {
@@ -89,7 +89,7 @@ public abstract class ProcessorFactory<C extends ProcessorConfig, P extends Proc
 			return value;
 		} else {
 			ValueLocation location = ValueLocation.makeProperty(name(), property);
-			throw new RuntimeError("missing " + location.describeAsValue(), new FactoryExecutionContext(this));
+			throw new RuntimeError("missing " + location.describeAsValue(), new FactoryExecutionScope(this));
 		}
 	}
 
@@ -115,7 +115,7 @@ public abstract class ProcessorFactory<C extends ProcessorConfig, P extends Proc
 			return Duration.parse(duration).toMillis();
 		} catch (DateTimeParseException e) {
 			throw new RuntimeError(e.getLocalizedMessage() + " at index " + (e.getErrorIndex() - start) + ": \"" + durationString + "\"",
-					new FactoryExecutionContext(this));
+					new FactoryExecutionScope(this), e);
 		}
 	}
 
@@ -124,7 +124,7 @@ public abstract class ProcessorFactory<C extends ProcessorConfig, P extends Proc
 			return ApplicationUtil.substituteVariables(text);
 		} catch (UndefinedSubstitutionVariableException e) {
 			ValueLocation location = ValueLocation.makeProperty(name(), property);
-			throw new RuntimeError("unknown variable in " + location.describeAsValue() + ": " + e.getName(), new FactoryExecutionContext(this));
+			throw new RuntimeError("unknown variable in " + location.describeAsValue() + ": " + e.getName(), new FactoryExecutionScope(this), e);
 		}
 	}
 
@@ -133,8 +133,7 @@ public abstract class ProcessorFactory<C extends ProcessorConfig, P extends Proc
 			return Pattern.compile(regex);
 		} catch (PatternSyntaxException e) {
 			ValueLocation location = ValueLocation.makeProperty(name(), property);
-			throw new RuntimeError("invalid regex in " + location.describeAsValue() + ":" + e.getMessage(),
-					new FactoryExecutionContext(this));
+			throw new RuntimeError("invalid regex in " + location.describeAsValue() + ":" + e.getMessage(), new FactoryExecutionScope(this), e);
 		}
 	}
 

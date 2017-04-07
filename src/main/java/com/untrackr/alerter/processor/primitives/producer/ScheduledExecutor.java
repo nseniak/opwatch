@@ -2,7 +2,7 @@ package com.untrackr.alerter.processor.primitives.producer;
 
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.RuntimeError;
-import com.untrackr.alerter.processor.common.ProcessorVoidExecutionContext;
+import com.untrackr.alerter.processor.common.ProcessorVoidExecutionScope;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.concurrent.ScheduledFuture;
@@ -26,7 +26,7 @@ public class ScheduledExecutor {
 	public void stop(Processor<?> processor) {
 		boolean stopped = scheduledFuture.cancel(true);
 		if (!stopped) {
-			throw new RuntimeError("couldn't stop scheduled producer", new ProcessorVoidExecutionContext(processor));
+			throw new RuntimeError("couldn't stop scheduled producer", new ProcessorVoidExecutionScope(processor));
 		}
 	}
 

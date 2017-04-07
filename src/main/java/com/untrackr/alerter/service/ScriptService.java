@@ -72,6 +72,8 @@ public class ScriptService {
 	@Autowired
 	private DocumentationService documentationService;
 
+	public static final String INIT_SCRIPT_PATH = "/_init_scripts/";
+
 	private Map<Class<? extends Processor>, ProcessorFactory<?, ? extends Processor>> factories = new LinkedHashMap<>();
 
 	private static NashornScriptEngine scriptEngine;
@@ -117,11 +119,11 @@ public class ScriptService {
 
 	private void loadScriptResources() {
 		// Load NPM first
-		loadScriptResource(applicationContext.getResource("classpath:/scripts/npm/jvm-npm.js"));
+		loadScriptResource(applicationContext.getResource("classpath:" + INIT_SCRIPT_PATH + "npm/jvm-npm.js"));
 		// Load the other scripts
 		Resource[] scriptResources = new Resource[0];
 		try {
-			scriptResources = applicationContext.getResources("classpath:/scripts/startup/*.js");
+			scriptResources = applicationContext.getResources("classpath:" + INIT_SCRIPT_PATH + "startup/*.js");
 		} catch (IOException e) {
 			throw new IllegalStateException("Cannot find script resource: " + e.getMessage(), e);
 		}
@@ -232,7 +234,7 @@ public class ScriptService {
 	public void executeConsoleInput(String script) {
 		ScriptContext context = scriptEngine.getContext();
 		processorService.withExceptionHandling(null,
-				new GlobalExecutionContext(),
+				GlobalExecutionScope::new,
 				() -> {
 					Object value = scriptEngine.eval(script, context);
 					if (value != null) {

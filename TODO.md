@@ -23,7 +23,7 @@
 * [x] Fix "pretty"
 * Automatically load processors from Github
 * ready() method
-* Integrations: see list in https://www.statuscake.com/kb/knowledge-base/getting-alerts-from-an-integration/
+* Integrations: see list in https://www.statuscake.com/kb/knowledge-base/getting-alerts-from-an-integration/ and https://www.loggly.com/docs/alert-endpoints/
 * mute/downgrade alarms by UI
 * display alias name instead of processor as source
 * display root payload of alerts

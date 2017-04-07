@@ -14,10 +14,12 @@ public abstract class SpecialProcessor<C extends ProcessorConfig> extends Proces
 	public void stop(List<Processor<?>> processors) {
 		boolean ok = true;
 		for (Processor<?> processor : processors) {
-			ok = ok & processorService.withExceptionHandling("error stopping processor", new ProcessorVoidExecutionContext(processor), processor::stop);
+			ok = ok & processorService.withExceptionHandling("error stopping processor",
+					() -> new ProcessorVoidExecutionScope(processor),
+					processor::stop);
 		}
 		if (ok) {
-			throw new RuntimeError("error stopping processor", new ProcessorVoidExecutionContext(this));
+			throw new RuntimeError("error stopping processor", new ProcessorVoidExecutionScope(this));
 		}
 	}
 

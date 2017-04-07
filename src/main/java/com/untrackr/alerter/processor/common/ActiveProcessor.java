@@ -77,7 +77,7 @@ public abstract class ActiveProcessor<D extends ActiveProcessorConfig> extends P
 				break;
 		}
 		if (joiner.length() != 0) {
-			throw new RuntimeError(joiner.toString(), new ProcessorVoidExecutionContext(this));
+			throw new RuntimeError(joiner.toString(), new ProcessorVoidExecutionScope(this));
 		}
 	}
 
@@ -99,7 +99,7 @@ public abstract class ActiveProcessor<D extends ActiveProcessorConfig> extends P
 
 	private void output(List<Processor<?>> consumers, Payload<?> payload) {
 		if (processorService.config().trace()) {
-			logger.info("Output: " + location.descriptor() + " ==> " + processorService.json(payload));
+			logger.info("Output: " + getName() + " ==> " + processorService.json(payload));
 		}
 		long now = System.currentTimeMillis();
 		long elapsedSinceLastOutput = now - lastOutputTime;
@@ -126,7 +126,7 @@ public abstract class ActiveProcessor<D extends ActiveProcessorConfig> extends P
 		if (!consumerThreadFuture.isDone()) {
 			boolean stopped = consumerThreadFuture.cancel(true);
 			if (!stopped) {
-				throw new RuntimeError("cannot stop consumer thread", new ProcessorVoidExecutionContext(this));
+				throw new RuntimeError("cannot stop consumer thread", new ProcessorVoidExecutionScope(this));
 			}
 		}
 	}
@@ -141,7 +141,7 @@ public abstract class ActiveProcessor<D extends ActiveProcessorConfig> extends P
 		if (!clazz.isAssignableFrom(value.getClass())) {
 			ScriptService sc = processorService.getScriptService();
 			String message = "wrong input value: expected " + sc.typeName(clazz) + ", got " + sc.typeName(value.getClass());
-			throw new RuntimeError(message, new ProcessorPayloadExecutionContext(this, payload));
+			throw new RuntimeError(message, new ProcessorPayloadExecutionScope(this, payload));
 		}
 		return (T) value;
 	}

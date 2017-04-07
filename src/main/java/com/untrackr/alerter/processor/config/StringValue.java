@@ -38,7 +38,7 @@ public class StringValue extends ConfigPropertyValue {
 		} else {
 			Object value = producer.call(payload, processor);
 			return (String) processor.getProcessorService().getScriptService().convertScriptValue(producer.getValueLocation(), String.class, value,
-					(message) -> new RuntimeError(message, new ProcessorPayloadExecutionContext(processor, payload)));
+					(message) -> new RuntimeError(message, new ProcessorPayloadExecutionScope(processor, payload)));
 		}
 	}
 

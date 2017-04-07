@@ -17,21 +17,21 @@ public abstract class Processor<C extends ProcessorConfig> {
 	protected List<Processor<?>> consumers = new ArrayList<>();
 	protected Processor<?> container;
 	protected ProcessorSignature signature;
-	protected ProcessorLocation location;
+	protected ScriptStack constructionStack;
 
 	public Processor(ProcessorService processorService, C configuration, String name) {
 		this.id = processorService.uuid();
 		this.processorService = processorService;
 		this.name = name;
 		this.configuration = configuration;
-		this.location = new ProcessorLocation(name, ScriptStack.currentStack());
+		this.constructionStack = ScriptStack.currentStack();
 	}
 
 	// TODO Signal error in factory instead
 	public void assignContainer(Processor<?> processor) {
 		if (container != null) {
-			throw new RuntimeError("a processor can only be used once; this one is already used in " + container.getLocation().descriptor(),
-					new ProcessorVoidExecutionContext(this));
+			throw new RuntimeError("a processor can only be used once; this one is already used in " + container.getName(),
+					new ProcessorVoidExecutionScope(this));
 		}
 		container = processor;
 	}
@@ -74,8 +74,8 @@ public abstract class Processor<C extends ProcessorConfig> {
 		return processorService;
 	}
 
-	public ProcessorLocation getLocation() {
-		return location;
+	public ScriptStack getConstructionStack() {
+		return constructionStack;
 	}
 
 	public ProcessorSignature getSignature() {

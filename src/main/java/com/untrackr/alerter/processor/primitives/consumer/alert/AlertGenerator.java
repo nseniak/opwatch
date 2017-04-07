@@ -35,7 +35,7 @@ public class AlertGenerator extends Consumer<AlertGeneratorConfig> {
 		} else {
 			channel = processorService.findChannel(channelName);
 			if (channel == null) {
-				throw new RuntimeError("channel not found: \"" + channelName + "\"", new ProcessorVoidExecutionContext(this));
+				throw new RuntimeError("channel not found: \"" + channelName + "\"", new ProcessorVoidExecutionScope(this));
 			}
 		}
 		if (!toggle) {
@@ -53,11 +53,9 @@ public class AlertGenerator extends Consumer<AlertGeneratorConfig> {
 	}
 
 	private Message makeAlerterMessage(Message.Type type, Payload<?> payload) {
-		ExecutionContext context = new ProcessorPayloadExecutionContext(this, payload);
-		MessageScope scope = context.makeMessageScope(processorService);
-		MessageData messageData = new MessageData();
-		context.addContextData(messageData, processorService);
-		return new Message(type, level, title, null, scope, messageData);
+		ExecutionScope scope = new ProcessorPayloadExecutionScope(this, payload);
+		MessageContext context = scope.makeContext(processorService, constructionStack);
+		return new Message(type, level, title, context);
 	}
 
 }

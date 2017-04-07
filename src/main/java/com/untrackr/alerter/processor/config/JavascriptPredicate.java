@@ -15,7 +15,7 @@ public class JavascriptPredicate extends JavascriptFunction {
 		Object result = invoke(processor, payload);
 		ScriptService scriptService = processor.getProcessorService().getScriptService();
 		return (boolean) scriptService.convertScriptValue(valueLocation, Boolean.class, result,
-				(message) -> new RuntimeError(message, new ProcessorPayloadExecutionContext(processor, payload)));
+				(message) -> new RuntimeError(message, new ProcessorPayloadExecutionScope(processor, payload)));
 	}
 
 }

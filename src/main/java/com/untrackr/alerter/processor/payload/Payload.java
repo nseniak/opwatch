@@ -2,7 +2,6 @@ package com.untrackr.alerter.processor.payload;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.untrackr.alerter.processor.common.Processor;
-import com.untrackr.alerter.processor.common.ProcessorLocation;
 import com.untrackr.alerter.service.ProcessorService;
 
 /**
@@ -22,7 +21,7 @@ public class Payload<V> {
 	/**
 	 * Name of the processor that generated this payload.
 	 */
-	private ProcessorLocation producer;
+	private String producer;
 	/**
 	 * The previous payload, or null if this is a root payload.
 	 */
@@ -32,7 +31,7 @@ public class Payload<V> {
 	 */
 	private V value;
 
-	protected Payload(long timestamp, String hostname, ProcessorLocation producer, Payload<?> previous, V value) {
+	protected Payload(long timestamp, String hostname, String producer, Payload<?> previous, V value) {
 		this.timestamp = timestamp;
 		this.hostname = hostname;
 		this.producer = producer;
@@ -41,11 +40,11 @@ public class Payload<V> {
 	}
 
 	public static <V> Payload makeRoot(ProcessorService processorService, Processor producer, V value) {
-		return new Payload<>(System.currentTimeMillis(), processorService.config().hostName(), producer.getLocation(), null, value);
+		return new Payload<>(System.currentTimeMillis(), processorService.config().hostName(), producer.getName(), null, value);
 	}
 
 	public static <V> Payload makeTransformed(ProcessorService processorService, Processor producer, Payload previous, V value) {
-		return new Payload<>(System.currentTimeMillis(), processorService.config().hostName(), producer.getLocation(), previous, value);
+		return new Payload<>(System.currentTimeMillis(), processorService.config().hostName(), producer.getName(), previous, value);
 	}
 
 	public long getTimestamp() {
@@ -56,7 +55,7 @@ public class Payload<V> {
 		return hostname;
 	}
 
-	public ProcessorLocation getProducer() {
+	public String getProducer() {
 		return producer;
 	}
 

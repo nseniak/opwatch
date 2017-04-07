@@ -40,12 +40,6 @@ public class ConsoleChannel implements Channel {
 			processorService.printStdout(logMessage);
 		} else {
 			processorService.printStdout(message.getType() + ": " + message.getTitle());
-			if (message.getData() != null) {
-				String stack = message.getData().get("stack");
-				if (stack != null) {
-					processorService.printStdout(stack);
-				}
-			}
 		}
 	}
 

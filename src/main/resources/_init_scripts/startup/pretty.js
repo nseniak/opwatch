@@ -81,15 +81,17 @@ pretty = function (jsObject, expandAlias, indentLength) {
 	prettyObjectPrint = function (object, indent) {
 		var value = [],
 				property;
-
-		indent += indentString;
+		newIndent = indent + indentString;
 		for (property in object) {
 			if (object.hasOwnProperty(property)) {
-				value.push(indent + property + ': ' + pretty(object[property], indent));
+				value.push(newIndent + property + ': ' + pretty(object[property], newIndent));
 			}
 		}
-
-		return value.join(newLineJoin) + newLine;
+		if (value.length != 0) {
+			return '{' + newLine + value.join(newLineJoin) + newLine + indent + '}';
+		} else {
+			return '{}';
+		}
 	};
 
 	prettyProcessorPrint = function (processor, indent) {
@@ -106,7 +108,7 @@ pretty = function (jsObject, expandAlias, indentLength) {
 		name = factory.name();
 		newIndent = indent + indentString;
 		if ((name == "alias") && !expandAlias) {
-			return config.name + '({' + newLine + prettyObjectPrint(config.configuration, newIndent) + indent + '})';
+			return config.name + '(' + prettyObjectPrint(config.configuration, indent) + ')';
 		} else {
 			properties = config.properties();
 			if (properties.length == 0) {
@@ -171,7 +173,7 @@ pretty = function (jsObject, expandAlias, indentLength) {
 
 				case 'object':
 					visited.push(element);
-					return fromArray + '{' + newLine + prettyObjectPrint(element, indent) + indent + '}';
+					return fromArray + prettyObjectPrint(element, indent);
 
 				case 'string':
 					return fromArray + JSON.stringify(element);

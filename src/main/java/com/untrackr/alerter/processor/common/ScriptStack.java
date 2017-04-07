@@ -7,50 +7,47 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 
+import static com.untrackr.alerter.service.ScriptService.INIT_SCRIPT_PATH;
+
 public class ScriptStack {
 
 	private List<ScriptStackElement> elements = new ArrayList<>();
 
-	private ScriptStack() {
-	}
-
-	public ScriptStack(Throwable t) {
-		Throwable cause = t;
-		while (cause.getCause() != null) {
-			cause = cause.getCause();
-		}
-		initFromStack(cause.getStackTrace());
+	private ScriptStack(Throwable t) {
+		initFromStack(t.getStackTrace());
 	}
 
 	private ScriptStack(StackTraceElement[] stack) {
 		initFromStack(stack);
 	}
 
-	public static ScriptStack exceptionStack(Throwable cause, String fileName, int lineNumber) {
-		ScriptStack scriptStack = new ScriptStack(cause);
+	private ScriptStack(Throwable t, String fileName, int lineNumber) {
+		initFromStack(t.getStackTrace());
 		if (fileName != null) {
-			ScriptStack.ScriptStackElement top = scriptStack.top();
+			ScriptStack.ScriptStackElement top = top();
 			if ((top == null) || !(fileName.equals(top.getFileName()) && (lineNumber == top.getLineNumber()))) {
-				scriptStack.addElement(fileName, lineNumber);
+				addElement(fileName, lineNumber);
 			}
 		}
-		return scriptStack;
 	}
 
-	public static ScriptStack exceptionStack(ScriptException cause) {
-		return exceptionStack(cause, cause.getFileName(), cause.getLineNumber());
-	}
-
-	public static ScriptStack exceptionStack(NashornException cause) {
-		return exceptionStack(cause, cause.getFileName(), cause.getLineNumber());
+	public static ScriptStack exceptionStack(Throwable t) {
+		Throwable current = t;
+		while (current.getCause() != null) {
+			if (current instanceof ScriptException) {
+				ScriptException excep = (ScriptException) current;
+				return new ScriptStack(excep, excep.getFileName(), excep.getLineNumber());
+			} else if (current instanceof NashornException) {
+				NashornException excep = (NashornException) current;
+				return new ScriptStack(excep, excep.getFileName(), excep.getLineNumber());
+			}
+			current = current.getCause();
+		}
+		return new ScriptStack(current);
 	}
 
 	public static ScriptStack currentStack() {
 		return new ScriptStack(Thread.currentThread().getStackTrace());
-	}
-
-	public static ScriptStack emptyStack() {
-		return new ScriptStack();
 	}
 
 	private void initFromStack(StackTraceElement[] javaStack) {
@@ -61,13 +58,13 @@ public class ScriptStack {
 		}
 	}
 
-	public void addElement(String fileName, int lineNumber) {
-		if (fileName != null) {
+	private void addElement(String fileName, int lineNumber) {
+		if ((fileName != null) && !fileName.contains(INIT_SCRIPT_PATH)) {
 			elements.add(new ScriptStackElement(fileName, lineNumber));
 		}
 	}
 
-	public ScriptStackElement top() {
+	private ScriptStackElement top() {
 		if (elements.isEmpty()) {
 			return null;
 		} else {
@@ -113,6 +110,10 @@ public class ScriptStack {
 			this.lineNumber = lineNumber;
 		}
 
+	}
+
+	public List<ScriptStackElement> getElements() {
+		return elements;
 	}
 
 }

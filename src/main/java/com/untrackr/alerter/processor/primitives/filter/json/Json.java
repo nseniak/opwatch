@@ -1,7 +1,7 @@
 package com.untrackr.alerter.processor.primitives.filter.json;
 
 import com.untrackr.alerter.processor.common.RuntimeError;
-import com.untrackr.alerter.processor.common.ProcessorPayloadExecutionContext;
+import com.untrackr.alerter.processor.common.ProcessorPayloadExecutionScope;
 import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.processor.primitives.filter.Filter;
 import com.untrackr.alerter.service.ProcessorService;
@@ -22,7 +22,8 @@ public class Json extends Filter<JsonConfig> {
 			result = processorService.parseJson(value);
 		} catch (IOException e) {
 			throw new RuntimeError("cannot parse json: " + e.getMessage(),
-					new ProcessorPayloadExecutionContext(this, payload));
+					new ProcessorPayloadExecutionScope(this, payload),
+					e);
 		}
 		outputTransformed(result, payload);
 	}

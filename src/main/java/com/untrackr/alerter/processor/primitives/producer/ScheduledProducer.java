@@ -1,7 +1,7 @@
 package com.untrackr.alerter.processor.primitives.producer;
 
 import com.untrackr.alerter.processor.common.RuntimeError;
-import com.untrackr.alerter.processor.common.ProcessorVoidExecutionContext;
+import com.untrackr.alerter.processor.common.ProcessorVoidExecutionScope;
 import com.untrackr.alerter.processor.common.ScheduledProcessor;
 import com.untrackr.alerter.processor.config.ScheduledProcessorConfig;
 import com.untrackr.alerter.processor.payload.Payload;
@@ -15,7 +15,7 @@ public abstract class ScheduledProducer<D extends ScheduledProcessorConfig> exte
 
 	@Override
 	public void consumeInOwnThread(Payload<?> payload) {
-		throw new RuntimeError("producer should not receive input", new ProcessorVoidExecutionContext(this));
+		throw new RuntimeError("producer should not receive input", new ProcessorVoidExecutionScope(this));
 	}
 
 }

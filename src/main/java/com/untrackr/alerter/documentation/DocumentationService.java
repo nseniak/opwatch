@@ -40,8 +40,9 @@ public class DocumentationService {
 			}
 			return new ProcessorDoc(factory.name(), fieldDocList, "processor doc");
 		} catch (IntrospectionException e) {
-			throw new RuntimeError("error while generation documentation: " + descClass.getName() + ": " + e.getMessage(), e,
-					new GlobalExecutionContext());
+			throw new RuntimeError("error while generation documentation: " + descClass.getName() + ": " + e.getMessage(),
+					new GlobalExecutionScope(),
+					e);
 		}
 	}
 

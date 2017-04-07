@@ -1,7 +1,7 @@
 package com.untrackr.alerter.processor.primitives.consumer.post;
 
 import com.untrackr.alerter.processor.common.RuntimeError;
-import com.untrackr.alerter.processor.common.ProcessorPayloadExecutionContext;
+import com.untrackr.alerter.processor.common.ProcessorPayloadExecutionScope;
 import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.processor.payload.RemotePayload;
 import com.untrackr.alerter.processor.primitives.consumer.Consumer;
@@ -41,15 +41,16 @@ public class Post extends Consumer<PostConfig> {
 				return;
 			} else {
 				postErrorSignaled = true;
-				throw new RuntimeError("http error when posting to \"" + pathString + "\": " + e.getLocalizedMessage(), e,
-						new ProcessorPayloadExecutionContext(this, payload));
+				throw new RuntimeError("http error when posting to \"" + pathString + "\": " + e.getLocalizedMessage(),
+						new ProcessorPayloadExecutionScope(this, payload),
+						e);
 			}
 		}
 		HttpStatus status = response.getStatusCode();
 		if (status != HttpStatus.OK) {
 			postErrorSignaled = true;
 			throw new RuntimeError("invalid response status when posting to \"" + pathString + "\": " + status.value() + " " + status.getReasonPhrase(),
-					new ProcessorPayloadExecutionContext(this, payload));
+					new ProcessorPayloadExecutionScope(this, payload));
 		}
 		postErrorSignaled = false;
 	}

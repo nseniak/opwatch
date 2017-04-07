@@ -1,7 +1,7 @@
 package com.untrackr.alerter.processor.primitives.filter.jstack;
 
 import com.untrackr.alerter.processor.common.RuntimeError;
-import com.untrackr.alerter.processor.common.ProcessorPayloadExecutionContext;
+import com.untrackr.alerter.processor.common.ProcessorPayloadExecutionScope;
 import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.processor.payload.PayloadObjectValue;
 import com.untrackr.alerter.processor.primitives.filter.Filter;
@@ -107,7 +107,7 @@ public class Jstack extends Filter<JstackConfig> {
 				currentException.setLocation("<unknown location>");
 			}
 			currentException.computeCombined();
-			processorService.signalSystemException(new RuntimeError("Cannot parse exception trace", new ProcessorPayloadExecutionContext(this, input)));
+			processorService.signalSystemException(new RuntimeError("Cannot parse exception trace", new ProcessorPayloadExecutionScope(this, input)));
 			state.reset();
 			return currentException;
 		}

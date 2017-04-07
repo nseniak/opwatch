@@ -1,6 +1,6 @@
 package com.untrackr.alerter.processor.primitives.producer.receive;
 
-import com.untrackr.alerter.processor.common.ProcessorVoidExecutionContext;
+import com.untrackr.alerter.processor.common.ProcessorVoidExecutionScope;
 import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.processor.primitives.producer.Producer;
 import com.untrackr.alerter.service.HttpService;
@@ -28,7 +28,7 @@ public class Receive extends Producer<ReceiveConfig> implements HttpService.Post
 	@Override
 	public void handlePost(Object input) {
 		processorService.withExceptionHandling("error consuming http post",
-				new ProcessorVoidExecutionContext(this),
+				() -> new ProcessorVoidExecutionScope(this),
 				() -> {
 					Payload<?> remotePayload = processorService.getObjectMapper().convertValue(input, Payload.class);
 					outputTransformed(remotePayload.getValue(), remotePayload);

@@ -1,6 +1,6 @@
 package com.untrackr.alerter.processor.common;
 
-public class ProcessorLocation {
+public class ConstructionContext {
 
 	/**
 	 * Name of the processor
@@ -11,7 +11,7 @@ public class ProcessorLocation {
 	 */
 	private ScriptStack stack;
 
-	public ProcessorLocation(String name, ScriptStack stack) {
+	public ConstructionContext(String name, ScriptStack stack) {
 		this.name = name;
 		this.stack = stack;
 	}

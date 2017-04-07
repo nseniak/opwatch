@@ -25,8 +25,6 @@ import org.springframework.stereotype.Service;
 import sun.misc.Signal;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.LinkedHashMap;
@@ -289,9 +287,9 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	}
 
 	public void signalSystemInfo(String title) {
-		ExecutionContext context = new GlobalExecutionContext();
-		MessageScope scope = context.makeMessageScope(this);
-		Message message = new Message(Message.Type.info, Message.Level.medium, title, null, scope, null);
+		ExecutionScope scope = new GlobalExecutionScope();
+		MessageContext context = scope.makeContext(this, ScriptStack.currentStack());
+		Message message = new Message(Message.Type.info, Message.Level.medium, title, context);
 		publish(systemChannel(), message);
 	}
 
@@ -302,19 +300,14 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			// Script exception messages contain the exception name, which is ugly
 			title = title.substring(SCRIPT_EXCEPTION_MESSAGE_PREFIX.length());
 		}
-		String emitterName = e.getContext().emitterName();
-		if (emitterName != null) {
-			title = emitterName + ": " + title;
+		ExecutionScope scope = e.getScope();
+		ScriptStack stack = ScriptStack.exceptionStack(e);
+		MessageContext context = scope.makeContext(this, stack);
+		String processorName = context.getProcessorName();
+		if (processorName != null) {
+			title = processorName + ": " + title;
 		}
-		ExecutionContext context = e.getContext();
-		MessageScope scope = context.makeMessageScope(this);
-		MessageData messageData = new MessageData();
-		ScriptStack stack = new ScriptStack(e);
-		if (!stack.empty()) {
-			messageData.put("stack", stack.asString());
-		}
-		context.addContextData(messageData, this);
-		Message message = new Message(Message.Type.error, e.getLevel(), title, null, scope, messageData);
+		Message message = new Message(Message.Type.error, e.getLevel(), title, context);
 		publish(systemChannel(), message);
 	}
 
@@ -334,13 +327,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		}
 	}
 
-	private void addStack(MessageData data, Throwable t) {
-		StringWriter writer = new StringWriter();
-		t.printStackTrace(new PrintWriter(writer));
-		data.put("stack", writer.toString());
-	}
-
-	public boolean withExceptionHandling(String messagePrefix, ExecutionContext context, ThrowingRunnable runnable) {
+	public boolean withExceptionHandling(String messagePrefix, ExecutionContextFactory defaultContextFactory, ThrowingRunnable runnable) {
 		boolean error = true;
 		try {
 			runnable.run();
@@ -355,9 +342,15 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			signalSystemException(e);
 		} catch (Throwable t) {
 			String message = ((messagePrefix != null) ? messagePrefix + ": " : "") + t.getMessage();
-			signalSystemException(new RuntimeError(message, t, context));
+			signalSystemException(new RuntimeError(message, defaultContextFactory.make(), t));
 		}
 		return error;
+	}
+
+	public interface ExecutionContextFactory {
+
+		ExecutionScope make();
+
 	}
 
 	public interface ThrowingRunnable {
@@ -374,6 +367,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		try {
 			return objectMapper.writeValueAsString(value);
 		} catch (JsonProcessingException e) {
+			logger.error("Error while converting json to string", e);
 			return "<cannot convert to string>";
 		}
 	}
@@ -382,6 +376,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		try {
 			return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(value);
 		} catch (JsonProcessingException e) {
+			logger.error("Error while converting json to string", e);
 			return "<cannot convert to string>";
 		}
 	}
@@ -395,7 +390,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	}
 
 	public HealthcheckInfo healthcheck() {
-		String runningProcessorDesc = (runningProcessor == null) ? null : runningProcessor.getLocation().descriptor();
+		String runningProcessorDesc = (runningProcessor == null) ? null : runningProcessor.getName();
 		return new HealthcheckInfo(config.hostName(), runningProcessorDesc);
 	}
 

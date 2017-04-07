@@ -2,9 +2,9 @@ package com.untrackr.alerter.channel.pushover;
 
 import com.untrackr.alerter.channel.common.Channel;
 import com.untrackr.alerter.common.FrequencyLimiter;
-import com.untrackr.alerter.processor.common.GlobalExecutionContext;
+import com.untrackr.alerter.processor.common.GlobalExecutionScope;
 import com.untrackr.alerter.processor.common.Message;
-import com.untrackr.alerter.processor.common.MessageScope;
+import com.untrackr.alerter.processor.common.MessageContext;
 import com.untrackr.alerter.processor.common.RuntimeError;
 import com.untrackr.alerter.service.ProcessorService;
 import net.pushover.client.*;
@@ -82,19 +82,9 @@ public class PushoverChannel implements Channel {
 		MessagePriority priority = levelPriority(message.getLevel());
 		String title = truncate(alertTitle(message), MAX_TITLE_LENGTH);
 		StringWriter writer = new StringWriter();
-		MessageScope scope = message.getScope();
+		MessageContext scope = message.getContext();
 		writer.append("Hostname: " + scope.getHostname());
 		writer.append("\n");
-		if (message.getBody() != null) {
-			writer.append(message.getBody()).append(FIELD_DELIMITER);
-		}
-		if (message.getData() != null) {
-			for (Map.Entry<String, String> pair : message.getData().entrySet()) {
-				String key = pair.getKey();
-				String value = pair.getValue();
-				writer.append(key).append(": ").append(truncate(value, MAX_DATA_ITEM_LENGTH)).append(FIELD_DELIMITER);
-			}
-		}
 		String body = writer.toString();
 		if (body.isEmpty()) {
 			body = "--";
@@ -163,8 +153,8 @@ public class PushoverChannel implements Channel {
 		throw new IllegalStateException("unknown level: " + level.name());
 	}
 
-	private boolean checkFrequencyLimits(MessageScope scope) {
-		String scopeId = scope.getId();
+	private boolean checkFrequencyLimits(MessageContext scope) {
+		String scopeId = scope.getAlerterId();
 		FrequencyLimiter scopeLimiter = scopeFrequenceyLimiter.get(scopeId);
 		if (scopeLimiter == null) {
 			int maxAlertsPerMinute = config.getMaxPerMinute();
@@ -232,7 +222,7 @@ public class PushoverChannel implements Channel {
 				throw new RuntimeError("Status error while pushing to Pushover: " + result.toString());
 			}
 		} catch (PushoverException e) {
-			throw new RuntimeError("Error while pushing to Pushover" , e, new GlobalExecutionContext());
+			throw new RuntimeError("Error while pushing to Pushover" , new GlobalExecutionScope(), e);
 		}
 	}
 

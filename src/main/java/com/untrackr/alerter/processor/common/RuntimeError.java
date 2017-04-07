@@ -4,47 +4,49 @@ public class RuntimeError extends RuntimeException {
 
 	private static Message.Level DEFAULT_LEVEL = Message.Level.emergency;
 
-	private ExecutionContext context;
+	private ExecutionScope scope;
 	private Message.Level level;
-
-	public RuntimeError(String message, ExecutionContext context) {
-		super(message);
-		this.level = DEFAULT_LEVEL;
-		this.context = context;
-	}
 
 	public RuntimeError(String message) {
 		super(message);
 		this.level = DEFAULT_LEVEL;
-		this.context = new GlobalExecutionContext();
+		this.scope = new GlobalExecutionScope();
 	}
 
-	public RuntimeError(Throwable cause, ExecutionContext context) {
-		super(cause);
+	public RuntimeError(String message, ExecutionScope scope) {
+		super(message);
 		this.level = DEFAULT_LEVEL;
-		this.context = context;
+		this.scope = scope;
 	}
 
-	public RuntimeError(Throwable cause) {
-		super(cause);
-		this.level = DEFAULT_LEVEL;
-		this.context = new GlobalExecutionContext();
-	}
-
-	public RuntimeError(String message, Throwable cause, ExecutionContext context) {
-		super(message, cause);
-		this.level = DEFAULT_LEVEL;
-		this.context = context;
-	}
 
 	public RuntimeError(String message, Throwable cause) {
 		super(message, cause);
 		this.level = DEFAULT_LEVEL;
-		this.context = new GlobalExecutionContext();
+		this.scope = new GlobalExecutionScope();
 	}
 
-	public ExecutionContext getContext() {
-		return context;
+	public RuntimeError(String message, ExecutionScope scope, Throwable cause) {
+		super(message, cause);
+		this.level = DEFAULT_LEVEL;
+		this.scope = scope;
+	}
+
+
+	public RuntimeError(Throwable cause) {
+		super(cause);
+		this.level = DEFAULT_LEVEL;
+		this.scope = new GlobalExecutionScope();
+	}
+
+	public RuntimeError(Throwable cause, ExecutionScope scope) {
+		super(cause);
+		this.level = DEFAULT_LEVEL;
+		this.scope = scope;
+	}
+
+	public ExecutionScope getScope() {
+		return scope;
 	}
 
 	public Message.Level getLevel() {
