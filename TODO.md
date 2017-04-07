@@ -28,6 +28,7 @@
 * display alias name instead of processor as source
 * display root payload of alerts
 * new pushover4j versionc
+* manage frequency limitation by title, not by processor
 
 ------
 

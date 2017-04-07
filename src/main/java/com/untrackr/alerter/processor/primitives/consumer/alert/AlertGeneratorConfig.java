@@ -4,9 +4,8 @@ import com.untrackr.alerter.processor.config.*;
 
 public class AlertGeneratorConfig extends ActiveProcessorConfig {
 
-	// TODO Make StringValue
 	private String priority = "medium";
-	private StringValue message;
+	private String title;
 	private JavascriptPredicate trigger;
 	private Boolean toggle = false;
 	private String channel;
@@ -21,12 +20,12 @@ public class AlertGeneratorConfig extends ActiveProcessorConfig {
 	}
 
 	@ImplicitProperty
-	public StringValue getMessage() {
-		return message;
+	public String getTitle() {
+		return title;
 	}
 
-	public void setMessage(StringValue message) {
-		this.message = message;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	@OptionalProperty

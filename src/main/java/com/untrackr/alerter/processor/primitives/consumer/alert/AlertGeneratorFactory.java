@@ -41,7 +41,7 @@ public class AlertGeneratorFactory extends ActiveProcessorFactory<AlertGenerator
 		} catch (IllegalArgumentException e) {
 			throw new RuntimeError("bad alert priority: \"" + priorityName + "\"", new FactoryExecutionContext(this));
 		}
-		StringValue message = checkPropertyValue("message", config.getMessage());
+		String message = checkPropertyValue("title", config.getTitle());
 		JavascriptPredicate predicate = config.getTrigger();
 		boolean toggle = checkPropertyValue("toggle", config.getToggle());
 		String channelName = config.getChannel();
