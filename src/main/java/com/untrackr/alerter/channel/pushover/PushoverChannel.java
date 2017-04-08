@@ -23,8 +23,6 @@ public class PushoverChannel implements Channel {
 
 	public static int MAX_TITLE_LENGTH = 250;
 	public static int MAX_MESSAGE_LENGTH = 1024;
-	private static final int MAX_DATA_ITEM_LENGTH = 120;
-	private static final String FIELD_DELIMITER = "\n--\n";
 
 	private String name;
 	private PushoverConfiguration config;
@@ -135,23 +133,15 @@ public class PushoverChannel implements Channel {
 	}
 
 	private String alertTitle(Message message) {
-		return levelPrefix(message.getLevel()) + typeSuffix(message.getType()) + ": " + message.getTitle();
+		return levelPrefix(message.getLevel()) + capitalize(message.getType().getDescriptor()) + ": " + message.getTitle();
 	}
 
-	private String typeSuffix(Message.Type type) {
-		switch (type) {
-			case error:
-				return "Error";
-			case info:
-				return "Info";
-			case alert:
-				return "Alert";
-			case alertStart:
-				return "Alert";
-			case alertEnd:
-				return "End of Alert";
+	private String capitalize(String str) {
+		if (str.isEmpty()) {
+			return str;
+		} else {
+			return Character.toUpperCase(str.charAt(0)) + str.substring(1);
 		}
-		throw new IllegalStateException("unknown message type: " + type.name());
 	}
 
 	private String levelPrefix(Message.Level level) {

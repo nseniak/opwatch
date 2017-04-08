@@ -59,23 +59,7 @@ public class SlackChannel implements Channel {
 	}
 
 	private String alertTitle(Message message) {
-		return levelPrefix(message.getLevel()) + typeSuffix(message.getType()) + ": " + message.getTitle();
-	}
-
-	private String typeSuffix(Message.Type type) {
-		switch (type) {
-			case error:
-				return "Error";
-			case info:
-				return "Info";
-			case alert:
-				return "Alert";
-			case alertStart:
-				return "Alert";
-			case alertEnd:
-				return "End of Alert";
-		}
-		throw new IllegalStateException("unknown message type: " + type.name());
+		return levelPrefix(message.getLevel()) + message.getType().getDescriptor() + ": " + message.getTitle();
 	}
 
 	private String levelPrefix(Message.Level level) {

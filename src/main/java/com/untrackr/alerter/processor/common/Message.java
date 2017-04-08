@@ -3,7 +3,23 @@ package com.untrackr.alerter.processor.common;
 public class Message {
 
 	public enum Type {
-		error, info, alert, alertStart, alertEnd
+
+		error("error"),
+		info("info"),
+		alert("alert"),
+		alertStart("start of alert"),
+		alertEnd("end of alert");
+
+		String descriptor;
+
+		Type(String descriptor) {
+			this.descriptor = descriptor;
+		}
+
+		public String getDescriptor() {
+			return descriptor;
+		}
+
 	}
 
 	public enum Level {
