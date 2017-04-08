@@ -7,7 +7,6 @@ import com.untrackr.alerter.processor.common.Message;
 import com.untrackr.alerter.processor.common.MessageContext;
 import com.untrackr.alerter.processor.common.RuntimeError;
 import com.untrackr.alerter.service.ProcessorService;
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import net.pushover.client.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +15,8 @@ import java.io.StringWriter;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+
+import static org.springframework.util.StringUtils.capitalize;
 
 public class PushoverChannel implements Channel {
 
@@ -83,7 +84,7 @@ public class PushoverChannel implements Channel {
 		StringWriter writer = new StringWriter();
 		MessageContext scope = message.getContext();
 		writer.append("Hostname: " + scope.getHostname()).append("\n");
-		writeObject(writer, message.getBody());
+		writeBody(writer, message.getBody());
 		String bodyText = writer.toString();
 		bodyText = truncate(bodyText, MAX_MESSAGE_LENGTH);
 		Integer retry = null;
@@ -99,20 +100,17 @@ public class PushoverChannel implements Channel {
 		send(pushoverMessage);
 	}
 
-	private void writeObject(StringWriter writer, Object object) {
+	private void writeBody(StringWriter writer, Object object) {
 		if (object == null) {
 			return;
-		}
-		if (object instanceof ScriptObjectMirror) {
-			ScriptObjectMirror mirror = (ScriptObjectMirror) object;
-			for (String key : mirror.getOwnKeys(false)) {
-				Object value = mirror.get(key);
+		} else if (!processorService.getScriptService().bean(object)) {
+			writer.append(object.toString());
+		} else {
+			processorService.getScriptService().mapFields(object, (key, value) -> {
 				if (value != null) {
 					writer.append(key).append(": ").append(value.toString()).append("\n");
 				}
-			}
-		} else {
-			writer.append(object.toString());
+			});
 		}
 	}
 
@@ -134,14 +132,6 @@ public class PushoverChannel implements Channel {
 
 	private String alertTitle(Message message) {
 		return levelPrefix(message.getLevel()) + capitalize(message.getType().getDescriptor()) + ": " + message.getTitle();
-	}
-
-	private String capitalize(String str) {
-		if (str.isEmpty()) {
-			return str;
-		} else {
-			return Character.toUpperCase(str.charAt(0)) + str.substring(1);
-		}
 	}
 
 	private String levelPrefix(Message.Level level) {

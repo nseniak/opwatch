@@ -38,7 +38,7 @@ public class PostFactory extends ActiveProcessorFactory<PostConfig, Post> {
 	@Override
 	public Post make(Object scriptObject) {
 		PostConfig descriptor = convertProcessorConfig(scriptObject);
-		String pathString = checkVariableSubstitution("path", checkPropertyValue("path", descriptor.getPath()));
+		String pathString = checkPropertyValue("path", descriptor.getPath());
 		Matcher matcher = pathPattern.matcher(pathString);
 		if (!matcher.matches()) {
 			throw new RuntimeError("incorrect \"path\" syntax: \"" + pathString + "\"",

@@ -31,6 +31,7 @@
 * manage frequency limitation by title, not by processor
 * Better slack messages
 * Hook to create custom Pushover and Slack messages
+* Aggregate messages
 
 ------
 

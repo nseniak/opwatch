@@ -1,5 +1,6 @@
 package com.untrackr.alerter.service;
 
+import com.google.common.primitives.Primitives;
 import com.untrackr.alerter.documentation.DocumentationService;
 import com.untrackr.alerter.documentation.ProcessorDoc;
 import com.untrackr.alerter.processor.common.*;
@@ -44,8 +45,11 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import javax.script.*;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -329,6 +333,37 @@ public class ScriptService {
 			}
 		}
 		throw exceptionFactory.make("invalid " + valueLocation.describeAsValue() + ", expected " + documentationService.typeName(clazz) + ", got: " + scriptValue);
+	}
+
+	public boolean bean(Object object) {
+		return (object != null) && !Primitives.isWrapperType(object.getClass());
+	}
+
+	public void mapFields(Object object, fieldHandler handler) {
+		if (object instanceof ScriptObjectMirror) {
+			ScriptObjectMirror mirror = (ScriptObjectMirror) object;
+			for (String key : mirror.getOwnKeys(true)) {
+				handler.handle(key, mirror.get(key));
+			}
+		} else {
+			try {
+				for (PropertyDescriptor propertyDescriptor : Introspector.getBeanInfo(object.getClass()).getPropertyDescriptors()) {
+					String key = propertyDescriptor.getName();
+					if (!key.equals("class")) {
+						Object value = propertyDescriptor.getReadMethod().invoke(object);
+						handler.handle(key, value);
+					}
+				}
+			} catch (IllegalAccessException | InvocationTargetException | IntrospectionException e) {
+				logger.error("Cannot map fields: " + object.getClass().getName(), e);
+			}
+		}
+	}
+
+	public interface fieldHandler {
+
+		void handle(String key, Object value);
+
 	}
 
 	public String typeName(Type type) {

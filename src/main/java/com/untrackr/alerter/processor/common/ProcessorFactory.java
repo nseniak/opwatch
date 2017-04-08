@@ -1,7 +1,5 @@
 package com.untrackr.alerter.processor.common;
 
-import com.untrackr.alerter.common.ApplicationUtil;
-import com.untrackr.alerter.common.UndefinedSubstitutionVariableException;
 import com.untrackr.alerter.processor.config.*;
 import com.untrackr.alerter.service.ProcessorService;
 import org.slf4j.Logger;
@@ -116,15 +114,6 @@ public abstract class ProcessorFactory<C extends ProcessorConfig, P extends Proc
 		} catch (DateTimeParseException e) {
 			throw new RuntimeError(e.getLocalizedMessage() + " at index " + (e.getErrorIndex() - start) + ": \"" + durationString + "\"",
 					new FactoryExecutionScope(this), e);
-		}
-	}
-
-	public String checkVariableSubstitution(String property, String text) {
-		try {
-			return ApplicationUtil.substituteVariables(text);
-		} catch (UndefinedSubstitutionVariableException e) {
-			ValueLocation location = ValueLocation.makeProperty(name(), property);
-			throw new RuntimeError("unknown variable in " + location.describeAsValue() + ": " + e.getName(), new FactoryExecutionScope(this), e);
 		}
 	}
 

@@ -38,7 +38,7 @@ public class CurlFactory extends ScheduledExecutorFactory<CurlConfig, Curl> {
 	@Override
 	public Curl make(Object scriptObject) {
 		CurlConfig config = convertProcessorConfig(scriptObject);
-		String urlString = checkVariableSubstitution("url", checkPropertyValue("url", config.getUrl()));
+		String urlString = checkPropertyValue("url", config.getUrl());
 		URI uri;
 		try {
 			uri = new URI(urlString);

@@ -1,6 +1,8 @@
 package com.untrackr.alerter.channel.slack;
 
 import allbegray.slack.SlackClientFactory;
+import allbegray.slack.type.Attachment;
+import allbegray.slack.type.Field;
 import allbegray.slack.type.Payload;
 import allbegray.slack.webhook.SlackWebhookClient;
 import com.untrackr.alerter.channel.common.Channel;
@@ -9,6 +11,8 @@ import com.untrackr.alerter.processor.common.RuntimeError;
 import com.untrackr.alerter.service.ProcessorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.springframework.util.StringUtils.capitalize;
 
 public class SlackChannel implements Channel {
 
@@ -54,8 +58,35 @@ public class SlackChannel implements Channel {
 	public void publish(Message message) {
 		SlackWebhookClient client = SlackClientFactory.createWebhookClient(webhookUrl);
 		Payload payload = new Payload();
-		payload.setText(message.getTitle());
+		payload.setText(levelPrefix(message.getLevel()) + capitalize(message.getType().getDescriptor()) + ": " + message.getTitle());
+		addBodyAttachment(payload, message.getBody());
+		Attachment infoAttachment = new Attachment();
+		infoAttachment.addField(new Field("Level", message.getLevel().name(), true));
+		infoAttachment.addField(new Field("Hostname", message.getContext().getHostname(), true));
+		payload.addAttachment(infoAttachment);
 		client.post(payload);
+	}
+
+	private void addBodyAttachment(Payload payload, Object object) {
+		Attachment attachment = new Attachment();
+		if (object != null) {
+			if (!processorService.getScriptService().bean(object)) {
+				attachment.setText(object.toString());
+			} else {
+				processorService.getScriptService().mapFields(object, (key, value) -> {
+					if (value != null) {
+						attachment.addField(new Field(key, value.toString(), false));
+					}
+				});
+			}
+		}
+		if (!empty(attachment)) {
+			payload.addAttachment(attachment);
+		}
+	}
+
+	private boolean empty(Attachment attachment) {
+		return (attachment.getText() == null) && attachment.getFields().isEmpty();
 	}
 
 	private String alertTitle(Message message) {
