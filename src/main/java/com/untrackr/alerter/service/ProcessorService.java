@@ -9,6 +9,7 @@ import com.untrackr.alerter.channel.common.*;
 import com.untrackr.alerter.channel.console.ConsoleConfiguration;
 import com.untrackr.alerter.channel.console.ConsoleMessageService;
 import com.untrackr.alerter.channel.pushover.PushoverMessageService;
+import com.untrackr.alerter.channel.slack.SlackMessageService;
 import com.untrackr.alerter.common.ThreadUtil;
 import com.untrackr.alerter.ioservice.FileTailingService;
 import com.untrackr.alerter.processor.common.*;
@@ -117,6 +118,8 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		} catch (Exception e) {
 			logger.error("Initialization failed", e);
 			printStderr("Initialization failed: " + e.getMessage());
+			ScriptStack stack = ScriptStack.exceptionStack(e);
+			printStderr(stack.asString());
 		}
 	}
 
@@ -124,11 +127,12 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		LinkedHashMap<String, Channel> channelMap = new LinkedHashMap<>();
 		addServiceChannels(channelConfig, channelMap, new ConsoleMessageService());
 		addServiceChannels(channelConfig, channelMap, new PushoverMessageService());
+		addServiceChannels(channelConfig, channelMap, new SlackMessageService());
 		Channel consoleChannel = channelMap.computeIfAbsent(CONSOLE_CHANNEL_NAME,
 				k -> new ConsoleMessageService().createChannels(new ConsoleConfiguration(), this).get(0));
 		Channel defaultChannel = null;
 		Channel errorChannel = null;
-		String defaultChannelName = channelConfig.getDefaultChannel();
+		String defaultChannelName = channelConfig.getAlertChannel();
 		if (defaultChannelName != null) {
 			defaultChannel = channelMap.get(defaultChannelName);
 			if (defaultChannel == null) {
@@ -137,7 +141,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		} else {
 			defaultChannel = consoleChannel;
 		}
-		String errorChannelName = channelConfig.getErrorChannel();
+		String errorChannelName = channelConfig.getSystemChannel();
 		if (errorChannelName != null) {
 			errorChannel = channelMap.get(errorChannelName);
 			if (errorChannel == null) {

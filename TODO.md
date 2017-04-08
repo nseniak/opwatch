@@ -27,7 +27,7 @@
 * mute/downgrade alarms by UI
 * display alias name instead of processor as source
 * display root payload of alerts
-* new pushover4j versionc
+* new pushover4j version
 * manage frequency limitation by title, not by processor
 
 ------

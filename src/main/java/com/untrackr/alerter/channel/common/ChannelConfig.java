@@ -6,8 +6,8 @@ import java.util.Map;
 public class ChannelConfig {
 
 	private Map<String, Object> services = new LinkedHashMap<>();
-	private String defaultChannel;
-	private String errorChannel;
+	private String alertChannel;
+	private String systemChannel;
 
 	public Map<String, Object> getServices() {
 		return services;
@@ -17,20 +17,20 @@ public class ChannelConfig {
 		this.services = services;
 	}
 
-	public String getDefaultChannel() {
-		return defaultChannel;
+	public String getAlertChannel() {
+		return alertChannel;
 	}
 
-	public void setDefaultChannel(String defaultChannel) {
-		this.defaultChannel = defaultChannel;
+	public void setAlertChannel(String alertChannel) {
+		this.alertChannel = alertChannel;
 	}
 
-	public String getErrorChannel() {
-		return errorChannel;
+	public String getSystemChannel() {
+		return systemChannel;
 	}
 
-	public void setErrorChannel(String errorChannel) {
-		this.errorChannel = errorChannel;
+	public void setSystemChannel(String systemChannel) {
+		this.systemChannel = systemChannel;
 	}
 
 }

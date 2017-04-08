@@ -11,19 +11,29 @@ channels = {
 		// Pushover channels
 		"pushover": {
 			"channels": {
-				"pushover_dev": {
+				"<unique channel name>": {
 					"apiToken": "<your Pushover API token here>",
 					"userKey": "<your Pushover user key here>"
+				}
+			}
+		},
+
+		// Slack channels
+		"slack": {
+			"channels": {
+				"<unique channel name>": {
+					"webhookUrl": "<your Slack webhook here>"
 				}
 			}
 		}
 
 	},
 
-	// Use pushover_dev as the default alert channel
-	"alert": "pushover_dev",
-	// Use pushover_dev as the system channel
-	"system": "pushover_dev"
+
+	// Default channel for alerts
+	"alertChannel": "<channel name>",
+	// Default channel for system messages (like errors)
+	"systemChannel": "<channel name>"
 
 };
 

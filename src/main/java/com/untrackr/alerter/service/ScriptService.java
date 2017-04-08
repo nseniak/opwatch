@@ -81,7 +81,6 @@ public class ScriptService {
 	public void initialize() {
 		scriptEngine = (NashornScriptEngine) new ScriptEngineManager().getEngineByName("nashorn");
 		loadScriptResources();
-		loadInitFile();
 		try {
 			createSimplePrimitiveFunction("run", processorService::runProcessor);
 			createSimplePrimitiveFunction("__factories", this::factories);
@@ -110,6 +109,7 @@ public class ScriptService {
 			createSimpleFactoryFunction(new ShFactory(processorService));
 			createSimpleFactoryFunction(new JstackFactory(processorService));
 			createSimpleFactoryFunction(new JsonFactory(processorService));
+			loadInitFile();
 			ProcessorDoc doc = documentationService.documentation(new CurlFactory(processorService));
 			logger.info("Doc");
 		} catch (ScriptException e) {
