@@ -336,7 +336,7 @@ public class ScriptService {
 	}
 
 	public boolean bean(Object object) {
-		return (object != null) && !Primitives.isWrapperType(object.getClass());
+		return (object != null) && !(object instanceof String) && !Primitives.isWrapperType(object.getClass());
 	}
 
 	public void mapFields(Object object, fieldHandler handler) {

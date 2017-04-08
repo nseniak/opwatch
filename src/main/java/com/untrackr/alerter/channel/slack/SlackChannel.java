@@ -2,6 +2,7 @@ package com.untrackr.alerter.channel.slack;
 
 import allbegray.slack.SlackClientFactory;
 import allbegray.slack.type.Attachment;
+import allbegray.slack.type.Color;
 import allbegray.slack.type.Field;
 import allbegray.slack.type.Payload;
 import allbegray.slack.webhook.SlackWebhookClient;
@@ -58,39 +59,60 @@ public class SlackChannel implements Channel {
 	public void publish(Message message) {
 		SlackWebhookClient client = SlackClientFactory.createWebhookClient(webhookUrl);
 		Payload payload = new Payload();
-		payload.setText(levelPrefix(message.getLevel()) + capitalize(message.getType().getDescriptor()) + ": " + message.getTitle());
-		addBodyAttachment(payload, message.getBody());
-		Attachment infoAttachment = new Attachment();
-		infoAttachment.addField(new Field("Level", message.getLevel().name(), true));
-		infoAttachment.addField(new Field("Hostname", message.getContext().getHostname(), true));
-		payload.addAttachment(infoAttachment);
+		addMainAttachment(payload, message);
+		String logMessage = "Message to Slack[" + name + "] " + processorService.prettyJson(payload);
+		logger.info(logMessage);
+		if (processorService.config().channelDebug()) {
+			processorService.printStdout("(debug) " + logMessage);
+			return;
+		}
 		client.post(payload);
 	}
 
-	private void addBodyAttachment(Payload payload, Object object) {
+	private void addMainAttachment(Payload payload, Message message) {
 		Attachment attachment = new Attachment();
-		if (object != null) {
-			if (!processorService.getScriptService().bean(object)) {
-				attachment.setText(object.toString());
+		attachment.setColor(levelColor(message.getLevel()));
+		attachment.setTitle(levelPrefix(message.getLevel()) + capitalize(message.getType().getDescriptor()) + ": " + message.getTitle());
+		Object body = message.getBody();
+		if (body != null) {
+			if (!processorService.getScriptService().bean(body)) {
+				attachment.setText(body.toString());
 			} else {
-				processorService.getScriptService().mapFields(object, (key, value) -> {
+				processorService.getScriptService().mapFields(body, (key, value) -> {
 					if (value != null) {
 						attachment.addField(new Field(key, value.toString(), false));
 					}
 				});
 			}
 		}
+		attachment.addField(new Field("Level", message.getLevel().name(), true));
+		attachment.addField(new Field("Hostname", message.getContext().getHostname(), true));
 		if (!empty(attachment)) {
 			payload.addAttachment(attachment);
 		}
 	}
 
 	private boolean empty(Attachment attachment) {
-		return (attachment.getText() == null) && attachment.getFields().isEmpty();
+		return (attachment.getTitle() == null) && (attachment.getText() == null) && attachment.getFields().isEmpty();
 	}
 
 	private String alertTitle(Message message) {
 		return levelPrefix(message.getLevel()) + message.getType().getDescriptor() + ": " + message.getTitle();
+	}
+
+	private Color levelColor(Message.Level level) {
+		switch (level) {
+			case lowest:
+			case low:
+				return Color.GOOD;
+			case medium:
+				return Color.WARNING;
+			case high:
+				return Color.DANGER;
+			case emergency:
+				return Color.DANGER;
+		}
+		throw new IllegalStateException("unknown level: " + level.name());
 	}
 
 	private String levelPrefix(Message.Level level) {

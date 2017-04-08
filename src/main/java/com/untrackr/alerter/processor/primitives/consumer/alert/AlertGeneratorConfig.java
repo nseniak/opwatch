@@ -4,7 +4,7 @@ import com.untrackr.alerter.processor.config.*;
 
 public class AlertGeneratorConfig extends ActiveProcessorConfig {
 
-	private String priority = "medium";
+	private String level = "medium";
 	private String title;
 	private ConstantOrFilter<Object> body;
 	private JavascriptPredicate trigger;
@@ -12,12 +12,12 @@ public class AlertGeneratorConfig extends ActiveProcessorConfig {
 	private String channel;
 
 	@OptionalProperty
-	public String getPriority() {
-		return priority;
+	public String getLevel() {
+		return level;
 	}
 
-	public void setPriority(String priority) {
-		this.priority = priority;
+	public void setLevel(String level) {
+		this.level = level;
 	}
 
 	@ImplicitProperty

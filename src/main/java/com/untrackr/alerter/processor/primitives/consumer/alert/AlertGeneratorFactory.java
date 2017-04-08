@@ -34,7 +34,7 @@ public class AlertGeneratorFactory extends ActiveProcessorFactory<AlertGenerator
 	@Override
 	public AlertGenerator make(Object scriptObject) {
 		AlertGeneratorConfig config = convertProcessorConfig(scriptObject);
-		String priorityName = checkPropertyValue("priority", config.getPriority());
+		String priorityName = checkPropertyValue("priority", config.getLevel());
 		Message.Level level;
 		try {
 			level = Message.Level.valueOf(priorityName);
