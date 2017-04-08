@@ -2,6 +2,7 @@ package com.untrackr.alerter.processor.primitives.consumer.alert;
 
 import com.untrackr.alerter.channel.common.Channel;
 import com.untrackr.alerter.processor.common.*;
+import com.untrackr.alerter.processor.config.ConstantOrFilter;
 import com.untrackr.alerter.processor.config.JavascriptPredicate;
 import com.untrackr.alerter.processor.payload.Payload;
 import com.untrackr.alerter.processor.primitives.consumer.Consumer;
@@ -11,24 +12,26 @@ public class AlertGenerator extends Consumer<AlertGeneratorConfig> {
 
 	private Message.Level level;
 	private String title;
-	private JavascriptPredicate predicate;
+	private ConstantOrFilter<Object> body;
+	private JavascriptPredicate trigger;
 	private boolean toggle;
 	private boolean toggleUp;
 	private String channelName;
 
 	public AlertGenerator(ProcessorService processorService, AlertGeneratorConfig descriptor, String name, String title,
-												Message.Level level, JavascriptPredicate predicate, boolean toggle, String channelName) {
+												ConstantOrFilter<Object> body, Message.Level level, JavascriptPredicate trigger, boolean toggle, String channelName) {
 		super(processorService, descriptor, name);
 		this.level = level;
 		this.title = title;
-		this.predicate = predicate;
+		this.body = body;
+		this.trigger = trigger;
 		this.toggle = toggle;
 		this.channelName = channelName;
 	}
 
 	@Override
 	public void consumeInOwnThread(Payload<?> payload) {
-		boolean alert = (predicate == null) || predicate.call(payload, this);
+		boolean alert = (trigger == null) || trigger.call(payload, this);
 		Channel channel;
 		if (channelName == null) {
 			channel = processorService.alertChannel();
@@ -55,7 +58,13 @@ public class AlertGenerator extends Consumer<AlertGeneratorConfig> {
 	private Message makeAlerterMessage(Message.Type type, Payload<?> payload) {
 		ExecutionScope scope = new ProcessorPayloadExecutionScope(this, payload);
 		MessageContext context = scope.makeContext(processorService, constructionStack);
-		return new Message(type, level, title, context);
+		Object bodyValue = null;
+		if (body != null) {
+			bodyValue = body.value(this, payload, Object.class);
+		} else {
+			bodyValue = payload.getValue();
+		}
+		return new Message(type, level, title, bodyValue, context);
 	}
 
 }

@@ -7,6 +7,7 @@ import com.untrackr.alerter.processor.common.Message;
 import com.untrackr.alerter.processor.common.MessageContext;
 import com.untrackr.alerter.processor.common.RuntimeError;
 import com.untrackr.alerter.service.ProcessorService;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import net.pushover.client.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,13 +84,10 @@ public class PushoverChannel implements Channel {
 		String title = truncate(alertTitle(message), MAX_TITLE_LENGTH);
 		StringWriter writer = new StringWriter();
 		MessageContext scope = message.getContext();
-		writer.append("Hostname: " + scope.getHostname());
-		writer.append("\n");
-		String body = writer.toString();
-		if (body.isEmpty()) {
-			body = "--";
-		}
-		body = truncate(body, MAX_MESSAGE_LENGTH);
+		writer.append("Hostname: " + scope.getHostname()).append("\n");
+		writeObject(writer, message.getBody());
+		String bodyText = writer.toString();
+		bodyText = truncate(bodyText, MAX_MESSAGE_LENGTH);
 		Integer retry = null;
 		Integer expire = null;
 		if (message.getLevel() == Message.Level.emergency) {
@@ -99,8 +97,25 @@ public class PushoverChannel implements Channel {
 		if (checkFrequencyLimits(scope)) {
 			return;
 		}
-		PushoverMessage pushoverMessage = makePushoverMessage(pushoverKey, title, body, priority, retry, expire);
+		PushoverMessage pushoverMessage = makePushoverMessage(pushoverKey, title, bodyText, priority, retry, expire);
 		send(pushoverMessage);
+	}
+
+	private void writeObject(StringWriter writer, Object object) {
+		if (object == null) {
+			return;
+		}
+		if (object instanceof ScriptObjectMirror) {
+			ScriptObjectMirror mirror = (ScriptObjectMirror) object;
+			for (String key : mirror.getOwnKeys(false)) {
+				Object value = mirror.get(key);
+				if (value != null) {
+					writer.append(key).append(": ").append(value.toString()).append("\n");
+				}
+			}
+		} else {
+			writer.append(object.toString());
+		}
 	}
 
 	private MessagePriority levelPriority(Message.Level level) {

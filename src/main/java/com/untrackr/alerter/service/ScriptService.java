@@ -255,43 +255,45 @@ public class ScriptService {
 	public Object convertScriptValue(ValueLocation valueLocation, Type type, Object scriptValue, RuntimeExceptionFactory exceptionFactory) {
 		if (scriptValue == null) {
 			return null;
-		} else if (type instanceof Class) {
+		}
+		if (type instanceof Class) {
 			return convertScriptValueToClass(valueLocation, (Class) type, scriptValue, exceptionFactory);
-		} else if (type instanceof ParameterizedType) {
-			return convertScriptValueToParameterizedType(valueLocation, (ParameterizedType) type, scriptValue, exceptionFactory);
 		}
-		throw exceptionFactory.make("invalid " + valueLocation.describeAsValue() + ", expected " + documentationService.typeName(type) + ", got: " + scriptValue);
-	}
-
-	private Object convertScriptValueToParameterizedType(ValueLocation valueLocation, ParameterizedType type, Object scriptValue, RuntimeExceptionFactory exceptionFactory) {
-		Type listType = documentationService.parameterizedListType(type);
-		if (listType == null) {
-			return convertScriptValue(valueLocation, type.getRawType(), scriptValue, exceptionFactory);
-		} else {
-			try {
-				ScriptObjectMirror scriptObject = (ScriptObjectMirror) scriptValue;
-				List<Object> scriptList = (List<Object>) ScriptUtils.convert(scriptObject, List.class);
-				List<Object> list = new ArrayList<>();
-				for (Object scriptListObject : scriptList) {
-					list.add(convertScriptValue(valueLocation.toListElement(), listType, scriptListObject, exceptionFactory));
-				}
-				return list;
-			} catch (ClassCastException e) {
-				// Nothing to do
+		if (type instanceof ParameterizedType) {
+			ParameterizedType paramType = (ParameterizedType) type;
+			Type elementType = documentationService.parameterizedTypeParameter(paramType, List.class);
+			if (elementType != null) {
+				return convertList(valueLocation, type, elementType, scriptValue, exceptionFactory);
 			}
+			Type valueType = documentationService.parameterizedTypeParameter(paramType, ConstantOrFilter.class);
+			if (valueType != null) {
+				return convertConstantOrFilter(valueLocation, type, valueType, scriptValue, exceptionFactory);
+			}
+			return convertScriptValue(valueLocation, paramType.getRawType(), scriptValue, exceptionFactory);
 		}
 		throw exceptionFactory.make("invalid " + valueLocation.describeAsValue() + ", expected " + documentationService.typeName(type) + ", got: " + scriptValue);
 	}
 
+	private Object convertList(ValueLocation valueLocation, Type listType, Type elementType, Object scriptValue, RuntimeExceptionFactory exceptionFactory) {
+		ScriptObjectMirror scriptObject = (ScriptObjectMirror) scriptValue;
+		List<Object> scriptList = (List<Object>) ScriptUtils.convert(scriptObject, List.class);
+		List<Object> list = new ArrayList<>();
+		for (Object scriptListObject : scriptList) {
+			list.add(convertScriptValue(valueLocation.toListElement(), elementType, scriptListObject, exceptionFactory));
+		}
+		return list;
+	}
+
+	private Object convertConstantOrFilter(ValueLocation valueLocation, Type type, Type valueType, Object scriptValue, RuntimeExceptionFactory exceptionFactory) {
+		if ((scriptValue instanceof ScriptObjectMirror) && ((ScriptObjectMirror) scriptValue).isFunction()) {
+			return ConstantOrFilter.makeFunctional(new JavascriptFilter((ScriptObjectMirror) scriptValue, valueLocation), valueLocation);
+		}
+		return ConstantOrFilter.makeConstant(convertScriptValue(valueLocation, valueType, scriptValue, exceptionFactory));
+	}
 
 	private Object convertScriptValueToClass(ValueLocation valueLocation, Class<?> clazz, Object scriptValue, RuntimeExceptionFactory exceptionFactory) {
 		if (clazz.isAssignableFrom(scriptValue.getClass())) {
 			return scriptValue;
-		}
-		if (clazz == StringValue.class) {
-			if (String.class.isAssignableFrom(scriptValue.getClass())) {
-				return StringValue.makeConstant((String) scriptValue);
-			}
 		}
 		if (scriptValue instanceof ScriptObjectMirror) {
 			ScriptObjectMirror scriptObject = (ScriptObjectMirror) scriptValue;
@@ -302,8 +304,6 @@ public class ScriptService {
 					return new JavascriptPredicate(scriptObject, valueLocation);
 				} else if (clazz == JavascriptProducer.class) {
 					return new JavascriptProducer(scriptObject, valueLocation);
-				} else if (clazz == StringValue.class) {
-					return StringValue.makeFunctional(new JavascriptFilter(scriptObject, valueLocation), valueLocation);
 				}
 			} else {
 				Object sobj = ScriptObjectMirror.unwrap(scriptValue, Context.getGlobal());

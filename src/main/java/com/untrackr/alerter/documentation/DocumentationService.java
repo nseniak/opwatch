@@ -3,7 +3,7 @@ package com.untrackr.alerter.documentation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.processor.config.ProcessorConfig;
-import com.untrackr.alerter.processor.config.StringValue;
+import com.untrackr.alerter.processor.config.ConstantOrFilter;
 import com.untrackr.alerter.service.ScriptService;
 import jdk.nashorn.internal.objects.NativeRegExp;
 import org.slf4j.Logger;
@@ -108,20 +108,29 @@ public class DocumentationService {
 	public String typeName(Type type) {
 		if (type instanceof Class) {
 			return simpleClassName((Class) type);
-		} else if (type instanceof ParameterizedType) {
-			return parameterizedTypeName((ParameterizedType) type);
-		} else {
-			return type.toString();
 		}
+		if (type instanceof ParameterizedType) {
+			ParameterizedType paramType = (ParameterizedType) type;
+			Type listType = parameterizedTypeParameter(paramType, List.class);
+			if (listType != null) {
+				return listTypeName(listType);
+			}
+			Type valueType = parameterizedTypeParameter(paramType, ConstantOrFilter.class);
+			if (valueType != null) {
+				return constantOrFilterTypeName(valueType);
+			}
+			return typeName(paramType.getRawType());
+		}
+		return type.toString();
 	}
 
-	public String parameterizedTypeName(ParameterizedType type) {
-		Type listType = parameterizedListType(type);
-		if (listType != null) {
-			return typeName(listType) + " array";
-		} else {
-			return typeName(type.getRawType());
-		}
+	private String listTypeName(Type listType) {
+		return typeName(listType) + " array";
+	}
+
+	private String constantOrFilterTypeName(Type valueType) {
+		String name = typeName(valueType);
+		return name + " or function returning " + name;
 	}
 
 	public String simpleClassName(Class<?> clazz) {
@@ -139,7 +148,7 @@ public class DocumentationService {
 			return "a RegExp";
 		} else if (ProcessorConfig.class.isAssignableFrom(clazz)) {
 			return "a processor configuration";
-		} else if (StringValue.class.isAssignableFrom(clazz)) {
+		} else if (ConstantOrFilter.class.isAssignableFrom(clazz)) {
 			return "a string or function";
 		} else if (com.untrackr.alerter.processor.config.JavascriptFunction.class.isAssignableFrom(clazz)) {
 			return "a function";
@@ -150,10 +159,9 @@ public class DocumentationService {
 		}
 	}
 
-	public Type parameterizedListType(ParameterizedType type) {
-		ParameterizedType paramType = (ParameterizedType) type;
+	public Type parameterizedTypeParameter(ParameterizedType paramType, Class<?> clazz) {
 		Type[] args = paramType.getActualTypeArguments();
-		if ((paramType.getRawType() == List.class) && (args.length == 1)) {
+		if ((paramType.getRawType() == clazz) && (args.length == 1)) {
 			return args[0];
 		} else {
 			return null;

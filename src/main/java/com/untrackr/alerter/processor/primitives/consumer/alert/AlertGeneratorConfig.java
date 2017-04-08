@@ -6,6 +6,7 @@ public class AlertGeneratorConfig extends ActiveProcessorConfig {
 
 	private String priority = "medium";
 	private String title;
+	private ConstantOrFilter<Object> body;
 	private JavascriptPredicate trigger;
 	private Boolean toggle = false;
 	private String channel;
@@ -26,6 +27,15 @@ public class AlertGeneratorConfig extends ActiveProcessorConfig {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	@OptionalProperty
+	public ConstantOrFilter<Object> getBody() {
+		return body;
+	}
+
+	public void setBody(ConstantOrFilter<Object> body) {
+		this.body = body;
 	}
 
 	@OptionalProperty

@@ -29,13 +29,15 @@ public class Message {
 	private Type type;
 	private Level level;
 	private String title;
+	private Object body;
 	private MessageContext context;
 	private long timestamp;
 
-	public Message(Type type, Level level, String title, MessageContext context) {
+	public Message(Type type, Level level, String title, Object body, MessageContext context) {
 		this.type = type;
 		this.level = level;
 		this.title = title;
+		this.body = body;
 		this.context = context;
 		this.timestamp = System.currentTimeMillis();
 	}
@@ -50,6 +52,10 @@ public class Message {
 
 	public String getTitle() {
 		return title;
+	}
+
+	public Object getBody() {
+		return body;
 	}
 
 	public long getTimestamp() {

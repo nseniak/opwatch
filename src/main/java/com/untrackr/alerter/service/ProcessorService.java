@@ -271,11 +271,11 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 				Thread.sleep(TimeUnit.DAYS.toMillis(1));
 			}
 		} catch (InterruptedException e) {
-			printStderr("Processor interrupted");
+			printStderr("processor interrupted");
 		} finally {
 			runningProcessor = null;
 		}
-		signalSystemInfo("alerter stopped");
+		signalSystemInfo("processor stopped");
 		processor.stop();
 		return UNDEFINED;
 	}
@@ -293,7 +293,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	public void signalSystemInfo(String title) {
 		ExecutionScope scope = new GlobalExecutionScope();
 		MessageContext context = scope.makeContext(this, ScriptStack.currentStack());
-		Message message = new Message(Message.Type.info, Message.Level.medium, title, context);
+		Message message = new Message(Message.Type.info, Message.Level.medium, title, null, context);
 		publish(systemChannel(), message);
 	}
 
@@ -311,7 +311,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		if (processorName != null) {
 			title = processorName + ": " + title;
 		}
-		Message message = new Message(Message.Type.error, e.getLevel(), title, context);
+		Message message = new Message(Message.Type.error, e.getLevel(), title, stack.asString(), context);
 		publish(systemChannel(), message);
 	}
 
