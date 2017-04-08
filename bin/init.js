@@ -1,6 +1,8 @@
 // Initialization code loaded on startup
 // Use -init <file-or-url> to specify a different initialization file
 
+load("script/processors.js");
+
 // Definition of the message channels
 channels = {
 

@@ -158,3 +158,15 @@ function constructor_short_help(schema) {
 function capitalizeFirstLetter(string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
 }
+
+
+function merge_config() {
+	var res = {};
+	for (var i = 0; i < arguments.length; i++) {
+		var config = arguments[i];
+		for (p in config) {
+			res[p] = config[p];
+		}
+	}
+	return res;
+}
