@@ -18,7 +18,12 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestTemplate;
 import sun.misc.Signal;
 
 import java.io.IOException;
@@ -62,6 +67,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	private AlerterConfig config;
 	private Thread mainThread;
 	private Processor runningProcessor;
+	private RestTemplate restTemplate = new RestTemplate();
 
 	private static String SCRIPT_EXCEPTION_MESSAGE_PREFIX = "javax.script.ScriptException: ";
 
@@ -240,7 +246,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		}
 	}
 
-	public boolean withExceptionHandling(String messagePrefix, ExecutionContextFactory defaultContextFactory, ThrowingRunnable runnable) {
+	public boolean withExceptionHandling(String messagePrefix, ExecutionScopeFactory defaultScopeFactory, ThrowingRunnable runnable) {
 		boolean error = true;
 		try {
 			runnable.run();
@@ -255,16 +261,43 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			signalSystemException(e);
 		} catch (Throwable t) {
 			String message = ((messagePrefix != null) ? messagePrefix + ": " : "") + exceptionMessage(t);
-			signalSystemException(new RuntimeError(message, defaultContextFactory.make(), t));
+			signalSystemException(new RuntimeError(message, defaultScopeFactory.make(), t));
 		}
 		return error;
+	}
+
+	public <T> ResponseEntity<T> postForEntityWithErrors(String uri,
+																											 Object request,
+																											 Class<T> clazz,
+																											 String hostname,
+																											 int port,
+																											 String path,
+																											 ExecutionScopeFactory scopeFactory) {
+		try {
+			return restTemplate.postForEntity(uri, request, clazz);
+		} catch (ResourceAccessException e) {
+			throw new RuntimeError("cannot connect to alerter on " + hostname + ":" + port,
+					scopeFactory.make());
+		} catch (HttpStatusCodeException e) {
+			HttpStatus status = e.getStatusCode();
+			if (status == HttpStatus.NOT_FOUND) {
+				throw new RuntimeError("alerter on " + hostname + ":" + port + " not receiving on path \"" + path + "\"",
+						scopeFactory.make());
+			}
+			String errorMessage = e.getResponseBodyAsString();
+			if (errorMessage.isEmpty()) {
+				errorMessage = "bad status: " + status.value() + " " + status.getReasonPhrase();
+			}
+			throw new RuntimeError("invalid response status when posting to " + uri + ": " + errorMessage,
+					scopeFactory.make());
+		}
 	}
 
 	private String exceptionMessage(Throwable t) {
 		return (t.getMessage() != null) ? t.getMessage() : t.getClass().getName();
 	}
 
-	public interface ExecutionContextFactory {
+	public interface ExecutionScopeFactory {
 
 		ExecutionScope make();
 

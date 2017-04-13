@@ -1,13 +1,12 @@
 package com.untrackr.alerter.channel.services.remote;
 
 import com.untrackr.alerter.channel.common.Channel;
+import com.untrackr.alerter.processor.common.GlobalExecutionScope;
 import com.untrackr.alerter.processor.common.Message;
 import com.untrackr.alerter.processor.common.RuntimeError;
 import com.untrackr.alerter.service.ProcessorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -22,6 +21,7 @@ public class RemoteChannel implements Channel {
 	private String hostname;
 	private int port;
 	private String remoteChannel;
+	private String path;
 	private String url;
 	private RestTemplate restTemplate = new RestTemplate();
 
@@ -47,7 +47,7 @@ public class RemoteChannel implements Channel {
 		if (remoteChannel == null) {
 			throw new RuntimeError("Remote channel not defined for channel \"" + name + "\"");
 		}
-		String path = "/publish/" + remoteChannel;
+		path = "/publish/" + remoteChannel;
 		url = UriComponentsBuilder.newInstance().scheme("http").host(hostname).port(port).path(path).toUriString();
 	}
 
@@ -68,16 +68,8 @@ public class RemoteChannel implements Channel {
 		if (processorService.config().channelDebug()) {
 			processorService.printStdout(logMessage);
 		} else {
-			try {
-				restTemplate.postForEntity(url, message, String.class);
-			} catch (HttpStatusCodeException e) {
-				HttpStatus status = e.getStatusCode();
-				String errorMessage = e.getResponseBodyAsString();
-				if (errorMessage == null) {
-					errorMessage = "bad status: " + status.value() + " " + status.getReasonPhrase();
-				}
-				throw new RuntimeException("invalid response status when publishing message to \"" + url + "\": " + errorMessage);
-			}
+			processorService.postForEntityWithErrors(url, message, String.class, hostname, port, path,
+					GlobalExecutionScope::new);
 		}
 	}
 

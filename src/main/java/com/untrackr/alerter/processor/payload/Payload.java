@@ -33,6 +33,9 @@ public class Payload<V> {
 	 */
 	private Object metadata;
 
+	private Payload() {
+	}
+
 	private Payload(long timestamp, String hostname, String producer, Payload<?> previous, V value) {
 		this.timestamp = timestamp;
 		this.hostname = hostname;

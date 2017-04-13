@@ -28,10 +28,10 @@
 * display alias name instead of processor as source
 * display root payload of alerts
 * new pushover4j version
-* manage frequency limitation by title, not by processor
-* Better slack messages
+* [x] manage frequency limitation by title, not by processor
+* [x] Better slack messages
 * Hook to create custom Pushover and Slack messages
-* Aggregate messages
+* [x] Aggregate messages
 
 ------
 
