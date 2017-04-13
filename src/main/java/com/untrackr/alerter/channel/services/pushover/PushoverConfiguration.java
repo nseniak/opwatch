@@ -1,4 +1,4 @@
-package com.untrackr.alerter.channel.pushover;
+package com.untrackr.alerter.channel.services.pushover;
 
 import com.untrackr.alerter.channel.common.ServiceConfiguration;
 
@@ -9,7 +9,6 @@ public class PushoverConfiguration extends ServiceConfiguration {
 
 	private Map<String, ChannelConfig> channels;
 	private int maxPerMinute = 10;
-	private int globalMaxPerMinute = 30;
 	private int emergencyRetry = (int) TimeUnit.SECONDS.toSeconds(60);
 	private int emergencyExpire = (int) TimeUnit.SECONDS.toSeconds(3600);
 
@@ -95,14 +94,6 @@ public class PushoverConfiguration extends ServiceConfiguration {
 
 	public void setMaxPerMinute(int maxPerMinute) {
 		this.maxPerMinute = maxPerMinute;
-	}
-
-	public int getGlobalMaxPerMinute() {
-		return globalMaxPerMinute;
-	}
-
-	public void setGlobalMaxPerMinute(int globalMaxPerMinute) {
-		this.globalMaxPerMinute = globalMaxPerMinute;
 	}
 
 	public int getEmergencyRetry() {

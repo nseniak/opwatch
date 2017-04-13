@@ -1,4 +1,4 @@
-package com.untrackr.alerter.channel.slack;
+package com.untrackr.alerter.channel.services.slack;
 
 import com.untrackr.alerter.channel.common.ServiceConfiguration;
 
@@ -8,7 +8,6 @@ public class SlackConfiguration extends ServiceConfiguration {
 
 	private Map<String, ChannelConfig> channels;
 	private int maxPerMinute = 10;
-	private int globalMaxPerMinute = 30;
 
 	public static class Application {
 
@@ -84,14 +83,6 @@ public class SlackConfiguration extends ServiceConfiguration {
 
 	public void setMaxPerMinute(int maxPerMinute) {
 		this.maxPerMinute = maxPerMinute;
-	}
-
-	public int getGlobalMaxPerMinute() {
-		return globalMaxPerMinute;
-	}
-
-	public void setGlobalMaxPerMinute(int globalMaxPerMinute) {
-		this.globalMaxPerMinute = globalMaxPerMinute;
 	}
 
 }

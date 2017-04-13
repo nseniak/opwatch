@@ -5,6 +5,7 @@ import com.untrackr.alerter.documentation.DocumentationService;
 import com.untrackr.alerter.documentation.ProcessorDoc;
 import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.processor.config.*;
+import com.untrackr.alerter.processor.payload.Stats;
 import com.untrackr.alerter.processor.primitives.consumer.alert.AlertGeneratorFactory;
 import com.untrackr.alerter.processor.primitives.consumer.post.PostFactory;
 import com.untrackr.alerter.processor.primitives.consumer.stdout.StdoutFactory;
@@ -88,7 +89,9 @@ public class ScriptService {
 		try {
 			createSimplePrimitiveFunction("run", processorService::runProcessor);
 			createSimplePrimitiveFunction("__factories", this::factories);
+			createSimplePrimitiveFunction("__stats", Stats::makeStats);
 			createSimpleBinding("config", processorService.config());
+			createSimpleBinding("__service", processorService);
 			createVarargFactoryFunction(new ParallelFactory(processorService));
 			createVarargFactoryFunction(new PipeFactory(processorService));
 			createSimpleFactoryFunction(new AliasFactory(processorService));
@@ -221,13 +224,19 @@ public class ScriptService {
 		bindings.put(name, object);
 	}
 
-	private void createSimplePrimitiveFunction(String name, JavascriptFunction function) throws ScriptException {
-		ScriptContext context = scriptEngine.getContext();
-		Bindings bindings = context.getBindings(ScriptContext.ENGINE_SCOPE);
-		bindings.put(name, function);
+	private void createSimplePrimitiveFunction(String name, JavascriptFunction0 function) throws ScriptException {
+		createSimpleBinding(name, function);
 	}
 
-	private List<ProcessorFactory<?, ?>> factories(Object obj) {
+	private void createSimplePrimitiveFunction(String name, JavascriptFunction1 function) throws ScriptException {
+		createSimpleBinding(name, function);
+	}
+
+	private void createSimplePrimitiveFunction(String name, JavascriptFunction2 function) throws ScriptException {
+		createSimpleBinding(name, function);
+	}
+
+	private List<ProcessorFactory<?, ?>> factories() {
 		return new ArrayList<>(factories.values());
 	}
 
@@ -247,13 +256,25 @@ public class ScriptService {
 				});
 	}
 
-	private <T> JavascriptFunction javascriptFunction(JavascriptFunction<Object, T> fun) {
-		return fun;
+	@FunctionalInterface
+	public interface JavascriptFunction0<R> {
+
+		R apply();
+
 	}
 
 	@FunctionalInterface
-	public interface JavascriptFunction<T, R> {
-		R apply(T t);
+	public interface JavascriptFunction1<T, R> {
+
+		R apply(T arg);
+
+	}
+
+	@FunctionalInterface
+	public interface JavascriptFunction2<T1, T2, R> {
+
+		R apply(T1 arg1, T2 arg2);
+
 	}
 
 	public Object convertScriptValue(ValueLocation valueLocation, Type type, Object scriptValue, RuntimeExceptionFactory exceptionFactory) {
@@ -267,19 +288,22 @@ public class ScriptService {
 			ParameterizedType paramType = (ParameterizedType) type;
 			Type elementType = documentationService.parameterizedTypeParameter(paramType, List.class);
 			if (elementType != null) {
-				return convertList(valueLocation, type, elementType, scriptValue, exceptionFactory);
+				if (scriptValue instanceof ScriptObjectMirror) {
+					return convertList(valueLocation, type, elementType, (ScriptObjectMirror) scriptValue, exceptionFactory);
+				}
+			} else {
+				Type valueType = documentationService.parameterizedTypeParameter(paramType, ConstantOrFilter.class);
+				if (valueType != null) {
+					return convertConstantOrFilter(valueLocation, type, valueType, scriptValue, exceptionFactory);
+				} else {
+					return convertScriptValue(valueLocation, paramType.getRawType(), scriptValue, exceptionFactory);
+				}
 			}
-			Type valueType = documentationService.parameterizedTypeParameter(paramType, ConstantOrFilter.class);
-			if (valueType != null) {
-				return convertConstantOrFilter(valueLocation, type, valueType, scriptValue, exceptionFactory);
-			}
-			return convertScriptValue(valueLocation, paramType.getRawType(), scriptValue, exceptionFactory);
 		}
 		throw exceptionFactory.make("invalid " + valueLocation.describeAsValue() + ", expected " + documentationService.typeName(type) + ", got: " + scriptValue);
 	}
 
-	private Object convertList(ValueLocation valueLocation, Type listType, Type elementType, Object scriptValue, RuntimeExceptionFactory exceptionFactory) {
-		ScriptObjectMirror scriptObject = (ScriptObjectMirror) scriptValue;
+	private Object convertList(ValueLocation valueLocation, Type listType, Type elementType, ScriptObjectMirror scriptObject, RuntimeExceptionFactory exceptionFactory) {
 		List<Object> scriptList = (List<Object>) ScriptUtils.convert(scriptObject, List.class);
 		List<Object> list = new ArrayList<>();
 		for (Object scriptListObject : scriptList) {
@@ -298,6 +322,12 @@ public class ScriptService {
 	private Object convertScriptValueToClass(ValueLocation valueLocation, Class<?> clazz, Object scriptValue, RuntimeExceptionFactory exceptionFactory) {
 		if (clazz.isAssignableFrom(scriptValue.getClass())) {
 			return scriptValue;
+		}
+		if (Number.class.isAssignableFrom(clazz)) {
+			Object number = convertScriptValueToNumber((Class<? extends Number>) clazz, scriptValue);
+			if (number != null) {
+				return number;
+			}
 		}
 		if (scriptValue instanceof ScriptObjectMirror) {
 			ScriptObjectMirror scriptObject = (ScriptObjectMirror) scriptValue;
@@ -333,6 +363,23 @@ public class ScriptService {
 			}
 		}
 		throw exceptionFactory.make("invalid " + valueLocation.describeAsValue() + ", expected " + documentationService.typeName(clazz) + ", got: " + scriptValue);
+	}
+
+	private Object convertScriptValueToNumber(Class<? extends Number> clazz, Object scriptValue) {
+		try {
+			if (clazz == Integer.class) {
+				return ((Number) scriptValue).intValue();
+			} else if (clazz == Long.class) {
+				return ((Number) scriptValue).longValue();
+			} else if (clazz == Float.class) {
+				return ((Number) scriptValue).floatValue();
+			} else if (clazz == Double.class) {
+				return ((Number) scriptValue).doubleValue();
+			}
+		} catch (ClassCastException e) {
+			// Nothing to do
+		}
+		return null;
 	}
 
 	public boolean bean(Object object) {

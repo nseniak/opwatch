@@ -34,9 +34,9 @@ public class AlertGenerator extends Consumer<AlertGeneratorConfig> {
 		boolean alert = (trigger == null) || trigger.call(payload, this);
 		Channel channel;
 		if (channelName == null) {
-			channel = processorService.alertChannel();
+			channel = processorService.getMessagingService().alertChannel();
 		} else {
-			channel = processorService.findChannel(channelName);
+			channel = processorService.getMessagingService().findChannel(channelName);
 			if (channel == null) {
 				throw new RuntimeError("channel not found: \"" + channelName + "\"", new ProcessorVoidExecutionScope(this));
 			}
@@ -64,7 +64,7 @@ public class AlertGenerator extends Consumer<AlertGeneratorConfig> {
 		} else {
 			bodyValue = payload.getValue();
 		}
-		return new Message(type, level, title, bodyValue, context);
+		return Message.makeNew(type, level, title, bodyValue, context);
 	}
 
 }

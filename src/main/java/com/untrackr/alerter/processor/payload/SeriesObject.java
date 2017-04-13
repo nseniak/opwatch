@@ -3,19 +3,30 @@ package com.untrackr.alerter.processor.payload;
 public class SeriesObject {
 
 	private Object value;
-	private long stamp;
+	private Long timestamp;
 
-	public SeriesObject(Object value, long stamp) {
+	public SeriesObject() {
+	}
+
+	public SeriesObject(Object value, long timestamp) {
 		this.value = value;
-		this.stamp = stamp;
+		this.timestamp = timestamp;
 	}
 
 	public Object getValue() {
 		return value;
 	}
 
-	public long getStamp() {
-		return stamp;
+	public void setValue(Object value) {
+		this.value = value;
+	}
+
+	public Long getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(Long timestamp) {
+		this.timestamp = timestamp;
 	}
 
 }

@@ -30,14 +30,14 @@ public class Message {
 		high(3),
 		emergency(4);
 
-		int level;
+		int rank;
 
-		Level(int level) {
-			this.level = level;
+		Level(int rank) {
+			this.rank = rank;
 		}
 
-		public int getLevel() {
-			return level;
+		public int getRank() {
+			return rank;
 		}
 
 	}
@@ -49,13 +49,18 @@ public class Message {
 	private MessageContext context;
 	private long timestamp;
 
-	public Message(Type type, Level level, String title, Object body, MessageContext context) {
-		this.type = type;
-		this.level = level;
-		this.title = title;
-		this.body = body;
-		this.context = context;
-		this.timestamp = System.currentTimeMillis();
+	private Message() {
+	}
+
+	public static Message makeNew(Type type, Level level, String title, Object body, MessageContext context) {
+		Message message = new Message();
+		message.type = type;
+		message.level = level;
+		message.title = title;
+		message.body = body;
+		message.context = context;
+		message.timestamp = System.currentTimeMillis();
+		return message;
 	}
 
 	public Type getType() {

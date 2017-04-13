@@ -25,6 +25,17 @@ channels = {
 					"webhookUrl": "<your Slack webhook here>"
 				}
 			}
+		},
+
+		// Remote channels
+		"remote": {
+			"channels": {
+				"<unique channel name>": {
+					"hostname": "<remote host name>",
+					// "port": <remote host port number (optional)>
+					"channel": "<remote channel name>"
+				}
+			}
 		}
 
 	},

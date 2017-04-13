@@ -2,9 +2,9 @@ package com.untrackr.alerter.documentation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.untrackr.alerter.processor.common.*;
-import com.untrackr.alerter.processor.config.ProcessorConfig;
 import com.untrackr.alerter.processor.config.ConstantOrFilter;
-import com.untrackr.alerter.service.ScriptService;
+import com.untrackr.alerter.processor.config.JavascriptFunction;
+import com.untrackr.alerter.processor.config.ProcessorConfig;
 import jdk.nashorn.internal.objects.NativeRegExp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -142,7 +142,7 @@ public class DocumentationService {
 			return "a boolean";
 		} else if (Number.class.isAssignableFrom(clazz)) {
 			return "a number";
-		} else if (ScriptService.JavascriptFunction.class.isAssignableFrom(clazz)) {
+		} else if (JavascriptFunction.class.isAssignableFrom(clazz)) {
 			return "a function";
 		} else if (NativeRegExp.class.isAssignableFrom(clazz)) {
 			return "a RegExp";
@@ -161,7 +161,7 @@ public class DocumentationService {
 
 	public Type parameterizedTypeParameter(ParameterizedType paramType, Class<?> clazz) {
 		Type[] args = paramType.getActualTypeArguments();
-		if ((paramType.getRawType() == clazz) && (args.length == 1)) {
+		if ((paramType.getRawType() instanceof Class) && (clazz.isAssignableFrom((Class) paramType.getRawType())) && (args.length == 1)) {
 			return args[0];
 		} else {
 			return null;

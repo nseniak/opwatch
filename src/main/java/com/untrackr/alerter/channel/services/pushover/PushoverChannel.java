@@ -1,7 +1,9 @@
-package com.untrackr.alerter.channel.pushover;
+package com.untrackr.alerter.channel.services.pushover;
 
-import com.untrackr.alerter.channel.common.Channel;
-import com.untrackr.alerter.common.FrequencyLimiter;
+import com.untrackr.alerter.channel.common.gated.GatedChannel;
+import com.untrackr.alerter.channel.common.gated.MessageAggregate;
+import com.untrackr.alerter.channel.common.gated.Rate;
+import com.untrackr.alerter.channel.common.gated.RateLimiter;
 import com.untrackr.alerter.processor.common.GlobalExecutionScope;
 import com.untrackr.alerter.processor.common.Message;
 import com.untrackr.alerter.processor.common.MessageContext;
@@ -12,13 +14,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.StringWriter;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.springframework.util.StringUtils.capitalize;
 
-public class PushoverChannel implements Channel {
+public class PushoverChannel extends GatedChannel<PushoverConfiguration> {
 
 	private static final Logger logger = LoggerFactory.getLogger(PushoverChannel.class);
 
@@ -29,23 +32,19 @@ public class PushoverChannel implements Channel {
 	private PushoverConfiguration config;
 	private PushoverMessageService service;
 	private ProcessorService processorService;
+	private RateLimiter rateLimiter;
 	private PushoverKey pushoverKey;
-	private Map<String, FrequencyLimiter> scopeFrequenceyLimiter = new ConcurrentHashMap<>();
-	private FrequencyLimiter globalFrequencyLimiter;
-	private int globalAlertCount;
 
 	public PushoverChannel(String name, PushoverConfiguration config, PushoverMessageService service, ProcessorService processorService) {
+		super(service);
 		this.name = name;
 		this.config = config;
 		this.service = service;
 		this.processorService = processorService;
 		this.pushoverKey = makeKey(name);
-		initializeFrequencyLimiters();
-	}
-
-	@Override
-	public String serviceName() {
-		return service.serviceName();
+		this.rateLimiter = new RateLimiter(service.timestampSeconds(),
+				Arrays.asList(new Rate((int) TimeUnit.MINUTES.toSeconds(1), config.getMaxPerMinute())),
+				service.apiTokenRateLimit(pushoverKey.getApiToken()));
 	}
 
 	private PushoverKey makeKey(String channelName) {
@@ -64,21 +63,45 @@ public class PushoverChannel implements Channel {
 		return new PushoverKey(apiToken, userKey);
 	}
 
-	private void initializeFrequencyLimiters() {
-		scopeFrequenceyLimiter = new ConcurrentHashMap<>();
-		int maxAlertsPerMinute = config.getGlobalMaxPerMinute();
-		globalFrequencyLimiter = new FrequencyLimiter(TimeUnit.MINUTES.toMillis(1), maxAlertsPerMinute);
-		globalAlertCount = 0;
-	}
-
 	@Override
 	public String name() {
 		return name;
 	}
 
 	@Override
-	public void publish(Message message) {
-		globalAlertCount = globalAlertCount + 1;
+	protected RateLimiter rateLimiter() {
+		return rateLimiter;
+	}
+
+	@Override
+	protected void publishLimitReached(Rate rateLimit) {
+		String title = limitReachedMessage(rateLimit);
+		String body = "Muting for a while";
+		PushoverMessage pushoverMessage = makePushoverMessage(pushoverKey, title, body, MessagePriority.NORMAL);
+		send(pushoverMessage);
+	}
+
+	@Override
+	protected void publishAggregate(List<Message> messages, Date mutedOn) {
+		MessageAggregate aggregate = new MessageAggregate();
+		for (Message message : messages) {
+			String title = alertTitle(message);
+			aggregate.addMessage(title, message);
+		}
+		Message.Level level = aggregate.getMaxLevel();
+		String title = levelPrefix(level) + "Unmuting " + processorService.config().hostName();
+		StringWriter writer = new StringWriter();
+		writer.append("The following messages were muted:").append("\n");
+		for (MessageAggregate.AggregateMessagePart part : aggregate.messageParts()) {
+			writer.append(part.titleWithCount()).append("\n");
+		}
+		String body = truncate(writer.toString(), MAX_MESSAGE_LENGTH);
+		PushoverMessage pushoverMessage = makePushoverMessage(pushoverKey, title, body, levelPriority(level));
+		send(pushoverMessage);
+	}
+
+	@Override
+	protected void publishOne(Message message) {
 		MessagePriority priority = levelPriority(message.getLevel());
 		String title = truncate(alertTitle(message), MAX_TITLE_LENGTH);
 		StringWriter writer = new StringWriter();
@@ -87,16 +110,7 @@ public class PushoverChannel implements Channel {
 		writeBody(writer, message.getBody());
 		String bodyText = writer.toString();
 		bodyText = truncate(bodyText, MAX_MESSAGE_LENGTH);
-		Integer retry = null;
-		Integer expire = null;
-		if (message.getLevel() == Message.Level.emergency) {
-			retry = config.getEmergencyRetry();
-			expire = config.getEmergencyExpire();
-		}
-		if (checkFrequencyLimits(scope)) {
-			return;
-		}
-		PushoverMessage pushoverMessage = makePushoverMessage(pushoverKey, title, bodyText, priority, retry, expire);
+		PushoverMessage pushoverMessage = makePushoverMessage(pushoverKey, title, bodyText, priority);
 		send(pushoverMessage);
 	}
 
@@ -148,37 +162,6 @@ public class PushoverChannel implements Channel {
 		throw new IllegalStateException("unknown level: " + level.name());
 	}
 
-	private boolean checkFrequencyLimits(MessageContext scope) {
-		String scopeId = scope.getAlerterId();
-		FrequencyLimiter scopeLimiter = scopeFrequenceyLimiter.get(scopeId);
-		if (scopeLimiter == null) {
-			int maxAlertsPerMinute = config.getMaxPerMinute();
-			scopeLimiter = new FrequencyLimiter(TimeUnit.MINUTES.toMillis(1), maxAlertsPerMinute);
-			scopeFrequenceyLimiter.put(scopeId, scopeLimiter);
-		}
-		if (checkFrequencyLimits(scopeLimiter, "Limit of %1$s reached for " + scope.descriptor())) {
-			return true;
-		}
-		if (checkFrequencyLimits(globalFrequencyLimiter, "Global limit of %1$s reached")) {
-			return true;
-		}
-		return false;
-	}
-
-	private boolean checkFrequencyLimits(FrequencyLimiter limiter, String titleFormat) {
-		int scopeEverflow = limiter.ping();
-		if (scopeEverflow > 0) {
-			if (scopeEverflow == 1) {
-				String title = String.format(titleFormat, limiter.describeLimit("message", "messages"));
-				String body = "Muting for a moment.";
-				PushoverMessage pushoverMessage = makePushoverMessage(pushoverKey, "Alert not sent: " + title, body, MessagePriority.NORMAL, null, null);
-				send(pushoverMessage);
-			}
-			return true;
-		}
-		return false;
-	}
-
 	private String truncate(String str, int length) {
 		if (str.length() <= length) {
 			return str;
@@ -190,9 +173,13 @@ public class PushoverChannel implements Channel {
 	private PushoverMessage makePushoverMessage(PushoverKey pushoverKey,
 																							String title,
 																							String message,
-																							MessagePriority priority,
-																							Integer retry,
-																							Integer expire) {
+																							MessagePriority priority) {
+		Integer retry = null;
+		Integer expire = null;
+		if (priority == MessagePriority.EMERGENCY) {
+			retry = config.getEmergencyRetry();
+			expire = config.getEmergencyExpire();
+		}
 		return PushoverMessage.builderWithApiToken(pushoverKey.getApiToken())
 				.setUserId(pushoverKey.getUserKey())
 				.setTitle(title)
@@ -217,7 +204,7 @@ public class PushoverChannel implements Channel {
 				throw new RuntimeError("Status error while pushing to Pushover: " + result.toString());
 			}
 		} catch (PushoverException e) {
-			throw new RuntimeError("Error while pushing to Pushover" , new GlobalExecutionScope(), e);
+			throw new RuntimeError("Error while pushing to Pushover", new GlobalExecutionScope(), e);
 		}
 	}
 

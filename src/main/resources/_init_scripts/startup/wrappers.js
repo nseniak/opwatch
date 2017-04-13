@@ -170,3 +170,7 @@ function merge_config() {
 	}
 	return res;
 }
+
+function stats(data) {
+	return __stats(__service, data);
+}

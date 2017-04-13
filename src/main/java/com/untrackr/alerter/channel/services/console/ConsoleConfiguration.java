@@ -1,4 +1,4 @@
-package com.untrackr.alerter.channel.console;
+package com.untrackr.alerter.channel.services.console;
 
 import com.untrackr.alerter.channel.common.ServiceConfiguration;
 

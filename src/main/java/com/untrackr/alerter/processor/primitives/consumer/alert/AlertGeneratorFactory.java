@@ -45,7 +45,7 @@ public class AlertGeneratorFactory extends ActiveProcessorFactory<AlertGenerator
 		JavascriptPredicate trigger = config.getTrigger();
 		boolean toggle = checkPropertyValue("toggle", config.getToggle());
 		String channelName = config.getChannel();
-		if ((channelName != null) && (processorService.findChannel(channelName) == null)) {
+		if ((channelName != null) && (processorService.getMessagingService().findChannel(channelName) == null)) {
 			throw new RuntimeError("channel not found: \"" + channelName + "\"", new FactoryExecutionScope(this));
 		}
 		ConstantOrFilter<Object> body = config.getBody();

@@ -1,15 +1,11 @@
 package com.untrackr.alerter.service;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.untrackr.alerter.CommandLineOptions;
-import com.untrackr.alerter.channel.MessageServiceService;
-import com.untrackr.alerter.channel.common.*;
-import com.untrackr.alerter.channel.console.ConsoleConfiguration;
-import com.untrackr.alerter.channel.console.ConsoleMessageService;
-import com.untrackr.alerter.channel.pushover.PushoverMessageService;
-import com.untrackr.alerter.channel.slack.SlackMessageService;
+import com.untrackr.alerter.channel.common.Channel;
+import com.untrackr.alerter.channel.common.ChannelConfig;
+import com.untrackr.alerter.channel.common.MessagingService;
+import com.untrackr.alerter.common.ObjectMapperService;
 import com.untrackr.alerter.common.ThreadUtil;
 import com.untrackr.alerter.ioservice.FileTailingService;
 import com.untrackr.alerter.processor.common.*;
@@ -28,18 +24,12 @@ import sun.misc.Signal;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_COMMENTS;
-import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
-import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_NULL_MAP_VALUES;
-import static com.untrackr.alerter.channel.console.ConsoleMessageService.CONSOLE_CHANNEL_NAME;
 import static jdk.nashorn.internal.runtime.ScriptRuntime.UNDEFINED;
 
 @Service
@@ -63,14 +53,13 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	private ApplicationContext applicationContext;
 
 	@Autowired
-	private MessageServiceService messageServiceService;
+	private ObjectMapperService objectMapperService;
 
-	private static String DEFAULT_DEFAULT_CHANNEL = "console";
+	@Autowired
+	private MessagingService messagingService;
 
 	private String id;
 	private AlerterConfig config;
-	private Channels channels;
-	private ObjectMapper objectMapper;
 	private Thread mainThread;
 	private Processor runningProcessor;
 
@@ -85,12 +74,6 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		id = uuid();
-		// Object mapper
-		objectMapper = new ObjectMapper();
-		objectMapper.configure(WRITE_DATES_AS_TIMESTAMPS, false);
-		objectMapper.configure(WRITE_NULL_MAP_VALUES, false);
-		objectMapper.configure(ALLOW_COMMENTS, true);
-		objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 	}
 
 	@Override
@@ -106,10 +89,10 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		Signal.handle(new Signal("INT"), this::userInterruptHandler);
 		try {
 			createConfig(options);
-			initializeChannels(new ChannelConfig());
+			messagingService.initializeChannels(new ChannelConfig());
 			scriptService.initialize();
-			printStdout("Default alert channel: " + channels.getAlertChannel().name());
-			printStdout("System channel: " + channels.getSystemChannel().name());
+			printStdout("Default alert channel: " + messagingService.alertChannel().name());
+			printStdout("System channel: " + messagingService.systemChannel().name());
 			if (options.getScripts().isEmpty()) {
 				runRepl(options);
 			} else {
@@ -123,65 +106,6 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		}
 	}
 
-	public void initializeChannels(ChannelConfig channelConfig) {
-		LinkedHashMap<String, Channel> channelMap = new LinkedHashMap<>();
-		addServiceChannels(channelConfig, channelMap, new ConsoleMessageService());
-		addServiceChannels(channelConfig, channelMap, new PushoverMessageService());
-		addServiceChannels(channelConfig, channelMap, new SlackMessageService());
-		Channel consoleChannel = channelMap.computeIfAbsent(CONSOLE_CHANNEL_NAME,
-				k -> new ConsoleMessageService().createChannels(new ConsoleConfiguration(), this).get(0));
-		Channel defaultChannel = null;
-		Channel errorChannel = null;
-		String defaultChannelName = channelConfig.getAlertChannel();
-		if (defaultChannelName != null) {
-			defaultChannel = channelMap.get(defaultChannelName);
-			if (defaultChannel == null) {
-				throw new RuntimeError("the specified default channel does not exist: \"" + defaultChannelName + "\"");
-			}
-		} else {
-			defaultChannel = consoleChannel;
-		}
-		String errorChannelName = channelConfig.getSystemChannel();
-		if (errorChannelName != null) {
-			errorChannel = channelMap.get(errorChannelName);
-			if (errorChannel == null) {
-				throw new RuntimeError("the specified error channel does not exist: \"" + errorChannelName + "\"");
-			}
-		} else {
-			errorChannel = defaultChannel;
-		}
-		channels = new Channels(channelMap, defaultChannel, errorChannel);
-		logger.info("Alert channel: " + channels.getAlertChannel().name());
-		logger.info("System channel: " + channels.getSystemChannel().name());
-	}
-
-	private <F extends ServiceConfiguration, C extends Channel> void addServiceChannels(ChannelConfig channelConfig,
-																																											LinkedHashMap<String, Channel> channelMap,
-																																											MessageService<F, C> service) {
-		String serviceName = service.serviceName();
-		Object serviceConfig = channelConfig.getServices().get(serviceName);
-		if (serviceConfig == null) {
-			return;
-		}
-		Class<F> configClass = service.configurationClass();
-		F config;
-		try {
-			config = objectMapper.convertValue(serviceConfig, configClass);
-		} catch (RuntimeException e) {
-			String message = "invalid configuration for service \"" + serviceName + "\"";
-			logger.error(message, e);
-			throw new RuntimeError(message + ": " + e.getMessage());
-		}
-		List<C> channels = service.createChannels(config, this);
-		for (C channel : channels) {
-			String name = channel.name();
-			Channel previous = channelMap.put(name, channel);
-			if (previous != null) {
-				throw new RuntimeError("cannot create " + channel.serviceName() + " channel \"" + name + "\": a channel with the same name already exists");
-			}
-		}
-	}
-
 	private void createConfig(CommandLineOptions options) {
 		config = new AlerterConfig(this, options);
 		if (config.hostName() == null) {
@@ -191,22 +115,6 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 				throw new RuntimeError("Cannot determine hostname; please specify one with -hostname <hostname>");
 			}
 		}
-	}
-
-	public Channel findChannel(String name) {
-		return channels.getChannelMap().get(name);
-	}
-
-	public Channel consoleChannel() {
-		return findChannel(CONSOLE_CHANNEL_NAME);
-	}
-
-	public Channel alertChannel() {
-		return channels.getAlertChannel();
-	}
-
-	public Channel systemChannel() {
-		return channels.getSystemChannel();
 	}
 
 	private void userInterruptHandler(Signal signal) {
@@ -293,8 +201,8 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	public void signalSystemInfo(String title) {
 		ExecutionScope scope = new GlobalExecutionScope();
 		MessageContext context = scope.makeContext(this, ScriptStack.currentStack());
-		Message message = new Message(Message.Type.info, Message.Level.medium, title, null, context);
-		publish(systemChannel(), message);
+		Message message = Message.makeNew(Message.Type.info, Message.Level.medium, title, null, context);
+		publish(messagingService.systemChannel(), message);
 	}
 
 	public void signalSystemException(RuntimeError e) {
@@ -311,20 +219,21 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		if (processorName != null) {
 			title = processorName + ": " + title;
 		}
-		Message message = new Message(Message.Type.error, e.getLevel(), title, stack.asString(), context);
-		publish(systemChannel(), message);
+		Message message = Message.makeNew(Message.Type.error, e.getLevel(), title, stack.asString(), context);
+		publish(messagingService.systemChannel(), message);
 	}
 
 	public void publish(Channel channel, Message message) {
 		try {
+			logger.info("Publish to " + channel.serviceName() + "[" + channel.name() + "] " + prettyJson(message));
 			channel.publish(message);
 		} catch (Throwable t) {
-			String logMessage = "Error trying to publish to channel \"" + channel.name() + "\": " + t.getMessage();
+			String logMessage = "Error trying to publish to channel \"" + channel.name() + "\": " + exceptionMessage(t);
 			logger.error(logMessage, t);
 			try {
 				printStdout(logMessage);
 				printStdout("Publishing to console instead:");
-				consoleChannel().publish(message);
+				messagingService.consoleChannel().publish(message);
 			} catch (Throwable t2) {
 				logger.error("Error trying to publish to console", t2);
 			}
@@ -345,10 +254,14 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		} catch (RuntimeError e) {
 			signalSystemException(e);
 		} catch (Throwable t) {
-			String message = ((messagePrefix != null) ? messagePrefix + ": " : "") + t.getMessage();
+			String message = ((messagePrefix != null) ? messagePrefix + ": " : "") + exceptionMessage(t);
 			signalSystemException(new RuntimeError(message, defaultContextFactory.make(), t));
 		}
 		return error;
+	}
+
+	private String exceptionMessage(Throwable t) {
+		return (t.getMessage() != null) ? t.getMessage() : t.getClass().getName();
 	}
 
 	public interface ExecutionContextFactory {
@@ -369,7 +282,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	public String json(Object value) {
 		try {
-			return objectMapper.writeValueAsString(value);
+			return objectMapperService.objectMapper().writeValueAsString(value);
 		} catch (JsonProcessingException e) {
 			logger.error("Error while converting json to string", e);
 			return "<cannot convert to string>";
@@ -378,7 +291,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	public String prettyJson(Object value) {
 		try {
-			return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(value);
+			return objectMapperService.objectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(value);
 		} catch (JsonProcessingException e) {
 			logger.error("Error while converting json to string", e);
 			return "<cannot convert to string>";
@@ -386,7 +299,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	}
 
 	public Object parseJson(String text) throws IOException {
-		return objectMapper.readValue(text, Object.class);
+		return objectMapperService.objectMapper().readValue(text, Object.class);
 	}
 
 	public void exit() {
@@ -426,12 +339,16 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		return consumerExecutor;
 	}
 
-	public ObjectMapper getObjectMapper() {
-		return objectMapper;
+	public ObjectMapperService getObjectMapperService() {
+		return objectMapperService;
 	}
 
 	public ScriptService getScriptService() {
 		return scriptService;
+	}
+
+	public MessagingService getMessagingService() {
+		return messagingService;
 	}
 
 }

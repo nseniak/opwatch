@@ -30,7 +30,7 @@ public class Receive extends Producer<ReceiveConfig> implements HttpService.Post
 		processorService.withExceptionHandling("error consuming http post",
 				() -> new ProcessorVoidExecutionScope(this),
 				() -> {
-					Payload<?> remotePayload = processorService.getObjectMapper().convertValue(input, Payload.class);
+					Payload<?> remotePayload = processorService.getObjectMapperService().objectMapper().convertValue(input, Payload.class);
 					outputTransformed(remotePayload.getValue(), remotePayload);
 				});
 	}

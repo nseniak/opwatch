@@ -47,7 +47,7 @@ public abstract class TrailCollecter<D extends ScheduledProcessorConfig> extends
 		if ((timestamp - startupTimestamp) < duration) {
 			return;
 		}
-		queue.removeIf(to -> (timestamp - to.getStamp()) > duration);
+		queue.removeIf(to -> (timestamp - to.getTimestamp()) > duration);
 		outputProduced(producedObject());
 	}
 

@@ -13,6 +13,9 @@ public class ScriptStack {
 
 	private List<ScriptStackElement> elements = new ArrayList<>();
 
+	private ScriptStack() {
+	}
+
 	private ScriptStack(Throwable t) {
 		initFromStack(t.getStackTrace());
 	}
@@ -60,7 +63,7 @@ public class ScriptStack {
 
 	private void addElement(String fileName, int lineNumber) {
 		if ((fileName != null) && !fileName.contains(INIT_SCRIPT_PATH)) {
-			elements.add(new ScriptStackElement(fileName, lineNumber));
+			elements.add(ScriptStackElement.makeNew(fileName, lineNumber));
 		}
 	}
 
@@ -89,9 +92,14 @@ public class ScriptStack {
 		private String fileName;
 		private int lineNumber;
 
-		public ScriptStackElement(String fileName, int lineNumber) {
-			this.fileName = fileName;
-			this.lineNumber = lineNumber;
+		private ScriptStackElement() {
+		}
+
+		public static ScriptStackElement makeNew(String fileName, int lineNumber) {
+			ScriptStackElement element = new ScriptStackElement();
+			element.fileName = fileName;
+			element.lineNumber = lineNumber;
+			return element;
 		}
 
 		public String getFileName() {
@@ -114,6 +122,10 @@ public class ScriptStack {
 
 	public List<ScriptStackElement> getElements() {
 		return elements;
+	}
+
+	public void setElements(List<ScriptStackElement> elements) {
+		this.elements = elements;
 	}
 
 }

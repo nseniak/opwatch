@@ -1,4 +1,4 @@
-package com.untrackr.alerter.channel.pushover;
+package com.untrackr.alerter.channel.services.pushover;
 
 public class PushoverKey {
 

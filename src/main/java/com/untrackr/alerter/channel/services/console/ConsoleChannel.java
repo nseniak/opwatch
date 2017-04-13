@@ -1,4 +1,4 @@
-package com.untrackr.alerter.channel.console;
+package com.untrackr.alerter.channel.services.console;
 
 import com.untrackr.alerter.channel.common.Channel;
 import com.untrackr.alerter.processor.common.Message;
@@ -6,7 +6,7 @@ import com.untrackr.alerter.service.ProcessorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.untrackr.alerter.channel.console.ConsoleMessageService.CONSOLE_CHANNEL_NAME;
+import static com.untrackr.alerter.channel.services.console.ConsoleMessageService.CONSOLE_CHANNEL_NAME;
 
 public class ConsoleChannel implements Channel {
 
@@ -36,7 +36,6 @@ public class ConsoleChannel implements Channel {
 	public void publish(Message message) {
 		String logMessage = "Message to Console " + processorService.prettyJson(message);
 		logger.info(logMessage);
-		processorService.printStdout(logMessage);
 		if (processorService.config().channelDebug()) {
 			processorService.printStdout(logMessage);
 		} else {

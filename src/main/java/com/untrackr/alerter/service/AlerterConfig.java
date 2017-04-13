@@ -8,6 +8,8 @@ import com.untrackr.alerter.processor.common.ValueLocation;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.untrackr.alerter.AlerterApplication.DEFAULT_HTTP_PORT;
+
 public class AlerterConfig {
 
 	private ProcessorService processorService;
@@ -50,7 +52,7 @@ public class AlerterConfig {
 		this.processorInputQueueTimeout = ApplicationUtil.property("alerter.input.queue.timeout", TimeUnit.SECONDS.toMillis(60));
 		this.minimumOutputDelay = ApplicationUtil.property("alerter.output.min.delay", TimeUnit.MILLISECONDS.toMillis(0));
 		this.defaultPostHostname = ApplicationUtil.property("alerter.post.hostname", "localhost");
-		this.defaultPostPort = ApplicationUtil.property("alerter.post.port", 28018);
+		this.defaultPostPort = ApplicationUtil.property("alerter.post.port", DEFAULT_HTTP_PORT);
 		this.cronScriptOutputCheckDelay = TimeUnit.SECONDS.toMillis(100);
 		this.cronCommandExitTimeout = TimeUnit.MINUTES.toMillis(3);
 		this.commandStartTimeout = TimeUnit.MINUTES.toMillis(1);
@@ -59,7 +61,7 @@ public class AlerterConfig {
 
 	public void channels(Object scriptObject) {
 		ChannelConfig config = (ChannelConfig) processorService.getScriptService().convertScriptValue(ValueLocation.makeToplevel(), ChannelConfig.class, scriptObject, RuntimeError::new);
-		processorService.initializeChannels(config);
+		processorService.getMessagingService().initializeChannels(config);
 		channels = config;
 	}
 

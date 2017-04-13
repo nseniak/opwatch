@@ -16,6 +16,8 @@ import org.springframework.context.ApplicationContext;
 @SpringBootApplication
 public class AlerterApplication implements CommandLineRunner {
 
+	public static final int DEFAULT_HTTP_PORT = 28018;
+
 	@Autowired
 	private ProcessorService processorService;
 
@@ -35,9 +37,8 @@ public class AlerterApplication implements CommandLineRunner {
 			ApplicationUtil.checkProperty("app.log.dir", "logging directory");
 			ApplicationUtil.checkProperty("app.log.basename", "logfile basename");
 			options = parseOptions(args);
-			if (options.getPort() != null) {
-				System.setProperty("server.port", Integer.toString(options.getPort()));
-			}
+			int port = (options.getPort() != null) ? options.getPort() : DEFAULT_HTTP_PORT;
+			System.setProperty("server.port", Integer.toString(port));
 			new SpringApplicationBuilder(AlerterApplication.class).web(!options.isNoHttp()).run(args);
 		} catch (ConnectorStartFailedException e) {
 			System.err.println("Cannot start http server on port " + e.getPort());
@@ -59,7 +60,7 @@ public class AlerterApplication implements CommandLineRunner {
 		OptionSpec<Integer> port = parser.accepts("port").withRequiredArg().ofType(Integer.class);
 		OptionSpec<Void> traceChannels = parser.accepts("trace-channels");
 		OptionSpec<String> files = parser.nonOptions().ofType(String.class);
-		OptionSet optionSet  = parser.parse(argStrings);
+		OptionSet optionSet = parser.parse(argStrings);
 		CommandLineOptions options = new CommandLineOptions();
 		options.setHostname(optionSet.valueOf(hostname));
 		options.setNoHttp(optionSet.has(noHttp));
