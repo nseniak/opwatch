@@ -1,13 +1,11 @@
 package com.untrackr.alerter.processor.payload;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.service.ProcessorService;
 
 /**
  * Represents the output of a processor.
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "_type")
 public class Payload<V> {
 
 	/**
@@ -30,8 +28,12 @@ public class Payload<V> {
 	 * The payload value.
 	 */
 	private V value;
+	/**
+	 * Optional metadata
+	 */
+	private Object metadata;
 
-	protected Payload(long timestamp, String hostname, String producer, Payload<?> previous, V value) {
+	private Payload(long timestamp, String hostname, String producer, Payload<?> previous, V value) {
 		this.timestamp = timestamp;
 		this.hostname = hostname;
 		this.producer = producer;
@@ -65,6 +67,14 @@ public class Payload<V> {
 
 	public Object getValue() {
 		return value;
+	}
+
+	public Object getMetadata() {
+		return metadata;
+	}
+
+	public void setMetadata(Object metadata) {
+		this.metadata = metadata;
 	}
 
 }
