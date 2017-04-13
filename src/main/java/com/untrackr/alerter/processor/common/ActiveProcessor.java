@@ -81,13 +81,13 @@ public abstract class ActiveProcessor<D extends ActiveProcessorConfig> extends P
 		}
 	}
 
-	public void outputTransformed(Object value, Payload input) {
-		Payload payload = Payload.makeTransformed(processorService, this, input, value);
+	public <V> void outputTransformed(V value, Payload<?> input) {
+		Payload<V> payload = Payload.makeTransformed(processorService, this, input, value);
 		output(consumers, payload);
 	}
 
-	public void outputProduced(Object value) {
-		Payload payload = Payload.makeRoot(processorService, this, value);
+	public <V> void outputProduced(V value) {
+		Payload<V> payload = Payload.makeRoot(processorService, this, value);
 		output(consumers, payload);
 	}
 

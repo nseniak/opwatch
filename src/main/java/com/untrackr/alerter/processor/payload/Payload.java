@@ -41,11 +41,11 @@ public class Payload<V> {
 		this.value = value;
 	}
 
-	public static <V> Payload makeRoot(ProcessorService processorService, Processor producer, V value) {
+	public static <V> Payload<V> makeRoot(ProcessorService processorService, Processor producer, V value) {
 		return new Payload<>(System.currentTimeMillis(), processorService.config().hostName(), producer.getName(), null, value);
 	}
 
-	public static <V> Payload makeTransformed(ProcessorService processorService, Processor producer, Payload previous, V value) {
+	public static <V> Payload<V> makeTransformed(ProcessorService processorService, Processor producer, Payload<?> previous, V value) {
 		return new Payload<>(System.currentTimeMillis(), processorService.config().hostName(), producer.getName(), previous, value);
 	}
 
