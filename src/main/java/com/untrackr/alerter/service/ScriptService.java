@@ -288,8 +288,11 @@ public class ScriptService {
 			ParameterizedType paramType = (ParameterizedType) type;
 			Type elementType = documentationService.parameterizedTypeParameter(paramType, List.class);
 			if (elementType != null) {
-				if (scriptValue instanceof ScriptObjectMirror) {
-					return convertList(valueLocation, type, elementType, (ScriptObjectMirror) scriptValue, exceptionFactory);
+				try {
+					List<Object> scriptList = (List<Object>) ScriptUtils.convert(scriptValue, List.class);
+					return convertList(valueLocation, type, elementType, scriptList, exceptionFactory);
+				} catch (Throwable t) {
+					// Do nothing
 				}
 			} else {
 				Type valueType = documentationService.parameterizedTypeParameter(paramType, ConstantOrFilter.class);
@@ -303,8 +306,7 @@ public class ScriptService {
 		throw exceptionFactory.make("invalid " + valueLocation.describeAsValue() + ", expected " + documentationService.typeName(type) + ", got: " + scriptValue);
 	}
 
-	private Object convertList(ValueLocation valueLocation, Type listType, Type elementType, ScriptObjectMirror scriptObject, RuntimeExceptionFactory exceptionFactory) {
-		List<Object> scriptList = (List<Object>) ScriptUtils.convert(scriptObject, List.class);
+	private Object convertList(ValueLocation valueLocation, Type listType, Type elementType, List<Object> scriptList, RuntimeExceptionFactory exceptionFactory) {
 		List<Object> list = new ArrayList<>();
 		for (Object scriptListObject : scriptList) {
 			list.add(convertScriptValue(valueLocation.toListElement(), elementType, scriptListObject, exceptionFactory));
