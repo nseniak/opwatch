@@ -1,4 +1,4 @@
-* Make it possible to use a wrapper function for a processor definition
+* [x] Make it possible to use a wrapper function for a processor definition
 * Find name
 * Getting started
 * Reference documentation generation
@@ -27,13 +27,16 @@
 * mute/downgrade alarms by UI
 * display alias name instead of processor as source
 * display root payload of alerts
-* new pushover4j version
+* Move to new pushover4j version
 * [x] manage frequency limitation by title, not by processor
 * [x] Better slack messages
 * Hook to create custom Pushover and Slack messages
 * [x] Aggregate messages
 
 ------
+
+What is Pipenik?
+
 
 Design goals:
 * Easy to deploy and to use

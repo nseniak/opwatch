@@ -1,4 +1,4 @@
-package com.untrackr.alerter.processor.primitives.consumer.post;
+package com.untrackr.alerter.processor.primitives.consumer.send;
 
 import com.untrackr.alerter.processor.common.ProcessorPayloadExecutionScope;
 import com.untrackr.alerter.processor.payload.Payload;

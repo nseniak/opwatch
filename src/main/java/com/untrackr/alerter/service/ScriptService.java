@@ -7,7 +7,7 @@ import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.processor.config.*;
 import com.untrackr.alerter.processor.payload.Stats;
 import com.untrackr.alerter.processor.primitives.consumer.alert.AlertGeneratorFactory;
-import com.untrackr.alerter.processor.primitives.consumer.post.SendFactory;
+import com.untrackr.alerter.processor.primitives.consumer.send.SendFactory;
 import com.untrackr.alerter.processor.primitives.consumer.stdout.StdoutFactory;
 import com.untrackr.alerter.processor.primitives.filter.apply.ApplyFactory;
 import com.untrackr.alerter.processor.primitives.filter.collect.CollectFactory;

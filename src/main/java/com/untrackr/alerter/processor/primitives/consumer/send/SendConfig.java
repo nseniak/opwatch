@@ -1,7 +1,6 @@
-package com.untrackr.alerter.processor.primitives.consumer.post;
+package com.untrackr.alerter.processor.primitives.consumer.send;
 
 import com.untrackr.alerter.processor.config.ActiveProcessorConfig;
-import com.untrackr.alerter.processor.config.ImplicitProperty;
 import com.untrackr.alerter.processor.config.OptionalProperty;
 
 public class SendConfig extends ActiveProcessorConfig {
