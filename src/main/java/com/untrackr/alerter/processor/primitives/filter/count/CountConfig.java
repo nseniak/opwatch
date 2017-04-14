@@ -1,4 +1,4 @@
-package com.untrackr.alerter.processor.primitives.producer.count;
+package com.untrackr.alerter.processor.primitives.filter.count;
 
 import com.untrackr.alerter.processor.config.ImplicitProperty;
 import com.untrackr.alerter.processor.config.JavascriptPredicate;
@@ -10,7 +10,7 @@ public class CountConfig extends ScheduledProcessorConfig {
 	private JavascriptPredicate predicate;
 	private String duration;
 
-	@ImplicitProperty
+	@OptionalProperty
 	public JavascriptPredicate getPredicate() {
 		return predicate;
 	}
@@ -19,7 +19,7 @@ public class CountConfig extends ScheduledProcessorConfig {
 		this.predicate = predicate;
 	}
 
-	@OptionalProperty
+	@ImplicitProperty
 	public String getDuration() {
 		return duration;
 	}

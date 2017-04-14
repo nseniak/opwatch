@@ -1,4 +1,4 @@
-package com.untrackr.alerter.processor.primitives.producer.count;
+package com.untrackr.alerter.processor.primitives.filter.count;
 
 import com.untrackr.alerter.processor.common.ProcessorSignature;
 import com.untrackr.alerter.processor.config.JavascriptPredicate;

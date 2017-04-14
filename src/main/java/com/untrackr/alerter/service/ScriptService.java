@@ -17,7 +17,7 @@ import com.untrackr.alerter.processor.primitives.filter.jstack.JstackFactory;
 import com.untrackr.alerter.processor.primitives.filter.sh.ShFactory;
 import com.untrackr.alerter.processor.primitives.filter.stdout.TraceFactory;
 import com.untrackr.alerter.processor.primitives.producer.console.StdinFactory;
-import com.untrackr.alerter.processor.primitives.producer.count.CountFactory;
+import com.untrackr.alerter.processor.primitives.filter.count.CountFactory;
 import com.untrackr.alerter.processor.primitives.producer.cron.CronFactory;
 import com.untrackr.alerter.processor.primitives.producer.curl.CurlFactory;
 import com.untrackr.alerter.processor.primitives.producer.df.DfFactory;
