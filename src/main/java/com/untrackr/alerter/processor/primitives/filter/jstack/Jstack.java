@@ -43,6 +43,7 @@ public class Jstack extends Filter<JstackConfig> {
 	private static Pattern blankLine = Pattern.compile("^\\p{Space}*$");
 
 	public ParsedException parseNextLine(String line, Payload<?> input) {
+		String latestNonBlank = state.getLatestNonBlankLine();
 		if (!blankLine.matcher(line).matches()) {
 			state.setLatestNonBlankLine(line);
 		}
@@ -54,7 +55,7 @@ public class Jstack extends Filter<JstackConfig> {
 				// Set current exception
 				String name = exceptionLineMatcher.group("name");
 				String message = exceptionLineMatcher.group("message");
-				String previous = (state.getLatestNonBlankLine() != null) ? state.getLatestNonBlankLine() : "";
+				String previous = (latestNonBlank != null) ? latestNonBlank : "";
 				ParsedException exception = new ParsedException(name, message, previous);
 				state.setAtLineSeen(false);
 				state.setLinesSinceException(0);
