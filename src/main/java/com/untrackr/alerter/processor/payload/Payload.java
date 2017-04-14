@@ -17,6 +17,10 @@ public class Payload<V> {
 	 */
 	private String hostname;
 	/**
+	 * Http port of the alerter on which the payload was generated.
+	 */
+	private int port;
+	/**
 	 * Name of the processor that generated this payload.
 	 */
 	private String producer;
@@ -36,40 +40,69 @@ public class Payload<V> {
 	private Payload() {
 	}
 
-	private Payload(long timestamp, String hostname, String producer, Payload<?> previous, V value) {
+	private Payload(long timestamp, String hostname, int port, String producer, Payload<?> previous, V value) {
 		this.timestamp = timestamp;
 		this.hostname = hostname;
+		this.port = port;
 		this.producer = producer;
 		this.previous = previous;
 		this.value = value;
 	}
 
 	public static <V> Payload<V> makeRoot(ProcessorService processorService, Processor producer, V value) {
-		return new Payload<>(System.currentTimeMillis(), processorService.config().hostName(), producer.getName(), null, value);
+		return new Payload<>(System.currentTimeMillis(), processorService.hostName(), processorService.port(), producer.getName(), null, value);
 	}
 
 	public static <V> Payload<V> makeTransformed(ProcessorService processorService, Processor producer, Payload<?> previous, V value) {
-		return new Payload<>(System.currentTimeMillis(), processorService.config().hostName(), producer.getName(), previous, value);
+		return new Payload<>(System.currentTimeMillis(), processorService.hostName(), processorService.port(), producer.getName(), previous, value);
 	}
 
 	public long getTimestamp() {
 		return timestamp;
 	}
 
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
+	}
+
 	public String getHostname() {
 		return hostname;
+	}
+
+	public void setHostname(String hostname) {
+		this.hostname = hostname;
+	}
+
+	public int getPort() {
+		return port;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
 	}
 
 	public String getProducer() {
 		return producer;
 	}
 
-	public Payload getPrevious() {
+	public void setProducer(String producer) {
+		this.producer = producer;
+	}
+
+	public Payload<?> getPrevious() {
 		return previous;
 	}
 
-	public Object getValue() {
+	public void setPrevious(Payload<?> previous) {
+		this.previous = previous;
+	}
+
+	public V getValue() {
 		return value;
+	}
+
+	public void setValue(V value) {
+		this.value = value;
 	}
 
 	public Object getMetadata() {

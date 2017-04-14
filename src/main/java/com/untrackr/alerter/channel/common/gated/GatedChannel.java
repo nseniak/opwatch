@@ -69,7 +69,7 @@ public abstract class GatedChannel<S extends ServiceConfiguration> implements Ch
 
 	protected String limitReachedMessage(Rate rateLimit) {
 		return "Limit of " + rateLimit.describe("message", "messages") + " reached on "
-				+ gatedMessageService.getProcessorService().config().hostName();
+				+ gatedMessageService.getProcessorService().hostName();
 	}
 
 	protected abstract RateLimiter rateLimiter();

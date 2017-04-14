@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
@@ -62,6 +63,9 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	@Autowired
 	private MessagingService messagingService;
+
+	@Value("${server.port}")
+	private int port;
 
 	private String id;
 	private AlerterConfig config;
@@ -350,6 +354,14 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	public AlerterConfig config() {
 		return config;
+	}
+
+	public String hostName() {
+		return config.hostName();
+	}
+
+	public int port() {
+		return port;
 	}
 
 	public FileTailingService getFileTailingService() {

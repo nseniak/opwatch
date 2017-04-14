@@ -66,7 +66,7 @@ public class SlackChannel extends GatedChannel<SlackConfiguration> {
 			aggregate.addMessage(title, message);
 		}
 		Payload payload = new Payload();
-		payload.setText("Unmuting " + processorService.config().hostName() + ". The following messages were muted:");
+		payload.setText("Unmuting " + processorService.hostName() + ". The following messages were muted:");
 		Attachment attachment = new Attachment();
 		StringWriter writer = new StringWriter();
 		boolean first = true;

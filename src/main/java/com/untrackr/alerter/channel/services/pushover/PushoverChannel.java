@@ -89,7 +89,7 @@ public class PushoverChannel extends GatedChannel<PushoverConfiguration> {
 			aggregate.addMessage(title, message);
 		}
 		Message.Level level = aggregate.getMaxLevel();
-		String title = levelPrefix(level) + "Unmuting " + processorService.config().hostName();
+		String title = levelPrefix(level) + "Unmuting " + processorService.hostName();
 		StringWriter writer = new StringWriter();
 		writer.append("The following messages were muted:").append("\n");
 		for (MessageAggregate.AggregateMessagePart part : aggregate.messageParts()) {

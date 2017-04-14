@@ -34,19 +34,19 @@ public class MessageContext {
 	}
 
 	public static MessageContext makeGlobal(ProcessorService processorService, ScriptStack stack) {
-		String hostname = processorService.config().hostName();
+		String hostname = processorService.hostName();
 		String alerterId = processorService.getId();
 		return new MessageContext(EmitterType.global, hostname, alerterId, null, null, stack);
 	}
 
 	public static MessageContext makeProcessor(ProcessorService processorService, String processorName, Payload<?> payload, ScriptStack stack) {
-		String hostname = processorService.config().hostName();
+		String hostname = processorService.hostName();
 		String alerterId = processorService.getId();
 		return new MessageContext(EmitterType.global, hostname, alerterId, processorName, payload, stack);
 	}
 
 	public static MessageContext makeFactory(ProcessorService processorService, String processorName, ScriptStack stack) {
-		String hostname = processorService.config().hostName();
+		String hostname = processorService.hostName();
 		String alerterId = processorService.getId();
 		return new MessageContext(EmitterType.global, hostname, alerterId, processorName, null, stack);
 	}

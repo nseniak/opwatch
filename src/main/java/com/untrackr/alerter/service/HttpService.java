@@ -16,6 +16,8 @@ import java.util.Collection;
 @RestController
 public class HttpService {
 
+	public static final String RECEIVE_PATH_PREFIX = "/receive";
+
 	private Multimap<String, PostBodyHandle> consumers = HashMultimap.create();
 
 	public void addPostBodyConsumer(String path, PostBodyHandle consumer) {
@@ -26,9 +28,9 @@ public class HttpService {
 		consumers.remove(urlPath, consumer);
 	}
 
-	@RequestMapping(value = "/processor/**", method = RequestMethod.POST)
+	@RequestMapping(value = "/receive/**", method = RequestMethod.POST)
 	public ResponseEntity<Void> put(HttpServletRequest request, @RequestBody Object body) throws JsonProcessingException {
-		String urlPath = request.getServletPath().substring("/processor".length());
+		String urlPath = request.getServletPath().substring(RECEIVE_PATH_PREFIX.length());
 		Collection<PostBodyHandle> pathConsumers = consumers.get(urlPath);
 		if (pathConsumers.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);

@@ -6,6 +6,8 @@ import com.untrackr.alerter.processor.primitives.consumer.Consumer;
 import com.untrackr.alerter.service.ProcessorService;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import static com.untrackr.alerter.service.HttpService.RECEIVE_PATH_PREFIX;
+
 public class Send extends Consumer<SendConfig> {
 
 	private String pathString;
@@ -20,7 +22,7 @@ public class Send extends Consumer<SendConfig> {
 		this.hostname = hostname;
 		this.port = port;
 		this.path = path;
-		uri = UriComponentsBuilder.newInstance().scheme("http").host(hostname).port(port).path("/processor" + path).toUriString();
+		uri = UriComponentsBuilder.newInstance().scheme("http").host(hostname).port(port).path(RECEIVE_PATH_PREFIX + path).toUriString();
 	}
 
 	@Override
