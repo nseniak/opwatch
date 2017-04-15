@@ -360,8 +360,12 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		return config.hostName();
 	}
 
-	public int port() {
-		return port;
+	public Integer port() {
+		if (config().noHttp()) {
+			return null;
+		} else {
+			return port;
+		}
 	}
 
 	public FileTailingService getFileTailingService() {

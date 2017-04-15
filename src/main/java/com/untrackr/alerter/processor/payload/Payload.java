@@ -19,7 +19,7 @@ public class Payload<V> {
 	/**
 	 * Http port of the alerter on which the payload was generated.
 	 */
-	private int port;
+	private Integer port;
 	/**
 	 * Name of the processor that generated this payload.
 	 */
@@ -40,7 +40,7 @@ public class Payload<V> {
 	private Payload() {
 	}
 
-	private Payload(long timestamp, String hostname, int port, String producer, Payload<?> previous, V value) {
+	private Payload(long timestamp, String hostname, Integer port, String producer, Payload<?> previous, V value) {
 		this.timestamp = timestamp;
 		this.hostname = hostname;
 		this.port = port;
@@ -73,11 +73,11 @@ public class Payload<V> {
 		this.hostname = hostname;
 	}
 
-	public int getPort() {
+	public Integer getPort() {
 		return port;
 	}
 
-	public void setPort(int port) {
+	public void setPort(Integer port) {
 		this.port = port;
 	}
 
