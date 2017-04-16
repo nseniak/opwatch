@@ -33,8 +33,7 @@ public class TraceFactory extends ActiveProcessorFactory<TraceConfig, Trace> {
 	@Override
 	public Trace make(Object scriptObject) {
 		TraceConfig config = convertProcessorConfig(scriptObject);
-		boolean displayPayload = checkPropertyValue("payload", config.getPayload());
-		return new Trace(getProcessorService(), config, name(), displayPayload);
+		return new Trace(getProcessorService(), config, name());
 	}
 
 }
