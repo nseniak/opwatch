@@ -125,7 +125,7 @@ function vararg_make_processor(factory, args) {
 //
 function help() {
 	print("Processor constructors, by category:");
-	var factories = __factories(1);
+	var factories = __factories();
 	var by_category = {};
 	for (var i = 0; i < factories.length; i++) {
 		var fact = factories[i];
