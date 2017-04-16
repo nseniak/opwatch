@@ -11,6 +11,8 @@ import static com.untrackr.alerter.channel.services.console.ConsoleMessageServic
 public class ConsoleChannel implements Channel {
 
 	private static final Logger logger = LoggerFactory.getLogger(ConsoleChannel.class);
+	private static final String CONTENT_PREFIX = ">> ";
+	private static final String CONSOLE_PREFIX = "[console] ";
 
 	private ConsoleConfiguration config;
 	private ConsoleMessageService service;
@@ -39,7 +41,21 @@ public class ConsoleChannel implements Channel {
 		if (processorService.config().channelDebug()) {
 			processorService.printStdout(logMessage);
 		} else {
-			processorService.printStdout("[console] " + message.getType() + ": " + message.getTitle());
+			processorService.printStdout(CONSOLE_PREFIX + message.getType() + ": " + message.getTitle());
+			if (message.getBody() != null) {
+				Object body = message.getBody();
+				if (body != null) {
+					if (!processorService.getScriptService().bean(body)) {
+						processorService.printStdout(CONSOLE_PREFIX + CONTENT_PREFIX + body.toString());
+					} else {
+						processorService.getScriptService().mapFields(body, (key, value) -> {
+							if (value != null) {
+								processorService.printStdout(CONSOLE_PREFIX + CONTENT_PREFIX + key + ": " + value.toString());
+							}
+						});
+					}
+				}
+			}
 		}
 	}
 
