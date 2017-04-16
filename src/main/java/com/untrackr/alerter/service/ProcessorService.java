@@ -101,8 +101,6 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			createConfig(options);
 			messagingService.initializeChannels(new ChannelConfig());
 			scriptService.initialize();
-			printStdout("Default alert channel: " + messagingService.alertChannel().name());
-			printStdout("System channel: " + messagingService.systemChannel().name());
 			if (options.getScripts().isEmpty()) {
 				runRepl(options);
 			} else {
@@ -235,7 +233,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	public void publish(Channel channel, Message message) {
 		try {
-			logger.info("Publish to " + channel.serviceName() + "[" + channel.name() + "] " + prettyJson(message));
+			logger.info("Publish to [" + channel.serviceName() + " channel \"" + channel.name() + "\"] " + prettyJson(message));
 			channel.publish(message);
 		} catch (Throwable t) {
 			String logMessage = "Error trying to publish to channel \"" + channel.name() + "\": " + exceptionMessage(t);
@@ -245,7 +243,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 				printStdout("Publishing to console instead:");
 				messagingService.consoleChannel().publish(message);
 			} catch (Throwable t2) {
-				logger.error("Error trying to publish to console", t2);
+				logger.error("Error trying to publish to [console]", t2);
 			}
 		}
 	}

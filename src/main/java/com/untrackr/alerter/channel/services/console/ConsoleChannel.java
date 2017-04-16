@@ -34,12 +34,12 @@ public class ConsoleChannel implements Channel {
 
 	@Override
 	public void publish(Message message) {
-		String logMessage = "Message to Console " + processorService.prettyJson(message);
+		String logMessage = "[console] " + processorService.prettyJson(message);
 		logger.info(logMessage);
 		if (processorService.config().channelDebug()) {
 			processorService.printStdout(logMessage);
 		} else {
-			processorService.printStdout(message.getType() + ": " + message.getTitle());
+			processorService.printStdout("[console] " + message.getType() + ": " + message.getTitle());
 		}
 	}
 

@@ -63,7 +63,7 @@ public class RemoteChannel implements Channel {
 
 	@Override
 	public void publish(Message message) {
-		String logMessage = "Message to Remote[" + name + "] " + processorService.prettyJson(message);
+		String logMessage = "[Remote channel \"" + name + "\"] " + processorService.prettyJson(message);
 		logger.info(logMessage);
 		if (processorService.config().channelDebug()) {
 			processorService.printStdout(logMessage);
