@@ -6,7 +6,6 @@ import com.untrackr.alerter.processor.primitives.producer.ScheduledProducer;
 import com.untrackr.alerter.service.ProcessorService;
 
 import java.io.File;
-import java.util.Date;
 
 public class Stat extends ScheduledProducer<StatConfig> {
 
@@ -26,7 +25,7 @@ public class Stat extends ScheduledProducer<StatConfig> {
 		} else {
 			info.exists = true;
 			info.size = file.length();
-			info.lastModified = new Date(file.lastModified());
+			info.lastModified = file.lastModified();
 		}
 		outputProduced(info);
 	}
@@ -36,7 +35,7 @@ public class Stat extends ScheduledProducer<StatConfig> {
 		private String file;
 		private boolean exists;
 		private Long size;
-		private Date lastModified;
+		private long lastModified;
 
 		public String getFile() {
 			return file;
@@ -50,7 +49,7 @@ public class Stat extends ScheduledProducer<StatConfig> {
 			return size;
 		}
 
-		public Date getLastModified() {
+		public long getLastModified() {
 			return lastModified;
 		}
 
