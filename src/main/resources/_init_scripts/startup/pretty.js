@@ -80,8 +80,8 @@ pretty = function (jsObject, expandAlias, indentLength) {
 
 	prettyObjectPrint = function (object, indent) {
 		var value = [],
-				property;
-		newIndent = indent + indentString;
+				property,
+				newIndent = indent + indentString;
 		for (property in object) {
 			if (object.hasOwnProperty(property)) {
 				value.push(newIndent + property + ': ' + pretty(object[property], newIndent));
@@ -96,6 +96,7 @@ pretty = function (jsObject, expandAlias, indentLength) {
 
 	prettyProcessorPrint = function (processor, indent) {
 		var value = [],
+				newIndent = indent + indentString,
 				config,
 				factory,
 				name,
@@ -106,7 +107,6 @@ pretty = function (jsObject, expandAlias, indentLength) {
 		config = processor.configuration;
 		factory = processor.factory;
 		name = factory.name();
-		newIndent = indent + indentString;
 		if ((name == "alias") && !expandAlias) {
 			return config.name + '(' + prettyObjectPrint(config.configuration, indent) + ')';
 		} else {
@@ -128,11 +128,11 @@ pretty = function (jsObject, expandAlias, indentLength) {
 	prettyArray = function (array, indent) {
 		var index,
 				length = array.length,
+				newIndent = indent + indentString,
 				value = [];
 		if (length == 0) {
 			return "";
 		}
-		newIndent = indent + indentString;
 		for (index = 0; index < length; index += 1) {
 			value.push(pretty(array[index], newIndent, newIndent));
 		}
