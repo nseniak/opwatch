@@ -9,4 +9,4 @@ java \
 	-Dapp.log.dir=${LOG_DIR} \
 	-Dapp.log.basename=${LOG_BASENAME} \
 	-jar lib/alerter-*.jar \
-	$*
+	"$@"

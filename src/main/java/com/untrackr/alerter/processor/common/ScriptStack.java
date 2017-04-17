@@ -87,6 +87,14 @@ public class ScriptStack {
 		return joiner.toString();
 	}
 
+	public String asStringOrNull() {
+		if (empty()) {
+			return null;
+		} else {
+			return asString();
+		}
+	}
+
 	public static class ScriptStackElement {
 
 		private String fileName;

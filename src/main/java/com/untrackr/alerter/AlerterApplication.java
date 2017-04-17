@@ -30,8 +30,8 @@ public class AlerterApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		processorService.run(options);
-		SpringApplication.exit(applicationContext);
+		boolean success = processorService.run(options);
+		SpringApplication.exit(applicationContext, () -> success ? 0 : 1);
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -44,14 +44,15 @@ public class AlerterApplication implements CommandLineRunner {
 			}
 			int port = (options.getPort() != null) ? options.getPort() : DEFAULT_HTTP_PORT;
 			System.setProperty("server.port", Integer.toString(port));
-			new SpringApplicationBuilder(AlerterApplication.class).web(!options.isNoHttp()).run(args);
+			new SpringApplicationBuilder(AlerterApplication.class).web(!options.isNoServer()).run(args);
 		} catch (ConnectorStartFailedException e) {
 			System.err.println("Cannot start the embedded http server on port " + e.getPort());
 			System.err.println("To specify another port, use --port <port>");
-			System.err.println("To start without an http server, use --no-http");
+			System.err.println("To start without an http server, use --no-server");
 			System.exit(1);
 		} catch (Throwable t) {
-			System.err.println(t.getMessage());
+			System.err.println("Could not start. An internal error occurred.");
+			t.printStackTrace(System.err);
 			System.exit(1);
 		}
 	}
@@ -59,23 +60,29 @@ public class AlerterApplication implements CommandLineRunner {
 	private static CommandLineOptions parseOptions(String[] argStrings) throws IOException {
 		OptionParser parser = new OptionParser();
 		OptionSpec<String> hostname = parser.accepts("hostname", "specify the current machine's hostname").withRequiredArg().ofType(String.class);
-		OptionSpec<String> initFile = parser.accepts("init", "load the given script at startup, instead of the default (startup.js)").withRequiredArg().ofType(String.class);
-		OptionSpec<Void> noInit = parser.accepts("no-init", "do not load any initialization script at startup");
-		OptionSpec<Void> noHttp = parser.accepts("no-http", "do not start the embedded http server");
+		OptionSpec<String> initFile = parser.accepts("init", "given a script filename or url, execute this script at startup instead of the default one (startup.js)").withRequiredArg().ofType(String.class);
+		OptionSpec<Void> noInit = parser.accepts("no-init", "do not execute any initialization script at startup");
+		OptionSpec<String> runExpression = parser.accepts("run", "evaluate the given Javascript expression to a processor, and run it").withRequiredArg().ofType(String.class);
+		OptionSpec<Void> noServer = parser.accepts("no-server", "do not start the embedded http server");
 		OptionSpec<Integer> port = parser.accepts("port","use the specified port for the embedded http server").withRequiredArg().ofType(Integer.class);
 		OptionSpec<Void> traceChannels = parser.accepts("trace-channels","print sent messages to standard output, instead of sending them");
 		OptionSpec<Void> help = parser.accepts("help","print this help").forHelp();
-		OptionSpec<String> files = parser.nonOptions().ofType(String.class);
+		OptionSpec<String> files = parser.nonOptions("filenames or urls of scripts to execute in sequence").ofType(String.class);
 		OptionSet optionSet = parser.parse(argStrings);
 		if (optionSet.has(help)) {
-			parser.printHelpOn(System.out);
+			parser.printHelpOn(System.err);
+			return null;
+		}
+		if (optionSet.has(runExpression) && !optionSet.valuesOf(files).isEmpty()) {
+			System.err.println("Incompatible options: cannot pass both --run and script files to execute");
 			return null;
 		}
 		CommandLineOptions options = new CommandLineOptions();
 		options.setHostname(optionSet.valueOf(hostname));
-		options.setNoHttp(optionSet.has(noHttp));
+		options.setNoServer(optionSet.has(noServer));
 		options.setInitScript(optionSet.valueOf(initFile));
 		options.setNoInit(optionSet.has(noInit));
+		options.setRunExpression(optionSet.valueOf(runExpression));
 		options.setPort(optionSet.valueOf(port));
 		options.setTraceChannels(optionSet.has(traceChannels));
 		options.setScripts(optionSet.valuesOf(files));

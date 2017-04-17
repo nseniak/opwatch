@@ -40,7 +40,7 @@ public class AlerterConfig {
 		this.hostName = options.getHostname();
 		this.initFile = options.getInitScript();
 		this.noInit = options.isNoInit();
-		this.noHttp = options.isNoHttp();
+		this.noHttp = options.isNoServer();
 		this.traceChannels = options.isTraceChannels();
 		this.fileWatchingCheckDelay = TimeUnit.SECONDS.toMillis(1);
 		this.executorTerminationTimeout = TimeUnit.SECONDS.toMillis(30);

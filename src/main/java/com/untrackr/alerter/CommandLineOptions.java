@@ -5,11 +5,12 @@ import java.util.List;
 public class CommandLineOptions {
 
 	private String hostname;
-	private boolean noHttp;
+	private boolean noServer;
 	private String initScript;
 	private boolean noInit;
 	private Integer port;
 	private boolean traceChannels;
+	private String runExpression;
 	private List<String> scripts;
 
 	public String getHostname() {
@@ -20,12 +21,12 @@ public class CommandLineOptions {
 		this.hostname = hostname;
 	}
 
-	public boolean isNoHttp() {
-		return noHttp;
+	public boolean isNoServer() {
+		return noServer;
 	}
 
-	public void setNoHttp(boolean noHttp) {
-		this.noHttp = noHttp;
+	public void setNoServer(boolean noServer) {
+		this.noServer = noServer;
 	}
 
 	public String getInitScript() {
@@ -58,6 +59,14 @@ public class CommandLineOptions {
 
 	public void setTraceChannels(boolean traceChannels) {
 		this.traceChannels = traceChannels;
+	}
+
+	public String getRunExpression() {
+		return runExpression;
+	}
+
+	public void setRunExpression(String runExpression) {
+		this.runExpression = runExpression;
 	}
 
 	public List<String> getScripts() {

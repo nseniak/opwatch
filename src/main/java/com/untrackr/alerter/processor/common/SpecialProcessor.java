@@ -18,7 +18,7 @@ public abstract class SpecialProcessor<C extends ProcessorConfig> extends Proces
 					() -> new ProcessorVoidExecutionScope(processor),
 					processor::stop);
 		}
-		if (ok) {
+		if (!ok) {
 			throw new RuntimeError("error stopping processor", new ProcessorVoidExecutionScope(this));
 		}
 	}

@@ -94,24 +94,36 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		ThreadUtil.safeExecutorShutdownNow(scheduledExecutor, "ScheduledExecutor", config().executorTerminationTimeout());
 	}
 
-	public void run(CommandLineOptions options) {
+	public boolean run(CommandLineOptions options) {
 		mainThread = Thread.currentThread();
 		Signal.handle(new Signal("INT"), this::userInterruptHandler);
 		try {
 			createConfig(options);
 			messagingService.initializeChannels(new ChannelConfig());
 			scriptService.initialize();
-			if (options.getScripts().isEmpty()) {
-				runRepl(options);
-			} else {
-				runFiles(options);
-			}
 		} catch (Exception e) {
 			logger.error("Initialization failed", e);
 			printStderr("Initialization failed: " + e.getMessage());
 			ScriptStack stack = ScriptStack.exceptionStack(e);
-			printStderr(stack.asString());
+			if (!stack.empty()) {
+				printStderr(stack.asString());
+			}
+			return false;
 		}
+		return withExceptionHandling(null, GlobalExecutionScope::new, () -> {
+			if (options.getRunExpression() != null) {
+				runExpression(options);
+			} else if (options.getScripts().isEmpty()) {
+				runRepl(options);
+			} else {
+				runFiles(options);
+			}
+		});
+	}
+
+	private void userInterruptHandler(Signal signal) {
+		printCtrlC();
+		mainThread.interrupt();
 	}
 
 	private void createConfig(CommandLineOptions options) {
@@ -125,9 +137,8 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		}
 	}
 
-	private void userInterruptHandler(Signal signal) {
-		printCtrlC();
-		mainThread.interrupt();
+	private void runExpression(CommandLineOptions options) {
+		scriptService.runExpression(options.getRunExpression());
 	}
 
 	public void runRepl(CommandLineOptions options) {
@@ -159,6 +170,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	private void printCtrlC() {
 		System.err.print("^C");
+		System.err.flush();
 	}
 
 	private String readLine(ConsoleReader reader) {
@@ -176,7 +188,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	public Object runProcessor(Object scriptObject) {
 		String name = "run";
 		Processor processor = (Processor) scriptService.convertScriptValue(ValueLocation.makeArgument(name, "processor"), Processor.class, scriptObject,
-				(message) -> new RuntimeError(message));
+				RuntimeError::new);
 		processor.inferSignature();
 		processor.check();
 		processor.start();
@@ -227,7 +239,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		if (processorName != null) {
 			title = processorName + ": " + title;
 		}
-		Message message = Message.makeNew(Message.Type.error, e.getLevel(), title, stack.asString(), context);
+		Message message = Message.makeNew(Message.Type.error, e.getLevel(), title, stack.asStringOrNull(), context);
 		publish(messagingService.systemChannel(), message);
 	}
 
@@ -249,10 +261,10 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	}
 
 	public boolean withExceptionHandling(String messagePrefix, ExecutionScopeFactory defaultScopeFactory, ThrowingRunnable runnable) {
-		boolean error = true;
+		boolean success = false;
 		try {
 			runnable.run();
-			error = false;
+			success = true;
 		} catch (InterruptedException e) {
 			// The application is exiting; rethrow
 			throw new ApplicationInterruptedException(ApplicationInterruptedException.INTERRUPTION);
@@ -265,7 +277,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			String message = ((messagePrefix != null) ? messagePrefix + ": " : "") + exceptionMessage(t);
 			signalSystemException(new RuntimeError(message, defaultScopeFactory.make(), t));
 		}
-		return error;
+		return success;
 	}
 
 	public <T> ResponseEntity<T> postForEntityWithErrors(String uri,

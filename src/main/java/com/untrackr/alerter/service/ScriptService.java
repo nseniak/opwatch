@@ -200,6 +200,16 @@ public class ScriptService {
 
 	}
 
+	public void runExpression(String expression) {
+		ScriptContext context = scriptEngine.getContext();
+		try {
+			Object result = scriptEngine.eval(expression, context);
+			processorService.runProcessor(result);
+		} catch (ScriptException e) {
+			throw new RuntimeError(e);
+		}
+	}
+
 	private <C extends ProcessorConfig, T extends Processor> void createSimpleFactoryFunction(ProcessorFactory<C, T> processorFactory) throws ScriptException {
 		createFactoryFunction(processorFactory, "factory_wrapper");
 	}
