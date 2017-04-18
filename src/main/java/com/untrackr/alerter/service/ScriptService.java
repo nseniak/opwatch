@@ -77,7 +77,7 @@ public class ScriptService {
 	@Autowired
 	private DocumentationService documentationService;
 
-	public static final String INIT_SCRIPT_PATH = "/_init_scripts/";
+	public static final String INIT_SCRIPT_PATH = "_init_scripts/";
 
 	private Map<Class<? extends Processor>, ProcessorFactory<?, ? extends Processor>> factories = new LinkedHashMap<>();
 
@@ -126,11 +126,11 @@ public class ScriptService {
 
 	private void loadScriptResources() {
 		// Load NPM first
-		loadScriptResource(applicationContext.getResource("classpath:" + INIT_SCRIPT_PATH + "npm/jvm-npm.js"));
+		loadScriptResource(applicationContext.getResource("classpath:/" + INIT_SCRIPT_PATH + "npm/jvm-npm.js"));
 		// Load the other scripts
 		Resource[] scriptResources = new Resource[0];
 		try {
-			scriptResources = applicationContext.getResources("classpath:" + INIT_SCRIPT_PATH + "startup/*.js");
+			scriptResources = applicationContext.getResources("classpath:/" + INIT_SCRIPT_PATH + "startup/*.js");
 		} catch (IOException e) {
 			throw new IllegalStateException("Cannot find script resource: " + e.getMessage(), e);
 		}

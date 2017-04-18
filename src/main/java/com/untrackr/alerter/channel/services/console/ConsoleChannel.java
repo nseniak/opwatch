@@ -46,7 +46,9 @@ public class ConsoleChannel implements Channel {
 				Object body = message.getBody();
 				if (body != null) {
 					if (!processorService.getScriptService().bean(body)) {
-						processorService.printStdout(CONSOLE_PREFIX + CONTENT_PREFIX + body.toString());
+						for (String line : body.toString().split("\\R")) {
+							processorService.printStdout(CONSOLE_PREFIX + CONTENT_PREFIX + line);
+						}
 					} else {
 						processorService.getScriptService().mapFields(body, (key, value) -> {
 							if (value != null) {

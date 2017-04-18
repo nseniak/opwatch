@@ -21,6 +21,10 @@ public class Payload<V> {
 	 */
 	private Integer port;
 	/**
+	 * Id of the producer that generated this payload.
+	 */
+	private String producerId;
+	/**
 	 * Name of the processor that generated this payload.
 	 */
 	private String producer;
@@ -40,21 +44,22 @@ public class Payload<V> {
 	private Payload() {
 	}
 
-	private Payload(long timestamp, String hostname, Integer port, String producer, Payload<?> previous, V value) {
+	private Payload(long timestamp, String hostname, Integer port, String producerId, String producer, Payload<?> previous, V value) {
 		this.timestamp = timestamp;
 		this.hostname = hostname;
 		this.port = port;
+		this.producerId = producerId;
 		this.producer = producer;
 		this.previous = previous;
 		this.value = value;
 	}
 
 	public static <V> Payload<V> makeRoot(ProcessorService processorService, Processor producer, V value) {
-		return new Payload<>(System.currentTimeMillis(), processorService.hostName(), processorService.port(), producer.getName(), null, value);
+		return new Payload<>(System.currentTimeMillis(), processorService.hostName(), processorService.port(), producer.getId(), producer.getName(), null, value);
 	}
 
 	public static <V> Payload<V> makeTransformed(ProcessorService processorService, Processor producer, Payload<?> previous, V value) {
-		return new Payload<>(System.currentTimeMillis(), processorService.hostName(), processorService.port(), producer.getName(), previous, value);
+		return new Payload<>(System.currentTimeMillis(), processorService.hostName(), processorService.port(), producer.getId(), producer.getName(), previous, value);
 	}
 
 	public long getTimestamp() {
@@ -79,6 +84,14 @@ public class Payload<V> {
 
 	public void setPort(Integer port) {
 		this.port = port;
+	}
+
+	public String getProducerId() {
+		return producerId;
+	}
+
+	public void setProducerId(String producerId) {
+		this.producerId = producerId;
 	}
 
 	public String getProducer() {
