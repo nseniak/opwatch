@@ -1,4 +1,4 @@
-package com.untrackr.alerter.processor.primitives.special.parallel;
+package com.untrackr.alerter.processor.primitives.control.parallel;
 
 import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.processor.payload.Payload;
@@ -6,7 +6,7 @@ import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.List;
 
-public class Parallel extends SpecialProcessor<ParallelConfig> {
+public class Parallel extends ControlProcessor<ParallelConfig> {
 
 	private List<Processor<?>> processors;
 

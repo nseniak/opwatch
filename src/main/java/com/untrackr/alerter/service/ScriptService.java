@@ -9,15 +9,19 @@ import com.untrackr.alerter.processor.payload.Stats;
 import com.untrackr.alerter.processor.primitives.consumer.alert.AlertGeneratorFactory;
 import com.untrackr.alerter.processor.primitives.consumer.send.SendFactory;
 import com.untrackr.alerter.processor.primitives.consumer.stdout.StdoutFactory;
+import com.untrackr.alerter.processor.primitives.control.alias.AliasFactory;
+import com.untrackr.alerter.processor.primitives.control.parallel.ParallelFactory;
+import com.untrackr.alerter.processor.primitives.control.pipe.PipeFactory;
 import com.untrackr.alerter.processor.primitives.filter.apply.ApplyFactory;
 import com.untrackr.alerter.processor.primitives.filter.collect.CollectFactory;
+import com.untrackr.alerter.processor.primitives.filter.count.CountFactory;
 import com.untrackr.alerter.processor.primitives.filter.grep.GrepFactory;
 import com.untrackr.alerter.processor.primitives.filter.json.JsonFactory;
 import com.untrackr.alerter.processor.primitives.filter.jstack.JstackFactory;
 import com.untrackr.alerter.processor.primitives.filter.sh.ShFactory;
 import com.untrackr.alerter.processor.primitives.filter.stdout.TraceFactory;
+import com.untrackr.alerter.processor.primitives.filter.test.TestFactory;
 import com.untrackr.alerter.processor.primitives.producer.console.StdinFactory;
-import com.untrackr.alerter.processor.primitives.filter.count.CountFactory;
 import com.untrackr.alerter.processor.primitives.producer.cron.CronFactory;
 import com.untrackr.alerter.processor.primitives.producer.curl.CurlFactory;
 import com.untrackr.alerter.processor.primitives.producer.df.DfFactory;
@@ -27,9 +31,6 @@ import com.untrackr.alerter.processor.primitives.producer.stat.StatFactory;
 import com.untrackr.alerter.processor.primitives.producer.tail.TailFactory;
 import com.untrackr.alerter.processor.primitives.producer.top.TopFactory;
 import com.untrackr.alerter.processor.primitives.producer.trail.TrailFactory;
-import com.untrackr.alerter.processor.primitives.special.alias.AliasFactory;
-import com.untrackr.alerter.processor.primitives.special.parallel.ParallelFactory;
-import com.untrackr.alerter.processor.primitives.special.pipe.PipeFactory;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import jdk.nashorn.api.scripting.ScriptUtils;
@@ -87,7 +88,6 @@ public class ScriptService {
 		scriptEngine = (NashornScriptEngine) new ScriptEngineManager().getEngineByName("nashorn");
 		loadScriptResources();
 		try {
-			createSimplePrimitiveFunction("run", processorService::runProcessor);
 			createSimplePrimitiveFunction("__factories", this::factories);
 			createSimplePrimitiveFunction("__stats", Stats::makeStats);
 			createSimpleBinding("config", processorService.config());
@@ -98,6 +98,7 @@ public class ScriptService {
 			createSimpleFactoryFunction(new StdinFactory(processorService));
 			createSimpleFactoryFunction(new GrepFactory(processorService));
 			createSimpleFactoryFunction(new ApplyFactory(processorService));
+			createSimpleFactoryFunction(new TestFactory(processorService));
 			createSimpleFactoryFunction(new CollectFactory(processorService));
 			createSimpleFactoryFunction(new TailFactory(processorService));
 			createSimpleFactoryFunction(new StdoutFactory(processorService));
@@ -203,8 +204,10 @@ public class ScriptService {
 	public void runExpression(String expression) {
 		ScriptContext context = scriptEngine.getContext();
 		try {
-			Object result = scriptEngine.eval(expression, context);
-			processorService.runProcessor(result);
+			Object scriptObject = scriptEngine.eval(expression, context);
+			Processor processor = (Processor) convertScriptValue(ValueLocation.makeToplevel(), Processor.class, scriptObject,
+					RuntimeError::new);
+			processor.run();
 		} catch (ScriptException e) {
 			throw new RuntimeError(e);
 		}

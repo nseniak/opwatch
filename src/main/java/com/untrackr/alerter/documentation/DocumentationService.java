@@ -49,7 +49,7 @@ public class DocumentationService {
 	public String processorCategoryName(ProcessorFactory<?, ?> factory) {
 		ProcessorSignature signature = factory.staticSignature();
 		if (signature == null) {
-			return "special";
+			return "control";
 		}
 		ProcessorSignature.PipeRequirement inputRequirement = signature.getInputRequirement();
 		ProcessorSignature.PipeRequirement outputRequirement = signature.getOutputRequirement();

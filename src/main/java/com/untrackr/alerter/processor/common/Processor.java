@@ -6,6 +6,9 @@ import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import static jdk.nashorn.internal.runtime.ScriptRuntime.UNDEFINED;
 
 public abstract class Processor<C extends ProcessorConfig> {
 
@@ -34,6 +37,27 @@ public abstract class Processor<C extends ProcessorConfig> {
 					new ProcessorVoidExecutionScope(this));
 		}
 		container = processor;
+	}
+
+	public Object run() {
+		String name = "run";
+		inferSignature();
+		check();
+		start();
+		processorService.signalSystemInfo("processor up and running");
+		processorService.setRunningProcessor(this);
+		try {
+			while (true) {
+				Thread.sleep(TimeUnit.DAYS.toMillis(1));
+			}
+		} catch (InterruptedException e) {
+			processorService.printStderr("processor interrupted");
+		} finally {
+			processorService.setRunningProcessor(null);
+		}
+		processorService.signalSystemInfo("processor stopped");
+		stop();
+		return UNDEFINED;
 	}
 
 	/**

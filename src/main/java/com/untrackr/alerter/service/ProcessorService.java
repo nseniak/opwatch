@@ -36,8 +36,6 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static jdk.nashorn.internal.runtime.ScriptRuntime.UNDEFINED;
-
 @Service
 public class ProcessorService implements InitializingBean, DisposableBean {
 
@@ -183,29 +181,6 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 				printCtrlC();
 			}
 		}
-	}
-
-	public Object runProcessor(Object scriptObject) {
-		String name = "run";
-		Processor processor = (Processor) scriptService.convertScriptValue(ValueLocation.makeArgument(name, "processor"), Processor.class, scriptObject,
-				RuntimeError::new);
-		processor.inferSignature();
-		processor.check();
-		processor.start();
-		signalSystemInfo("processor up and running");
-		runningProcessor = processor;
-		try {
-			while (true) {
-				Thread.sleep(TimeUnit.DAYS.toMillis(1));
-			}
-		} catch (InterruptedException e) {
-			printStderr("processor interrupted");
-		} finally {
-			runningProcessor = null;
-		}
-		signalSystemInfo("processor stopped");
-		processor.stop();
-		return UNDEFINED;
 	}
 
 	private void runFiles(CommandLineOptions options) {
@@ -408,6 +383,10 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	public MessagingService getMessagingService() {
 		return messagingService;
+	}
+
+	public void setRunningProcessor(Processor runningProcessor) {
+		this.runningProcessor = runningProcessor;
 	}
 
 }

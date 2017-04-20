@@ -7,19 +7,17 @@ import com.untrackr.alerter.service.ProcessorService;
 
 public class Apply extends Filter<ApplyConfig> {
 
-	private JavascriptFilter transformer;
+	private JavascriptFilter lambda;
 
-	public Apply(ProcessorService processorService, ApplyConfig descriptor, String name, JavascriptFilter transformer) {
+	public Apply(ProcessorService processorService, ApplyConfig descriptor, String name, JavascriptFilter lambda) {
 		super(processorService, descriptor, name);
-		this.transformer = transformer;
+		this.lambda = lambda;
 	}
 
 	@Override
 	public void consumeInOwnThread(Payload<?> payload) {
-		Object result = transformer.call(payload, this);
-		if (result != null) {
-			outputTransformed(result, payload);
-		}
+		Object result = lambda.call(payload, this);
+		outputTransformed(result, payload);
 	}
 
 }

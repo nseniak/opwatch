@@ -1,4 +1,4 @@
-package com.untrackr.alerter.processor.primitives.special.pipe;
+package com.untrackr.alerter.processor.primitives.control.parallel;
 
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.config.ImplicitProperty;
@@ -6,7 +6,7 @@ import com.untrackr.alerter.processor.config.ProcessorConfig;
 
 import java.util.List;
 
-public class PipeConfig extends ProcessorConfig {
+public class ParallelConfig extends ProcessorConfig {
 
 	private List<Processor<?>> processors;
 

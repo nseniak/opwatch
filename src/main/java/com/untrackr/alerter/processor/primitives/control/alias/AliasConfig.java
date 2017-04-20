@@ -1,4 +1,4 @@
-package com.untrackr.alerter.processor.primitives.special.alias;
+package com.untrackr.alerter.processor.primitives.control.alias;
 
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.config.ProcessorConfig;

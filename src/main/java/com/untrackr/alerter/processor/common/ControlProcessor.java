@@ -5,9 +5,9 @@ import com.untrackr.alerter.service.ProcessorService;
 
 import java.util.List;
 
-public abstract class SpecialProcessor<C extends ProcessorConfig> extends Processor<C> {
+public abstract class ControlProcessor<C extends ProcessorConfig> extends Processor<C> {
 
-	public SpecialProcessor(ProcessorService processorService, C configuration, String name) {
+	public ControlProcessor(ProcessorService processorService, C configuration, String name) {
 		super(processorService, configuration, name);
 	}
 

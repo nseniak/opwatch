@@ -1,4 +1,4 @@
-package com.untrackr.alerter.processor.primitives.special.pipe;
+package com.untrackr.alerter.processor.primitives.control.pipe;
 
 import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.service.ProcessorService;

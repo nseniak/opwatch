@@ -1,4 +1,4 @@
-package com.untrackr.alerter.processor.primitives.special.parallel;
+package com.untrackr.alerter.processor.primitives.control.parallel;
 
 import com.untrackr.alerter.processor.common.Processor;
 import com.untrackr.alerter.processor.common.ProcessorFactory;
