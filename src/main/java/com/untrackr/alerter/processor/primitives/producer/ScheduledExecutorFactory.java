@@ -2,6 +2,8 @@ package com.untrackr.alerter.processor.primitives.producer;
 
 import com.untrackr.alerter.processor.common.ActiveProcessor;
 import com.untrackr.alerter.processor.common.ActiveProcessorFactory;
+import com.untrackr.alerter.processor.common.FactoryExecutionScope;
+import com.untrackr.alerter.processor.common.RuntimeError;
 import com.untrackr.alerter.processor.config.ScheduledProcessorConfig;
 import com.untrackr.alerter.service.ProcessorService;
 
@@ -13,6 +15,10 @@ public abstract class ScheduledExecutorFactory<D extends ScheduledProcessorConfi
 
 	protected ScheduledExecutor makeScheduledExecutor(ScheduledProcessorConfig descriptor) {
 		long period = durationValue(checkPropertyValue("period", descriptor.getPeriod()));
+		if (period <= 0) {
+			throw new RuntimeError("duration must be strictly positive: " + descriptor.getPeriod(),
+					new FactoryExecutionScope(this));
+		}
 		return new ScheduledExecutor(processorService, period);
 	}
 

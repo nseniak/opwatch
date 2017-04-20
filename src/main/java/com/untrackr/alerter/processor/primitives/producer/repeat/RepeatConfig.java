@@ -6,15 +6,15 @@ import com.untrackr.alerter.processor.config.ScheduledProcessorConfig;
 
 public class RepeatConfig extends ScheduledProcessorConfig {
 
-	private JavascriptProducer producer;
+	private JavascriptProducer lambda;
 
 	@ImplicitProperty
-	public JavascriptProducer getProducer() {
-		return producer;
+	public JavascriptProducer getLambda() {
+		return lambda;
 	}
 
-	public void setProducer(JavascriptProducer producer) {
-		this.producer = producer;
+	public void setLambda(JavascriptProducer lambda) {
+		this.lambda = lambda;
 	}
 
 }
