@@ -329,7 +329,7 @@ public class ScriptService {
 
 	private Object convertConstantOrFilter(ValueLocation valueLocation, Type type, Type valueType, Object scriptValue, RuntimeExceptionFactory exceptionFactory) {
 		if ((scriptValue instanceof ScriptObjectMirror) && ((ScriptObjectMirror) scriptValue).isFunction()) {
-			return ConstantOrFilter.makeFunctional(new JavascriptFilter((ScriptObjectMirror) scriptValue, valueLocation), valueLocation);
+			return ConstantOrFilter.makeFunctional(new JavascriptFilter((ScriptObjectMirror) scriptValue, valueLocation, processorService), valueLocation);
 		}
 		return ConstantOrFilter.makeConstant(convertScriptValue(valueLocation, valueType, scriptValue, exceptionFactory));
 	}
@@ -348,11 +348,11 @@ public class ScriptService {
 			ScriptObjectMirror scriptObject = (ScriptObjectMirror) scriptValue;
 			if (scriptObject.isFunction()) {
 				if (clazz == JavascriptFilter.class) {
-					return new JavascriptFilter(scriptObject, valueLocation);
+					return new JavascriptFilter(scriptObject, valueLocation, processorService);
 				} else if (clazz == JavascriptPredicate.class) {
-					return new JavascriptPredicate(scriptObject, valueLocation);
+					return new JavascriptPredicate(scriptObject, valueLocation, processorService);
 				} else if (clazz == JavascriptProducer.class) {
-					return new JavascriptProducer(scriptObject, valueLocation);
+					return new JavascriptProducer(scriptObject, valueLocation, processorService);
 				}
 			} else {
 				Object sobj = ScriptObjectMirror.unwrap(scriptValue, Context.getGlobal());
