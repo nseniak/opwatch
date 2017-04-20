@@ -6,12 +6,12 @@ import com.untrackr.alerter.service.ProcessorService;
 
 public class Stdout extends Consumer<StdoutConfig> {
 
-	public Stdout(ProcessorService processorService, StdoutConfig descriptor, String name) {
-		super(processorService, descriptor, name);
+	public Stdout(ProcessorService processorService, StdoutConfig configuration, String name) {
+		super(processorService, configuration, name);
 	}
 
 	@Override
-	public void consumeInOwnThread(Payload<?> payload) {
+	public void consume(Payload<?> payload) {
 		System.out.println(processorService.json(payload.getValue()));
 	}
 

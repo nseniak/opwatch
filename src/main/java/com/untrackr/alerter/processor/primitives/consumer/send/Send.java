@@ -16,8 +16,8 @@ public class Send extends Consumer<SendConfig> {
 	private String path;
 	private String uri;
 
-	public Send(ProcessorService processorService, SendConfig descriptor, String name, String pathString, String hostname, int port, String path) {
-		super(processorService, descriptor, name);
+	public Send(ProcessorService processorService, SendConfig configuration, String name, String pathString, String hostname, int port, String path) {
+		super(processorService, configuration, name);
 		this.pathString = pathString;
 		this.hostname = hostname;
 		this.port = port;
@@ -26,7 +26,7 @@ public class Send extends Consumer<SendConfig> {
 	}
 
 	@Override
-	public void consumeInOwnThread(Payload<?> payload) {
+	public void consume(Payload<?> payload) {
 		processorService.postForEntityWithErrors(uri, payload, Void.class, hostname, port, path,
 				() -> new ProcessorPayloadExecutionScope(this, payload));
 	}

@@ -14,8 +14,8 @@ public class Tail extends Producer<TailConfig> {
 	private boolean ignoreBlankLine;
 	private TailedFile tailedFile;
 
-	public Tail(ProcessorService processorService, TailConfig descriptor, String name, Path file, boolean ignoreBlankLine) {
-		super(processorService, descriptor, name);
+	public Tail(ProcessorService processorService, TailConfig configuration, String name, Path file, boolean ignoreBlankLine) {
+		super(processorService, configuration, name);
 		this.file = file;
 		this.ignoreBlankLine = ignoreBlankLine;
 	}

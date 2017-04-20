@@ -29,14 +29,14 @@ public class Curl extends ScheduledProducer<CurlConfig> {
 	private MediaType anyText = MediaType.valueOf("text/*");
 
 	public Curl(ProcessorService processorService,
-							CurlConfig descriptor,
+							CurlConfig configuration,
 							String name,
 							ScheduledExecutor scheduledExecutor,
 							URI uri,
 							int connectTimeout,
 							int readTimeout,
 							boolean insecure) {
-		super(processorService, descriptor, name, scheduledExecutor);
+		super(processorService, configuration, name, scheduledExecutor);
 		this.uri = uri;
 		this.connectTimeout = connectTimeout;
 		this.readTimeout = readTimeout;

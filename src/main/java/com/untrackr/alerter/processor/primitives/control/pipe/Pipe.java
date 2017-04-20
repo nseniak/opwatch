@@ -12,8 +12,8 @@ public class Pipe extends ControlProcessor<PipeConfig> {
 
 	private List<Processor<?>> processors;
 
-	public Pipe(ProcessorService processorService, List<Processor<?>> processors, PipeConfig descriptor, String name) {
-		super(processorService, descriptor, name);
+	public Pipe(ProcessorService processorService, List<Processor<?>> processors, PipeConfig configuration, String name) {
+		super(processorService, configuration, name);
 		this.processors = processors;
 		Processor<?> previous = null;
 		for (Processor<?> processor : processors) {

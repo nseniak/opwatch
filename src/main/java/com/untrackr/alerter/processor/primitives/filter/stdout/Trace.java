@@ -6,12 +6,12 @@ import com.untrackr.alerter.service.ProcessorService;
 
 public class Trace extends Consumer<TraceConfig> {
 
-	public Trace(ProcessorService processorService, TraceConfig descriptor, String name) {
-		super(processorService, descriptor, name);
+	public Trace(ProcessorService processorService, TraceConfig configuration, String name) {
+		super(processorService, configuration, name);
 	}
 
 	@Override
-	public void consumeInOwnThread(Payload<?> payload) {
+	public void consume(Payload<?> payload) {
 		processorService.printStdout(processorService.json(payload));
 		outputTransformed(payload.getValue(), payload);
 	}

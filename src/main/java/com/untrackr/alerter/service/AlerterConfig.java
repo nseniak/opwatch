@@ -27,7 +27,6 @@ public class AlerterConfig {
 	private int lineBufferSize;
 	private int inputQueueSize;
 	private long processorInputQueueTimeout;
-	private long minimumOutputDelay;
 	private String defaultPostHostname;
 	private int defaultPostPort;
 	private long cronScriptOutputCheckDelay;
@@ -50,7 +49,6 @@ public class AlerterConfig {
 		this.lineBufferSize = ApplicationUtil.property("alerter.line.buffer.size", 8192 * 100);
 		this.inputQueueSize = ApplicationUtil.property("alerter.input.queue.size", 100);
 		this.processorInputQueueTimeout = ApplicationUtil.property("alerter.input.queue.timeout", TimeUnit.SECONDS.toMillis(60));
-		this.minimumOutputDelay = ApplicationUtil.property("alerter.output.min.delay", TimeUnit.MILLISECONDS.toMillis(0));
 		this.defaultPostHostname = ApplicationUtil.property("alerter.post.hostname", "localhost");
 		this.defaultPostPort = ApplicationUtil.property("alerter.post.port", DEFAULT_HTTP_PORT);
 		this.cronScriptOutputCheckDelay = TimeUnit.SECONDS.toMillis(100);
@@ -171,14 +169,6 @@ public class AlerterConfig {
 
 	public void processorInputQueueTimeout(long processorInputQueueTimeout) {
 		this.processorInputQueueTimeout = processorInputQueueTimeout;
-	}
-
-	public long minimumOutputDelay() {
-		return minimumOutputDelay;
-	}
-
-	public void minimumOutputDelay(long minimumOutputDelay) {
-		this.minimumOutputDelay = minimumOutputDelay;
 	}
 
 	public String defaultPostHostname() {

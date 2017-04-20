@@ -9,8 +9,8 @@ public class Alias extends ControlProcessor<AliasConfig> {
 
 	Processor<?> processor;
 
-	public Alias(ProcessorService processorService, Processor<?> processor, AliasConfig descriptor, String name) {
-		super(processorService, descriptor, name);
+	public Alias(ProcessorService processorService, Processor<?> processor, AliasConfig configuration, String name) {
+		super(processorService, configuration, name);
 		this.processor = processor;
 		processor.assignContainer(this);
 	}

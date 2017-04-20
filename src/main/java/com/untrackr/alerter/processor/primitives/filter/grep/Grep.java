@@ -10,8 +10,8 @@ public class Grep extends ConditionalFilter<GrepConfig> {
 	private NativeRegExp regexp;
 	private boolean invert;
 
-	public Grep(ProcessorService processorService, GrepConfig descriptor, String name, NativeRegExp regexp, boolean invert) {
-		super(processorService, descriptor, name);
+	public Grep(ProcessorService processorService, GrepConfig configuration, String name, NativeRegExp regexp, boolean invert) {
+		super(processorService, configuration, name);
 		this.regexp = regexp;
 		this.invert = invert;
 	}

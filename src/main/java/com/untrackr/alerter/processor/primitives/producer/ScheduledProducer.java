@@ -9,12 +9,12 @@ import com.untrackr.alerter.service.ProcessorService;
 
 public abstract class ScheduledProducer<D extends ScheduledProcessorConfig> extends ScheduledProcessor<D> {
 
-	public ScheduledProducer(ProcessorService processorService, D descriptor, String name, ScheduledExecutor scheduledExecutor) {
-		super(processorService, descriptor, name, scheduledExecutor);
+	public ScheduledProducer(ProcessorService processorService, D configuration, String name, ScheduledExecutor scheduledExecutor) {
+		super(processorService, configuration, name, scheduledExecutor);
 	}
 
 	@Override
-	public void consumeInOwnThread(Payload<?> payload) {
+	public void consume(Payload<?> payload) {
 		throw new RuntimeError("producer should not receive input", new ProcessorVoidExecutionScope(this));
 	}
 

@@ -8,8 +8,8 @@ public abstract class ScheduledProcessor<D extends ScheduledProcessorConfig> ext
 
 	private ScheduledExecutor scheduledExecutor;
 
-	public ScheduledProcessor(ProcessorService processorService, D descriptor, String name, ScheduledExecutor scheduledExecutor) {
-		super(processorService, descriptor, name);
+	public ScheduledProcessor(ProcessorService processorService, D configuration, String name, ScheduledExecutor scheduledExecutor) {
+		super(processorService, configuration, name);
 		this.scheduledExecutor = scheduledExecutor;
 	}
 

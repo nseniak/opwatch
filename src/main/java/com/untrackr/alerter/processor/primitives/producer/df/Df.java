@@ -12,10 +12,9 @@ import java.io.File;
 public class Df extends ScheduledProducer<DfConfig> {
 
 	private File file;
-	private boolean fileNotFoundErrorSignaled = false;
 
-	public Df(ProcessorService processorService, DfConfig descriptor, String name, ScheduledExecutor scheduledExecutor, File file) {
-		super(processorService, descriptor, name, scheduledExecutor);
+	public Df(ProcessorService processorService, DfConfig configuration, String name, ScheduledExecutor scheduledExecutor, File file) {
+		super(processorService, configuration, name, scheduledExecutor);
 		this.file = file;
 	}
 
@@ -24,14 +23,8 @@ public class Df extends ScheduledProducer<DfConfig> {
 		PartitionInfo info = new PartitionInfo();
 		info.file = file.getAbsolutePath();
 		if (!file.exists()) {
-			if (fileNotFoundErrorSignaled) {
-				return;
-			} else {
-				fileNotFoundErrorSignaled = true;
-				throw new RuntimeError("file not found: " + file, new ProcessorVoidExecutionScope(this));
-			}
+			throw new RuntimeError("file not found: " + file, new ProcessorVoidExecutionScope(this));
 		}
-		fileNotFoundErrorSignaled = false;
 		long partitionSize = file.getTotalSpace();
 		info.size = partitionSize;
 		long partitionAvailable = file.getFreeSpace();

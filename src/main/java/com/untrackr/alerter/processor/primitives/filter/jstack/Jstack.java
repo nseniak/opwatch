@@ -17,13 +17,13 @@ public class Jstack extends Filter<JstackConfig> {
 
 	private final static int MAX_EXCEPTION_LINES = 500;
 
-	public Jstack(ProcessorService processorService, JstackConfig descriptor, String name, Pattern methodPattern) {
-		super(processorService, descriptor, name);
+	public Jstack(ProcessorService processorService, JstackConfig configuration, String name, Pattern methodPattern) {
+		super(processorService, configuration, name);
 		this.methodPattern = methodPattern;
 	}
 
 	@Override
-	public void consumeInOwnThread(Payload<?> input) {
+	public synchronized void consume(Payload<?> input) {
 		String text = payloadValue(input, String.class);
 		String[] lines = text.split("\n");
 		for (String line : lines) {

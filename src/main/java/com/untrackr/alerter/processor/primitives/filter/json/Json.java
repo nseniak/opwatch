@@ -10,12 +10,12 @@ import java.io.IOException;
 
 public class Json extends Filter<JsonConfig> {
 
-	public Json(ProcessorService processorService, JsonConfig descriptor, String name) {
-		super(processorService, descriptor, name);
+	public Json(ProcessorService processorService, JsonConfig configuration, String name) {
+		super(processorService, configuration, name);
 	}
 
 	@Override
-	public void consumeInOwnThread(Payload<?> payload) {
+	public void consume(Payload<?> payload) {
 		String value = payloadValue(payload, String.class);
 		Object result = null;
 		try {

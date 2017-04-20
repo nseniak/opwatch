@@ -9,12 +9,12 @@ import com.untrackr.alerter.service.ProcessorService;
 
 public abstract class Producer<D extends ActiveProcessorConfig> extends ActiveProcessor<D> {
 
-	public Producer(ProcessorService processorService, D descriptor, String name) {
-		super(processorService, descriptor, name);
+	public Producer(ProcessorService processorService, D configuration, String name) {
+		super(processorService, configuration, name);
 	}
 
 	@Override
-	public void consumeInOwnThread(Payload<?> payload) {
+	public void consume(Payload<?> payload) {
 		throw new RuntimeError("producer should not receive input", new ProcessorVoidExecutionScope(this));
 	}
 

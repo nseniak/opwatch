@@ -9,8 +9,8 @@ public class Cron extends ScheduledProducer<CronConfig> {
 
 	private CommandRunner commandRunner;
 
-	public Cron(ProcessorService processorService, CronConfig descriptor, String name, ScheduledExecutor scheduledExecutor, CommandRunner commandRunner) {
-		super(processorService, descriptor, name, scheduledExecutor);
+	public Cron(ProcessorService processorService, CronConfig configuration, String name, ScheduledExecutor scheduledExecutor, CommandRunner commandRunner) {
+		super(processorService, configuration, name, scheduledExecutor);
 		this.commandRunner = commandRunner;
 	}
 

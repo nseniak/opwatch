@@ -10,8 +10,8 @@ public class Receive extends Producer<ReceiveConfig> implements HttpService.Post
 
 	private String urlPath;
 
-	public Receive(ProcessorService processorService, ReceiveConfig descriptor, String name, String urlPath) {
-		super(processorService, descriptor, name);
+	public Receive(ProcessorService processorService, ReceiveConfig configuration, String name, String urlPath) {
+		super(processorService, configuration, name);
 		this.urlPath = urlPath;
 	}
 

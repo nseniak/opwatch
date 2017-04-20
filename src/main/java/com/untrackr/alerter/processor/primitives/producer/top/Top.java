@@ -10,8 +10,8 @@ import java.lang.management.ManagementFactory;
 
 public class Top extends ScheduledProducer<TopConfig> {
 
-	public Top(ProcessorService processorService, TopConfig descriptor, String name, ScheduledExecutor scheduledExecutor) {
-		super(processorService, descriptor, name, scheduledExecutor);
+	public Top(ProcessorService processorService, TopConfig configuration, String name, ScheduledExecutor scheduledExecutor) {
+		super(processorService, configuration, name, scheduledExecutor);
 	}
 
 	@Override

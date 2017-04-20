@@ -9,8 +9,8 @@ public class Repeat extends ScheduledProducer<RepeatConfig> {
 
 	private JavascriptProducer producer;
 
-	public Repeat(ProcessorService processorService, RepeatConfig descriptor, String name, ScheduledExecutor scheduledExecutor, JavascriptProducer producer) {
-		super(processorService, descriptor, name, scheduledExecutor);
+	public Repeat(ProcessorService processorService, RepeatConfig configuration, String name, ScheduledExecutor scheduledExecutor, JavascriptProducer producer) {
+		super(processorService, configuration, name, scheduledExecutor);
 		this.producer = producer;
 	}
 

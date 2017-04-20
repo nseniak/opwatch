@@ -14,26 +14,20 @@ public abstract class TrailCollecter<D extends ScheduledProcessorConfig> extends
 	protected LinkedBlockingQueue<SeriesObject> queue;
 	private long startupTimestamp;
 
-	public TrailCollecter(ProcessorService processorService, D descriptor, String name, ScheduledExecutor scheduledExecutor, long duration) {
-		super(processorService, descriptor, name, scheduledExecutor);
+	public TrailCollecter(ProcessorService processorService, D configuration, String name, ScheduledExecutor scheduledExecutor, long duration) {
+		super(processorService, configuration, name, scheduledExecutor);
 		this.duration = duration;
 		this.queue = new LinkedBlockingQueue<>();
 	}
 
 	@Override
 	public void start() {
-		createConsumerThread();
 		startupTimestamp = System.currentTimeMillis();
 		super.start();
 	}
 
 	@Override
-	public void stop() {
-		stopConsumerThread();
-	}
-
-	@Override
-	public void consumeInOwnThread(Payload<?> payload) {
+	public void consume(Payload<?> payload) {
 		long timestamp = System.currentTimeMillis();
 		Object result = collectedObject(payload);
 		if (result != null) {

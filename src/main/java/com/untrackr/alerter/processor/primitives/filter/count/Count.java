@@ -10,8 +10,8 @@ public class Count extends TrailCollecter<CountConfig> {
 
 	private JavascriptPredicate predicate;
 
-	public Count(ProcessorService processorService, CountConfig descriptor, String name, ScheduledExecutor scheduledExecutor, JavascriptPredicate predicate, long duration) {
-		super(processorService, descriptor, name, scheduledExecutor, duration);
+	public Count(ProcessorService processorService, CountConfig configuration, String name, ScheduledExecutor scheduledExecutor, JavascriptPredicate predicate, long duration) {
+		super(processorService, configuration, name, scheduledExecutor, duration);
 		this.predicate = predicate;
 	}
 

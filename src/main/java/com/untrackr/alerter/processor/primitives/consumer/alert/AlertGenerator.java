@@ -5,10 +5,9 @@ import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.processor.config.ConstantOrFilter;
 import com.untrackr.alerter.processor.config.JavascriptPredicate;
 import com.untrackr.alerter.processor.payload.Payload;
-import com.untrackr.alerter.processor.primitives.consumer.Consumer;
 import com.untrackr.alerter.service.ProcessorService;
 
-public class AlertGenerator extends Consumer<AlertGeneratorConfig> {
+public class AlertGenerator extends ThreadedConsumer<AlertGeneratorConfig> {
 
 	private Message.Level level;
 	private String title;
@@ -18,9 +17,9 @@ public class AlertGenerator extends Consumer<AlertGeneratorConfig> {
 	private boolean toggleUp;
 	private String channelName;
 
-	public AlertGenerator(ProcessorService processorService, AlertGeneratorConfig descriptor, String name, String title,
+	public AlertGenerator(ProcessorService processorService, AlertGeneratorConfig configuration, String name, String title,
 												ConstantOrFilter<Object> body, Message.Level level, JavascriptPredicate trigger, boolean toggle, String channelName) {
-		super(processorService, descriptor, name);
+		super(processorService, configuration, name);
 		this.level = level;
 		this.title = title;
 		this.body = body;

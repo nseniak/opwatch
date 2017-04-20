@@ -10,8 +10,8 @@ public class Parallel extends ControlProcessor<ParallelConfig> {
 
 	private List<Processor<?>> processors;
 
-	public Parallel(ProcessorService processorService, List<Processor<?>> processors, ParallelConfig descriptor, String name) {
-		super(processorService, descriptor, name);
+	public Parallel(ProcessorService processorService, List<Processor<?>> processors, ParallelConfig configuration, String name) {
+		super(processorService, configuration, name);
 		this.processors = processors;
 		for (Processor<?> processor : processors) {
 			processor.assignContainer(this);

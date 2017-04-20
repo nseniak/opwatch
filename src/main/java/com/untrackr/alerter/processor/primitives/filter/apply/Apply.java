@@ -9,13 +9,13 @@ public class Apply extends Filter<ApplyConfig> {
 
 	private JavascriptFilter lambda;
 
-	public Apply(ProcessorService processorService, ApplyConfig descriptor, String name, JavascriptFilter lambda) {
-		super(processorService, descriptor, name);
+	public Apply(ProcessorService processorService, ApplyConfig configuration, String name, JavascriptFilter lambda) {
+		super(processorService, configuration, name);
 		this.lambda = lambda;
 	}
 
 	@Override
-	public void consumeInOwnThread(Payload<?> payload) {
+	public void consume(Payload<?> payload) {
 		Object result = lambda.call(payload, this);
 		outputTransformed(result, payload);
 	}

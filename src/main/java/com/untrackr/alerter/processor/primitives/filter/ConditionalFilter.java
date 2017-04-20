@@ -6,12 +6,12 @@ import com.untrackr.alerter.service.ProcessorService;
 
 public abstract class ConditionalFilter<D extends ActiveProcessorConfig> extends Filter<D> {
 
-	public ConditionalFilter(ProcessorService processorService, D descriptor, String name) {
-		super(processorService, descriptor, name);
+	public ConditionalFilter(ProcessorService processorService, D configuration, String name) {
+		super(processorService, configuration, name);
 	}
 
 	@Override
-	public void consumeInOwnThread(Payload<?> input) {
+	public void consume(Payload<?> input) {
 		if (predicateValue(input)) {
 			outputTransformed(input.getValue(), input);
 		}

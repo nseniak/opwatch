@@ -13,8 +13,8 @@ public class Sh extends Filter<ShConfig> {
 	protected Future<?> commandConsumerThreadFuture;
 	private CommandRunner commandRunner;
 
-	public Sh(ProcessorService processorService, ShConfig descriptor, String name, CommandRunner commandRunner) {
-		super(processorService, descriptor, name);
+	public Sh(ProcessorService processorService, ShConfig configuration, String name, CommandRunner commandRunner) {
+		super(processorService, configuration, name);
 		this.commandRunner = commandRunner;
 	}
 
@@ -39,7 +39,7 @@ public class Sh extends Filter<ShConfig> {
 	}
 
 	@Override
-	public void consumeInOwnThread(Payload<?> payload) {
+	public void consume(Payload<?> payload) {
 		commandRunner.consume(this, payload);
 	}
 

@@ -9,8 +9,8 @@ public class Test extends ConditionalFilter<TestConfig> {
 
 	private JavascriptPredicate lambda;
 
-	public Test(ProcessorService processorService, TestConfig descriptor, String name, JavascriptPredicate lambda) {
-		super(processorService, descriptor, name);
+	public Test(ProcessorService processorService, TestConfig configuration, String name, JavascriptPredicate lambda) {
+		super(processorService, configuration, name);
 		this.lambda = lambda;
 	}
 

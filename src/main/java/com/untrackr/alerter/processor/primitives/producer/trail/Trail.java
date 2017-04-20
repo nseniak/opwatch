@@ -8,8 +8,8 @@ import com.untrackr.alerter.service.ProcessorService;
 
 public class Trail extends TrailCollecter<TrailConfig> {
 
-	public Trail(ProcessorService processorService, TrailConfig descriptor, String name, ScheduledExecutor scheduledExecutor, long duration) {
-		super(processorService, descriptor, name, scheduledExecutor, duration);
+	public Trail(ProcessorService processorService, TrailConfig configuration, String name, ScheduledExecutor scheduledExecutor, long duration) {
+		super(processorService, configuration, name, scheduledExecutor, duration);
 	}
 
 	@Override

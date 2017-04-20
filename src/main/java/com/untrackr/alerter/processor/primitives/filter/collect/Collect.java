@@ -12,14 +12,14 @@ public class Collect extends Filter<CollectConfig> {
 	private int count;
 	private EvictingQueue<SeriesObject> queue;
 
-	public Collect(ProcessorService processorService, CollectConfig descriptor, String name, int count) {
-		super(processorService, descriptor, name);
+	public Collect(ProcessorService processorService, CollectConfig configuration, String name, int count) {
+		super(processorService, configuration, name);
 		this.count = count;
 		this.queue = EvictingQueue.create(count);
 	}
 
 	@Override
-	public void consumeInOwnThread(Payload<?> payload) {
+	public synchronized void consume(Payload<?> payload) {
 		Object value = payload.getValue();
 		if (value != null) {
 			long timestamp = System.currentTimeMillis();

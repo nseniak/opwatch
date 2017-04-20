@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.StringJoiner;
-import java.util.concurrent.Future;
 
 /**
  * A processor that runs in its own thread
@@ -18,12 +17,8 @@ public abstract class ActiveProcessor<D extends ActiveProcessorConfig> extends P
 
 	private static final Logger logger = LoggerFactory.getLogger(ActiveProcessor.class);
 
-	private Future<?> consumerThreadFuture;
-	private long lastOutputTime = 0;
-	private ConsumerThreadRunner consumerThreadRunner;
-
-	public ActiveProcessor(ProcessorService processorService, D descriptor, String name) {
-		super(processorService, descriptor, name);
+	public ActiveProcessor(ProcessorService processorService, D configuration, String name) {
+		super(processorService, configuration, name);
 	}
 
 	@Override
@@ -44,7 +39,6 @@ public abstract class ActiveProcessor<D extends ActiveProcessorConfig> extends P
 		producer.addConsumer(this);
 	}
 
-	// TODO Signal error in factory?
 	@Override
 	public void check() {
 		StringJoiner joiner = new StringJoiner(", ");
@@ -81,6 +75,16 @@ public abstract class ActiveProcessor<D extends ActiveProcessorConfig> extends P
 		}
 	}
 
+	@Override
+	public void start() {
+		// By default, do nothing
+	}
+
+	@Override
+	public void stop() {
+		// By default, do nothing
+	}
+
 	public <V> void outputTransformed(V value, Payload<?> input) {
 		Payload<V> payload = Payload.makeTransformed(processorService, this, input, value);
 		output(consumers, payload);
@@ -91,8 +95,6 @@ public abstract class ActiveProcessor<D extends ActiveProcessorConfig> extends P
 		output(consumers, payload);
 	}
 
-	public abstract void consumeInOwnThread(Payload<?> payload);
-
 	public void output(Payload<?> payload) {
 		output(consumers, payload);
 	}
@@ -101,39 +103,9 @@ public abstract class ActiveProcessor<D extends ActiveProcessorConfig> extends P
 		if (processorService.config().trace()) {
 			logger.info("Output: " + getName() + " ==> " + processorService.json(payload));
 		}
-		long now = System.currentTimeMillis();
-		long elapsedSinceLastOutput = now - lastOutputTime;
-		long minElapsed = processorService.config().minimumOutputDelay();
-		if (elapsedSinceLastOutput < minElapsed) {
-			try {
-				Thread.sleep(minElapsed - elapsedSinceLastOutput);
-			} catch (InterruptedException e) {
-				throw new ApplicationInterruptedException(ApplicationInterruptedException.INTERRUPTION);
-			}
-		}
 		for (Processor<?> consumer : consumers) {
 			consumer.consume(payload);
 		}
-		lastOutputTime = System.currentTimeMillis();
-	}
-
-	public void createConsumerThread() {
-		consumerThreadRunner = new ConsumerThreadRunner(processorService, this);
-		consumerThreadFuture = processorService.getConsumerExecutor().submit(consumerThreadRunner);
-	}
-
-	public void stopConsumerThread() {
-		if (!consumerThreadFuture.isDone()) {
-			boolean stopped = consumerThreadFuture.cancel(true);
-			if (!stopped) {
-				throw new RuntimeError("cannot stop consumer thread", new ProcessorVoidExecutionScope(this));
-			}
-		}
-	}
-
-	@Override
-	public void consume(Payload<?> payload) {
-		consumerThreadRunner.consume(payload);
 	}
 
 	public <T> T payloadValue(Payload payload, Class<?> clazz) {

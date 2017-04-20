@@ -13,10 +13,10 @@ public class ConsumerThreadRunner implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(ConsumerThreadRunner.class);
 
 	protected ProcessorService processorService;
-	protected ActiveProcessor<?> processor;
+	protected ThreadedConsumer<?> processor;
 	protected ArrayBlockingQueue<Payload<?>> inputQueue;
 
-	public ConsumerThreadRunner(ProcessorService processorService, ActiveProcessor<?> processor) {
+	public ConsumerThreadRunner(ProcessorService processorService, ThreadedConsumer<?> processor) {
 		this.processorService = processorService;
 		this.processor = processor;
 		int inputQueueSize = processorService.config().inputQueueSize();
