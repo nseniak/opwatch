@@ -4,14 +4,14 @@ import com.untrackr.alerter.service.AlerterConfig;
 
 public class ScheduledProcessorConfig extends ActiveProcessorConfig {
 
-	private String period = AlerterConfig.defaultScheduledProducerPeriod();
+	private Duration period = AlerterConfig.defaultScheduledProducerPeriod();
 
 	@OptionalProperty
-	public String getPeriod() {
+	public Duration getPeriod() {
 		return period;
 	}
 
-	public void setPeriod(String period) {
+	public void setPeriod(Duration period) {
 		this.period = period;
 	}
 

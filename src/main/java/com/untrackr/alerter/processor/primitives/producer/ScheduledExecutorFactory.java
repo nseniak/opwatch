@@ -14,7 +14,7 @@ public abstract class ScheduledExecutorFactory<D extends ScheduledProcessorConfi
 	}
 
 	protected ScheduledExecutor makeScheduledExecutor(ScheduledProcessorConfig descriptor) {
-		long period = durationValue(checkPropertyValue("period", descriptor.getPeriod()));
+		long period = checkPropertyValue("period", descriptor.getPeriod()).value(this);
 		if (period <= 0) {
 			throw new RuntimeError("duration must be strictly positive: " + descriptor.getPeriod(),
 					new FactoryExecutionScope(this));

@@ -10,8 +10,6 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.time.Duration;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -96,24 +94,6 @@ public abstract class ProcessorFactory<C extends ProcessorConfig, P extends Proc
 			return defaultValue;
 		} else {
 			return value;
-		}
-	}
-
-	protected long durationValue(String durationString) {
-		String duration;
-		int start;
-		if (durationString.startsWith("P") || durationString.startsWith("p")) {
-			duration = durationString;
-			start = 0;
-		} else {
-			duration = "pt" + durationString;
-			start = 2;
-		}
-		try {
-			return Duration.parse(duration).toMillis();
-		} catch (DateTimeParseException e) {
-			throw new RuntimeError(e.getLocalizedMessage() + " at index " + (e.getErrorIndex() - start) + ": \"" + durationString + "\"",
-					new FactoryExecutionScope(this), e);
 		}
 	}
 

@@ -344,6 +344,15 @@ public class ScriptService {
 				return number;
 			}
 		}
+		if (Duration.class.isAssignableFrom(clazz)) {
+			if (scriptValue instanceof String) {
+				return Duration.makeText((String) scriptValue);
+			}
+			Object number = convertScriptValueToNumber(Long.class, scriptValue);
+			if (number != null) {
+				return Duration.makeMilliseconds((long) number);
+			}
+		}
 		if (scriptValue instanceof ScriptObjectMirror) {
 			ScriptObjectMirror scriptObject = (ScriptObjectMirror) scriptValue;
 			if (scriptObject.isFunction()) {

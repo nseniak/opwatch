@@ -1,5 +1,6 @@
 package com.untrackr.alerter.processor.primitives.producer.curl;
 
+import com.untrackr.alerter.processor.config.Duration;
 import com.untrackr.alerter.processor.config.ImplicitProperty;
 import com.untrackr.alerter.processor.config.OptionalProperty;
 import com.untrackr.alerter.processor.config.ScheduledProcessorConfig;
@@ -8,8 +9,8 @@ import com.untrackr.alerter.service.AlerterConfig;
 public class CurlConfig extends ScheduledProcessorConfig {
 
 	private String url;
-	private String connectTimeout = AlerterConfig.defaultHttpConnectTimeout();
-	private String readTimeout = AlerterConfig.defaultHttpReadTimeout();
+	private Duration connectTimeout = AlerterConfig.defaultHttpConnectTimeout();
+	private Duration readTimeout = AlerterConfig.defaultHttpReadTimeout();
 	private Boolean insecure = false;
 
 	@ImplicitProperty
@@ -22,20 +23,20 @@ public class CurlConfig extends ScheduledProcessorConfig {
 	}
 
 	@OptionalProperty
-	public String getConnectTimeout() {
+	public Duration getConnectTimeout() {
 		return connectTimeout;
 	}
 
-	public void setConnectTimeout(String connectTimeout) {
+	public void setConnectTimeout(Duration connectTimeout) {
 		this.connectTimeout = connectTimeout;
 	}
 
 	@OptionalProperty
-	public String getReadTimeout() {
+	public Duration getReadTimeout() {
 		return readTimeout;
 	}
 
-	public void setReadTimeout(String readTimeout) {
+	public void setReadTimeout(Duration readTimeout) {
 		this.readTimeout = readTimeout;
 	}
 

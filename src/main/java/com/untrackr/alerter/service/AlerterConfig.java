@@ -5,6 +5,7 @@ import com.untrackr.alerter.channel.common.ChannelConfig;
 import com.untrackr.alerter.common.ApplicationUtil;
 import com.untrackr.alerter.processor.common.RuntimeError;
 import com.untrackr.alerter.processor.common.ValueLocation;
+import com.untrackr.alerter.processor.config.Duration;
 
 import java.util.concurrent.TimeUnit;
 
@@ -119,8 +120,8 @@ public class AlerterConfig {
 		this.tailPollInterval = tailPollInterval;
 	}
 
-	public static String defaultScheduledProducerPeriod() {
-		return "1s";
+	public static Duration defaultScheduledProducerPeriod() {
+		return Duration.makeText("1s");
 	}
 
 	public boolean channelDebug() {
@@ -139,12 +140,12 @@ public class AlerterConfig {
 		this.traceProcessors = trace;
 	}
 
-	public static String defaultHttpConnectTimeout() {
-		return "5s";
+	public static Duration defaultHttpConnectTimeout() {
+		return Duration.makeText("5s");
 	}
 
-	public static String defaultHttpReadTimeout() {
-		return "10s";
+	public static Duration defaultHttpReadTimeout() {
+		return Duration.makeText("10s");
 	}
 
 	public int lineBufferSize() {

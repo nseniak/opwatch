@@ -32,7 +32,10 @@ pretty = function (jsObject, expandAlias, indentLength) {
 	};
 
 	valueType = function (o) {
-		var type = TYPES[typeof o] || TYPES[TOSTRING.call(o)] || processor(o) || processorFunction(o) || stringConstant(o) || stringProducer(o) || (o ? 'object' : 'null');
+		var type = TYPES[typeof o] || TYPES[TOSTRING.call(o)] || processor(o) || processorFunction(o)
+				|| stringConstant(o) || stringFilter(o)
+				|| durationMilliseconds(o) || durationText(o)
+				|| (o ? 'object' : 'null');
 		return type;
 	};
 
@@ -60,9 +63,25 @@ pretty = function (jsObject, expandAlias, indentLength) {
 		}
 	}
 
-	stringProducer = function (d) {
+	stringFilter = function (d) {
 		if (d && d.producer) {
-			return "stringProducer"
+			return "stringFilter"
+		} else {
+			return null;
+		}
+	}
+
+	durationMilliseconds = function (d) {
+		if (d && d.milliseconds) {
+			return "durationMilliseconds"
+		} else {
+			return null;
+		}
+	}
+
+	durationText = function (d) {
+		if (d && d.text) {
+			return "durationText"
 		} else {
 			return null;
 		}
@@ -187,8 +206,14 @@ pretty = function (jsObject, expandAlias, indentLength) {
 				case 'stringConstant':
 					return fromArray + JSON.stringify(element.constant);
 
-				case 'stringProducer':
+				case 'stringFilter':
 					return fromArray + functionSignature(element.producer.function);
+
+				case 'durationMilliseconds':
+					return fromArray + element.milliseconds;
+
+				case 'durationText':
+					return fromArray + JSON.stringify(element.text);
 
 				case 'undefined':
 					return fromArray + 'undefined';

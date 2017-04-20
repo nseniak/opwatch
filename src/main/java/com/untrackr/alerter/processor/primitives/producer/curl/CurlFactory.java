@@ -47,8 +47,8 @@ public class CurlFactory extends ScheduledExecutorFactory<CurlConfig, Curl> {
 					new FactoryExecutionScope(this),
 					e);
 		}
-		long connectTimeout = durationValue(checkPropertyValue("connectTimeout", config.getConnectTimeout()));
-		long readTimeout = durationValue(checkPropertyValue("readTimeout", config.getReadTimeout()));
+		long connectTimeout = checkPropertyValue("connectTimeout", config.getConnectTimeout()).value(this);
+		long readTimeout = checkPropertyValue("readTimeout", config.getReadTimeout()).value(this);
 		boolean insecure = config.getInsecure();
 		return new Curl(getProcessorService(), config, name(), makeScheduledExecutor(config), uri,
 				(int) connectTimeout, (int) readTimeout, insecure);

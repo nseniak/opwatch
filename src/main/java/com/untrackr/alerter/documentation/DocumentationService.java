@@ -3,6 +3,7 @@ package com.untrackr.alerter.documentation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.untrackr.alerter.processor.common.*;
 import com.untrackr.alerter.processor.config.ConstantOrFilter;
+import com.untrackr.alerter.processor.config.Duration;
 import com.untrackr.alerter.processor.config.JavascriptFunction;
 import com.untrackr.alerter.processor.config.ProcessorConfig;
 import jdk.nashorn.internal.objects.NativeRegExp;
@@ -148,12 +149,12 @@ public class DocumentationService {
 			return "a RegExp";
 		} else if (ProcessorConfig.class.isAssignableFrom(clazz)) {
 			return "a processor configuration";
-		} else if (ConstantOrFilter.class.isAssignableFrom(clazz)) {
-			return "a string or function";
 		} else if (com.untrackr.alerter.processor.config.JavascriptFunction.class.isAssignableFrom(clazz)) {
 			return "a function";
 		} else if (Processor.class.isAssignableFrom(clazz)) {
 			return "a processor";
+		} else if (Duration.class.isAssignableFrom(clazz)) {
+			return "a number of milliseconds or duration string";
 		} else {
 			return "an Object";
 		}

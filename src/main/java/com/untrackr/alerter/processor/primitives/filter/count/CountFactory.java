@@ -35,7 +35,7 @@ public class CountFactory extends ScheduledExecutorFactory<CountConfig, Count> {
 	public Count make(Object scriptObject) {
 		CountConfig config = convertProcessorConfig(scriptObject);
 		JavascriptPredicate predicate = config.getPredicate();
-		long duration = durationValue(checkPropertyValue("duration", config.getDuration()));
+		long duration = checkPropertyValue("duration", config.getDuration()).value(this);
 		return new Count(getProcessorService(), config, name(), makeScheduledExecutor(config), predicate, duration);
 	}
 
