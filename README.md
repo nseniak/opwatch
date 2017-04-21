@@ -10,7 +10,7 @@ are combined to build monitoring applications.
 
 Here's an example of a small Opwatch monitoring application `my_first_processor.js`:
 
-```
+```js
 processor = pipe(tail("/tmp/application.log"), grep(/ERROR/), alert("An error occurred!"));
 processor.run();
 ```
@@ -24,7 +24,7 @@ data to be appended.
 
 To run this program, type at the command line:
 
-```
+```sh
 $ opwatch my_first_processor.js
 ```
 
@@ -47,7 +47,7 @@ To stop the program, type Ctrl-C or kill the Opwatch process.
 Opwatch can also run as an interactive Javascript read-eval-print loop, which is useful for learning and experimenting. 
 To start the interactive loop, run the Opwatch command without a script file argument:
 
-```
+```sh
 $ opwatch
 ```
 
@@ -65,7 +65,7 @@ A few tips:
 The `--run` option lets you build and run a processor using a single command line. Its argument is a Javascript expression 
 that must evaluate to a processor. For example:
 
-```
+```sh
 $ opwatch --run 'pipe(tail("/tmp/application.log"), grep(/ERROR/), alert("An error occurred!"))'
 ```
 
@@ -88,7 +88,7 @@ the total volume size and available size.
 To see an example of `df` output, run the command below. The output of `df` is pipelined to the input of `stdout`, 
 which consumes any Javascript object and displays it in Json syntax, which is useful for testing and debugging purposes:
 
-```
+```js
 > pipe(df("/tmp"), stdout()).run()
 {"file":"/tmp","size":499055067136,"used":347210567680,"available":151844499456,"percentUsed":69.57359829499134}
 {"file":"/tmp","size":499055067136,"used":347210567680,"available":151844499456,"percentUsed":69.57359829499134}
@@ -110,7 +110,7 @@ Processors can be combined with `pipe` and `parallel`:
 For example, the following processor monitors a log file and generates an alert if a line contains either ERROR
 or WARNING:
 
-```
+```js
 pipe(
   tail("application.log"), 
   parallel(grep(/ERROR/), grep(/WARNING/)), 
@@ -124,7 +124,7 @@ the construction of processors to make code easier to write and read, and to yie
 in this example:
 
  
-```
+```js
 function grepErrorOrWarn() {
   return parallel(grep(/ERROR/), grep(/WARNING/));
 }
@@ -154,7 +154,7 @@ For example, the `grep` processor has two configuration properties:
 
 The two following calls to the `grep` constructor are equivalent:
 
-```
+```js
 grep({ regexp: /ERROR/, invert: false});
 grep({ regexp: /ERROR/ }); // invert is false by default
 ```
@@ -168,7 +168,7 @@ When a processor has exactly one mandatory property, its constructor can be invo
 property, instead of an object having that property. For instance, the following calls to the `grep` constructor 
 are equivalent:
 
-```
+```js
 grep({ regexp: /ERROR/ }); // regexp is the onlye mandatory property of grep
 grep(/ERROR/); // directly pass the regexp value
 ```
@@ -177,7 +177,7 @@ The `pipe` and `parallel` constructors are a special case. They have one mandato
 contains an array of processors. These processors can be directly passed to constructor as its arguments. The following 
 calls are equivalent:
 
-```
+```js
 pipe({ processors: [ df("/tmp"), stdout() ] })
 pipe([ df("/tmp"), stdout() ])
 pipe(df("/tmp"), stdout())
@@ -207,7 +207,7 @@ Processors fall into the following categories, depending on how they handle inpu
 These categories are useful for documentation purposes. They also allow Opwatch to check the validity of constructed 
 processors. For instance, if you try to pipeline a consumer into another consumer, you get an error message:
 
-```
+```js
 > pipe(alert("problem"), stdout()).run()
 [console] error: alert: input is missing, has no output but expected to have one
 [console] >> at <eval>:1
@@ -217,7 +217,7 @@ Unlike Unix commands, processors don't an implicit input and output. A consumer 
 another processor, and a producer must explicitly send its output to another processor. If you try to run a 
 processor that breaks these rules, you get an error message:
 
-```
+```js
 > df("/tmp").run()
 [console] error: df: output is ignored
 [console] >> at <eval>:1
@@ -226,7 +226,7 @@ processor that breaks these rules, you get an error message:
 To read from the keyboard or write to the screen, use the `stdin` and the `stdout` processors as in the following 
 example:
 
-```
+```js
 > pipe(stdin(), grep('ERROR'), stdout()).run()
 // Type some text with the keyword ERROR
 ```
