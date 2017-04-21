@@ -92,7 +92,7 @@ function prop_compare(p1, p2) {
 
 function property_help(prop) {
 	var opt_left = prop.optional ? "[ " : "";
-	var opt_right = prop.optional ? ((prop.defaultValue != null) ? " = " + JSON.stringify(prop.defaultValue) : "") + " ]" : "";
+	var opt_right = prop.optional ? ((prop.defaultValue != null) ? " = " + pretty(prop.defaultValue) : "") + " ]" : "";
 	return opt_left + prop.name + " <" + prop.type + ">" + opt_right;
 }
 
