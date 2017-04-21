@@ -17,27 +17,29 @@ processor.run();
 
 The first line of code builds a *processor* object using constructor functions `pipe`, `tail`, `grep` and `alert`. Processors 
 are the building blocks of monitoring programs. The second line runs the processor, entering an infinite 
-loop that only stops when the Opwatch process forcibly exits. If you're familiar with Unix commands 
-and some Javascript, you can probably infer the goal of this program. Note that the `tail` processor has the same blocking
-behaviour as the Unix command `tail -F -n 0`, thus starting at the bottom of the file and waiting for additional 
-data to be appended.
+loop that only stops when the Opwatch process forcibly exits.
 
-To run this program, type at the command line:
+If you're familiar with Unix commands and some Javascript, you can probably infer the goal of this program. The `tail`
+processor has the same blocking behaviour as the Unix command `tail -F -n 0`, thus starting at the bottom of the file 
+and waiting for additional data to be appended. The `grep` processor takes a Javascript regexp as its argument and
+behaves similarly to the Unix `grep`, passing any matching input to the next processor.
+
+The `alert` processor is specific to Opwatch and raises an alert with a given title. By default, alerts
+are printed on the console (a.k.a standard output), but Opwatch can be configured to redirect them to more interesting 
+channels, like [Slack](https://slack.com/) or [Pushover](https://pushover.net/). 
+
+To run this program, invoke the `opwatch` command with the program file as its argument. After a few seconds, 
+you get a message informing you that the processor is running. Now, every time you append a line containing the 
+keyword `ERROR` to the file `/tmp/application.log`, you get a message with the alert title and the matching line:
 
 ```sh
 $ opwatch my_first_processor.js
-```
-
-After a few seconds, you get a message informing you that a processor is running:
- 
-```
 [console] info: processor up and running
-```
-
-Now, every time you append a line containing the keyword `ERROR` to the file `/tmp/application.log`, you get a message:
- 
-```
 [console] alert: An error occurred!
+[console] >> This is a line containing the ERROR keyword
+[console] alert: An error occurred!
+[console] >> Another line containing the ERROR keyword
+// And so on until stopped
 ```
 
 To stop the program, type Ctrl-C or kill the Opwatch process.
