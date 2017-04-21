@@ -243,7 +243,7 @@ pretty = function (jsObject, expandAlias, indentLength) {
 		newLine = '\n';
 		newLineJoin = ',' + newLine;
 		visited = [];
-		return pretty(jsObject, '') + newLine;
+		return pretty(jsObject, '');
 	}
 
 	return 'Error: no Javascript object provided';
