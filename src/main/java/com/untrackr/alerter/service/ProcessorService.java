@@ -228,7 +228,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			try {
 				printStdout(logMessage);
 				printStdout("Publishing to console instead:");
-				messagingService.consoleChannel().publish(message);
+				messagingService.defaultConsoleChannel().publish(message);
 			} catch (Throwable t2) {
 				logger.error("Error trying to publish to [console]", t2);
 			}

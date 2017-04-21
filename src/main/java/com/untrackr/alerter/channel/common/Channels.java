@@ -7,13 +7,14 @@ public class Channels {
 	private Map<String, Channel> channelMap;
 
 	private Channel alertChannel;
-
 	private Channel systemChannel;
+	private Channel defaultConsoleChannel;
 
-	public Channels(Map<String, Channel> channelMap, Channel alertChannel, Channel systemChannel) {
+	public Channels(Map<String, Channel> channelMap, Channel alertChannel, Channel systemChannel, Channel defaultConsoleChannel) {
 		this.channelMap = channelMap;
 		this.alertChannel = alertChannel;
 		this.systemChannel = systemChannel;
+		this.defaultConsoleChannel = defaultConsoleChannel;
 	}
 
 	public Map<String, Channel> getChannelMap() {
@@ -38,6 +39,14 @@ public class Channels {
 
 	public void setSystemChannel(Channel systemChannel) {
 		this.systemChannel = systemChannel;
+	}
+
+	public Channel getDefaultConsoleChannel() {
+		return defaultConsoleChannel;
+	}
+
+	public void setDefaultConsoleChannel(Channel defaultConsoleChannel) {
+		this.defaultConsoleChannel = defaultConsoleChannel;
 	}
 
 }

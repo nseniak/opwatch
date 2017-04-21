@@ -119,8 +119,6 @@ However, they are not identical. They don't necessarily have the same options or
 good ideas and familiar names from Unix, but take liberties with the original when it makes sense in the context of a 
 monitoring application.
 
-### Input and output
-
 In Unix, commands receive plain text as their input and produce plain text as their output. 
 In Opwatch, processors can consume and produce arbitrary Javascript objects, not only strings.
 This facilitates the communication of structured information between processors. For example, the `df` processor, 
@@ -139,10 +137,10 @@ which consumes any Javascript object and displays it in Json syntax, which is us
 ```
 
 Note that `df` doesn't exit after executing once, like its Unix counterpart, but rather repeats 
-its output every second until forcibly stopped. This is a common pattern in Opwatch where the goal is to
-create monitoring applications, rather than one-shot executions.
+its output at regular intervals (every second by default) until forcibly stopped. This is a common pattern in Opwatch 
+where the goal is to watch continuously rather than execute one-shot checks.
 
-### Pipelines and parallel execution
+## Combining processors
 
 Processors can be combined with `pipe` and `parallel`:
 
@@ -157,23 +155,32 @@ pipe(
   tail("application.log"), 
   parallel(grep(/ERROR/), grep(/WARNING/)), 
   alert("Error or warning")
-)
+).run()
 ```
 
-Pipes and parallel processors can be arbitrarily nested. The following processor uses `count`,
-which counts its inputs over a given period of time, and `test`, which outputs its input 
-if it obeys to a certain Javascript condition, to generate an alert for a log file if a line
-contains ERROR or if there are more than 100 lines generated over a period of 10 seconds:
+Pipes and parallel processors can be arbitrarily nested. In the more sophisticated processors, nesting
+can be quite deep, which makes them hard to write and read in one block. We recommend that you modularize 
+the construction of processors to make code easier to write and read, and to yield to code reuse, like
+in this example:
 
+ 
 ```
-pipe(
-  tail("application.log"), 
-  parallel(grep(/ERROR/), pipe(count("1m"), test(function (c) { return c > 1000 })), 
-  alert("Problem!")
-)
+function grepErrorOrWarn() {
+  return parallel(grep(/ERROR/), grep(/WARNING/));
+}
+
+function checkLogFile(file) {
+  return pipe(
+    tail(file), 
+    grepErrorOrWarn(), 
+    alert("Error or warning: " + file)
+  );
+}
+
+checkLogFile("application.log").run()
 ```
 
-### Constructors
+### Constructor syntax
 
 Processors are built using constructors. A constructor takes a configuration object as its argument. The
 configuration object has properties that specify the processor options. Configurations properties can 
@@ -192,7 +199,7 @@ grep({ regexp: /ERROR/, invert: false});
 grep({ regexp: /ERROR/ }); // invert is false by default
 ```
 
-#### Constructor shorthands
+#### Shorthands
 
 Systematically passing full objects to constructors can create syntactic cluttering and reduce program readability. 
 Opwatch provides a few syntactic shorthands for sake of brevity.
@@ -216,7 +223,17 @@ pipe([ df("/tmp"), stdout() ])
 pipe(df("/tmp"), stdout())
 ```
 
-### Processor categories
+### Alerts
+
+The whole point of Opwatch is to send alarms. The `alarm` processor
+
+
+### Statistics
+
+
+
+
+### Categories of processors
 
 Processors fall into the following categories, depending on how they handle input and output:
 
@@ -253,40 +270,6 @@ example:
 > pipe(stdin(), grep('ERROR'), stdout()).run()
 // Type some text with the keyword ERROR
 ```
-
-### Alerts
-
-Now we're getting to the 
-
-The whole point of Opwatch is to generate 
-
-The pipeline operator
-`|` connects the text output of a command to the text input of the next command.
-
-Opwatch uses the same pipeline principle to connect processors. For instance, in `my_first_processor.js`, the
-`tail`, `grep` and `alert` processors are connected in a pipeline: when `tail` generates a line of text, it is
-consumed by `grep`, whose output is then consumed by `alert`. 
- 
-
-
-### Reuse
-
-
-
-```
-function logErrorAlert(filename) {
-   return tail(filename), grep(/ERROR/), alert("An error occurred in " + filename);
-}
-
-logErrorAlert("/tmp/application.log").run();
-```
-
-alias
-
-
-### Alerts
-
-Where do alerts go?
 
 ## Advanced notions
 

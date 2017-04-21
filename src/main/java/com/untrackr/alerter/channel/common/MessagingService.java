@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
 
-import static com.untrackr.alerter.channel.services.console.ConsoleMessageService.CONSOLE_CHANNEL_NAME;
+import static com.untrackr.alerter.channel.services.console.ConsoleMessageService.DEFAULT_CONSOLE_CHANNEL_NAME;
 
 @Service
 public class MessagingService {
@@ -44,10 +44,10 @@ public class MessagingService {
 		addServiceChannels(channelConfig, channelMap, remoteChannelService);
 		addServiceChannels(channelConfig, channelMap, pushoverMessageService);
 		addServiceChannels(channelConfig, channelMap, slackMessageService);
-		Channel consoleChannel = channelMap.computeIfAbsent(CONSOLE_CHANNEL_NAME,
+		Channel defaultConsoleChannel = channelMap.computeIfAbsent(DEFAULT_CONSOLE_CHANNEL_NAME,
 				k -> {
 					consoleMessageService.createChannels(new ConsoleConfiguration());
-					return consoleMessageService.channels().get(0);
+					return consoleMessageService.makeDefaultChannel();
 				});
 		Channel defaultChannel = null;
 		Channel errorChannel = null;
@@ -55,10 +55,10 @@ public class MessagingService {
 		if (defaultChannelName != null) {
 			defaultChannel = channelMap.get(defaultChannelName);
 			if (defaultChannel == null) {
-				throw new RuntimeError("the specified default channel does not exist: \"" + defaultChannelName + "\"");
+				throw new RuntimeError("the specified default alert channel does not exist: \"" + defaultChannelName + "\"");
 			}
 		} else {
-			defaultChannel = consoleChannel;
+			defaultChannel = defaultConsoleChannel;
 		}
 		String errorChannelName = channelConfig.getSystemChannel();
 		if (errorChannelName != null) {
@@ -67,9 +67,9 @@ public class MessagingService {
 				throw new RuntimeError("the specified error channel does not exist: \"" + errorChannelName + "\"");
 			}
 		} else {
-			errorChannel = defaultChannel;
+			errorChannel = defaultConsoleChannel;
 		}
-		channels = new Channels(channelMap, defaultChannel, errorChannel);
+		channels = new Channels(channelMap, defaultChannel, errorChannel, defaultConsoleChannel);
 		logger.info("Setting alert channel: " + channels.getAlertChannel().name());
 		logger.info("Setting system channel: " + channels.getSystemChannel().name());
 	}
@@ -105,8 +105,8 @@ public class MessagingService {
 		return channels.getChannelMap().get(name);
 	}
 
-	public Channel consoleChannel() {
-		return findChannel(CONSOLE_CHANNEL_NAME);
+	public Channel defaultConsoleChannel() {
+		return channels.getDefaultConsoleChannel();
 	}
 
 	public Channel alertChannel() {

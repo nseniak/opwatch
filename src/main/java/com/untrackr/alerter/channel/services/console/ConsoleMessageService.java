@@ -6,19 +6,19 @@ import com.untrackr.alerter.service.ProcessorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class ConsoleMessageService implements MessageService<ConsoleConfiguration> {
 
 	public static final String CONSOLE_SERVICE_NAME = "console";
-	public static final String CONSOLE_CHANNEL_NAME = "console";
+	public static final String DEFAULT_CONSOLE_CHANNEL_NAME = "console";
 
 	@Autowired
 	private ProcessorService processorService;
 
-	private ConsoleChannel consoleChannel;
+	private List<ConsoleChannel> channels;
 
 	@Override
 	public String serviceName() {
@@ -32,12 +32,23 @@ public class ConsoleMessageService implements MessageService<ConsoleConfiguratio
 
 	@Override
 	public void createChannels(ConsoleConfiguration config) {
-		consoleChannel = new ConsoleChannel(config, this, processorService);
+		channels = new ArrayList<>();
+		if (config.getChannels() == null) {
+			return;
+		}
+		for (String channelName : config.getChannels().keySet()) {
+			ConsoleChannel channel = new ConsoleChannel(channelName, config, this, processorService);
+			channels.add(channel);
+		}
+	}
+
+	public ConsoleChannel makeDefaultChannel() {
+		return new ConsoleChannel(DEFAULT_CONSOLE_CHANNEL_NAME, new ConsoleConfiguration(), this, processorService);
 	}
 
 	@Override
 	public List<Channel> channels() {
-		return Collections.singletonList(consoleChannel);
+		return new ArrayList<>(channels);
 	}
 
 }

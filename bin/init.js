@@ -8,6 +8,17 @@ channels = {
 
 	"services": {
 
+		// Console channel
+		"console": {
+			"channels": {
+				"console": {}
+			}
+		}
+
+		/*
+
+		// Complete missing information and uncomment to add channels
+
 		// Pushover channels
 		"pushover": {
 			"channels": {
@@ -38,15 +49,15 @@ channels = {
 			}
 		}
 
+	 */
+
 	},
 
-
 	// Default channel for alerts
-	"alertChannel": "<channel name>",
-	// Default channel for system messages (like errors)
-	"systemChannel": "<channel name>"
+	"alertChannel": "console",
+	// Default channel for system messages (e.g., errors)
+	"systemChannel": "console"
 
 };
 
-// Uncomment the following line to make the channel definition effective:
-// config.channels(channels);
+config.channels(channels);

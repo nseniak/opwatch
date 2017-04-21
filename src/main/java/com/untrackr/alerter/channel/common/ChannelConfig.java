@@ -1,7 +1,11 @@
 package com.untrackr.alerter.channel.common;
 
+import com.untrackr.alerter.channel.services.console.ConsoleConfiguration;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import static com.untrackr.alerter.channel.services.console.ConsoleMessageService.DEFAULT_CONSOLE_CHANNEL_NAME;
 
 public class ChannelConfig {
 
