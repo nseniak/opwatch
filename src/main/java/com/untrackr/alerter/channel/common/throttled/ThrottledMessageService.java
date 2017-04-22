@@ -1,4 +1,4 @@
-package com.untrackr.alerter.channel.common.gated;
+package com.untrackr.alerter.channel.common.throttled;
 
 import com.untrackr.alerter.channel.common.Channel;
 import com.untrackr.alerter.channel.common.MessageService;
@@ -16,15 +16,15 @@ import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public abstract class GatedMessageService<S extends ServiceConfiguration> implements MessageService<S>, Runnable {
+public abstract class ThrottledMessageService<S extends ServiceConfiguration> implements MessageService<S>, Runnable {
 
-	private static final Logger logger = LoggerFactory.getLogger(GatedMessageService.class);
+	private static final Logger logger = LoggerFactory.getLogger(ThrottledMessageService.class);
 
 	@Autowired
 	private ProcessorService processorService;
 
 	private ScheduledThreadPoolExecutor scheduledExecutor = new ScheduledThreadPoolExecutor(1, ThreadUtil.threadFactory("RateLimitedChannelServiceTask"));
-	private List<GatedChannel<S>> channels = new ArrayList<>();
+	private List<ThrottledChannel<S>> channels = new ArrayList<>();
 
 	@PostConstruct
 	public void schedule() {
@@ -49,7 +49,7 @@ public abstract class GatedMessageService<S extends ServiceConfiguration> implem
 	@Override
 	public void run() {
 		try {
-			for (GatedChannel<S> channel : channels) {
+			for (ThrottledChannel<S> channel : channels) {
 				channel.handlePendingMessages();
 			}
 		} catch (Throwable t) {
@@ -57,7 +57,7 @@ public abstract class GatedMessageService<S extends ServiceConfiguration> implem
 		}
 	}
 
-	protected abstract List<GatedChannel<S>> doCreateChannels(S config);
+	protected abstract List<ThrottledChannel<S>> doCreateChannels(S config);
 
 	public long timestampSeconds() {
 		return TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());

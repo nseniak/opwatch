@@ -1,4 +1,4 @@
-package com.untrackr.alerter.channel.common.gated;
+package com.untrackr.alerter.channel.common.throttled;
 
 import com.untrackr.alerter.channel.common.Channel;
 import com.untrackr.alerter.channel.common.ServiceConfiguration;
@@ -9,22 +9,22 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public abstract class GatedChannel<S extends ServiceConfiguration> implements Channel {
+public abstract class ThrottledChannel<S extends ServiceConfiguration> implements Channel {
 
-	private GatedMessageService<S> gatedMessageService;
+	private ThrottledMessageService<S> throttledMessageService;
 	private ConcurrentLinkedQueue<Message> waitingQueue;
 	private Rate currentLimit;
 	private Date mutedOn;
 
-	protected GatedChannel(GatedMessageService<S> gatedMessageService) {
-		this.gatedMessageService = gatedMessageService;
+	protected ThrottledChannel(ThrottledMessageService<S> throttledMessageService) {
+		this.throttledMessageService = throttledMessageService;
 		this.currentLimit = null;
 		this.waitingQueue = new ConcurrentLinkedQueue<>();
 	}
 
 	@Override
 	public String serviceName() {
-		return gatedMessageService.serviceName();
+		return throttledMessageService.serviceName();
 	}
 
 	@Override
@@ -42,7 +42,7 @@ public abstract class GatedChannel<S extends ServiceConfiguration> implements Ch
 		RateLimiter rateLimiter = rateLimiter();
 		synchronized (rateLimiter.root()) {
 			while (!waitingQueue.isEmpty()) {
-				long now = gatedMessageService.timestampSeconds();
+				long now = throttledMessageService.timestampSeconds();
 				Rate limitReached = rateLimiter.exceededRate(now);
 				if (limitReached == null) {
 					if (currentLimit != null) {
@@ -69,7 +69,7 @@ public abstract class GatedChannel<S extends ServiceConfiguration> implements Ch
 
 	protected String limitReachedMessage(Rate rateLimit) {
 		return "Limit of " + rateLimit.describe("message", "messages") + " reached on "
-				+ gatedMessageService.getProcessorService().hostName();
+				+ throttledMessageService.getProcessorService().hostName();
 	}
 
 	protected abstract RateLimiter rateLimiter();

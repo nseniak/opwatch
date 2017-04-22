@@ -1,9 +1,9 @@
 package com.untrackr.alerter.channel.services.pushover;
 
-import com.untrackr.alerter.channel.common.gated.GatedChannel;
-import com.untrackr.alerter.channel.common.gated.MessageAggregate;
-import com.untrackr.alerter.channel.common.gated.Rate;
-import com.untrackr.alerter.channel.common.gated.RateLimiter;
+import com.untrackr.alerter.channel.common.throttled.ThrottledChannel;
+import com.untrackr.alerter.channel.common.throttled.MessageAggregate;
+import com.untrackr.alerter.channel.common.throttled.Rate;
+import com.untrackr.alerter.channel.common.throttled.RateLimiter;
 import com.untrackr.alerter.processor.common.GlobalExecutionScope;
 import com.untrackr.alerter.processor.common.Message;
 import com.untrackr.alerter.processor.common.MessageContext;
@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.springframework.util.StringUtils.capitalize;
 
-public class PushoverChannel extends GatedChannel<PushoverConfiguration> {
+public class PushoverChannel extends ThrottledChannel<PushoverConfiguration> {
 
 	private static final Logger logger = LoggerFactory.getLogger(PushoverChannel.class);
 

@@ -1,4 +1,4 @@
-package com.untrackr.alerter.channel.common.gated;
+package com.untrackr.alerter.channel.common.throttled;
 
 import com.untrackr.alerter.common.Assertion;
 import com.untrackr.alerter.common.TimestampCountTrail;

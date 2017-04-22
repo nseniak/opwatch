@@ -1,9 +1,9 @@
 package com.untrackr.alerter.channel.services.pushover;
 
-import com.untrackr.alerter.channel.common.gated.GatedChannel;
-import com.untrackr.alerter.channel.common.gated.GatedMessageService;
-import com.untrackr.alerter.channel.common.gated.Rate;
-import com.untrackr.alerter.channel.common.gated.RateLimiter;
+import com.untrackr.alerter.channel.common.throttled.ThrottledChannel;
+import com.untrackr.alerter.channel.common.throttled.ThrottledMessageService;
+import com.untrackr.alerter.channel.common.throttled.Rate;
+import com.untrackr.alerter.channel.common.throttled.RateLimiter;
 import com.untrackr.alerter.service.ProcessorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class PushoverMessageService extends GatedMessageService<PushoverConfiguration> {
+public class PushoverMessageService extends ThrottledMessageService<PushoverConfiguration> {
 
 	@Autowired
 	private ProcessorService processorService;
@@ -30,8 +30,8 @@ public class PushoverMessageService extends GatedMessageService<PushoverConfigur
 	}
 
 	@Override
-	public List<GatedChannel<PushoverConfiguration>> doCreateChannels(PushoverConfiguration config) {
-		List<GatedChannel<PushoverConfiguration>> channels = new ArrayList<>();
+	public List<ThrottledChannel<PushoverConfiguration>> doCreateChannels(PushoverConfiguration config) {
+		List<ThrottledChannel<PushoverConfiguration>> channels = new ArrayList<>();
 		if (config.getChannels() == null) {
 			return Collections.emptyList();
 		}

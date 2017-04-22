@@ -1,4 +1,4 @@
-package com.untrackr.alerter.channel.common.gated;
+package com.untrackr.alerter.channel.common.throttled;
 
 import java.util.concurrent.TimeUnit;
 

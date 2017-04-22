@@ -6,10 +6,10 @@ import allbegray.slack.type.Color;
 import allbegray.slack.type.Field;
 import allbegray.slack.type.Payload;
 import allbegray.slack.webhook.SlackWebhookClient;
-import com.untrackr.alerter.channel.common.gated.MessageAggregate;
-import com.untrackr.alerter.channel.common.gated.Rate;
-import com.untrackr.alerter.channel.common.gated.GatedChannel;
-import com.untrackr.alerter.channel.common.gated.RateLimiter;
+import com.untrackr.alerter.channel.common.throttled.MessageAggregate;
+import com.untrackr.alerter.channel.common.throttled.Rate;
+import com.untrackr.alerter.channel.common.throttled.ThrottledChannel;
+import com.untrackr.alerter.channel.common.throttled.RateLimiter;
 import com.untrackr.alerter.processor.common.Message;
 import com.untrackr.alerter.processor.common.RuntimeError;
 import com.untrackr.alerter.service.ProcessorService;
@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.springframework.util.StringUtils.capitalize;
 
-public class SlackChannel extends GatedChannel<SlackConfiguration> {
+public class SlackChannel extends ThrottledChannel<SlackConfiguration> {
 
 	private static final Logger logger = LoggerFactory.getLogger(SlackChannel.class);
 

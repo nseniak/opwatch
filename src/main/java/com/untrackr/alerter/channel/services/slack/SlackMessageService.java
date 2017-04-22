@@ -1,7 +1,7 @@
 package com.untrackr.alerter.channel.services.slack;
 
-import com.untrackr.alerter.channel.common.gated.GatedChannel;
-import com.untrackr.alerter.channel.common.gated.GatedMessageService;
+import com.untrackr.alerter.channel.common.throttled.ThrottledChannel;
+import com.untrackr.alerter.channel.common.throttled.ThrottledMessageService;
 import com.untrackr.alerter.service.ProcessorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
-public class SlackMessageService extends GatedMessageService<SlackConfiguration> {
+public class SlackMessageService extends ThrottledMessageService<SlackConfiguration> {
 
 	@Autowired
 	private ProcessorService processorService;
@@ -27,8 +27,8 @@ public class SlackMessageService extends GatedMessageService<SlackConfiguration>
 	}
 
 	@Override
-	public List<GatedChannel<SlackConfiguration>> doCreateChannels(SlackConfiguration config) {
-		List<GatedChannel<SlackConfiguration>> channels = new ArrayList<>();
+	public List<ThrottledChannel<SlackConfiguration>> doCreateChannels(SlackConfiguration config) {
+		List<ThrottledChannel<SlackConfiguration>> channels = new ArrayList<>();
 		if (config.getChannels() == null) {
 			return Collections.emptyList();
 		}

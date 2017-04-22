@@ -1,4 +1,4 @@
-package com.untrackr.alerter.channel.common.gated;
+package com.untrackr.alerter.channel.common.throttled;
 
 import com.untrackr.alerter.processor.common.Message;
 
