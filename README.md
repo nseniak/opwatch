@@ -1,28 +1,28 @@
-# Opwatch
+# Introduction to Opwatch
 
 ## What is Opwatch?
 
-Opwatch is a command line tool for monitoring live systems to detect problems and generate alerts. It consists in a 
-Javascript interpreter with a toolbox of predefined functions dedicated to monitoring and alerting. This toolbox
+Opwatch is a command line tool for monitoring live systems, detecting problems and generating alerts. It consists in a 
+Javascript interpreter augmented with a toolbox of functions dedicated to monitoring and alerting. This toolbox
 includes Unix-like functions like `tail` and `grep`, statistical functions, and alerting functions. To monitor a system, 
-you write a Javascript program that uses these functions to probes your system, identify issues and send alerts.
+you write a Javascript program that uses these functions, and execute it with the Opwatch interpreter.
 
-The goal of Opwatch is to let you cover all aspects of a live system and make sure nothing goes awry. Its design
-goals are:
+Since Opwatch monitoring programs are written as plain Javascript code, they can be easily modularized, 
+parameterized, stored, versioned, distributed, and reused across applications.
 
-* Versatility. You can use Opwatch to monitor website uptime, check a log file for error messages or Java exceptions, 
-monitor disk space, invoke an application's healthcheck endpoints. You can trigger alerts based on any condition that 
-can be expressed in Javascript, using its statistical library or any other functions.
-* Modularity. Because it is programmable in Javascript, Opwatch lets you to define libraries of reusable 
-functions that can be shared across applications.
+Opwatch aims at covering most dimensions of a live system. You can use it to monitor website uptime, 
+check a log file for specific messages or exceptions, monitor disk space, invoke an application's healthcheck 
+endpoints. You can trigger alerts based on any condition that can be expressed in Javascript, using its statistical 
+library or any other functions.
 
-On the other hand, Opwatch does not aim at being a complete monitoring platform. It does not include a database, 
-log indexing, search and charting. It is specifically designed for alerting and can be used as a complement to
-monitoring platforms.
+### What Opwatch is not
+ 
+Opwatch does not aim at being a complete monitoring platform. It does not include a database, log indexing, search 
+and charting. It is designed to do alerts, and only alerts, and can be used as a complement to monitoring platforms.
 
-### A simple Opwatch program
+## A simple Opwatch program
 
-Here's an example of a small Opwatch program `my_first_processor.js`:
+Here's an example of a small Opwatch program:
 
 ```js
 processor = pipe(tail("application.log"), grep(/ERROR/), alert("An error occurred!"));
@@ -45,12 +45,19 @@ The `alert` processor is specific to Opwatch and raises an alert with a given ti
 are printed to the console (a.k.a standard output), but Opwatch can redirect them to other channels, 
 like [Slack](https://slack.com/) or [Pushover](https://pushover.net/).
 
-To run this program, invoke the `opwatch` command with the program file as its argument. After a few seconds, 
+To run this program, invoke the `opwatch` command with the program file as its argument -- let's assume it's
+`my_first_processor.js`:
+
+```sh
+$ opwatch my_first_processor.js
+```
+
+After a few seconds, 
 you get a message informing you that the processor is running. Now, every time you append a line containing the 
-keyword `ERROR` to the file `application.log`, you get a message with the alert title and the matching line:
+keyword `ERROR` to the file `application.log`, you get a message with the alert title and the content
+of the matching line:
 
 ```
-$ opwatch my_first_processor.js
 [console] info: processor up and running
 [console] alert: An error occurred!
 [console] >> This is a line containing the ERROR keyword
@@ -61,9 +68,16 @@ $ opwatch my_first_processor.js
 
 To stop the program, type Ctrl-C or kill the Opwatch process.
 
+You can also run this program on a single command line using the `--run` option. The argument of `--run` is a
+Javascript expression that evaluates to a processor, which is run by Opwatch:
+
+```sh
+$ opwatch --run 'pipe(tail("application.log"), grep(/ERROR/), alert("An error occurred!"))'
+```
+
 ### The Opwatch shell
 
-Opwatch can run as an interactive Javascript read-eval-print loop, which is useful for learning and experimenting. 
+Opwatch can start an interactive Javascript read-eval-print loop, which is useful for learning and experimenting. 
 To start the interactive loop, run the Opwatch command without any argument:
 
 ```sh
@@ -78,15 +92,6 @@ A few tips:
   example `grep`, type `grep.help()`.
 * Type `pretty(processor)` to pretty-print a processor.
 * Type `exit()` to exit the Opwatch shell.
-
-### Command line execution
-
-The `--run` option lets you run a processor with a single command line. Its argument is a Javascript expression 
-that must evaluate to a processor. For example:
-
-```sh
-$ opwatch --run 'pipe(tail("application.log"), grep(/ERROR/), alert("An error occurred!"))'
-```
 
 ## Processors
 
@@ -217,7 +222,9 @@ The `alert` processor is the
 
 ### Channels
 
-### Gating
+### Toggle mode
+
+### Throttling
 
 ### Errors
 

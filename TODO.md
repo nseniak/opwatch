@@ -37,6 +37,7 @@
 * [x] Support Ctrl-C in alerter <<EOF foo EOF
 * [x] Option --run
 * [x] Add processor id to payload
+* Error message throttling
 
 ------
 
