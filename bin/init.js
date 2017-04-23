@@ -54,7 +54,7 @@ channels = {
 	},
 
 	// Default channel for alerts
-	"alertChannel": "console",
+	"applicationChannel": "console",
 	// Default channel for system messages (e.g., errors)
 	"systemChannel": "console"
 

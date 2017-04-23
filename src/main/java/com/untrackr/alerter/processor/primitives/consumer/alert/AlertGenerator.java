@@ -33,7 +33,7 @@ public class AlertGenerator extends ThreadedConsumer<AlertGeneratorConfig> {
 		boolean alert = (trigger == null) || trigger.call(payload, this);
 		Channel channel;
 		if (channelName == null) {
-			channel = processorService.getMessagingService().alertChannel();
+			channel = processorService.getMessagingService().applicationChannel();
 		} else {
 			channel = processorService.getMessagingService().findChannel(channelName);
 			if (channel == null) {

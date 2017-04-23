@@ -49,16 +49,16 @@ public class MessagingService {
 					consoleMessageService.createChannels(new ConsoleConfiguration());
 					return consoleMessageService.makeDefaultChannel();
 				});
-		Channel defaultChannel = null;
+		Channel applicationChannel = null;
 		Channel errorChannel = null;
-		String defaultChannelName = channelConfig.getAlertChannel();
-		if (defaultChannelName != null) {
-			defaultChannel = channelMap.get(defaultChannelName);
-			if (defaultChannel == null) {
-				throw new RuntimeError("the specified default alert channel does not exist: \"" + defaultChannelName + "\"");
+		String applicationChannelName = channelConfig.getApplicationChannel();
+		if (applicationChannelName != null) {
+			applicationChannel = channelMap.get(applicationChannelName);
+			if (applicationChannel == null) {
+				throw new RuntimeError("the specified default alert channel does not exist: \"" + applicationChannelName + "\"");
 			}
 		} else {
-			defaultChannel = defaultConsoleChannel;
+			applicationChannel = defaultConsoleChannel;
 		}
 		String errorChannelName = channelConfig.getSystemChannel();
 		if (errorChannelName != null) {
@@ -69,8 +69,8 @@ public class MessagingService {
 		} else {
 			errorChannel = defaultConsoleChannel;
 		}
-		channels = new Channels(channelMap, defaultChannel, errorChannel, defaultConsoleChannel);
-		logger.info("Setting alert channel: " + channels.getAlertChannel().name());
+		channels = new Channels(channelMap, applicationChannel, errorChannel, defaultConsoleChannel);
+		logger.info("Setting alert channel: " + channels.getApplicationChannel().name());
 		logger.info("Setting system channel: " + channels.getSystemChannel().name());
 	}
 
@@ -109,8 +109,8 @@ public class MessagingService {
 		return channels.getDefaultConsoleChannel();
 	}
 
-	public Channel alertChannel() {
-		return channels.getAlertChannel();
+	public Channel applicationChannel() {
+		return channels.getApplicationChannel();
 	}
 
 	public Channel systemChannel() {
