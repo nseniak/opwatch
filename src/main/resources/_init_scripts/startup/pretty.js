@@ -234,17 +234,14 @@ pretty = function (jsObject, expandAlias, indentLength) {
 		return fromArray + 'circular reference to ' + element.toString();
 	};
 
-	if (jsObject) {
-		if (indentLength === undefined) {
-			indentLength = 4;
-		}
-
-		indentString = repeatString(' ', indentLength);
-		newLine = '\n';
-		newLineJoin = ',' + newLine;
-		visited = [];
-		return pretty(jsObject, '');
+	if (indentLength === undefined) {
+		indentLength = 4;
 	}
 
-	return 'Error: no Javascript object provided';
+	indentString = repeatString(' ', indentLength);
+	newLine = '\n';
+	newLineJoin = ',' + newLine;
+	visited = [];
+	return pretty(jsObject, '');
+
 };

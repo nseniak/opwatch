@@ -5,6 +5,10 @@ import com.untrackr.alerter.processor.config.ConstantOrFilter;
 import com.untrackr.alerter.processor.config.JavascriptPredicate;
 import com.untrackr.alerter.service.ProcessorService;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class AlertGeneratorFactory extends ActiveProcessorFactory<AlertGeneratorConfig, AlertGenerator> {
 
 	public AlertGeneratorFactory(ProcessorService processorService) {
@@ -39,7 +43,10 @@ public class AlertGeneratorFactory extends ActiveProcessorFactory<AlertGenerator
 		try {
 			level = Message.Level.valueOf(priorityName);
 		} catch (IllegalArgumentException e) {
-			throw new RuntimeError("bad alert priority: \"" + priorityName + "\"", new FactoryExecutionScope(this), e);
+			List<String> allowed = Arrays.asList(Message.Level.values()).stream().map(Message.Level::name).collect(Collectors.toList());
+			String allowedString = String.join(", ", allowed);
+			throw new RuntimeError("incorrect alert level: \"" + priorityName + "\"; must be one of: " + allowedString,
+					new FactoryExecutionScope(this), e);
 		}
 		String title = checkPropertyValue("title", config.getTitle());
 		JavascriptPredicate trigger = config.getTrigger();

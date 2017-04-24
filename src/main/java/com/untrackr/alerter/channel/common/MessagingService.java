@@ -50,7 +50,8 @@ public class MessagingService {
 					return consoleMessageService.makeDefaultChannel();
 				});
 		Channel applicationChannel = null;
-		Channel errorChannel = null;
+		Channel systemChannel = null;
+		Channel fallbackChannel = null;
 		String applicationChannelName = channelConfig.getApplicationChannel();
 		if (applicationChannelName != null) {
 			applicationChannel = channelMap.get(applicationChannelName);
@@ -60,18 +61,28 @@ public class MessagingService {
 		} else {
 			applicationChannel = defaultConsoleChannel;
 		}
-		String errorChannelName = channelConfig.getSystemChannel();
-		if (errorChannelName != null) {
-			errorChannel = channelMap.get(errorChannelName);
-			if (errorChannel == null) {
-				throw new RuntimeError("the specified error channel does not exist: \"" + errorChannelName + "\"");
+		String systemChannelName = channelConfig.getSystemChannel();
+		if (systemChannelName != null) {
+			systemChannel = channelMap.get(systemChannelName);
+			if (systemChannel == null) {
+				throw new RuntimeError("the specified system channel does not exist: \"" + systemChannelName + "\"");
 			}
 		} else {
-			errorChannel = defaultConsoleChannel;
+			systemChannel = defaultConsoleChannel;
 		}
-		channels = new Channels(channelMap, applicationChannel, errorChannel, defaultConsoleChannel);
+		String fallbackChannelName = channelConfig.getFallbackChannel();
+		if (fallbackChannelName != null) {
+			fallbackChannel = channelMap.get(fallbackChannelName);
+			if (fallbackChannel == null) {
+				throw new RuntimeError("the specified fallback channel does not exist: \"" + systemChannelName + "\"");
+			}
+		} else {
+			fallbackChannel = defaultConsoleChannel;
+		}
+		channels = new Channels(channelMap, applicationChannel, systemChannel, fallbackChannel, defaultConsoleChannel);
 		logger.info("Setting alert channel: " + channels.getApplicationChannel().name());
 		logger.info("Setting system channel: " + channels.getSystemChannel().name());
+		logger.info("Setting fallback channel: " + channels.getFallbackChannel().name());
 	}
 
 	private <F extends ServiceConfiguration> void addServiceChannels(ChannelConfig channelConfig,
@@ -116,5 +127,7 @@ public class MessagingService {
 	public Channel systemChannel() {
 		return channels.getSystemChannel();
 	}
+
+	public Channel fallbackChannel() { return channels.getFallbackChannel(); }
 
 }

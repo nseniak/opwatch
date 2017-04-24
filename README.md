@@ -3,22 +3,20 @@
 ## What is Opwatch?
 
 Opwatch is a command line tool for monitoring live systems, detecting problems and generating alerts. It consists in a 
-Javascript interpreter augmented with a toolbox of functions dedicated to monitoring and alerting. This toolbox
+Javascript interpreter augmented with a toolbox dedicated to monitoring and alerting. This toolbox
 includes Unix-like functions like `tail` and `grep`, statistical functions, and alerting functions. To monitor a system, 
-you write a Javascript program that uses these functions, and execute it with the Opwatch interpreter.
+you write a Javascript program that uses these functions and execute it with the Opwatch interpreter.
 
-Since Opwatch monitoring programs are written as plain Javascript code, they can be easily modularized, 
-parameterized, stored, versioned, distributed, and reused across applications.
-
-Opwatch aims at covering most dimensions of a live system. You can use it to monitor website uptime, 
-check a log file for specific messages or exceptions, monitor disk space, invoke an application's healthcheck 
-endpoints. You can trigger alerts based on any condition that can be expressed in Javascript, using its statistical 
-library or any other functions.
+Since they're Javascript-based programs, Opwatch applications can be naturally modularized, versioned and reused 
+across applications. They're also versatile. You can trigger alerts based on any Javascript condition, and the toolbox
+approach lets you perform a wide variety of tasks, like monitoring website uptime, checking a log file for specific 
+messages or exceptions, monitoring disk space, or invoking an application's healthcheck endpoints.
 
 ### What Opwatch is not
  
-Opwatch does not aim at being a complete monitoring platform. It does not include a database, log indexing, search 
-and charting. It is designed to do alerts, and only alerts, and can be used as a complement to monitoring platforms.
+Opwatch does not aim at being a complete monitoring platform. It does not include a database, does not index log files, 
+doesn't have a graphical dashboard with charting. It is designed to do alerts, and can be used as a complement to 
+other monitoring tools.
 
 ## A simple Opwatch program
 
@@ -29,8 +27,8 @@ processor = pipe(tail("application.log"), grep(/ERROR/), alert("An error occurre
 processor.run();
 ```
 
-The first line of code builds a *processor* using the constructors `pipe`, `tail`, `grep` and `alert`. In Opwatch,
-processors are the building blocks of monitoring programs. Like Unix commands, they take an input, perform a specific 
+The first line of code builds a *processor* using the constructors `pipe`, `tail`, `grep` and `alert`. 
+Processors are the building blocks of monitoring programs. Like Unix commands, they take an input, perform a specific 
 function, and produce an output.
 
 The second line of code runs the processor, entering an infinite loop that only stops when the Opwatch process 
@@ -42,8 +40,8 @@ additional data to be appended. The `grep` processor takes a Javascript regexp a
 behaves similarly to the Unix `grep` command, passing any matching input to the next processor.
 
 The `alert` processor is specific to Opwatch and raises an alert with a given title. By default, alerts
-are printed to the console (a.k.a standard output), but Opwatch can redirect them to other channels, 
-like [Slack](https://slack.com/) or [Pushover](https://pushover.net/).
+are printed to the console (a.k.a standard output), but Opwatch can also publish them to messaging services 
+like [Slack](https://slack.com/) and [Pushover](https://pushover.net/).
 
 To run this program, invoke the `opwatch` command with the program file as its argument -- let's assume it's
 `my_first_processor.js`:
@@ -52,9 +50,8 @@ To run this program, invoke the `opwatch` command with the program file as its a
 $ opwatch my_first_processor.js
 ```
 
-After a few seconds, 
-you get a message informing you that the processor is running. Now, every time you append a line containing the 
-keyword `ERROR` to the file `application.log`, you get a message with the alert title and the content
+After a few seconds, you get a message informing you that the processor is running. Now, every time you append a line 
+containing the keyword `ERROR` to the file `application.log`, you get a message with the alert title and the content
 of the matching line:
 
 ```
@@ -68,8 +65,8 @@ of the matching line:
 
 To stop the program, type Ctrl-C or kill the Opwatch process.
 
-You can also run this program on a single command line using the `--run` option. The argument of `--run` is a
-Javascript expression that evaluates to a processor, which is run by Opwatch:
+You can also run this program on a single command line using the `--run` option. This option's argument is a
+Javascript expression that evaluates to a processor:
 
 ```sh
 $ opwatch --run 'pipe(tail("application.log"), grep(/ERROR/), alert("An error occurred!"))'
@@ -77,7 +74,7 @@ $ opwatch --run 'pipe(tail("application.log"), grep(/ERROR/), alert("An error oc
 
 ### The Opwatch shell
 
-Opwatch can start an interactive Javascript read-eval-print loop, which is useful for learning and experimenting. 
+Opwatch can run as an interactive Javascript read-eval-print loop, which is useful for learning and experimenting. 
 To start the interactive loop, run the Opwatch command without any argument:
 
 ```sh
@@ -98,9 +95,9 @@ A few tips:
 Opwatch draws from the Unix toolbox philosophy. Like Unix commands, processors are components that 
 consume an input, perform a function, and produce an output. Inputs and outputs can be connected using pipelines.
 
-Many processors, like `tail` and `grep`, are named after their Unix counterparts and have a similar function. 
-However, they don't necessarily have the exact same options or behavior. The goal here is to reuse good ideas and familiar
-names from Unix, not to stick to the letter.
+Many processors, like `tail` and `grep`, are named after their Unix counterpart and have a similar function. 
+However, they don't necessarily have the exact same options or behavior. The goal here is to reuse good ideas and 
+familiar names from Unix, not to stick to the letter.
 
 Here are several key differences between Opwatch processors and Unix commands:
 
@@ -227,7 +224,7 @@ Processors fall into the following categories, depending on how they handle inpu
    processors they combine. Example: `pipe`. For instance, `pipe(grep(/ERROR/), alert("problem))` is a consumer, while 
   `pipe(tail(file), grep(/ERROR/))` is a producer.
 
-These categories are useful for documentation purposes. They also allow Opwatch to check the validity of constructed 
+These categories are useful for documentation purposes. Opwatch also uses them to check the validity of constructed 
 processors. For instance, if you try to pipeline a consumer into another consumer, you get an error message:
 
 ```js
@@ -254,16 +251,64 @@ example:
 // Type some text with the keyword ERROR
 ```
 
-## Alerts and Channels
+## Alerts and channels
 
-Opwatch generates two types of alerts:
+By default, Opwatch prints alerts on the console. However, in most monitoring applications, you want alerts to be 
+published to third-party messaging services, like for example [Slack](https://slack.com/). Opwatch lets you do that by 
+configuring the *channels* to which alerts are published.
 
-* User alerts, explicitly generated by Javascript programs with the `alert` processor;
-* System alerts, generated by Opwatch to signal notable events and errors.
+A channel corresponds to the configuration of a messaging service with all its necessary parameters. The nature of these
+parameters depend on the type of service. For instance, a Slack channel is parameterized  with a webhook URL that you 
+obtain from the Slack admin interface.
 
+Channels are defined by calling the `config.channels()` function, passing a configuration object that lists
+the channels and specifies how they're used by Opwatch. Here is an example of code that defines a Slack channel 
+called `developers`:
 
+```js
+config.channels({
+	"services": {
+		"slack": {
+			"channels": {
+				"developers": {
+					"webhookUrl": "https://hooks.slack.com/services/thisisafakeurl"
+				}
+			}
+		}
+	},
+	"applicationChannel": "developers",
+	"systemChannel": "developers",
+	"fallbackChannel": "console",
+});
+```
 
-### Channels
+The `services` property contains the messaging services to be used by Opwatch and their associated channels.  The
+properties `applicationChannel`, `systemChannel` and `fallbackChannel` specify the names of channels used for
+different core functions: 
+
+* `applicationChannel` specifies the channel used by default by the `alert` processor. This default can be overridden 
+in an `alert` processor by specifying the `channel` configuration property, so you can write applications 
+that send alerts to different channels.
+* `systemChannel` specifies the channel used by Opwatch to signal errors and operation events like startup
+and shutdown. Specifically, Javascript errors are signaled as system alerts, thus if you start an Opwatch application 
+and an error occurs in the Javascript code, you'll be notified by an alert.
+* `fallbackChannel` specifies the secondary channel that Opwatch uses when it tries to publish to a primary channel 
+and fails. Failures can occur when the channel's service is down or when its configuration contains an error.
+
+The `console` channel corresponds to the standard output, and is always predefined in all configurations.
+
+### Types of channels
+
+Opwatch currently implements the following types of channels: 
+
+* The *Console* channel, which print alerts on the standard output. This is the default channel and is mostly 
+  used for learning and testing;
+* *[Slack](https://slack.com/)* channels, which print alerts as messages in Slack;
+* *[Pushover](https://pushover.net/)* channels, which send alerts as Pushover notifications;
+* *Remote* channels, which send alerts to other Opwatch servers in order to let them publish them.
+
+### Alert throttling
+
 
 
 ### Toggle mode

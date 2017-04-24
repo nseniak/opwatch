@@ -88,7 +88,7 @@ public class SlackChannel extends ThrottledChannel<SlackConfiguration> {
 	protected void publishOne(Message message) {
 		Payload payload = new Payload();
 		addMainAttachment(payload, message);
-		String logMessage = "[Slack channel \"" + name + "\"] " + processorService.prettyJson(payload);
+		String logMessage = logString() + " " + processorService.prettyJson(payload);
 		logger.info(logMessage);
 		if (processorService.config().channelDebug()) {
 			processorService.printStdout("(debug) " + logMessage);

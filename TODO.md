@@ -38,6 +38,7 @@
 * [x] Option --run
 * [x] Add processor id to payload
 * Error message throttling
+* Rename alerter to opwatch all over the place
 
 ------
 

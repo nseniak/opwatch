@@ -10,4 +10,8 @@ public interface Channel {
 
 	void publish(Message message);
 
+	default String logString() {
+		return "[" + serviceName() + " channel \"" + name() + "\"]";
+	}
+
 }

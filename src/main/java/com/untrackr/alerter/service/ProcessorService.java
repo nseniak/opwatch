@@ -101,7 +101,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			scriptService.initialize();
 		} catch (Exception e) {
 			logger.error("Initialization failed", e);
-			printStderr("Initialization failed: " + e.getMessage());
+			printStderr("Initialization failed: " + exceptionMessage(e));
 			ScriptStack stack = ScriptStack.exceptionStack(e);
 			if (!stack.empty()) {
 				printStderr(stack.asString());
@@ -144,7 +144,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		try {
 			reader = new ConsoleReader();
 		} catch (IOException e) {
-			printStderr("Cannot read from console: " + e.getMessage());
+			printStderr("Cannot read from console: " + exceptionMessage(e));
 			return;
 		}
 		reader.setExpandEvents(false);
@@ -202,7 +202,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	public void signalSystemException(RuntimeError e) {
 		logger.info("Error occurred", e);
-		String title = e.getMessage();
+		String title = exceptionMessage(e);
 		if (title.startsWith(SCRIPT_EXCEPTION_MESSAGE_PREFIX)) {
 			// Script exception messages contain the exception name, which is ugly
 			title = title.substring(SCRIPT_EXCEPTION_MESSAGE_PREFIX.length());
@@ -220,17 +220,25 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	public void publish(Channel channel, Message message) {
 		try {
-			logger.info("Publish to [" + channel.serviceName() + " channel \"" + channel.name() + "\"] " + prettyJson(message));
+			logger.info("Publishing to " + channel.logString() + ": " + prettyJson(message));
 			channel.publish(message);
 		} catch (Throwable t) {
-			String logMessage = "Error trying to publish to channel \"" + channel.name() + "\": " + exceptionMessage(t);
-			logger.error(logMessage, t);
 			try {
+				String logMessage = "Error trying to publish to channel " + channel.logString() + ": " + exceptionMessage(t);
+				logger.error(logMessage, t);
 				printStdout(logMessage);
-				printStdout("Publishing to console instead:");
-				messagingService.defaultConsoleChannel().publish(message);
+				printStdout("Publishing to fallback channel instead: " + messagingService.fallbackChannel().logString());
+				messagingService.fallbackChannel().publish(message);
 			} catch (Throwable t2) {
-				logger.error("Error trying to publish to [console]", t2);
+				try {
+					String logMessage = "Error trying to publish to the fallback channel " + messagingService.fallbackChannel() + ": " + exceptionMessage(t);
+					logger.error(logMessage, t2);
+					printStdout(logMessage);
+					printStdout("Publishing to default console channel");
+					messagingService.defaultConsoleChannel().publish(message);
+				} catch (Throwable t3) {
+					logger.error("Error trying to publish to the console channel", t3);
+				}
 			}
 		}
 	}

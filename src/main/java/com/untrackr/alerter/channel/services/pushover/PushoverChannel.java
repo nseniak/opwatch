@@ -191,7 +191,7 @@ public class PushoverChannel extends ThrottledChannel<PushoverConfiguration> {
 	}
 
 	private void send(PushoverMessage pushoverMessage) {
-		String logMessage = "[Pushover channel \"" + name + "\"] " + processorService.prettyJson(pushoverMessage);
+		String logMessage = logString() + " " + processorService.prettyJson(pushoverMessage);
 		logger.info(logMessage);
 		if (processorService.config().channelDebug()) {
 			processorService.printStdout("(debug) " + logMessage);

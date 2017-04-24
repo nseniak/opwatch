@@ -1,17 +1,14 @@
 package com.untrackr.alerter.channel.common;
 
-import com.untrackr.alerter.channel.services.console.ConsoleConfiguration;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import static com.untrackr.alerter.channel.services.console.ConsoleMessageService.DEFAULT_CONSOLE_CHANNEL_NAME;
 
 public class ChannelConfig {
 
 	private Map<String, Object> services = new LinkedHashMap<>();
-	private String alertChannel;
+	private String applicationChannel;
 	private String systemChannel;
+	private String fallbackChannel;
 
 	public Map<String, Object> getServices() {
 		return services;
@@ -21,12 +18,12 @@ public class ChannelConfig {
 		this.services = services;
 	}
 
-	public String getAlertChannel() {
-		return alertChannel;
+	public String getApplicationChannel() {
+		return applicationChannel;
 	}
 
-	public void setAlertChannel(String alertChannel) {
-		this.alertChannel = alertChannel;
+	public void setApplicationChannel(String applicationChannel) {
+		this.applicationChannel = applicationChannel;
 	}
 
 	public String getSystemChannel() {
@@ -35,6 +32,14 @@ public class ChannelConfig {
 
 	public void setSystemChannel(String systemChannel) {
 		this.systemChannel = systemChannel;
+	}
+
+	public String getFallbackChannel() {
+		return fallbackChannel;
+	}
+
+	public void setFallbackChannel(String fallbackChannel) {
+		this.fallbackChannel = fallbackChannel;
 	}
 
 }

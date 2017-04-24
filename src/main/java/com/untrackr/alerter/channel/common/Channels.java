@@ -6,15 +6,21 @@ public class Channels {
 
 	private Map<String, Channel> channelMap;
 
-	private Channel alertChannel;
+	private Channel applicationChannel;
 	private Channel systemChannel;
 	private Channel defaultConsoleChannel;
+	private Channel fallbackChannel;
 
-	public Channels(Map<String, Channel> channelMap, Channel alertChannel, Channel systemChannel, Channel defaultConsoleChannel) {
+	public Channels(Map<String, Channel> channelMap,
+									Channel applicationChannel,
+									Channel systemChannel,
+									Channel fallbackChannel,
+									Channel defaultConsoleChannel) {
 		this.channelMap = channelMap;
-		this.alertChannel = alertChannel;
+		this.applicationChannel = applicationChannel;
 		this.systemChannel = systemChannel;
 		this.defaultConsoleChannel = defaultConsoleChannel;
+		this.fallbackChannel = fallbackChannel;
 	}
 
 	public Map<String, Channel> getChannelMap() {
@@ -25,12 +31,12 @@ public class Channels {
 		this.channelMap = channelMap;
 	}
 
-	public Channel getAlertChannel() {
-		return alertChannel;
+	public Channel getApplicationChannel() {
+		return applicationChannel;
 	}
 
-	public void setAlertChannel(Channel alertChannel) {
-		this.alertChannel = alertChannel;
+	public void setApplicationChannel(Channel applicationChannel) {
+		this.applicationChannel = applicationChannel;
 	}
 
 	public Channel getSystemChannel() {
@@ -47,6 +53,14 @@ public class Channels {
 
 	public void setDefaultConsoleChannel(Channel defaultConsoleChannel) {
 		this.defaultConsoleChannel = defaultConsoleChannel;
+	}
+
+	public Channel getFallbackChannel() {
+		return fallbackChannel;
+	}
+
+	public void setFallbackChannel(Channel fallbackChannel) {
+		this.fallbackChannel = fallbackChannel;
 	}
 
 }
