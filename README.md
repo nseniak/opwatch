@@ -48,9 +48,9 @@ additional data to be appended. The `grep` processor takes a Javascript regexp a
 behaves similarly to the Unix `grep` command, passing any matching input to the next processor.
 
 The `alert` processor raises an alert when it receives an input. By default, alerts are printed 
-to the console (a.k.a standard output), but they can use third-party messaging services like Slack. In addition to 
-a title, Alerts have optional parameters including a level, trigger condition, body (i.e., extended content) and toggle 
-mode.
+on the console (a.k.a standard output), but Opwatch can also publish them on third-party messaging services like Slack.
+In addition to the title, Alerts have optional parameters including a level, trigger condition, body (i.e., extended 
+content) and toggle mode.
 
 To run this program, invoke the `opwatch` command with the program file as its argument -- let's assume it's
 `my_first_processor.js`:
