@@ -4,9 +4,9 @@ NAME
 
 SYNOPSIS
 
-> `opwatch` [ *options* ] *file_or_url*...
+`opwatch` [ *options* ] *file_or_url*...
 
-> `opwatch` [ *options* ]
+`opwatch` [ *options* ]
 
 DESCRIPTION
 
