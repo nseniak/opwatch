@@ -1,6 +1,6 @@
 ## `grep`
 
-Regexp filter.
+Regexp-based filter
 
 ### Synopsis
 
@@ -10,8 +10,8 @@ Regexp filter.
 
 ### Description
 
-Matches its input against a RegExp. If the matching succeeds, the input is passed as the output. Otherwise, it is
-ignored.
+The `grep` processor matches its input against a given RegExp. If the matching succeeds, the input is passed to the 
+output. Otherwise, it is ignored.
 
 The matching is performed using the RegExp [`test` method](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp). 
 

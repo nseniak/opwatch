@@ -47,7 +47,10 @@ TODO
 
 ## Resources
 
-* [Quick start](doc/quickstart.md) gets you started with Opwatch using a small example.
-* [Overview](doc/overview.md) introduces the key concepts that will help you read the reference documentation.
-* [Snippets](doc/reference/reference.md) contains a collection of small examples illustrating various usages of Opwatch.
-* [Reference](doc/reference/reference.md) is the reference documentation.
+* [Quick start](doc/quickstart.md)
+* [Overview](doc/overview.md)
+* [Code snippets](doc/reference/reference.md)
+* [Reference manual](doc/reference/reference.md)
+  * [Command line arguments and options](doc/reference/command.md)
+  * [Javascript reference](doc/reference/javascript.md)
+  * [Processors](doc/reference/processors.md)

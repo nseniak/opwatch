@@ -226,3 +226,27 @@ To handle this issue, the Slack and Pushover channels implement *throttling*. Th
 channel has a `maxPerMinute` property that limits the number of alerts that can be displayed. When this
 limit is reached, you're warned by a last informational alert and then the channel goes mute. As soon as it recovers 
 some capacity, you get an alert that contains a summary of the alerts that were muted.
+
+## Distributed monitoring
+
+Opwatch lets you create distributed pipelines that connect several Opwatch processes across machines. Distributed 
+pipelines are useful for aggregating data from several hosts in a single Opwatch process, and perform 
+global statistics and alerts.
+
+Distributed pipelines are created using the `send` and `receive` processors. The `send`
+processor sends whatever input it receives to another Opwatch process using the http protocol. The `receive` 
+processor listens for any incoming input on Opwatch's http port.
+
+For example, assume you have two machines named `host1` and `host2`. The following code running on `host1`
+sends any log file line that contains the ERROR keyword to an Opwatch endpoint called `logerror` on `host2`:
+
+```js
+pipe(tail("application.log"), grep(/ERROR/), send({ path: "logerror", hostname: "host2" })).run()
+```
+
+The following code running on `host2` receives any input sent to the `logerror` endpoint, and generates 
+an alert:
+
+```js
+pipe(receive("logerror"), alert("Found an error!")).run()
+```

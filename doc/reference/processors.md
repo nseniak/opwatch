@@ -1,11 +1,11 @@
 # Processors
 
-## Producers
+### Producers
 
-## Filters
+### Filters
 
-* [`grep`](grep.md)
+* [`grep`](grep.md) -- regexp-based filter
 
-## Consumers
+### Consumers
 
-## Control
+### Control
