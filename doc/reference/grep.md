@@ -10,10 +10,11 @@ Regexp-based filter
 
 ### Description
 
-The `grep` processor matches its input against a given RegExp. If the matching succeeds, the input is passed to the 
-output. Otherwise, it is ignored.
+The `grep` processor matches its input against a given 
+[RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp). If the matching 
+succeeds, the input is passed to the output. Otherwise, it is ignored.
 
-The matching is performed using the RegExp [`test` method](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp). 
+The matching is performed using the RegExp `test` method.
 
 ### Parameters
 
@@ -24,8 +25,9 @@ The matching is performed using the RegExp [`test` method](https://developer.moz
 
 ### Example
 
-The following code signal alerts for lines containing the ERROR or WARNING keyword in a log file:
+The following code signals an alert for each line in a log file that contains the `error` or `warning` keywords, 
+ignoring case:
 
 ```js
-pipe(tail("application.log"), grep(/ERROR|WARNING/), alert("Problem found!")).run()
+pipe(tail("application.log"), grep(/error|warning/i), alert("Problem found!")).run()
 ```
