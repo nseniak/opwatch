@@ -4,13 +4,9 @@ NAME
 
 SYNOPSIS
 
-```sh
-$ opwatch [ __options__ ] __file_or_url__...
-```
+> $ opwatch [ *options* ] *file_or_url*...
 
-```sh
-$ opwatch [ __options__ ]
-```
+> $ opwatch [ *options* ]
 
 DESCRIPTION
 
@@ -29,10 +25,10 @@ The following options are available:
 | Option | Description |                                               
 | :--- | :--- |                                               
 | --help | Print command help |                                           
-| --hostname __hostname__ | Specify the current machine's hostname |                    
-| --init file_or_url__ | Execute this script at startup instead of the default |         
+| --hostname *hostname* | Specify the current machine's hostname |                    
+| --init *file_or_url* | Execute this script at startup instead of the default |         
 | --no-init | Do not execute any initialization script at startup |       
 | --no-server | Do not start the embedded http server |                     
-| --port __port_number__ | Use the specified port for the embedded http server |       
-| --run __javascript_expression__ | Evaluate the given Javascript expression to a processor, and run it |                                              
+| --port *port_number* | Use the specified port for the embedded http server |       
+| --run *javascript_expression* | Evaluate the given Javascript expression to a processor, and run it |                                              
 | --trace-channels | Print all alerts to the standard output, instead of sending them to the messaging services |
