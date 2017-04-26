@@ -44,7 +44,9 @@ var tab2 = tab1 + tab1;
 
 function printHelp(schema, varargs) {
 	print("Category: " + schema.category);
+	print();
 	print("Invocation syntax:");
+	print();
 	var props = schema.properties;
 	if (varargs) {
 			print(tab1 + schema.name + "(<processor>, ...);");
