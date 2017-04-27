@@ -262,4 +262,4 @@ pipe(receive("logerror"), alert("Found an error!")).run()
 
 ## What to read next
 
-To learn more about Opwatch, we recommend that you read the [Reference manual](reference.md).
+To learn more about Opwatch, we recommend that you read the [Reference manual](reference/reference.md).
