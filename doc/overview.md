@@ -113,6 +113,15 @@ grep({ regexp: /ERROR/ }); // regexp is the only mandatory property of grep
 grep(/ERROR/); // directly pass the regexp value
 ```
 
+When a processor has no mandatory properties, or no properties at all, its constructor can be invoked without any 
+arguments. For instance, the `top` processor has no configuration properties, thus the following calls are
+equivalent:
+
+```js
+top({})
+top()
+```
+
 The `pipe` and `parallel` constructors are a special case. They have one mandatory property: `processors`, which 
 must contain an array of processors. These processors can be directly passed to constructor as so many arguments, 
 without putting them in an array. Therefore the following calls are equivalent:
@@ -250,3 +259,7 @@ an alert:
 ```js
 pipe(receive("logerror"), alert("Found an error!")).run()
 ```
+
+## What to read next
+
+To learn more about Opwatch, we recommend that you read the [Reference manual](reference.md).

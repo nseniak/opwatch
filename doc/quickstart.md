@@ -69,11 +69,18 @@ $ opwatch
 In the shell, type Ctrl-C to interrupt a running processor. This returns you to the interactive loop. To exit
 the shell, type `exit()`.
 
-## Getting interactive help
+## Getting help
 
-The `help()` function lists all the available predefined processors. To get more detailed help on a specific processor, for 
-example `grep`, type `grep.help()`:
+To get help on the `opwatch` command arguments and options, type:
 
+```sh
+$ opwatch --help
+```
 
+In the read-eval-print loop, the `help()` function lists all the available predefined processors. To get more 
+detailed help on a specific processor, for example `grep`, type `grep.help()`:
 
+## What to read next
 
+To learn more about Opwatch, we recommend you read the [Overview](overview.md).
+ 

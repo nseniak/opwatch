@@ -30,7 +30,6 @@ public abstract class Processor<C extends ProcessorConfig> {
 		this.constructionStack = ScriptStack.currentStack();
 	}
 
-	// TODO Signal error in factory instead
 	public void assignContainer(Processor<?> processor) {
 		if (container != null) {
 			throw new RuntimeError("a processor can only be used once; this one is already used in " + container.getName(),

@@ -2,8 +2,8 @@
 Packages.com.untrackr.alerter.service.ScriptService.logInfo("JavaScript module path: " + require.paths());
 //
 function factory_wrapper(factory) {
-	var ctor = function (arg) {
-		return make_processor(factory, arg);
+	var ctor = function () {
+		return make_processor(factory, arguments);
 	}
 	ctor.help = function () {
 		printHelp(factory.schema(), false);
@@ -12,17 +12,20 @@ function factory_wrapper(factory) {
 	return ctor;
 }
 
-function make_processor(factory, arg) {
+function make_processor(factory, args) {
 	var schema;
-	if (!arg) {
+	if (args.length > 1) {
+		factory.error("too many arguments");
+	}
+	if (args.length == 0) {
 		schema = {};
-	} else if (arg.constructor == Object) {
-		schema = arg;
+	} else if (args[0].constructor == Object) {
+		schema = args[0];
 	} else {
 		implicit = implicit_property(factory.schema());
 		if (implicit) {
 			schema = {};
-			schema[implicit.name] = arg;
+			schema[implicit.name] = args[0];
 		} else {
 			factory.error("doesn't have an implicit property; you must pass a full configuration object");
 		}
