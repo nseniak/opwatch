@@ -82,5 +82,5 @@ detailed help on a specific processor, for example `grep`, type `grep.help()`:
 
 ## What to read next
 
-To learn more about Opwatch, we recommend you read the [Overview](overview.md).
+To learn more about Opwatch, we recommend that you read the [Overview](overview.md).
  
