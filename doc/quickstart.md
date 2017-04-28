@@ -5,7 +5,7 @@
 Here's an example of a small Opwatch program:
 
 ```js
-processor = pipe(tail("application.log"), grep(/ERROR/), alert("An error occurred!"));
+var processor = pipe(tail("application.log"), grep(/ERROR/), alert("An error occurred!"));
 processor.run();
 ```
 

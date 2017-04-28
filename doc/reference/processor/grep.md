@@ -32,7 +32,7 @@ pipe(
   tail("application.log"), 
   grep(/error|warning/i), 
   alert("Problem found!")
-).run()
+).run();
 ```
 
 Signal an alert for each line in a log file that does *not* contain `info:`:
@@ -42,5 +42,5 @@ pipe(
 	tail("application.log"), 
 	grep({ regexp: /info:/, invert: true }), 
 	alert("Problem found!")
-).run()
+).run();
 ```

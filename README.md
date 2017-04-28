@@ -25,7 +25,7 @@ other monitoring tools.
 Here's an example of a small Opwatch program:
 
 ```js
-processor = pipe(tail("application.log"), grep(/ERROR/), alert("An error occurred!"));
+var processor = pipe(tail("application.log"), grep(/ERROR/), alert("An error occurred!"));
 processor.run();
 ```
 
@@ -49,7 +49,7 @@ TODO
 
 * [Quick start](doc/quickstart.md)
 * [Overview](doc/overview.md)
-* [Code snippets](doc/reference/reference.md)
+* [Code snippets](snippets.md)
 * [Reference manual](doc/reference/reference.md)
   * [Command line arguments and options](doc/reference/command.md)
   * [Javascript reference](doc/reference/javascript.md)

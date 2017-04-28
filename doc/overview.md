@@ -36,7 +36,7 @@ processor applies a Javascript function to its input, and lets it pass if and on
 boolean value:
 
 ```js
-pipe(df("/tmp"), test(function (input) { return input.percentUsed > 90 }), alert("Not enough space left")).run()
+pipe(df("/tmp"), test(function (input) { return input.percentUsed > 90 }), alert("Not enough space left")).run();
 ```
 
 ## Combining processors
@@ -54,7 +54,7 @@ pipe(
   tail("application.log"), 
   parallel(grep(/ERROR/), grep(/WARNING/)), 
   alert("Error or warning")
-).run()
+).run();
 ```
 
 Pipes and parallel processors can be arbitrarily nested. In real monitoring applications, nesting
@@ -76,7 +76,7 @@ function checkLogFile(file) {
   );
 }
 
-checkLogFile("application.log").run()
+checkLogFile("application.log").run();
 ```
 
 ## Constructor syntax
@@ -140,8 +140,8 @@ Processors fall into the following categories, depending on how they handle inpu
 * *Consumers* take an input and don't generate any output. Examples: `alert`; `stdout`.
 * *Filters* take an input and generate an output. Example: `grep`.
 * *Control processors* combine other processors into a new processor. Their input/output behavior depends on the 
-   processors they combine. Example: `pipe`. For instance, `pipe(grep(/ERROR/), alert("problem))` is a consumer, while 
-  `pipe(tail(file), grep(/ERROR/))` is a producer.
+   processors they combine. There are two control processors: `pipe` and `parallel`. For instance, 
+   `pipe(grep(/ERROR/), alert("problem))` is a consumer, while `pipe(tail(file), grep(/ERROR/))` is a producer.
 
 These categories are useful for documentation purposes. Opwatch also uses them to check the validity of constructed 
 processors. For instance, if you try to pipeline a consumer into another consumer, you get an error message:
@@ -152,7 +152,7 @@ processors. For instance, if you try to pipeline a consumer into another consume
 [console] >> at <eval>:1
 ```
 
-Unlike Unix commands, processors don't an implicit input and output. A consumer must explicitly get its input from 
+Unlike Unix commands, processors don't have an implicit input and output. A consumer must explicitly get its input from 
 another processor, and a producer must explicitly send its output to another processor. If you try to run a 
 processor that breaks these rules, you get an error message:
 
@@ -181,7 +181,8 @@ depend on the type of service. For instance, a Slack channel is parameterized  w
 obtain from the Slack admin interface, and which Opwatch uses to push alert messages.
 
 Channels are configured using the `config.channels()` function, which takes a channel descriptor as its argument. For 
-example, the code below defines a channel called `developers` that is connected to Slack:
+example, the code below defines three channels called `developers`, `devops` and `marketing` that are connected to 
+Slack:
 
 ```js
 config.channels({
@@ -189,22 +190,29 @@ config.channels({
 		"slack": {
 			"channels": {
 				"developers": {
-					"webhookUrl": "https://hooks.slack.com/services/thisisafakeurl"
+					"webhookUrl": "https://hooks.slack.com/services/thisisafakeurl1"
+				},
+				"devops": {
+					"webhookUrl": "https://hooks.slack.com/services/thisisafakeurl2"
+				},
+				"marketing": {
+					"webhookUrl": "https://hooks.slack.com/services/thisisafakeurl3"
 				}
 			}
 		}
 	},
 	"applicationChannel": "developers",
-	"systemChannel": "developers",
+	"systemChannel": "devops",
 	"fallbackChannel": "console"
 });
 ```
 
 Once this code is executed, subsequent alerts get published on Slack. The configuration properties `applicationChannel`, 
-`systemChannel` and `fallbackChannel` specify channel usage:
+`systemChannel` and `fallbackChannel` specify default channel usage:
 
 * `applicationChannel` is the channel used by default by `alert` processors. This default can be overridden 
-in each processor, so you can send alerts to different channels.
+in each processor, so you can send alerts to different channels. For example, you can send an alert to the
+marketing channel using `alert({ title: "new customer", channel: "marketing" })`.
 * `systemChannel` specifies the channel used by Opwatch to signal execution errors and operation events 
 like startup and shutdown. For instance, if a Javascript error occurs in an Opwatch application, you'll be notified 
 by an alert through the specified system channel.
@@ -247,17 +255,17 @@ processor sends whatever input it receives to another Opwatch process using the 
 processor listens for any incoming input on Opwatch's http port.
 
 For example, assume you have two machines named `host1` and `host2`. The following code running on `host1`
-sends any log file line that contains the ERROR keyword to an Opwatch endpoint called `logerror` on `host2`:
+sends any log file line that contains the ERROR keyword to an Opwatch endpoint called `logError` on `host2`:
 
 ```js
-pipe(tail("application.log"), grep(/ERROR/), send({ path: "logerror", hostname: "host2" })).run()
+pipe(tail("application.log"), grep(/ERROR/), send({ path: "logError", hostname: "host2" })).run();
 ```
 
 The following code running on `host2` receives any input sent to the `logerror` endpoint, and generates 
 an alert:
 
 ```js
-pipe(receive("logerror"), alert("Found an error!")).run()
+pipe(receive("logError"), alert("Found an error!")).run();
 ```
 
 ## What to read next

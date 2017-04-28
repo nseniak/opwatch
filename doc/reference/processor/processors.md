@@ -1,5 +1,8 @@
 # Processors
 
+We assume you've already read the [Overview](../../overview.md) which contains important information about processors.
+The manual covers mostly contains information that's not covered in the overview.
+
 ## Processor referencing
 
 A processor can only be used in one place. Once a processor is used in a `pipe` or `parallel`, it cannot be 
@@ -54,7 +57,7 @@ pipe(
 ).run();
 ```
 
-#### Payload argument
+#### Payload
 
 Callbacks that are applied to the processor's input, like in `apply`, are also passed a second argument, called
 the *payload*. The payload is an object with extended information (or metadata) about the input. It has the following 
@@ -71,16 +74,17 @@ properties:
   processor, i.e. in the current processor is a producer.
 * `id`: an internal id used to identify the previous processor in the pipeline, or `null` if there was none.
 
-The payload argument can be safely ignored, like in the `apply` example above, where the callback has a single
-`input` argument. To access it, just add a second argument to the callback and it will receive the payload. In
-the example below, the processor prints the lines that are typed at the keyboard, preceded with `from stdout:`.  
+The payload argument can be safely ignored by a callback, like in the `apply` example above where the callback only 
+has a single `input` argument and the payload is silently discarded. On the other hand, to access the payload, 
+just add a second argument, like in the example below which prints the lines that are typed at the keyboard, 
+preceded by `from stdin:`.  
 
 ```js
 pipe(
   stdin(), 
   apply(function (input, payload) { return "from " + payload.producer + ": " + input; }), 
   stdout()
-).run()
+).run();
 ```
 
 
