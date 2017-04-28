@@ -1,5 +1,5 @@
 // Initialization code loaded on startup
-// Use --init <file-or-url> to specify a different initialization file
+// Use --config <file-or-url> to specify a different initialization file
 
 load("script/processors.js");
 

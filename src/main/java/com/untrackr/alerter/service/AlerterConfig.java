@@ -16,8 +16,8 @@ public class AlerterConfig {
 	private ProcessorService processorService;
 	private ChannelConfig channels;
 	private String hostName;
-	private String initFile;
-	private boolean noInit;
+	private String configFile;
+	private boolean noConfig;
 	private boolean noHttp;
 	private long fileWatchingCheckDelay;
 	private long executorTerminationTimeout;
@@ -38,8 +38,8 @@ public class AlerterConfig {
 	public AlerterConfig(ProcessorService processorService, CommandLineOptions options) {
 		this.processorService = processorService;
 		this.hostName = options.getHostname();
-		this.initFile = options.getInitScript();
-		this.noInit = options.isNoInit();
+		this.configFile = options.getConfigScript();
+		this.noConfig = options.isNoConfig();
 		this.noHttp = options.isNoServer();
 		this.traceChannels = options.isTraceChannels();
 		this.fileWatchingCheckDelay = TimeUnit.SECONDS.toMillis(1);
@@ -77,11 +77,11 @@ public class AlerterConfig {
 	}
 
 	public String initFile() {
-		return initFile;
+		return configFile;
 	}
 
 	public boolean noInit() {
-		return noInit;
+		return noConfig;
 	}
 
 	public boolean noHttp() {

@@ -117,7 +117,7 @@ public class ScriptService {
 			createSimpleFactoryFunction(new TrailFactory(processorService));
 			createVarargFactoryFunction(new ParallelFactory(processorService));
 			createVarargFactoryFunction(new PipeFactory(processorService));
-			loadInitFile();
+			loadConfigFile();
 			ProcessorDoc doc = documentationService.documentation(new CurlFactory(processorService));
 			logger.info("Doc");
 		} catch (ScriptException e) {
@@ -144,11 +144,11 @@ public class ScriptService {
 		loadScript(() -> new InputStreamReader(scriptResource.getInputStream()), scriptResource.toString());
 	}
 
-	private void loadInitFile() {
+	private void loadConfigFile() {
 		if (processorService.config().noInit()) {
 			return;
 		}
-		String initFile = new File(new File(System.getProperty("user.dir")), "init.js").getAbsolutePath();
+		String initFile = new File(new File(System.getProperty("user.dir")), "config.js").getAbsolutePath();
 		if (processorService.config().initFile() != null) {
 			initFile = processorService.config().initFile();
 		}

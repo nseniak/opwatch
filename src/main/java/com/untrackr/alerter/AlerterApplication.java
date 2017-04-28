@@ -60,8 +60,8 @@ public class AlerterApplication implements CommandLineRunner {
 	private static CommandLineOptions parseOptions(String[] argStrings) throws IOException {
 		OptionParser parser = new OptionParser();
 		OptionSpec<String> hostname = parser.accepts("hostname", "specify the current machine's hostname").withRequiredArg().ofType(String.class);
-		OptionSpec<String> initFile = parser.accepts("init", "given a script filename or url, execute this script at startup instead of the default one (startup.js)").withRequiredArg().ofType(String.class);
-		OptionSpec<Void> noInit = parser.accepts("no-init", "do not execute any initialization script at startup");
+		OptionSpec<String> configFile = parser.accepts("config", "specify the filename or url of the configuration script, lo be loaded startup instead of the default one (config.js)").withRequiredArg().ofType(String.class);
+		OptionSpec<Void> noConfig = parser.accepts("no-config", "do not load the configuration script at startup");
 		OptionSpec<String> runExpression = parser.accepts("run", "evaluate the given Javascript expression to a processor, and run it").withRequiredArg().ofType(String.class);
 		OptionSpec<Void> noServer = parser.accepts("no-server", "do not start the embedded http server");
 		OptionSpec<Integer> port = parser.accepts("port","use the specified port for the embedded http server").withRequiredArg().ofType(Integer.class);
@@ -80,8 +80,8 @@ public class AlerterApplication implements CommandLineRunner {
 		CommandLineOptions options = new CommandLineOptions();
 		options.setHostname(optionSet.valueOf(hostname));
 		options.setNoServer(optionSet.has(noServer));
-		options.setInitScript(optionSet.valueOf(initFile));
-		options.setNoInit(optionSet.has(noInit));
+		options.setConfigScript(optionSet.valueOf(configFile));
+		options.setNoConfig(optionSet.has(noConfig));
 		options.setRunExpression(optionSet.valueOf(runExpression));
 		options.setPort(optionSet.valueOf(port));
 		options.setTraceChannels(optionSet.has(traceChannels));

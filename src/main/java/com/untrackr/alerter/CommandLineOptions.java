@@ -6,8 +6,8 @@ public class CommandLineOptions {
 
 	private String hostname;
 	private boolean noServer;
-	private String initScript;
-	private boolean noInit;
+	private String configScript;
+	private boolean noConfig;
 	private Integer port;
 	private boolean traceChannels;
 	private String runExpression;
@@ -29,20 +29,20 @@ public class CommandLineOptions {
 		this.noServer = noServer;
 	}
 
-	public String getInitScript() {
-		return initScript;
+	public String getConfigScript() {
+		return configScript;
 	}
 
-	public void setInitScript(String initScript) {
-		this.initScript = initScript;
+	public void setConfigScript(String configScript) {
+		this.configScript = configScript;
 	}
 
-	public boolean isNoInit() {
-		return noInit;
+	public boolean isNoConfig() {
+		return noConfig;
 	}
 
-	public void setNoInit(boolean noInit) {
-		this.noInit = noInit;
+	public void setNoConfig(boolean noConfig) {
+		this.noConfig = noConfig;
 	}
 
 	public Integer getPort() {
