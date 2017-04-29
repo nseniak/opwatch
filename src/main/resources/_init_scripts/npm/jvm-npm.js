@@ -59,7 +59,7 @@ module = (typeof module === 'undefined') ? {} : module;
 		var body = readFile(module.filename, module.core);
 		var dir = new File(module.filename).getParent();
 		// Evaluate using a utility function that specifies the right location, for debugging and trace purposes
-		var func = Packages.com.untrackr.alerter.service.ScriptService.eval("function (exports, module, require, __filename, __dirname) {" + body + "}", module.filename);
+		var func = Packages.org.opwatch.service.ScriptService.eval("function (exports, module, require, __filename, __dirname) {" + body + "}", module.filename);
 		func.apply(module,
 				[module.exports, module, module.require, module.filename, dir]);
 		module.loaded = true;

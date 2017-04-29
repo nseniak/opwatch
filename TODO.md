@@ -41,6 +41,7 @@
 * Rename alerter to opwatch all over the place
 * Per alert throttling
 * [x] Rename init.js to config.js
+* remove make-distrib.sh
 
 ------
 

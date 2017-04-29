@@ -1,5 +1,5 @@
 //
-Packages.com.untrackr.alerter.service.ScriptService.logInfo("JavaScript module path: " + require.paths());
+Packages.org.opwatch.service.ScriptService.logInfo("JavaScript module path: " + require.paths());
 //
 function factory_wrapper(factory) {
 	var ctor = function () {

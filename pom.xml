@@ -8,10 +8,10 @@
 		<version>1.5.2.RELEASE</version>
 	</parent>
 
-	<groupId>com.alerter</groupId>
-	<artifactId>alerter</artifactId>
-	<name>Alerter</name>
-	<description>Alerter</description>
+	<groupId>org.opwatch</groupId>
+	<artifactId>opwatch</artifactId>
+	<name>Opwatch</name>
+	<description>A tool for monitoring live systems to detect problems and generate alerts</description>
 	<version>1.0.RELEASE</version>
 
 	<repositories>
