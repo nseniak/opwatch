@@ -35,7 +35,7 @@ is contained in the file `my_first_processor.js`, you execute it by typing:
 $ opwatch my_first_processor.js
 ```
 
-After a few seconds, you get a message informing you that the processor is running. Now, every time you append a line 
+Opwatch displays a message informing you that the processor is running. Now, every time you append a line 
 containing the keyword `ERROR` to the file `application.log`, you get a message with the alert title and the content
 of the matching line:
 
