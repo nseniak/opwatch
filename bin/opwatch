@@ -1,11 +1,31 @@
 #!/bin/sh
+
+# Environment variables:
+#
+#   JAVA_OPTS -- Java Options to be passed to the JVM
+#
+
 DIR=$(dirname $0)
 cd ${DIR}
+
+if [ -x "$JAVA_HOME/bin/java" ]
+then
+    JAVA="$JAVA_HOME/bin/java"
+else
+    JAVA=`which java`
+fi
+
+if [ ! -x "$JAVA" ]
+then
+    echo "Java executable not found. Please install java in your PATH or set JAVA_HOME"
+    exit 1
+fi
 
 LOG_DIR=${DIR}/log
 LOG_BASENAME=alerter
 mkdir -p ${LOG_DIR} || exit 1
-java \
+${JAVA} \
+	${JAVA_OPTS} \
 	-Dapp.log.dir=${LOG_DIR} \
 	-Dapp.log.basename=${LOG_BASENAME} \
 	-jar lib/opwatch-*.jar \

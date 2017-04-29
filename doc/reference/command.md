@@ -25,6 +25,7 @@ The following options are available:
 | Option | Description |                                               
 | :--- | :--- |                                               
 | --help | Print command help |                                           
+| --version | Print the version and exit |                                           
 | --hostname *hostname* | Specify the current machine's hostname |                    
 | --config *file_or_url* | Load the specified config file at startup instead of the default one `config.js` |         
 | --no-config | Do not load a configuration script at startup |       

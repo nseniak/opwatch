@@ -67,10 +67,15 @@ public class Application implements CommandLineRunner {
 		OptionSpec<Integer> port = parser.accepts("port","use the specified port for the embedded http server").withRequiredArg().ofType(Integer.class);
 		OptionSpec<Void> traceChannels = parser.accepts("trace-channels","print sent messages to standard output, instead of sending them");
 		OptionSpec<Void> help = parser.accepts("help","print this help").forHelp();
+		OptionSpec<Void> version = parser.accepts("version","print the version and exit").forHelp();
 		OptionSpec<String> files = parser.nonOptions("filenames or urls of scripts to execute in sequence").ofType(String.class);
 		OptionSet optionSet = parser.parse(argStrings);
 		if (optionSet.has(help)) {
 			parser.printHelpOn(System.err);
+			return null;
+		}
+		if (optionSet.has(version)) {
+			System.out.println(Application.class.getPackage().getImplementationVersion());
 			return null;
 		}
 		if (optionSet.has(runExpression) && !optionSet.valuesOf(files).isEmpty()) {
