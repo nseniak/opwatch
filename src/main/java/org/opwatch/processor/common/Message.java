@@ -7,8 +7,8 @@ public class Message {
 		error("error"),
 		info("info"),
 		alert("alert"),
-		alertStart("start of alert"),
-		alertEnd("end of alert");
+		alertOn("alert ON"),
+		alertOff("alert OFF");
 
 		String descriptor;
 
@@ -45,19 +45,19 @@ public class Message {
 	private Type type;
 	private Level level;
 	private String title;
-	private Object body;
+	private Object details;
 	private MessageContext context;
 	private long timestamp;
 
 	private Message() {
 	}
 
-	public static Message makeNew(Type type, Level level, String title, Object body, MessageContext context) {
+	public static Message makeNew(Type type, Level level, String title, Object details, MessageContext context) {
 		Message message = new Message();
 		message.type = type;
 		message.level = level;
 		message.title = title;
-		message.body = body;
+		message.details = details;
 		message.context = context;
 		message.timestamp = System.currentTimeMillis();
 		return message;
@@ -75,8 +75,8 @@ public class Message {
 		return title;
 	}
 
-	public Object getBody() {
-		return body;
+	public Object getDetails() {
+		return details;
 	}
 
 	public long getTimestamp() {

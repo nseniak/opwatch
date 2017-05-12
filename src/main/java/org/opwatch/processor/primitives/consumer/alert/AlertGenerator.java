@@ -11,18 +11,18 @@ public class AlertGenerator extends ThreadedConsumer<AlertGeneratorConfig> {
 
 	private Message.Level level;
 	private String title;
-	private ConstantOrFilter<Object> body;
+	private ConstantOrFilter<Object> details;
 	private JavascriptPredicate trigger;
 	private boolean toggle;
-	private boolean toggleUp;
+	private boolean toggleOn;
 	private String channelName;
 
 	public AlertGenerator(ProcessorService processorService, AlertGeneratorConfig configuration, String name, String title,
-												ConstantOrFilter<Object> body, Message.Level level, JavascriptPredicate trigger, boolean toggle, String channelName) {
+												ConstantOrFilter<Object> details, Message.Level level, JavascriptPredicate trigger, boolean toggle, String channelName) {
 		super(processorService, configuration, name);
 		this.level = level;
 		this.title = title;
-		this.body = body;
+		this.details = details;
 		this.trigger = trigger;
 		this.toggle = toggle;
 		this.channelName = channelName;
@@ -45,25 +45,25 @@ public class AlertGenerator extends ThreadedConsumer<AlertGeneratorConfig> {
 				processorService.publish(channel, makeAlertMessage(Message.Type.alert, payload));
 			}
 		} else {
-			if (!toggleUp && alert) {
-				processorService.publish(channel, makeAlertMessage(Message.Type.alertStart, payload));
-			} else if (toggleUp && !alert) {
-				processorService.publish(channel, makeAlertMessage(Message.Type.alertEnd, payload));
+			if (!toggleOn && alert) {
+				processorService.publish(channel, makeAlertMessage(Message.Type.alertOn, payload));
+			} else if (toggleOn && !alert) {
+				processorService.publish(channel, makeAlertMessage(Message.Type.alertOff, payload));
 			}
-			toggleUp = alert;
+			toggleOn = alert;
 		}
 	}
 
 	private Message makeAlertMessage(Message.Type type, Payload<?> payload) {
 		ExecutionScope scope = new ProcessorPayloadExecutionScope(this, payload);
 		MessageContext context = scope.makeContext(processorService, constructionStack);
-		Object bodyValue = null;
-		if (body != null) {
-			bodyValue = body.value(this, payload, Object.class);
+		Object detailsValue = null;
+		if (details != null) {
+			detailsValue = details.value(this, payload, Object.class);
 		} else {
-			bodyValue = payload.getValue();
+			detailsValue = payload.getValue();
 		}
-		return Message.makeNew(type, level, title, bodyValue, context);
+		return Message.makeNew(type, level, title, detailsValue, context);
 	}
 
 }

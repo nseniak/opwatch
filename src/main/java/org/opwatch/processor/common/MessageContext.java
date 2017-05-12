@@ -11,7 +11,7 @@ public class MessageContext {
 
 	private EmitterType emitterType;
 	private String hostname;
-	private String servicenId;
+	private String serviceId;
 	private String processorName;
 	private Payload<?> payload;
 	private ScriptStack stack;
@@ -21,13 +21,13 @@ public class MessageContext {
 
 	private MessageContext(EmitterType emitterType,
 												 String hostname,
-												 String servicenId,
+												 String serviceId,
 												 String processorName,
 												 Payload<?> payload,
 												 ScriptStack stack) {
 		this.emitterType = emitterType;
 		this.hostname = hostname;
-		this.servicenId = servicenId;
+		this.serviceId = serviceId;
 		this.processorName = processorName;
 		this.payload = payload;
 		this.stack = stack;
@@ -78,12 +78,12 @@ public class MessageContext {
 		this.hostname = hostname;
 	}
 
-	public String getServicenId() {
-		return servicenId;
+	public String getServiceId() {
+		return serviceId;
 	}
 
-	public void setServicenId(String servicenId) {
-		this.servicenId = servicenId;
+	public void setServiceId(String serviceId) {
+		this.serviceId = serviceId;
 	}
 
 	public String getProcessorName() {

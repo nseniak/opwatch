@@ -47,7 +47,7 @@ public class Application implements CommandLineRunner {
 			new SpringApplicationBuilder(Application.class).web(!options.isNoServer()).run(args);
 		} catch (ConnectorStartFailedException e) {
 			System.err.println("Cannot start the embedded http server on port " + e.getPort());
-			System.err.println("To specify another port, use --port <port>");
+			System.err.println("The port may already be in use. To specify another port, use --port <port>");
 			System.err.println("To start without an http server, use --no-server");
 			System.exit(1);
 		} catch (Throwable t) {

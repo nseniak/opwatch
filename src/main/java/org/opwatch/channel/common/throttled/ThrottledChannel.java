@@ -1,6 +1,6 @@
 package org.opwatch.channel.common.throttled;
 
-import org.opwatch.channel.common.Channel;
+import org.opwatch.channel.common.ChannelImpl;
 import org.opwatch.channel.common.ServiceConfiguration;
 import org.opwatch.processor.common.Message;
 
@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public abstract class ThrottledChannel<S extends ServiceConfiguration> implements Channel {
+public abstract class ThrottledChannel<S extends ServiceConfiguration> extends ChannelImpl {
 
 	private ThrottledMessageService<S> throttledMessageService;
 	private ConcurrentLinkedQueue<Message> waitingQueue;

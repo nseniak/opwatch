@@ -8,8 +8,8 @@ import allbegray.slack.type.Payload;
 import allbegray.slack.webhook.SlackWebhookClient;
 import org.opwatch.channel.common.throttled.MessageAggregate;
 import org.opwatch.channel.common.throttled.Rate;
-import org.opwatch.channel.common.throttled.ThrottledChannel;
 import org.opwatch.channel.common.throttled.RateLimiter;
+import org.opwatch.channel.common.throttled.ThrottledChannel;
 import org.opwatch.processor.common.Message;
 import org.opwatch.processor.common.RuntimeError;
 import org.opwatch.service.ProcessorService;
@@ -21,8 +21,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import static org.springframework.util.StringUtils.capitalize;
 
 public class SlackChannel extends ThrottledChannel<SlackConfiguration> {
 
@@ -62,8 +60,7 @@ public class SlackChannel extends ThrottledChannel<SlackConfiguration> {
 	protected void publishAggregate(List<Message> messages, Date mutedOn) {
 		MessageAggregate aggregate = new MessageAggregate();
 		for (Message message : messages) {
-			String title = displayTitle(message);
-			aggregate.addMessage(title, message);
+			aggregate.addMessage(displayTitle(message), message);
 		}
 		Payload payload = new Payload();
 		payload.setText("Unmuting " + processorService.hostName() + ". The following messages were muted:");
@@ -120,13 +117,13 @@ public class SlackChannel extends ThrottledChannel<SlackConfiguration> {
 		Attachment attachment = new Attachment();
 		String title = displayTitle(message);
 		attachment.setColor(levelColor(message.getLevel()));
-		Object body = message.getBody();
-		if (body != null) {
-			if (!processorService.getScriptService().bean(body)) {
-				attachment.setText(title + "\n" + body.toString());
+		Object details = message.getDetails();
+		if (details != null) {
+			if (!processorService.getScriptService().bean(details)) {
+				attachment.setText(title + "\n" + details.toString());
 			} else {
 				attachment.setText(title);
-				processorService.getScriptService().mapFields(body, (key, value) -> {
+				processorService.getScriptService().mapFields(details, (key, value) -> {
 					if (value != null) {
 						attachment.addField(new Field(key, value.toString(), false));
 					}
@@ -138,10 +135,6 @@ public class SlackChannel extends ThrottledChannel<SlackConfiguration> {
 		if (!empty(attachment)) {
 			payload.addAttachment(attachment);
 		}
-	}
-
-	private String displayTitle(Message message) {
-		return levelPrefix(message.getLevel()) + capitalize(message.getType().getDescriptor()) + ": " + message.getTitle();
 	}
 
 	private boolean empty(Attachment attachment) {
@@ -159,20 +152,6 @@ public class SlackChannel extends ThrottledChannel<SlackConfiguration> {
 				return Color.DANGER;
 			case emergency:
 				return Color.DANGER;
-		}
-		throw new IllegalStateException("unknown level: " + level.name());
-	}
-
-	private String levelPrefix(Message.Level level) {
-		switch (level) {
-			case lowest:
-			case low:
-			case medium:
-				return "";
-			case high:
-				return "High ";
-			case emergency:
-				return "EMERGENCY ";
 		}
 		throw new IllegalStateException("unknown level: " + level.name());
 	}

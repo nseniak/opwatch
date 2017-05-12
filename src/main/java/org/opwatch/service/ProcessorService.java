@@ -73,6 +73,8 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	private static String SCRIPT_EXCEPTION_MESSAGE_PREFIX = "javax.script.ScriptException: ";
 
+	public static Message.Level INFO_DEFAULT_MESSAGE_LEVEL = Message.Level.medium;
+
 	private ThreadPoolExecutor consumerExecutor = new ThreadPoolExecutor(0, Integer.MAX_VALUE,
 			60L, TimeUnit.SECONDS, new SynchronousQueue<>(),
 			ThreadUtil.threadFactory("Consumer"));
@@ -160,10 +162,12 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	public void printStderr(String message) {
 		System.err.println(message);
+		System.err.flush();
 	}
 
 	public void printStdout(String message) {
 		System.out.println(message);
+		System.out.flush();
 	}
 
 	private void printCtrlC() {
@@ -196,7 +200,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	public void signalSystemInfo(String title) {
 		ExecutionScope scope = new GlobalExecutionScope();
 		MessageContext context = scope.makeContext(this, ScriptStack.currentStack());
-		Message message = Message.makeNew(Message.Type.info, Message.Level.medium, title, null, context);
+		Message message = Message.makeNew(Message.Type.info, INFO_DEFAULT_MESSAGE_LEVEL, title, null, context);
 		publish(messagingService.systemChannel(), message);
 	}
 

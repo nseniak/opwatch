@@ -42,6 +42,8 @@
 * Per alert throttling
 * [x] Rename init.js to config.js
 * remove make-distrib.sh
+* add cron processor: https://github.com/RedHogs/cron-parser/blob/master/cron-parser-core/src/test/java/net/redhogs/cronparser/CronExpressionDescriptorTest.java
+* add ses processor
 
 ------
 

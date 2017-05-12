@@ -31,7 +31,7 @@ public class Df extends ScheduledProducer<DfConfig> {
 		info.available = partitionAvailable;
 		long partitionUsed = partitionSize - partitionAvailable;
 		info.used = partitionUsed;
-		info.percentUsed = ((double) partitionUsed * 100) / partitionSize;
+		info.usageRatio = ((double) partitionUsed) / partitionSize;
 		outputProduced(info);
 	}
 
@@ -41,7 +41,7 @@ public class Df extends ScheduledProducer<DfConfig> {
 		private Long size;
 		private Long used;
 		private Long available;
-		private Double percentUsed;
+		private Double usageRatio;
 
 		public String getFile() {
 			return file;
@@ -59,8 +59,8 @@ public class Df extends ScheduledProducer<DfConfig> {
 			return available;
 		}
 
-		public Double getPercentUsed() {
-			return percentUsed;
+		public Double getUsageRatio() {
+			return usageRatio;
 		}
 
 	}

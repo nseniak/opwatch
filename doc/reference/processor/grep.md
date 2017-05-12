@@ -2,19 +2,11 @@
 
 Regexp-based filter
 
-### Synopsis
+### Input and output
 
 * Category: Filter
 * Input: String
 * Output: String
-
-### Description
-
-The `grep` processor matches its input against a given 
-[RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp). If the matching 
-succeeds, the input is passed to the output. Otherwise, it is ignored.
-
-The matching is performed using the RegExp `test` method.
 
 ### Configuration properties
 
@@ -22,6 +14,14 @@ The matching is performed using the RegExp `test` method.
 | :--- | :--- | :--- | :--- |
 | `regexp` | a regexp to match against the input string | RegExp | *Mandatory* | 
 | `invert` | if true, passes *non-macthing* input | Boolean | `false` |
+
+### Description
+
+The `grep` processor matches its input against the given 
+[RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp). If the matching 
+succeeds, the input is passed to the output. Otherwise, it is ignored.
+
+The matching is performed using the RegExp `test` method.
 
 ### Example
 

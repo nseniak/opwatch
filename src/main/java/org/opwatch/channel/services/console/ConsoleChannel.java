@@ -1,12 +1,12 @@
 package org.opwatch.channel.services.console;
 
-import org.opwatch.channel.common.Channel;
+import org.opwatch.channel.common.ChannelImpl;
 import org.opwatch.processor.common.Message;
 import org.opwatch.service.ProcessorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ConsoleChannel implements Channel {
+public class ConsoleChannel extends ChannelImpl {
 
 	private static final Logger logger = LoggerFactory.getLogger(ConsoleChannel.class);
 	private static final String CONTENT_PREFIX = ">> ";
@@ -41,16 +41,20 @@ public class ConsoleChannel implements Channel {
 		if (processorService.config().channelDebug()) {
 			processorService.printStdout(logMessage);
 		} else {
-			processorService.printStdout(consolePrefix + message.getType() + ": " + message.getTitle());
-			if (message.getBody() != null) {
-				Object body = message.getBody();
-				if (body != null) {
-					if (!processorService.getScriptService().bean(body)) {
-						for (String line : body.toString().split("\\R")) {
+			processorService.printStdout(consolePrefix + displayTitle(message));
+			String hostname = message.getContext().getHostname();
+			if (!hostname.equals(processorService.hostName())) {
+				processorService.printStdout("Hostname: " + hostname);
+			}
+			if (message.getDetails() != null) {
+				Object details = message.getDetails();
+				if (details != null) {
+					if (!processorService.getScriptService().bean(details)) {
+						for (String line : details.toString().split("\\R")) {
 							processorService.printStdout(consolePrefix + CONTENT_PREFIX + line);
 						}
 					} else {
-						processorService.getScriptService().mapFields(body, (key, value) -> {
+						processorService.getScriptService().mapFields(details, (key, value) -> {
 							if (value != null) {
 								processorService.printStdout(consolePrefix + CONTENT_PREFIX + key + ": " + value.toString());
 							}

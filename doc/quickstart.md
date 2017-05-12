@@ -36,14 +36,15 @@ $ opwatch my_first_processor.js
 ```
 
 Opwatch displays a message informing you that the processor is running. Now, every time you append a line 
-containing the keyword `ERROR` to the file `application.log`, you get a message with the alert title and the content
-of the matching line:
+containing the keyword `ERROR` to the file `application.log`, you get a message with the alert title and level
+(`medium` is the default) followed by the content of the matching line:
 
 ```
 [console] info: processor up and running
-[console] alert: An error occurred!
+[console] Alert(medium): An error occurred!
 [console] >> This is a line containing the ERROR keyword
-[console] alert: An error occurred!
+[console] Info: processor up and running
+[console] Alert(medium): An error occurred!
 [console] >> Another line containing the ERROR keyword
 // And so on until stopped
 ```

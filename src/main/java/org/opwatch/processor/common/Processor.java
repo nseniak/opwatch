@@ -42,8 +42,8 @@ public abstract class Processor<C extends ProcessorConfig> {
 		String name = "run";
 		inferSignature();
 		check();
-		start();
 		processorService.signalSystemInfo("processor up and running");
+		start();
 		processorService.setRunningProcessor(this);
 		try {
 			while (true) {
@@ -54,8 +54,8 @@ public abstract class Processor<C extends ProcessorConfig> {
 		} finally {
 			processorService.setRunningProcessor(null);
 		}
-		processorService.signalSystemInfo("processor stopped");
 		stop();
+		processorService.signalSystemInfo("processor stopped");
 		return UNDEFINED;
 	}
 

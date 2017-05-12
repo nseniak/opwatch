@@ -96,6 +96,7 @@ This section lists processors by category.
 
 ### Filters
 
+* [`alert`](alert.md) -- triggers an alert
 * [`grep`](grep.md) -- regexp-based filter
 
 ### Consumers

@@ -55,8 +55,8 @@ public class AlertGeneratorFactory extends ActiveProcessorFactory<AlertGenerator
 		if ((channelName != null) && (processorService.getMessagingService().findChannel(channelName) == null)) {
 			throw new RuntimeError("channel not found: \"" + channelName + "\"", new FactoryExecutionScope(this));
 		}
-		ConstantOrFilter<Object> body = config.getBody();
-		return new AlertGenerator(getProcessorService(), config, name(), title, body, level, trigger, toggle, channelName);
+		ConstantOrFilter<Object> details = config.getDetails();
+		return new AlertGenerator(getProcessorService(), config, name(), title, details, level, trigger, toggle, channelName);
 	}
 
 }

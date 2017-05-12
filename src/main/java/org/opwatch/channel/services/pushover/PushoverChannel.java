@@ -1,15 +1,15 @@
 package org.opwatch.channel.services.pushover;
 
-import org.opwatch.channel.common.throttled.ThrottledChannel;
+import net.pushover.client.*;
 import org.opwatch.channel.common.throttled.MessageAggregate;
 import org.opwatch.channel.common.throttled.Rate;
 import org.opwatch.channel.common.throttled.RateLimiter;
+import org.opwatch.channel.common.throttled.ThrottledChannel;
 import org.opwatch.processor.common.GlobalExecutionScope;
 import org.opwatch.processor.common.Message;
 import org.opwatch.processor.common.MessageContext;
 import org.opwatch.processor.common.RuntimeError;
 import org.opwatch.service.ProcessorService;
-import net.pushover.client.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,8 +18,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import static org.springframework.util.StringUtils.capitalize;
 
 public class PushoverChannel extends ThrottledChannel<PushoverConfiguration> {
 
@@ -85,11 +83,10 @@ public class PushoverChannel extends ThrottledChannel<PushoverConfiguration> {
 	protected void publishAggregate(List<Message> messages, Date mutedOn) {
 		MessageAggregate aggregate = new MessageAggregate();
 		for (Message message : messages) {
-			String title = alertTitle(message);
-			aggregate.addMessage(title, message);
+			aggregate.addMessage(displayTitle(message), message);
 		}
 		Message.Level level = aggregate.getMaxLevel();
-		String title = levelPrefix(level) + "Unmuting " + processorService.hostName();
+		String title = "Unmuting" + levelSuffix(level) + " " + processorService.hostName();
 		StringWriter writer = new StringWriter();
 		writer.append("The following messages were muted:").append("\n");
 		for (MessageAggregate.AggregateMessagePart part : aggregate.messageParts()) {
@@ -103,18 +100,18 @@ public class PushoverChannel extends ThrottledChannel<PushoverConfiguration> {
 	@Override
 	protected void publishOne(Message message) {
 		MessagePriority priority = levelPriority(message.getLevel());
-		String title = truncate(alertTitle(message), MAX_TITLE_LENGTH);
+		String title = truncate(displayTitle(message), MAX_TITLE_LENGTH);
 		StringWriter writer = new StringWriter();
 		MessageContext scope = message.getContext();
 		writer.append("Hostname: " + scope.getHostname()).append("\n");
-		writeBody(writer, message.getBody());
+		writeDetails(writer, message.getDetails());
 		String bodyText = writer.toString();
 		bodyText = truncate(bodyText, MAX_MESSAGE_LENGTH);
 		PushoverMessage pushoverMessage = makePushoverMessage(pushoverKey, title, bodyText, priority);
 		send(pushoverMessage);
 	}
 
-	private void writeBody(StringWriter writer, Object object) {
+	private void writeDetails(StringWriter writer, Object object) {
 		if (object == null) {
 			return;
 		} else if (!processorService.getScriptService().bean(object)) {
@@ -140,24 +137,6 @@ public class PushoverChannel extends ThrottledChannel<PushoverConfiguration> {
 				return MessagePriority.HIGH;
 			case emergency:
 				return MessagePriority.EMERGENCY;
-		}
-		throw new IllegalStateException("unknown level: " + level.name());
-	}
-
-	private String alertTitle(Message message) {
-		return levelPrefix(message.getLevel()) + capitalize(message.getType().getDescriptor()) + ": " + message.getTitle();
-	}
-
-	private String levelPrefix(Message.Level level) {
-		switch (level) {
-			case lowest:
-			case low:
-			case medium:
-				return "";
-			case high:
-				return "High ";
-			case emergency:
-				return "EMERGENCY ";
 		}
 		throw new IllegalStateException("unknown level: " + level.name());
 	}
