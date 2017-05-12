@@ -28,7 +28,7 @@ channel specified by `applicationChannel` in the [channel configuration](../chan
 
 #### How alerts are displayed
 
-An alert is displayed on the channel as a message combining the value of the the `title`, `level` and `details` 
+An alert is displayed on its channel as a message combining the `title`, `level` and `details` 
 properties. The specific way these properties are displayed depends on the type of channel; however the following 
 general display rules apply to all channel types:
 

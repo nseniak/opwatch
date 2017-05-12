@@ -3,7 +3,8 @@
 ## Processors
 
 Opwatch draws from the Unix toolbox philosophy. Like Unix commands, processors are components that 
-consume an input, perform a function, and produce an output. Inputs and outputs can be connected using pipelines.
+consume an input, perform a function, and produce an output. A processor's output can be sent to another processor's
+input using a pipeline.
 
 Many processors, like `tail` and `grep`, are named after their Unix counterpart and have a similar function. 
 However, they don't necessarily have the exact same options or behavior. The goal here is to reuse good ideas and 

@@ -103,3 +103,5 @@ This section lists processors by category.
 
 ### Control processors
 
+* [`pipe`](pipe.md) -- chains processors
+* [`parallel`](parallel.md) -- chains processors

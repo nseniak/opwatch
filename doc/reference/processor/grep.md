@@ -8,6 +8,13 @@ Regexp-based filter
 * Input: String
 * Output: String
 
+### Synopsis
+
+```js
+grep(regexp)
+grep(configuration_object)
+```
+
 ### Configuration properties
 
 | Property | Description | Type | Default |
