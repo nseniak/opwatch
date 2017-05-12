@@ -25,9 +25,10 @@ a processor that consumes any Javascript object and displays it in Json syntax, 
 
 ```js
 > pipe(df("/tmp"), stdout()).run()
-{"file":"/tmp","size":499055067136,"used":347210567680,"available":151844499456,"percentUsed":69.57359829499134}
-{"file":"/tmp","size":499055067136,"used":347210567680,"available":151844499456,"percentUsed":69.57359829499134}
-{"file":"/tmp","size":499055067136,"used":347210567680,"available":151844499456,"percentUsed":69.57359829499134}
+[console] Info: processor up and running
+{"file":"/tmp","size":499055067136,"used":425468854272,"available":73586212864,"usageRatio":0.8525489115133127}
+{"file":"/tmp","size":499055067136,"used":425468854272,"available":73586212864,"usageRatio":0.8525489115133127}
+{"file":"/tmp","size":499055067136,"used":425468854272,"available":73586212864,"usageRatio":0.8525489115133127}
 // And so on until stopped
 ```
 
