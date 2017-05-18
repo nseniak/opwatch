@@ -1,5 +1,10 @@
 # Opwatch overview
 
+## What is it for?
+
+Opwatch helps you dynamically monitor your server applications such as web sites, typically by tracking activity in log files, 
+identifying patterns and situations of interest, and alerting you via email, SMS, or other channel.
+
 ## Processors
 
 Opwatch draws from the Unix toolbox philosophy. Like Unix commands, processors are components that 
