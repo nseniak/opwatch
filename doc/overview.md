@@ -1,9 +1,10 @@
 # Opwatch overview
 
-## What is it for?
+## What is Opwatch?
 
-Opwatch helps you dynamically monitor your server applications such as web sites, typically by tracking activity in log files, 
-identifying patterns and situations of interest, and alerting you via email, SMS, or other channel.
+Opwatch consists in a Javascript interpreter with a built-in toolbox of objects, called *processors*, dedicated to 
+monitoring and alerting. Processors are the building blocks of monitoring programs. A monitoring program consists
+in creating, combining and running processors using Javascript code.
 
 ## Processors
 

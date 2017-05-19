@@ -1,5 +1,20 @@
 # Quick start
 
+## What is Opwatch for?
+
+Opwatch helps you dynamically monitor your server applications to detect problems and generate alerts via
+channels such as [Slack](https://slack.com/) and [Pushover](https://pushover.net/). Opwatch lets you perform a variety 
+of tasks like monitoring website uptime, checking a log file for specific messages or exceptions, monitoring disk 
+space and CPU trends, or invoking an application's healthcheck endpoint.
+
+## How does it work?
+
+Opwatch consists in a Javascript interpreter with a built-in toolbox of functions dedicated to monitoring and alerting. 
+This toolbox includes Unix-like functions like `tail` and `grep`, statistical functions, and alerting functions.
+
+Since Opwatch monitoring applications are plain Javascript programs, they can be modularized, versioned and reused 
+across systems.
+
 ## A simple Opwatch program
 
 Here's an example of a small Opwatch program:
