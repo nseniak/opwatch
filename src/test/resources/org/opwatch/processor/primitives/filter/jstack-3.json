@@ -1,0 +1,8 @@
+{
+  "name": "com.google.api.client.googleapis.json.GoogleJsonResponseException",
+  "message": "400 Bad Request",
+  "method": "com.google.api.client.googleapis.json.GoogleJsonResponseException.from",
+  "location": "GoogleJsonResponseException.java:145",
+  "combined": "com.google.api.client.googleapis.json.GoogleJsonResponseException::400 Bad Request::com.google.api.client.googleapis.json.GoogleJsonResponseException.from",
+  "previous": "2017-03-14 20:58:59.596  INFO 29559 --- [GmailPubSub-135773] c.u.w.gmail.SubscriptionWorkerService    : Exception while processing subscription task: { workerName: \"Pubsub\", id: \"58862d3449adf43f5cf81199\", dataId: \"572385fb7a16040e4ef9492a\", data: \"redacted@redacted.com\" }, attempt: 143731, will retry at: Tue Mar 14 20:59:29 UTC 2017"
+}

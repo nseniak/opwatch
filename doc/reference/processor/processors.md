@@ -97,11 +97,12 @@ This section lists processors by category.
 ### Filters
 
 * [`alert`](alert.md) -- triggers an alert
+* [`apply`](apply.md) -- computes its output using a callback
 * [`grep`](grep.md) -- regexp-based filter
 
 ### Consumers
 
 ### Control processors
 
-* [`pipe`](pipe.md) -- chains processors
 * [`parallel`](parallel.md) -- chains processors
+* [`pipe`](pipe.md) -- chains processors

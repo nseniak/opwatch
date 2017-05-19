@@ -22,6 +22,10 @@ public abstract class Processor<C extends ProcessorConfig> {
 	protected ProcessorSignature signature;
 	protected ScriptStack constructionStack;
 
+	public static final String PROCESSOR_RUNNING_MESSAGE = "processor up and running";
+	public static final String PROCESSOR_STOPPED_MESSAGE = "processor stopped";
+	public static final String PROCESSOR_INTERRUPTED_MESSAGE = "processor interrupted";
+
 	public Processor(ProcessorService processorService, C configuration, String name) {
 		this.id = processorService.uuid();
 		this.processorService = processorService;
@@ -42,20 +46,20 @@ public abstract class Processor<C extends ProcessorConfig> {
 		String name = "run";
 		inferSignature();
 		check();
-		processorService.signalSystemInfo("processor up and running");
+		processorService.signalSystemInfo(PROCESSOR_RUNNING_MESSAGE);
 		start();
-		processorService.setRunningProcessor(this);
+		processorService.setRunningProcessorThread(Thread.currentThread());
 		try {
 			while (true) {
 				Thread.sleep(TimeUnit.DAYS.toMillis(1));
 			}
 		} catch (InterruptedException e) {
-			processorService.printStderr("processor interrupted");
+			processorService.printStderr(PROCESSOR_INTERRUPTED_MESSAGE);
 		} finally {
-			processorService.setRunningProcessor(null);
+			processorService.setRunningProcessorThread(null);
 		}
 		stop();
-		processorService.signalSystemInfo("processor stopped");
+		processorService.signalSystemInfo(PROCESSOR_STOPPED_MESSAGE);
 		return UNDEFINED;
 	}
 

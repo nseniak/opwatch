@@ -30,6 +30,9 @@ public class Application implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
+		if (options == null) {
+			throw new IllegalStateException("this method should only be called by main()");
+		}
 		boolean success = processorService.run(options);
 		SpringApplication.exit(applicationContext, () -> success ? 0 : 1);
 	}

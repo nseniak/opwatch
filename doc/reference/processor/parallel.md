@@ -15,7 +15,7 @@ parallel(processor1, processor2, ...)
 parallel([ processor1, processor2, ... ])
 parallel(configuration_object)
 ```
-### Configuration properties
+### Configuration object properties
 
 | Property | Description | Type | Default |
 | :--- | :--- | :--- | :--- |

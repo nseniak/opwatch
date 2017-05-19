@@ -1,0 +1,8 @@
+{
+  "name": "javax.mail.MessagingException",
+  "message": "* BYE System Error",
+  "method": "com.sun.mail.imap.IMAPFolder.open",
+  "location": "IMAPFolder.java:1043",
+  "combined": "javax.mail.MessagingException::* BYE System Error::com.sun.mail.imap.IMAPFolder.open",
+  "previous": "2017-03-14 21:02:18.527  WARN 29559 --- [KeepAlive-66] c.u.w.h.MessageTransformationService     : Exception while processing stuck quarantined messages: redacted@redacted.com"
+}

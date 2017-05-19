@@ -8,6 +8,13 @@ Triggers an alert
 * Input: Any
 * Output: N/A
 
+### Synopsis
+
+```js
+alert(title)
+alert(configuration_object)
+```
+
 ### Configuration properties
 
 | Property | Description | Type | Default |
@@ -15,7 +22,7 @@ Triggers an alert
 | `title` | alert title | String | *Mandatory* | 
 | `level` | alert level, one of: `"lowest"`, `"low"`, `"medium"`, `"high"`, `"emergency"`  | String | `"medium"` |
 | `details` | alert detailed information | Object or (input, payload) => Object | `(input, payload) => input` | 
-| `trigger` | determines if the alarm must be triggered | (input, payload) => Boolean | *None* |
+| `trigger` | callback that determines if the alarm must be triggered | (input, payload) => Boolean | *None* |
 | `toggle` | determines if the alert is a toggle | Boolean | `false` |
 | `channel` | name of the channel where the alert is published | String | the default application channel |
 

@@ -38,7 +38,7 @@ public class Jstack extends Filter<JstackConfig> {
 	private static String fullyQualifiedIdentifierRegex = "(\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*\\.)+\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*(\\.<init>)?";
 	private static Pattern exceptionDescription = Pattern.compile("(?<name>" + fullyQualifiedIdentifierRegex + "): (?<message>.*)$");
 	private static Pattern exceptionLinePattern = Pattern.compile("^" + exceptionDescription);
-	private static Pattern atLinePattern = Pattern.compile("^\tat (?<method>" + fullyQualifiedIdentifierRegex + ")\\((?<location>[^)]*)\\).*");
+	private static Pattern atLinePattern = Pattern.compile("^\\p{Space}+at (?<method>" + fullyQualifiedIdentifierRegex + ")\\((?<location>[^)]*)\\).*");
 	private static Pattern causedByPattern = Pattern.compile("^Caused by: " + exceptionDescription);
 	private static Pattern blankLine = Pattern.compile("^\\p{Space}*$");
 
@@ -158,6 +158,7 @@ public class Jstack extends Filter<JstackConfig> {
 			this.exception = null;
 			this.linesSinceException = 0;
 			this.atLineSeen = false;
+			this.latestNonBlankLine = null;
 		}
 
 		public ParsedException getException() {
@@ -202,6 +203,9 @@ public class Jstack extends Filter<JstackConfig> {
 		private String location;
 		private String combined;
 		private String previous;
+
+		private ParsedException() {
+		}
 
 		public ParsedException(String name, String message, String previous) {
 			this.name = name;

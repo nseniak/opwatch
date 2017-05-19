@@ -1,7 +1,7 @@
 // Initialization code loaded on startup
 // Use --config <file-or-url> to specify a different initialization file
 
-load("script/processors.js");
+procs = require("./processors");
 
 // Definition of the message channels
 channels = {

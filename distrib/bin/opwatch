@@ -8,14 +8,14 @@
 DIR=$(dirname $0)
 cd ${DIR}
 
-if [ -x "$JAVA_HOME/bin/java" ]
+if [ -x "${JAVA_HOME}/bin/java" ]
 then
-    JAVA="$JAVA_HOME/bin/java"
+    JAVA="${JAVA_HOME}/bin/java"
 else
     JAVA=`which java`
 fi
 
-if [ ! -x "$JAVA" ]
+if [ ! -x "${JAVA}" ]
 then
     echo "Java executable not found. Please install java in your PATH or set JAVA_HOME"
     exit 1
@@ -28,5 +28,6 @@ ${JAVA} \
 	${JAVA_OPTS} \
 	-Dapp.log.dir=${LOG_DIR} \
 	-Dapp.log.basename=${LOG_BASENAME} \
+	-Dapp.home=${DIR}/.. \
 	-jar lib/opwatch-*.jar \
 	"$@"

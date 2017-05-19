@@ -1,6 +1,4 @@
 //
-Packages.org.opwatch.service.ScriptService.logInfo("JavaScript module path: " + require.paths());
-//
 function factory_wrapper(factory) {
 	var ctor = function () {
 		return make_processor(factory, arguments);
@@ -179,4 +177,9 @@ function merge_config() {
 
 function stats(data) {
 	return __stats(__service, data);
+}
+
+function interrupt() {
+	__service.stopRunningProcessor();
+	return undefined;
 }

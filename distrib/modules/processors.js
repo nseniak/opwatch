@@ -1,4 +1,4 @@
-function clock(config) {
+exports.clock = function (config) {
 	var i = 0;
 	return alias({
 		name: "clock",

@@ -1,0 +1,30 @@
+2017-03-14 20:58:59.596  INFO 29559 --- [PubsubWorker-1] com.untrackr.worker.WorkerService        : Handling pinged task: { workerName: "Pubsub", id: "58824729ccb47547d829d3ea", dataId: "58824729ccb47547d829d3e1", data: "redacted@redacted.com" }
+2017-03-14 20:58:59.596  INFO 29559 --- [GmailPubSub-135773] c.u.w.gmail.SubscriptionWorkerService    : Exception while processing subscription task: { workerName: "Pubsub", id: "58862d3449adf43f5cf81199", dataId: "572385fb7a16040e4ef9492a", data: "redacted@redacted.com" }, attempt: 143731, will retry at: Tue Mar 14 20:59:29 UTC 2017
+
+com.google.api.client.googleapis.json.GoogleJsonResponseException: 400 Bad Request
+{
+  "code" : 400,
+  "errors" : [ {
+    "domain" : "global",
+    "message" : "Bad Request",
+    "reason" : "failedPrecondition"
+  } ],
+  "message" : "Bad Request"
+}
+        at com.google.api.client.googleapis.json.GoogleJsonResponseException.from(GoogleJsonResponseException.java:145)
+        at com.google.api.client.googleapis.services.json.AbstractGoogleJsonClientRequest.newExceptionOnError(AbstractGoogleJsonClientRequest.java:113)
+        at com.google.api.client.googleapis.services.json.AbstractGoogleJsonClientRequest.newExceptionOnError(AbstractGoogleJsonClientRequest.java:40)
+        at com.google.api.client.googleapis.services.AbstractGoogleClientRequest$1.interceptResponse(AbstractGoogleClientRequest.java:321)
+        at com.google.api.client.http.HttpRequest.execute(HttpRequest.java:1056)
+        at com.google.api.client.googleapis.services.AbstractGoogleClientRequest.executeUnparsed(AbstractGoogleClientRequest.java:419)
+        at com.google.api.client.googleapis.services.AbstractGoogleClientRequest.executeUnparsed(AbstractGoogleClientRequest.java:352)
+        at com.google.api.client.googleapis.services.AbstractGoogleClientRequest.execute(AbstractGoogleClientRequest.java:469)
+        at com.untrackr.watcher.gmail.SubscriptionWorkerService.ensureMailboxWatched(SubscriptionWorkerService.java:235)
+        at com.untrackr.watcher.gmail.SubscriptionWorkerService.processMailbox(SubscriptionWorkerService.java:125)
+        at com.untrackr.watcher.gmail.SubscriptionWorkerService.lambda$taskPinged$1(SubscriptionWorkerService.java:94)
+        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+        at java.lang.Thread.run(Thread.java:745)
+
+2017-03-14 20:58:59.597  INFO 29559 --- [GmailPubSub-135773] com.untrackr.worker.TaskWorkerService    : Pinging task by id: 58862d3449adf43f5cf81199, date: Tue Mar 14 20:59:29 UTC 2017
+2017-03-14 20:58:59.597  INFO 29559 --- [GmailPubSub-135832] com.untrackr.worker.TaskWorkerService    : Pinging task by id: 58824c22b698185c622b2536, date: Tue Mar 14 20:59:29 UTC 2017

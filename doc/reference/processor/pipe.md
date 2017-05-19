@@ -16,7 +16,7 @@ pipe([ processor1, processor2, ... ])
 pipe(configuration_object)
 ```
 
-### Configuration properties
+### Configuration object properties
 
 | Property | Description | Type | Default |
 | :--- | :--- | :--- | :--- |

@@ -3,14 +3,22 @@ package org.opwatch.service;
 public class HealthcheckInfo {
 
 	private String hostname;
-	private String runningProcessor;
+	private boolean running;
 
 	private HealthcheckInfo() {
 	}
 
-	public HealthcheckInfo(String hostname, String runningProcessor) {
+	public HealthcheckInfo(String hostname, boolean running) {
 		this.hostname = hostname;
-		this.runningProcessor = runningProcessor;
+		this.running = running;
+	}
+
+	public String getHostname() {
+		return hostname;
+	}
+
+	public boolean isRunning() {
+		return running;
 	}
 
 }

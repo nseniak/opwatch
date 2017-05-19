@@ -1,7 +1,10 @@
 package org.opwatch.service;
 
+import com.coveo.nashorn_modules.FilesystemFolder;
+import com.coveo.nashorn_modules.Require;
 import com.google.common.primitives.Primitives;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
+import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import jdk.nashorn.api.scripting.ScriptUtils;
 import jdk.nashorn.internal.runtime.Context;
@@ -46,7 +49,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
-import javax.script.*;
+import javax.script.Bindings;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -78,6 +84,8 @@ public class ScriptService {
 	@Autowired
 	private DocumentationService documentationService;
 
+	private String homeDirectory = System.getProperty("app.home");
+
 	public static final String INIT_SCRIPT_PATH = "_init_scripts/";
 
 	private Map<Class<? extends Processor>, ProcessorFactory<?, ? extends Processor>> factories = new LinkedHashMap<>();
@@ -85,9 +93,12 @@ public class ScriptService {
 	private static NashornScriptEngine scriptEngine;
 
 	public void initialize() {
-		scriptEngine = (NashornScriptEngine) new ScriptEngineManager().getEngineByName("nashorn");
-		loadScriptResources();
+		NashornScriptEngineFactory scriptEngineFactory = new NashornScriptEngineFactory();
+		scriptEngine = (NashornScriptEngine) scriptEngineFactory.getScriptEngine("-scripting");
+		FilesystemFolder moduleFolder = FilesystemFolder.create(new File(homeDirectory + "/modules"), "UTF-8");
 		try {
+			Require.enable(scriptEngine, moduleFolder);
+			loadScriptResources();
 			createSimplePrimitiveFunction("__factories", this::factories);
 			createSimplePrimitiveFunction("__stats", Stats::makeStats);
 			createSimpleBinding("config", processorService.config());
@@ -127,11 +138,11 @@ public class ScriptService {
 
 	private void loadScriptResources() {
 		// Load NPM first
-		loadScriptResource(applicationContext.getResource("classpath:/" + INIT_SCRIPT_PATH + "npm/jvm-npm.js"));
+//		loadScriptResource(applicationContext.getResource("classpath:/" + INIT_SCRIPT_PATH + "npm/jvm-npm.js"));
 		// Load the other scripts
 		Resource[] scriptResources = new Resource[0];
 		try {
-			scriptResources = applicationContext.getResources("classpath:/" + INIT_SCRIPT_PATH + "startup/*.js");
+			scriptResources = applicationContext.getResources("classpath:/" + INIT_SCRIPT_PATH + "*.js");
 		} catch (IOException e) {
 			throw new IllegalStateException("Cannot find script resource: " + e.getMessage(), e);
 		}
@@ -144,11 +155,11 @@ public class ScriptService {
 		loadScript(() -> new InputStreamReader(scriptResource.getInputStream()), scriptResource.toString());
 	}
 
-	private void loadConfigFile() {
+	private void loadConfigFile() throws ScriptException {
 		if (processorService.config().noInit()) {
 			return;
 		}
-		String initFile = new File(new File(System.getProperty("user.dir")), "config.js").getAbsolutePath();
+		String initFile = new File(new File(homeDirectory), "config.js").getAbsolutePath();
 		if (processorService.config().initFile() != null) {
 			initFile = processorService.config().initFile();
 		}
@@ -463,6 +474,10 @@ public class ScriptService {
 
 	public NashornScriptEngine getScriptEngine() {
 		return scriptEngine;
+	}
+
+	public void setHomeDirectory(String homeDirectory) {
+		this.homeDirectory = homeDirectory;
 	}
 
 }

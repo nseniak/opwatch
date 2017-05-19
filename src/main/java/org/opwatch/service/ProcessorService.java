@@ -3,6 +3,7 @@ package org.opwatch.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jline.console.ConsoleReader;
 import jline.console.UserInterruptException;
+import org.opwatch.Application;
 import org.opwatch.CommandLineOptions;
 import org.opwatch.channel.common.Channel;
 import org.opwatch.channel.common.ChannelConfig;
@@ -16,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
@@ -62,13 +62,11 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	@Autowired
 	private MessagingService messagingService;
 
-	@Value("${server.port}")
-	private int port;
+	private Integer port;
 
 	private String id;
 	private Config config;
-	private Thread mainThread;
-	private Processor runningProcessor;
+	private Thread runningProcessorThread;
 	private RestTemplate restTemplate = new RestTemplate();
 
 	private static String SCRIPT_EXCEPTION_MESSAGE_PREFIX = "javax.script.ScriptException: ";
@@ -89,18 +87,21 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	@Override
 	public void destroy() throws Exception {
 		logger.info("Exiting");
-		mainThread.interrupt();
+		stopRunningProcessor();
 		ThreadUtil.safeExecutorShutdownNow(consumerExecutor, "ConsumerExecutor", config().executorTerminationTimeout());
 		ThreadUtil.safeExecutorShutdownNow(scheduledExecutor, "ScheduledExecutor", config().executorTerminationTimeout());
 	}
 
-	public boolean run(CommandLineOptions options) {
-		mainThread = Thread.currentThread();
+	public boolean initialize(CommandLineOptions options) {
 		Signal.handle(new Signal("INT"), this::userInterruptHandler);
 		try {
+			port = (options.isNoServer()) ? null
+					: (options.getPort() != null) ? options.getPort()
+					: Application.DEFAULT_HTTP_PORT;
 			createConfig(options);
 			messagingService.initializeChannels(new ChannelConfig());
 			scriptService.initialize();
+			return true;
 		} catch (Exception e) {
 			logger.error("Initialization failed", e);
 			printStderr("Initialization failed: " + exceptionMessage(e));
@@ -108,6 +109,12 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 			if (!stack.empty()) {
 				printStderr(stack.asString());
 			}
+			return false;
+		}
+	}
+
+	public boolean run(CommandLineOptions options) {
+		if (!initialize(options)) {
 			return false;
 		}
 		return withExceptionHandling(null, GlobalExecutionScope::new, () -> {
@@ -123,7 +130,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	private void userInterruptHandler(Signal signal) {
 		printCtrlC();
-		mainThread.interrupt();
+		stopRunningProcessor();
 	}
 
 	private void createConfig(CommandLineOptions options) {
@@ -194,7 +201,17 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	}
 
 	public void stopRunningProcessor() {
-		mainThread.interrupt();
+		if (runningProcessorThread != null) {
+			try {
+				runningProcessorThread.interrupt();
+			} catch (NullPointerException e) {
+				// The processor was stopped concurrently. Nothing to do.
+			}
+		}
+	}
+
+	public boolean running() {
+		return runningProcessorThread != null;
 	}
 
 	public void signalSystemInfo(String title) {
@@ -341,8 +358,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	}
 
 	public HealthcheckInfo healthcheck() {
-		String runningProcessorDesc = (runningProcessor == null) ? null : runningProcessor.getName();
-		return new HealthcheckInfo(config.hostName(), runningProcessorDesc);
+		return new HealthcheckInfo(config.hostName(), running());
 	}
 
 	public String getId() {
@@ -358,11 +374,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	}
 
 	public Integer port() {
-		if (config().noHttp()) {
-			return null;
-		} else {
-			return port;
-		}
+		return port;
 	}
 
 	public FileTailingService getFileTailingService() {
@@ -397,8 +409,8 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		return messagingService;
 	}
 
-	public void setRunningProcessor(Processor runningProcessor) {
-		this.runningProcessor = runningProcessor;
+	public void setRunningProcessorThread(Thread runningProcessorThread) {
+		this.runningProcessorThread = runningProcessorThread;
 	}
 
 }

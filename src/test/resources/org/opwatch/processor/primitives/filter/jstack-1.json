@@ -1,0 +1,8 @@
+{
+  "name": "com.untrackr.watcher.handler.CannotCreateQuarantineFolderException",
+  "message": "null",
+  "method": "com.untrackr.watcher.handler.MessageTransformationService.uidmoveToQuarantineCreateIfNeeded",
+  "location": "MessageTransformationService.java:2026",
+  "combined": "com.untrackr.watcher.handler.CannotCreateQuarantineFolderException::null::com.untrackr.watcher.handler.MessageTransformationService.uidmoveToQuarantineCreateIfNeeded",
+  "previous": "2017-05-18 10:27:05.358 ERROR 26240 --- [KeepAlive-501] c.u.watcher.handler.ImapWatcherService   : Exception while keeping connection alive: redacted@redacted.com"
+}
