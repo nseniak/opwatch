@@ -1,6 +1,7 @@
 package org.opwatch;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
@@ -73,7 +74,9 @@ public class ProcessorTestRoot {
 		return () -> {
 			// Set the current directory to <home>/bin so config.js can be properly loaded
 			scriptService.setHomeDirectory(System.getProperty("user.dir") + "/distrib");
-			assertThat(processorService.initialize(new CommandLineOptions()), is(true));
+			CommandLineOptions options = new CommandLineOptions();
+			options.setHostname("test_host");
+			assertThat(processorService.initialize(options), is(true));
 			scriptService.runExpression(expression);
 			return null;
 		};
@@ -152,18 +155,28 @@ public class ProcessorTestRoot {
 		return lines.subList(1, lines.size() - 1);
 	}
 
-	protected <T> T jsonParse(String text, Class<T> clazz) throws IOException {
-		return new ObjectMapper().readValue(text, clazz);
+	protected <T> T jsonParse(String text, Class<T> clazz) {
+		try {
+			return new ObjectMapper().readValue(text, clazz);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	protected <T> T jsonResourceParse(String name, Class<T> clazz) throws IOException {
-		return new ObjectMapper().readValue(resourceString(name), clazz);
+	protected <T> T jsonResourceParse(String name, Class<T> clazz) {
+		try {
+			return new ObjectMapper().readValue(resourceString(name), clazz);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	protected String jsonPrettyString(Object object) {
 		try {
-			return new ObjectMapper().writerWithDefaultPrettyPrinter()
-					.writeValueAsString(object);
+			ObjectMapper objectMapper = new ObjectMapper();
+			DefaultPrettyPrinter pp = new DefaultPrettyPrinter();
+			pp.indentArraysWith(new DefaultPrettyPrinter.FixedSpaceIndenter());
+			return objectMapper.writer(pp).writeValueAsString(object);
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}

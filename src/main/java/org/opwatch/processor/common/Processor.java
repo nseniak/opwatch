@@ -43,7 +43,6 @@ public abstract class Processor<C extends ProcessorConfig> {
 	}
 
 	public Object run() {
-		String name = "run";
 		inferSignature();
 		check();
 		processorService.signalSystemInfo(PROCESSOR_RUNNING_MESSAGE);

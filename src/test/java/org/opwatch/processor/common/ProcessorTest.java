@@ -5,10 +5,7 @@ import org.opwatch.ProcessorTestRoot;
 import org.opwatch.processor.primitives.producer.top.Top;
 import org.springframework.test.annotation.DirtiesContext;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;

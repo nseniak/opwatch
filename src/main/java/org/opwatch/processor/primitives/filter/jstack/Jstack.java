@@ -1,12 +1,15 @@
 package org.opwatch.processor.primitives.filter.jstack;
 
-import org.opwatch.processor.common.RuntimeError;
+import org.opwatch.common.Assertion;
 import org.opwatch.processor.common.ProcessorPayloadExecutionScope;
+import org.opwatch.processor.common.RuntimeError;
 import org.opwatch.processor.payload.Payload;
 import org.opwatch.processor.payload.PayloadObjectValue;
 import org.opwatch.processor.primitives.filter.Filter;
 import org.opwatch.service.ProcessorService;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,7 +18,7 @@ public class Jstack extends Filter<JstackConfig> {
 	private Pattern methodPattern;
 	private ParsingState state = new ParsingState();
 
-	private final static int MAX_EXCEPTION_LINES = 500;
+	private final static int MAX_EXCEPTION_LINES = 1000;
 
 	public Jstack(ProcessorService processorService, JstackConfig configuration, String name, Pattern methodPattern) {
 		super(processorService, configuration, name);
@@ -39,7 +42,8 @@ public class Jstack extends Filter<JstackConfig> {
 	private static Pattern exceptionDescription = Pattern.compile("(?<name>" + fullyQualifiedIdentifierRegex + "): (?<message>.*)$");
 	private static Pattern exceptionLinePattern = Pattern.compile("^" + exceptionDescription);
 	private static Pattern atLinePattern = Pattern.compile("^\\p{Space}+at (?<method>" + fullyQualifiedIdentifierRegex + ")\\((?<location>[^)]*)\\).*");
-	private static Pattern causedByPattern = Pattern.compile("^Caused by: " + exceptionDescription);
+	private static Pattern causedByPattern = Pattern.compile("^(?:Caused by:|Suppressed:) " + exceptionDescription);
+	private static Pattern omittedPattern = Pattern.compile("^\\p{Space}+\\.{3} \\p{N}+ (?:more|common frames omitted)");
 	private static Pattern blankLine = Pattern.compile("^\\p{Space}*$");
 
 	public ParsedException parseNextLine(String line, Payload<?> input) {
@@ -57,7 +61,8 @@ public class Jstack extends Filter<JstackConfig> {
 				String message = exceptionLineMatcher.group("message");
 				String previous = (latestNonBlank != null) ? latestNonBlank : "";
 				ParsedException exception = new ParsedException(name, message, previous);
-				state.setAtLineSeen(false);
+				exception.addLine(line);
+				state.setInMessage(true);
 				state.setLinesSinceException(0);
 				state.setException(exception);
 			}
@@ -65,41 +70,6 @@ public class Jstack extends Filter<JstackConfig> {
 		}
 		// We're inside an exception stack trace.
 		state.setLinesSinceException(state.getLinesSinceException() + 1);
-		// We're after an exception line. Check if it's an "at" line.
-		Matcher atLineMatcher = atLinePattern.matcher(line);
-		if (atLineMatcher.matches()) {
-			// We're on a at line. Use it to set the method and location.
-			state.setAtLineSeen(true);
-			String method = atLineMatcher.group("method");
-			String location = atLineMatcher.group("location");
-			if ((methodPattern == null) || (methodPattern.matcher(method).find())) {
-				// Found a satisfactory line in the stack. Return the exception.
-				currentException.setMethod(method);
-				currentException.setLocation(location);
-				currentException.computeCombined();
-				state.reset();
-				return currentException;
-			}
-			if (currentException.getMethod() == null) {
-				// Set default value for method and location.
-				currentException.setMethod(method);
-				currentException.setLocation(location);
-			}
-			return null;
-		}
-		Matcher causedByMatcher = causedByPattern.matcher(line);
-		if (causedByMatcher.matches()) {
-			// We're on a Caused by line.
-			state.setAtLineSeen(false);
-			return null;
-		}
-		if (state.isAtLineSeen()) {
-			// We've successfully parsed the exception message and at least one "at" line, and now we find a line
-			// that doesn't match a part of an exception trace. Means we've reached the end of the exception.
-			currentException.computeCombined();
-			state.reset();
-			return currentException;
-		}
 		if (state.getLinesSinceException() > MAX_EXCEPTION_LINES) {
 			// This exception trace is suspiciously long. Most probably a parsing error.
 			if (currentException.getMethod() == null) {
@@ -107,28 +77,50 @@ public class Jstack extends Filter<JstackConfig> {
 				currentException.setMethod("<unknown method>");
 				currentException.setLocation("<unknown location>");
 			}
-			currentException.computeCombined();
-			processorService.signalSystemException(new RuntimeError("Cannot parse exception trace", new ProcessorPayloadExecutionScope(this, input)));
+			processorService.signalSystemException(new RuntimeError("Cannot parse exception trace longer than " + MAX_EXCEPTION_LINES + " lines",
+					new ProcessorPayloadExecutionScope(this, input)));
 			state.reset();
 			return currentException;
 		}
-		// We're in a multiline exception message, e.g:
-		//
-		//		com.google.api.client.googleapis.json.GoogleJsonResponseException: 500 Internal Server Error
-		//		{
-		//			"code" : 500,
-		//				"errors" : [ {
-		//			"domain" : "global",
-		//					"message" : "Backend Error",
-		//					"reason" : "backendError"
-		//		} ],
-		//			"message" : "Backend Error"
-		//		}
-		//		at com.google.api.client.googleapis.json.GoogleJsonResponseException.from(GoogleJsonResponseException.java:145) ~[google-api-client-1.20.0.jar!/:1.20.0]
-		//		at com.google.api.client.googleapis.services.json.AbstractGoogleJsonClientRequest.newExceptionOnError(AbstractGoogleJsonClientRequest.java:113) ~[google-api-client-1.20.0.jar!/:1.20.0]
-		//
-		// Keep looking for an "at" line
-		return null;
+		// We're after an exception line. Check if it's an "at" line.
+		Matcher atLineMatcher = atLinePattern.matcher(line);
+		if (atLineMatcher.matches()) {
+			state.setInMessage(false);
+			currentException.addLine(line);
+			// Set the method and location, if not already set
+			String method = atLineMatcher.group("method");
+			String location = atLineMatcher.group("location");
+			String currentMethod = currentException.getMethod();
+			if ((currentMethod == null)
+					|| ((methodPattern != null) && !methodPattern.matcher(currentMethod).find() && methodPattern.matcher(method).find())) {
+				currentException.setMethod(method);
+				currentException.setLocation(location);
+			}
+			return null;
+		}
+		Matcher causedByMatcher = causedByPattern.matcher(line);
+		if (causedByMatcher.matches()) {
+			state.setInMessage(true);
+			currentException.addLine(line);
+			return null;
+		}
+		Matcher omittedMatcher = omittedPattern.matcher(line);
+		if (omittedMatcher.matches()) {
+			state.setInMessage(false);
+			currentException.addLine(line);
+			return null;
+		}
+		if (state.isInMessage()) {
+			// We're in a multiline exception message.
+			currentException.setExceptionMessage(currentException.getExceptionMessage() + "\n" + line);
+			currentException.addLine(line);
+			return null;
+		}
+		// First line after an exception
+		state.reset();
+		ParsedException newException = parseNextLine(line, input);
+		Assertion.assertExecutionState(newException == null);
+		return currentException;
 	}
 
 	static class ParsingState {
@@ -144,7 +136,7 @@ public class Jstack extends Filter<JstackConfig> {
 		/**
 		 * True if at least one "at" line has been spotted since the exception line
 		 */
-		private boolean atLineSeen;
+		private boolean inMessage;
 		/**
 		 * Last non-blank line seen.
 		 */
@@ -157,7 +149,7 @@ public class Jstack extends Filter<JstackConfig> {
 		public void reset() {
 			this.exception = null;
 			this.linesSinceException = 0;
-			this.atLineSeen = false;
+			this.inMessage = false;
 			this.latestNonBlankLine = null;
 		}
 
@@ -177,12 +169,12 @@ public class Jstack extends Filter<JstackConfig> {
 			this.linesSinceException = linesSinceException;
 		}
 
-		public boolean isAtLineSeen() {
-			return atLineSeen;
+		public boolean isInMessage() {
+			return inMessage;
 		}
 
-		public void setAtLineSeen(boolean atLineSeen) {
-			this.atLineSeen = atLineSeen;
+		public void setInMessage(boolean inMessage) {
+			this.inMessage = inMessage;
 		}
 
 		public String getLatestNonBlankLine() {
@@ -197,40 +189,41 @@ public class Jstack extends Filter<JstackConfig> {
 
 	public static class ParsedException extends PayloadObjectValue {
 
-		private String name;
-		private String message;
+		private String exceptionClass;
+		private String exceptionMessage;
 		private String method;
 		private String location;
-		private String combined;
-		private String previous;
+		private String previousLine;
+		private List<String> stack;
 
 		private ParsedException() {
 		}
 
-		public ParsedException(String name, String message, String previous) {
-			this.name = name;
-			this.message = message;
-			this.previous = previous;
+		public ParsedException(String exceptionClass, String exceptionMessage, String previousLine) {
+			this.exceptionClass = exceptionClass;
+			this.exceptionMessage = exceptionMessage;
+			this.previousLine = previousLine;
+			this.stack = new ArrayList<>();
 		}
 
-		private void computeCombined() {
-			combined = name + "::" + message + "::" + ((method == null) ? "" : method);
+		private void addLine(String line) {
+			stack.add(line);
 		}
 
-		public String getName() {
-			return name;
+		public String getExceptionClass() {
+			return exceptionClass;
 		}
 
-		public void setName(String name) {
-			this.name = name;
+		public void setExceptionClass(String exceptionClass) {
+			this.exceptionClass = exceptionClass;
 		}
 
-		public String getMessage() {
-			return message;
+		public String getExceptionMessage() {
+			return exceptionMessage;
 		}
 
-		public void setMessage(String message) {
-			this.message = message;
+		public void setExceptionMessage(String exceptionMessage) {
+			this.exceptionMessage = exceptionMessage;
 		}
 
 		public String getMethod() {
@@ -249,20 +242,20 @@ public class Jstack extends Filter<JstackConfig> {
 			this.location = location;
 		}
 
-		public String getCombined() {
-			return combined;
+		public String getPreviousLine() {
+			return previousLine;
 		}
 
-		public void setCombined(String combined) {
-			this.combined = combined;
+		public void setPreviousLine(String previousLine) {
+			this.previousLine = previousLine;
 		}
 
-		public String getPrevious() {
-			return previous;
+		public List<String> getStack() {
+			return stack;
 		}
 
-		public void setPrevious(String previous) {
-			this.previous = previous;
+		public void setStack(List<String> stack) {
+			this.stack = stack;
 		}
 
 	}

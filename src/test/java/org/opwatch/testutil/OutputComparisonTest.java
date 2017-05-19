@@ -1,6 +1,5 @@
 package org.opwatch.testutil;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;
@@ -35,14 +34,13 @@ abstract class OutputComparisonTest {
 
 	private Class<?> loaderClass;
 	private String expectedResourceName;
-	private OutputComparator comparator;
+	private OutputPrettyPrinter prettyPrinter;
 
 	protected OutputComparisonTest(Class<?> loaderClass, String expectedResourceName) {
 		this.expectedResourceName = expectedResourceName;
 		this.loaderClass = loaderClass;
 		DataType type = resourceType(expectedResourceName);
-		OutputComparator comparator = dataComparator(type);
-		this.comparator = comparator;
+		this.prettyPrinter = prettyPrinter(type);
 	}
 
 	public abstract String output();
@@ -62,7 +60,7 @@ abstract class OutputComparisonTest {
 			logger.info("Running comparison: " + displayName);
 			logger.info("   Expected output: " + expectedResource.getDescription());
 			String expectedString = resourceString(expectedResource);
-			comparator.compare(displayName, expectedString, output());
+			assertEquals(displayName, prettyPrinter.pretty(expectedString), prettyPrinter.pretty(output()));
 		}
 	}
 
@@ -73,12 +71,12 @@ abstract class OutputComparisonTest {
 				throw new RuntimeException("Cannot generate resource missing file because resources are not in a filesystem");
 			}
 			String directory = new File(outputResourceUrl.getFile()).getParent().replace("target/test-classes", "src/test/resources").replace("target\\test-classes", "src\\test\\resources");
-			File outputFile = new File(directory+"/"+expectedResourceName);
+			File outputFile = new File(directory + "/" + expectedResourceName);
 			logger.info("Generating output for test: " + displayName());
 			logger.info("   Output to: " + outputFile);
 			outputFile.getParentFile().mkdirs();
 			FileWriter fw = new FileWriter(outputFile);
-			fw.append(output());
+			fw.append(prettyPrinter.pretty(output()));
 			fw.close();
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
@@ -108,72 +106,57 @@ abstract class OutputComparisonTest {
 		}
 	}
 
-	private static OutputComparator dataComparator(DataType type) {
+	private static OutputPrettyPrinter prettyPrinter(DataType type) {
 		switch (type) {
 			case text:
-				return new TextComparator();
+				return new TextPrettyPrinter();
 			case html:
-				return new HtmlComparator();
+				return new HtmlPrettyPrinter();
 			case json:
-				return new JsonComparator();
+				return new JsonPrettyPrinter();
 			case png:
-				return new PngComparator();
+				return new PngPrettyPrinter();
 			default:
-				return new TextComparator();
+				return new TextPrettyPrinter();
 		}
 	}
 
-	public interface OutputComparator {
+	public interface OutputPrettyPrinter {
 
-		void compare(String reason, String expected, String actual);
+		String pretty(String value);
 
 	}
 
-	public static class JsonComparator implements OutputComparator {
+	public static class JsonPrettyPrinter implements OutputPrettyPrinter {
 
 		private ObjectMapper mapper = new ObjectMapper();
 
 		@Override
-		public void compare(String reason, String expected, String actual) {
+		public String pretty(String value) {
 			try {
-				new TextComparator().compare(reason,
-						jsonPrettyString(mapper.readValue(expected, Object.class)),
-						jsonPrettyString(mapper.readValue(actual, Object.class)));
+				Object object = mapper.readValue(value, Object.class);
+				return new ObjectMapper().writerWithDefaultPrettyPrinter()
+						.writeValueAsString(object);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
 		}
 
-		private String jsonPrettyString(Object object) {
-			try {
-				return new ObjectMapper().writerWithDefaultPrettyPrinter()
-						.writeValueAsString(object);
-			} catch (JsonProcessingException e) {
-				throw new RuntimeException(e);
-			}
+	}
+
+	public static class TextPrettyPrinter implements OutputPrettyPrinter {
+
+		@Override
+		public String pretty(String value) {
+			return value;
 		}
 
 	}
 
-	public static class TextComparator implements OutputComparator {
+	public static class HtmlPrettyPrinter implements OutputPrettyPrinter {
 
 		@Override
-		public void compare(String reason, String expected, String actual) {
-			assertEquals(reason, expected, actual);
-		}
-
-	}
-
-	public static class HtmlComparator implements OutputComparator {
-
-		@Override
-		public void compare(String reason, String expected, String actual) {
-			// Cannot use Hamcrest assertThat() because erroneous output is not recognized by IntelliJ, which thus
-			// doesn't add a "Click to see difference" link
-			assertEquals(reason, pretty(expected), pretty(actual));
-		}
-
-		private String pretty(String html) {
+		public String pretty(String html) {
 			Document doc = Jsoup.parseBodyFragment(html);
 			doc.outputSettings().prettyPrint(true);
 			String prettyHtml = doc.body().html();
@@ -183,11 +166,11 @@ abstract class OutputComparisonTest {
 
 	}
 
-	public static class PngComparator implements OutputComparisonTest.OutputComparator {
+	public static class PngPrettyPrinter implements OutputPrettyPrinter {
 
 		@Override
-		public void compare(String reason, String expected, String actual) {
-			assertEquals(reason, expected, actual);
+		public String pretty(String value) {
+			return value;
 		}
 
 	}

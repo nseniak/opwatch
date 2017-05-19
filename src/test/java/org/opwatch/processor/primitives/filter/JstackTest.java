@@ -7,15 +7,14 @@ import org.opwatch.ProcessorTestRoot;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
 import static org.opwatch.testutil.ResourceComparator.compareOutput;
 
 public class JstackTest extends ProcessorTestRoot {
 
-	private static long EXEC_TIME = TimeUnit.SECONDS.toMillis(1);
+	private static long EXEC_TIME = TimeUnit.MILLISECONDS.toMillis(1000);
 
 	@Rule
 	public ErrorCollector collector = new ErrorCollector();
@@ -27,8 +26,9 @@ public class JstackTest extends ProcessorTestRoot {
 					List<String> lines = runWithOutputLines(EXEC_TIME, new ByteArrayInputStream(resourceString.getBytes()),
 							expression("pipe(stdin(), jstack(), stdout())"));
 					List<String> content = outputContent(lines);
-					assertThat(content.size(), is(1));
-					return content.get(0);
+					StringJoiner joiner = new StringJoiner(",", "[", "]");
+					content.forEach(joiner::add);
+					return joiner.toString();
 				});
 	}
 
