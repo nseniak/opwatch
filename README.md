@@ -50,7 +50,7 @@ Opwatch requires at least Java 8. To install Java, we recommend that you use
 
 ### Download and installation
 
-Download the distribution archive of the [latest release](/releases/latest), and extract it. This creates a directory 
+Download the distribution archive of the [latest release](https://github.com/nseniak/opwatch/releases/latest), and extract it. This creates a directory 
 called `opwatch-<version>`. You can then run opwatch from the `bin` subdirectory:
  
 ```sh
