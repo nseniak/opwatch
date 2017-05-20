@@ -43,7 +43,21 @@ The [Quick start](doc/quickstart.md) guide takes you through this example in a l
 
 ## Installation
 
-TODO
+### Prerequisites
+
+Opwatch requires at least Java 8. To install Java, we recommend that you use 
+[Oracle’s installation documentation](http://docs.oracle.com/javase/8/docs/technotes/guides/install/install_overview.html).
+
+### Download and installation
+
+Download the latest distribution archive `opwatch-<version>-distrib.zip` 
+from the [releases](releases) page, and unzip it. This creates a directory called `opwatch-<version>`. You
+can then run opwatch from the `bin` subdirectory:
+ 
+```sh
+$ cd opwatch-<version>/bin
+$ ./opwatch
+```
 
 ## Resources
 
