@@ -4,7 +4,7 @@
 
 Opwatch consists in a Javascript interpreter with a built-in toolbox of objects, called *processors*, dedicated to 
 monitoring and alerting. Processors are the building blocks of monitoring programs. A monitoring program consists
-in creating, combining and running processors using Javascript code.
+in Javascript code that creates, combines and runs processors.
 
 ## Processors
 
