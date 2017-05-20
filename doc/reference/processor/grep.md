@@ -30,7 +30,7 @@ succeeds, the input is passed to the output. Otherwise, it is ignored.
 
 The matching is performed using the RegExp `test` method.
 
-### Example
+### Examples
 
 Signal an alert for each line in a log file that contains `error` or `warning`, ignoring case:
 

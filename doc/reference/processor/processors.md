@@ -99,6 +99,7 @@ This section lists processors by category.
 * [`alert`](alert.md) -- triggers an alert
 * [`apply`](apply.md) -- computes its output using a callback
 * [`grep`](grep.md) -- regexp-based filter
+* [`jstack`](jstack.md) -- Java exception stack trace parser
 
 ### Consumers
 

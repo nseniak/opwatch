@@ -25,3 +25,28 @@ parallel(configuration_object)
 
 The `parallel` processor executes processors in parallel. The input of the `parallel` processor is sent to 
 each processor, and the output of each processor is sent to the output of the `parallel` processor. 
+
+### Examples
+
+Signal an alert if the file `application.log` contains `ERROR` or `WARNING`:
+
+```js
+pipe(
+  tail("application.log"), 
+  parallel(grep(/ERROR/), grep(/WARNING/)), 
+  alert("Error or warning")
+).run();
+```
+
+Signal an alert if either `application1.log` or `application2.log` contains `ERROR`:
+
+```js
+pipe(
+	parallel(
+			tail("application1.log"),
+			tail("application2.log")
+	),
+  grep(/ERROR/), 
+  alert("Error or warning")
+).run();
+```

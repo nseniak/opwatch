@@ -1,10 +1,9 @@
 package org.opwatch.processor.primitives.filter.jstack;
 
+import jdk.nashorn.internal.objects.NativeRegExp;
 import org.opwatch.processor.common.ActiveProcessorFactory;
 import org.opwatch.processor.common.ProcessorSignature;
 import org.opwatch.service.ProcessorService;
-
-import java.util.regex.Pattern;
 
 public class JstackFactory extends ActiveProcessorFactory<JstackConfig, Jstack> {
 
@@ -35,9 +34,8 @@ public class JstackFactory extends ActiveProcessorFactory<JstackConfig, Jstack> 
 	@Override
 	public Jstack make(Object scriptObject) {
 		JstackConfig config = convertProcessorConfig(scriptObject);
-		String methodRegex = config.getMethodRegex();
-		Pattern methodPattern = (methodRegex == null) ? null : compilePattern("regex", methodRegex);
-		return new Jstack(getProcessorService(), config, name(), methodPattern);
+		NativeRegExp methodRegex = config.getMethodRegexp();
+		return new Jstack(getProcessorService(), config, name(), methodRegex);
 	}
 
 }

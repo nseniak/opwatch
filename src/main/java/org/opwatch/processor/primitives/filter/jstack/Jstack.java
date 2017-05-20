@@ -1,5 +1,6 @@
 package org.opwatch.processor.primitives.filter.jstack;
 
+import jdk.nashorn.internal.objects.NativeRegExp;
 import org.opwatch.common.Assertion;
 import org.opwatch.processor.common.ProcessorPayloadExecutionScope;
 import org.opwatch.processor.common.RuntimeError;
@@ -15,14 +16,14 @@ import java.util.regex.Pattern;
 
 public class Jstack extends Filter<JstackConfig> {
 
-	private Pattern methodPattern;
+	private NativeRegExp methodRegexp;
 	private ParsingState state = new ParsingState();
 
 	private final static int MAX_EXCEPTION_LINES = 1000;
 
-	public Jstack(ProcessorService processorService, JstackConfig configuration, String name, Pattern methodPattern) {
+	public Jstack(ProcessorService processorService, JstackConfig configuration, String name, NativeRegExp methodRegexp) {
 		super(processorService, configuration, name);
-		this.methodPattern = methodPattern;
+		this.methodRegexp = methodRegexp;
 	}
 
 	@Override
@@ -92,7 +93,7 @@ public class Jstack extends Filter<JstackConfig> {
 			String location = atLineMatcher.group("location");
 			String currentMethod = currentException.getMethod();
 			if ((currentMethod == null)
-					|| ((methodPattern != null) && !methodPattern.matcher(currentMethod).find() && methodPattern.matcher(method).find())) {
+					|| ((methodRegexp != null) && !methodRegexp.test(currentMethod) && methodRegexp.test(method))) {
 				currentException.setMethod(method);
 				currentException.setLocation(location);
 			}

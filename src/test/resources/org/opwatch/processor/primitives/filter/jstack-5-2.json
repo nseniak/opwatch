@@ -1,0 +1,16 @@
+[
+  {
+    "exceptionClass": "java.io.FileNotFoundException",
+    "exceptionMessage": "file.txt",
+    "method": "org.myproject.FileReader.readMyFile",
+    "location": "FileReader.java:19",
+    "previousLine": "",
+    "stack": [
+      "java.io.FileNotFoundException: file.txt",
+      "        at java.io.FileInputStream.<init>(FileInputStream.java)",
+      "        at java.io.FileInputStream.<init>(FileInputStream.java)",
+      "        at org.myproject.FileReader.readMyFile(FileReader.java:19)",
+      "        at org.myproject.Main.main(Main.java:27)"
+    ]
+  }
+]

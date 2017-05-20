@@ -1,5 +1,6 @@
 package org.opwatch.processor.primitives.filter.jstack;
 
+import jdk.nashorn.internal.objects.NativeRegExp;
 import org.opwatch.processor.config.ActiveProcessorConfig;
 import org.opwatch.processor.config.OptionalProperty;
 
@@ -8,15 +9,15 @@ public class JstackConfig extends ActiveProcessorConfig {
 	/**
 	 * Regex for the method name we look for in the stack. Optional.
 	 */
-	private String methodRegex;
+	private NativeRegExp methodRegexp;
 
 	@OptionalProperty
-	public String getMethodRegex() {
-		return methodRegex;
+	public NativeRegExp getMethodRegexp() {
+		return methodRegexp;
 	}
 
-	public void setMethodRegex(String methodRegex) {
-		this.methodRegex = methodRegex;
+	public void setMethodRegexp(NativeRegExp methodRegexp) {
+		this.methodRegexp = methodRegexp;
 	}
 
 }

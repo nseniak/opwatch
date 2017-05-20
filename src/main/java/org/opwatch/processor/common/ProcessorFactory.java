@@ -1,5 +1,6 @@
 package org.opwatch.processor.common;
 
+import jdk.nashorn.internal.objects.NativeRegExp;
 import org.opwatch.processor.config.*;
 import org.opwatch.service.ProcessorService;
 import org.slf4j.Logger;
@@ -94,15 +95,6 @@ public abstract class ProcessorFactory<C extends ProcessorConfig, P extends Proc
 			return defaultValue;
 		} else {
 			return value;
-		}
-	}
-
-	public Pattern compilePattern(String property, String regex) {
-		try {
-			return Pattern.compile(regex);
-		} catch (PatternSyntaxException e) {
-			ValueLocation location = ValueLocation.makeProperty(name(), property);
-			throw new RuntimeError("invalid regex in " + location.describeAsValue() + ":" + e.getMessage(), new FactoryExecutionScope(this), e);
 		}
 	}
 

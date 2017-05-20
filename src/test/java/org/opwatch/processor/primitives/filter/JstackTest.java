@@ -1,5 +1,6 @@
 package org.opwatch.processor.primitives.filter;
 
+import com.google.common.collect.ImmutableMap;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
@@ -7,6 +8,7 @@ import org.opwatch.ProcessorTestRoot;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
 
@@ -21,10 +23,16 @@ public class JstackTest extends ProcessorTestRoot {
 
 	@Test
 	public void testStack() throws Exception {
+		Map<String, String> jstackOptions = ImmutableMap.<String, String>builder()
+				.put("jstack-2-2.txt", "{ methodRegexp: /^com\\.untrackr/ }")
+				.put("jstack-2-3.txt", "{ methodRegexp: /^com\\.foobar/ }")
+				.put("jstack-5-2.txt", "{ methodRegexp: /^org\\.myproject\\./ }")
+				.build();
 		compareOutput(collector, JstackTest.class, "jstack-*.txt", "jstack-*.json",
 				(resourceName, resourceString) -> {
+					String options = jstackOptions.getOrDefault(resourceName, "");
 					List<String> lines = runWithOutputLines(EXEC_TIME, new ByteArrayInputStream(resourceString.getBytes()),
-							expression("pipe(stdin(), jstack(), stdout())"));
+							expression("pipe(stdin(), jstack(" + options + "), stdout())"));
 					List<String> content = outputContent(lines);
 					StringJoiner joiner = new StringJoiner(",", "[", "]");
 					content.forEach(joiner::add);
