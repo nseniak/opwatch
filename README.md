@@ -53,4 +53,4 @@ TODO
 * [Reference manual](doc/reference/reference.md)
   * [Command line arguments and options](doc/reference/command.md)
   * [Javascript reference](doc/reference/javascript.md)
-  * [Processors](doc/reference/processors.md)
+  * [Processors](doc/reference/processor/processors.md)
