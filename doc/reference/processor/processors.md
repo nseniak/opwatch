@@ -98,8 +98,11 @@ This section lists processors by category.
 
 * [`alert`](alert.md) -- triggers an alert
 * [`apply`](apply.md) -- computes its output using a callback
+* [`collect`](collect.md) -- collects the last `count` received inputs
 * [`grep`](grep.md) -- regexp-based filter
-* [`jstack`](jstack.md) -- Java exception stack trace parser
+* [`jstack`](jstack.md) -- parses java Java exception stack
+* [`test`](test.md) -- predicate-based filter
+* [`trail`](trail.md) -- collects the inputs received during the last `duration` milliseconds
 
 ### Consumers
 

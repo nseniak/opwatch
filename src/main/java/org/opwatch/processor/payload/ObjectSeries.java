@@ -1,15 +1,11 @@
 package org.opwatch.processor.payload;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import org.opwatch.service.ScriptService;
 
-public class ObjectSeries extends ArrayList<SeriesObject> {
+public class ObjectSeries {
 
-	public ObjectSeries() {
-	}
-
-	public ObjectSeries(Collection<SeriesObject> queue) {
-		super(queue);
+	public static Object toJavascript(ScriptService scriptService, SeriesObject[] array) {
+		return scriptService.array(array);
 	}
 
 }

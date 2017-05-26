@@ -1,6 +1,6 @@
 ## `pipe`
 
-Chains processors
+Chains processors.
 
 ### Input and output
 

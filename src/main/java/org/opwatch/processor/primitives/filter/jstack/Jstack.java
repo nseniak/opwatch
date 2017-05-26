@@ -5,7 +5,7 @@ import org.opwatch.common.Assertion;
 import org.opwatch.processor.common.ProcessorPayloadExecutionScope;
 import org.opwatch.processor.common.RuntimeError;
 import org.opwatch.processor.payload.Payload;
-import org.opwatch.processor.payload.PayloadObjectValue;
+import org.opwatch.processor.payload.PayloadPojoValue;
 import org.opwatch.processor.primitives.filter.Filter;
 import org.opwatch.service.ProcessorService;
 
@@ -188,7 +188,7 @@ public class Jstack extends Filter<JstackConfig> {
 
 	}
 
-	public static class ParsedException extends PayloadObjectValue {
+	public static class ParsedException extends PayloadPojoValue {
 
 		private String exceptionClass;
 		private String exceptionMessage;

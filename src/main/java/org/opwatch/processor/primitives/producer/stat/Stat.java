@@ -1,6 +1,6 @@
 package org.opwatch.processor.primitives.producer.stat;
 
-import org.opwatch.processor.payload.PayloadObjectValue;
+import org.opwatch.processor.payload.PayloadPojoValue;
 import org.opwatch.processor.primitives.producer.ScheduledExecutor;
 import org.opwatch.processor.primitives.producer.ScheduledProducer;
 import org.opwatch.service.ProcessorService;
@@ -27,10 +27,10 @@ public class Stat extends ScheduledProducer<StatConfig> {
 			info.size = file.length();
 			info.lastModified = file.lastModified();
 		}
-		outputProduced(info);
+		outputProduced(info.toJavascript(processorService.getScriptService()));
 	}
 
-	public static class FileInfo extends PayloadObjectValue {
+	public static class FileInfo extends PayloadPojoValue {
 
 		private String file;
 		private boolean exists;

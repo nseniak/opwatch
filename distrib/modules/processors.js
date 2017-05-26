@@ -4,7 +4,7 @@ exports.clock = function (config) {
 		name: "clock",
 		configuration: config,
 		processor: repeat(merge_config(config, {
-			producer: function() {
+			lambda: function() {
 				return i++;
 			}
 		}))

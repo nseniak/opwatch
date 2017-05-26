@@ -1,7 +1,7 @@
 package org.opwatch.processor.primitives.producer.top;
 
 import com.sun.management.OperatingSystemMXBean;
-import org.opwatch.processor.payload.PayloadObjectValue;
+import org.opwatch.processor.payload.PayloadPojoValue;
 import org.opwatch.processor.primitives.producer.ScheduledExecutor;
 import org.opwatch.processor.primitives.producer.ScheduledProducer;
 import org.opwatch.service.ProcessorService;
@@ -24,10 +24,10 @@ public class Top extends ScheduledProducer<TopConfig> {
 		info.freeSwapSpace = osBean.getFreeSwapSpaceSize();
 		info.totalPhysicalMemory = osBean.getTotalPhysicalMemorySize();
 		info.freePhysicalMemory = osBean.getFreePhysicalMemorySize();
-		outputProduced(info);
+		outputProduced(info.toJavascript(processorService.getScriptService()));
 	}
 
-	public static class TopInfo  extends PayloadObjectValue {
+	public static class TopInfo  extends PayloadPojoValue {
 
 		private int availableProcessors;
 		private double loadAverage;

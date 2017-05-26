@@ -2,7 +2,7 @@ package org.opwatch.service;
 
 import org.opwatch.processor.common.ApplicationInterruptedException;
 import org.opwatch.processor.common.RuntimeError;
-import org.opwatch.processor.payload.PayloadObjectValue;
+import org.opwatch.processor.payload.PayloadPojoValue;
 import org.opwatch.ioservice.LineReader;
 import org.opwatch.processor.common.ActiveProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +70,7 @@ public class ConsoleService {
 		consoleFuture.cancel(true);
 	}
 
-	public static class ConsoleLine extends PayloadObjectValue {
+	public static class ConsoleLine extends PayloadPojoValue {
 
 		private String text;
 		private int line;

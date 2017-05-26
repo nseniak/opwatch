@@ -1,6 +1,6 @@
 ## `grep`
 
-Regexp-based filter
+Regexp-based filter.
 
 ### Input and output
 
@@ -32,7 +32,7 @@ The matching is performed using the RegExp `test` method.
 
 ### Examples
 
-Signal an alert for each line in a log file that contains `error` or `warning`, ignoring case:
+#### Signal an alert for each line in a log file that contains `error` or `warning`
 
 ```js
 pipe(
@@ -42,7 +42,7 @@ pipe(
 ).run();
 ```
 
-Signal an alert for each line in a log file that does *not* contain `info:`:
+#### Signal an alert for each line in a log file that does *not* contain `info`
 
 ```js
 pipe(

@@ -7,6 +7,7 @@ import org.opwatch.processor.config.ConstantOrFilter;
 import org.opwatch.processor.config.Duration;
 import org.opwatch.processor.config.JavascriptFunction;
 import org.opwatch.processor.config.ProcessorConfig;
+import org.opwatch.processor.payload.PayloadScriptValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -155,6 +156,8 @@ public class DocumentationService {
 			return "a processor";
 		} else if (Duration.class.isAssignableFrom(clazz)) {
 			return "a number of milliseconds or duration string";
+		} else if (PayloadScriptValue.class.isAssignableFrom(clazz)) {
+			return PayloadScriptValue.javascriptClassName(clazz);
 		} else {
 			return "an Object";
 		}

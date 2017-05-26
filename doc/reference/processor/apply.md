@@ -1,6 +1,6 @@
 ## `apply`
 
-Computes its output using a callback
+Computes its output using a callback.
 
 ### Input and output
 
@@ -27,12 +27,17 @@ The `apply` processor invokes the `lambda` callback on any received input and se
 
 ### Example
 
-Print the length of log file lines:
+#### Trigger an alert if the average free swap space over 5 minutes is smaller than 10 megabytes
 
 ```js
 pipe(
-  tail("application.log"),
-  apply(function (input) { return input.length; }),
-  stdout()
+  top(),
+  apply(function (topOutput) { return topOutput.freeSwapSpace; }),
+  trail("5m"),
+  alert({
+  	title: "free swap space is low",
+  	trigger: function (freeSwapSpaceTrail) { return stats(freeSwapSpaceTrail).mean < 1e7; },
+  	toggle: true
+  })
 ).run();
 ```

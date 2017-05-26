@@ -2,7 +2,7 @@ package org.opwatch.processor.primitives.producer.df;
 
 import org.opwatch.processor.common.RuntimeError;
 import org.opwatch.processor.common.ProcessorVoidExecutionScope;
-import org.opwatch.processor.payload.PayloadObjectValue;
+import org.opwatch.processor.payload.PayloadPojoValue;
 import org.opwatch.processor.primitives.producer.ScheduledExecutor;
 import org.opwatch.processor.primitives.producer.ScheduledProducer;
 import org.opwatch.service.ProcessorService;
@@ -32,10 +32,10 @@ public class Df extends ScheduledProducer<DfConfig> {
 		long partitionUsed = partitionSize - partitionAvailable;
 		info.used = partitionUsed;
 		info.usageRatio = ((double) partitionUsed) / partitionSize;
-		outputProduced(info);
+		outputProduced(info.toJavascript(processorService.getScriptService()));
 	}
 
-	public static class PartitionInfo extends PayloadObjectValue {
+	public static class PartitionInfo extends PayloadPojoValue {
 
 		private String file;
 		private Long size;

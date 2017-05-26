@@ -29,13 +29,12 @@ public class SlackChannel extends ThrottledChannel<SlackConfiguration> {
 	private String name;
 	private SlackConfiguration config;
 	private SlackMessageService service;
-	private ProcessorService processorService;
 	private String webhookUrl;
 	private SlackWebhookClient client;
 	private RateLimiter rateLimiter;
 
 	public SlackChannel(String name, SlackConfiguration config, SlackMessageService service, ProcessorService processorService) {
-		super(service);
+		super(processorService, service);
 		this.name = name;
 		this.config = config;
 		this.service = service;
@@ -97,7 +96,7 @@ public class SlackChannel extends ThrottledChannel<SlackConfiguration> {
 	@Override
 	protected void publishLimitReached(Rate rateLimit) {
 		Payload payload = new Payload();
-		payload.setText(limitReachedMessage(rateLimit) +"\nMuting for a while");
+		payload.setText(limitReachedMessage(rateLimit) + "\nMuting for a while");
 		client.post(payload);
 	}
 
@@ -116,19 +115,11 @@ public class SlackChannel extends ThrottledChannel<SlackConfiguration> {
 	private void addMainAttachment(Payload payload, Message message) {
 		Attachment attachment = new Attachment();
 		String title = displayTitle(message);
+		attachment.setText(title);
 		attachment.setColor(levelColor(message.getLevel()));
-		Object details = message.getDetails();
-		if (details != null) {
-			if (!processorService.getScriptService().bean(details)) {
-				attachment.setText(title + "\n" + details.toString());
-			} else {
-				attachment.setText(title);
-				processorService.getScriptService().mapFields(details, (key, value) -> {
-					if (value != null) {
-						attachment.addField(new Field(key, value.toString(), false));
-					}
-				});
-			}
+		String detailsString = detailsString(message);
+		if (detailsString != null) {
+			attachment.addField(new Field("Details", detailsString, false));
 		}
 		attachment.addField(new Field("Level", message.getLevel().name(), true));
 		attachment.addField(new Field("Hostname", message.getContext().getHostname(), true));

@@ -1,6 +1,6 @@
 ## `jstack`
 
-Java exception stack trace parser
+Parses java Java exception stack.
 
 ### Input and output
 

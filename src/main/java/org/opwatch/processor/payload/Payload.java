@@ -6,7 +6,7 @@ import org.opwatch.service.ProcessorService;
 /**
  * Represents the output of a processor.
  */
-public class Payload<V> {
+public class Payload<V> extends PayloadPojoValue {
 
 	/**
 	 * Time at which the payload was generated.

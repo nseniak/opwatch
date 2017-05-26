@@ -1,6 +1,6 @@
 ## `pipe`
 
-Executes processors in parallel
+Executes processors in parallel.
 
 ### Input and output
 
@@ -28,7 +28,7 @@ each processor, and the output of each processor is sent to the output of the `p
 
 ### Examples
 
-Signal an alert if the file `application.log` contains `ERROR` or `WARNING`:
+#### Signal an alert if the file `application.log` contains `ERROR` or `WARNING`
 
 ```js
 pipe(
@@ -38,7 +38,7 @@ pipe(
 ).run();
 ```
 
-Signal an alert if either `application1.log` or `application2.log` contains `ERROR`:
+#### Signal an alert if either `application1.log` or `application2.log` contains `ERROR`
 
 ```js
 pipe(

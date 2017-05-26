@@ -3,6 +3,7 @@ package org.opwatch.processor.primitives.producer.trail;
 import org.opwatch.processor.common.TrailCollecter;
 import org.opwatch.processor.payload.ObjectSeries;
 import org.opwatch.processor.payload.Payload;
+import org.opwatch.processor.payload.SeriesObject;
 import org.opwatch.processor.primitives.producer.ScheduledExecutor;
 import org.opwatch.service.ProcessorService;
 
@@ -19,7 +20,9 @@ public class Trail extends TrailCollecter<TrailConfig> {
 
 	@Override
 	protected Object producedObject() {
-		return new ObjectSeries(queue);
+		SeriesObject[] objects = new SeriesObject[queue.size()];
+		queue.toArray(objects);
+		return ObjectSeries.toJavascript(processorService.getScriptService(), objects);
 	}
 
 }

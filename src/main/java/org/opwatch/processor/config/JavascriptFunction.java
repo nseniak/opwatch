@@ -21,13 +21,13 @@ public abstract class JavascriptFunction extends ConfigPropertyValue {
 	}
 
 	protected Object invoke(Processor processor, Payload payload) {
-		synchronized (processorService) {
+		synchronized (processorService.getScriptService()) {
 			return function.call(function, payload.getValue(), payload);
 		}
 	}
 
 	protected Object invoke(Processor processor) {
-		synchronized (processorService) {
+		synchronized (processorService.getScriptService()) {
 			return function.call(function);
 		}
 	}

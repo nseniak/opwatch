@@ -6,7 +6,7 @@ import org.opwatch.processor.common.RuntimeError;
 
 import java.time.format.DateTimeParseException;
 
-public class Duration {
+public class Duration extends ConfigPropertyValue {
 
 	public enum ValueType {
 		milliseconds, text

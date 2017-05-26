@@ -6,6 +6,11 @@ import org.opwatch.service.ProcessorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.stream.Stream;
+
 public class ConsoleChannel extends ChannelImpl {
 
 	private static final Logger logger = LoggerFactory.getLogger(ConsoleChannel.class);
@@ -14,13 +19,12 @@ public class ConsoleChannel extends ChannelImpl {
 	private String name;
 	private ConsoleConfiguration config;
 	private ConsoleMessageService service;
-	private ProcessorService processorService;
 
 	public ConsoleChannel(String name, ConsoleConfiguration config, ConsoleMessageService service, ProcessorService processorService) {
+		super(processorService);
 		this.name = name;
 		this.config = config;
 		this.service = service;
-		this.processorService = processorService;
 	}
 
 	@Override
@@ -33,36 +37,36 @@ public class ConsoleChannel extends ChannelImpl {
 		return name;
 	}
 
+	private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+
 	@Override
 	public void publish(Message message) {
-		String consolePrefix = (name.equals("console") ? "[console]" : logString()) + " ";
+		String consolePrefix = logString() + " ";
+		String contentPrefix = consolePrefix + CONTENT_PREFIX;
 		String logMessage = consolePrefix + processorService.prettyJson(message);
 		logger.info(logMessage);
 		if (processorService.config().channelDebug()) {
 			processorService.printStdout(logMessage);
 		} else {
 			processorService.printStdout(consolePrefix + displayTitle(message));
+			processorService.printStdout(contentPrefix + "time: " + dateFormat.format(new Date(message.getTimestamp())));
 			String hostname = message.getContext().getHostname();
 			if (!hostname.equals(processorService.hostName())) {
-				processorService.printStdout("Hostname: " + hostname);
+				processorService.printStdout(contentPrefix + "hostname: " + hostname);
 			}
-			if (message.getDetails() != null) {
-				Object details = message.getDetails();
-				if (details != null) {
-					if (!processorService.getScriptService().bean(details)) {
-						for (String line : details.toString().split("\\R")) {
-							processorService.printStdout(consolePrefix + CONTENT_PREFIX + line);
-						}
-					} else {
-						processorService.getScriptService().mapFields(details, (key, value) -> {
-							if (value != null) {
-								processorService.printStdout(consolePrefix + CONTENT_PREFIX + key + ": " + value.toString());
-							}
-						});
-					}
-				}
+			String detailsString = detailsString(message);
+			if (detailsString != null) {
+				String detailsPrefix = (message.getType().isSystem()) ? "" : "details: ";
+				String prefixedPretty = prefixLines(detailsPrefix + detailsString, contentPrefix);
+				processorService.printStdout(prefixedPretty);
 			}
 		}
+	}
+
+	private String prefixLines(String text, String prefix) {
+		String[] lines = text.split("\n");
+		String[] prefixedLines = Stream.of(lines).map(s -> prefix + s).toArray(String[]::new);
+		return String.join("\n", prefixedLines);
 	}
 
 	@Override

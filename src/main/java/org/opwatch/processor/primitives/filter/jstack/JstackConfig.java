@@ -7,7 +7,7 @@ import org.opwatch.processor.config.OptionalProperty;
 public class JstackConfig extends ActiveProcessorConfig {
 
 	/**
-	 * Regex for the method name we look for in the stack. Optional.
+	 * Regex for the method name we look for in the stack.
 	 */
 	private NativeRegExp methodRegexp;
 

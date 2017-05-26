@@ -2,6 +2,7 @@ package org.opwatch.service;
 
 import com.coveo.nashorn_modules.FilesystemFolder;
 import com.coveo.nashorn_modules.Require;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.primitives.Primitives;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
 import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
@@ -10,7 +11,6 @@ import jdk.nashorn.api.scripting.ScriptUtils;
 import jdk.nashorn.internal.runtime.Context;
 import jdk.nashorn.internal.runtime.JSType;
 import org.opwatch.documentation.DocumentationService;
-import org.opwatch.documentation.ProcessorDoc;
 import org.opwatch.processor.common.*;
 import org.opwatch.processor.config.*;
 import org.opwatch.processor.payload.Stats;
@@ -41,6 +41,7 @@ import org.opwatch.processor.primitives.producer.top.TopFactory;
 import org.opwatch.processor.primitives.producer.trail.TrailFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanInstantiationException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.InvalidPropertyException;
@@ -58,7 +59,6 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
@@ -90,7 +90,9 @@ public class ScriptService {
 
 	private Map<Class<? extends Processor>, ProcessorFactory<?, ? extends Processor>> factories = new LinkedHashMap<>();
 
-	private static NashornScriptEngine scriptEngine;
+	private NashornScriptEngine scriptEngine;
+
+	private ObjectMapper objectMapper = new ObjectMapper();
 
 	public void initialize() {
 		NashornScriptEngineFactory scriptEngineFactory = new NashornScriptEngineFactory();
@@ -129,18 +131,13 @@ public class ScriptService {
 			createVarargFactoryFunction(new ParallelFactory(processorService));
 			createVarargFactoryFunction(new PipeFactory(processorService));
 			loadConfigFile();
-			ProcessorDoc doc = documentationService.documentation(new CurlFactory(processorService));
-			logger.info("Doc");
 		} catch (ScriptException e) {
 			throw new RuntimeError("initialization error: " + e.getMessage(), e);
 		}
 	}
 
 	private void loadScriptResources() {
-		// Load NPM first
-//		loadScriptResource(applicationContext.getResource("classpath:/" + INIT_SCRIPT_PATH + "npm/jvm-npm.js"));
-		// Load the other scripts
-		Resource[] scriptResources = new Resource[0];
+		Resource[] scriptResources;
 		try {
 			scriptResources = applicationContext.getResources("classpath:/" + INIT_SCRIPT_PATH + "*.js");
 		} catch (IOException e) {
@@ -221,6 +218,36 @@ public class ScriptService {
 			processor.run();
 		} catch (ScriptException e) {
 			throw new RuntimeError(e);
+		}
+	}
+
+	public String pretty(Object object) {
+		synchronized (this) {
+			try {
+				return (String) scriptEngine.invokeFunction("pretty", object);
+			} catch (NoSuchMethodException | ScriptException e) {
+				throw new RuntimeError(e);
+			}
+		}
+	}
+
+	public String stringify(Object object) {
+		synchronized (this) {
+			try {
+				return (String) scriptEngine.invokeFunction("__stringify", object);
+			} catch (NoSuchMethodException | ScriptException e) {
+				throw new RuntimeError(e);
+			}
+		}
+	}
+
+	public Object array(Object[] objects) {
+		synchronized (this) {
+			try {
+				return scriptEngine.invokeFunction("Array", objects);
+			} catch (NoSuchMethodException | ScriptException e) {
+				throw new RuntimeError(e);
+			}
 		}
 	}
 
@@ -312,12 +339,8 @@ public class ScriptService {
 			ParameterizedType paramType = (ParameterizedType) type;
 			Type elementType = documentationService.parameterizedTypeParameter(paramType, List.class);
 			if (elementType != null) {
-				try {
-					List<Object> scriptList = (List<Object>) ScriptUtils.convert(scriptValue, List.class);
-					return convertList(valueLocation, type, elementType, scriptList, exceptionFactory);
-				} catch (Throwable t) {
-					// Do nothing
-				}
+				List<Object> scriptList = (List<Object>) ScriptUtils.convert(scriptValue, List.class);
+				return convertList(valueLocation, type, elementType, scriptList, exceptionFactory);
 			} else {
 				Type valueType = documentationService.parameterizedTypeParameter(paramType, ConstantOrFilter.class);
 				if (valueType != null) {
@@ -379,23 +402,40 @@ public class ScriptService {
 				if (clazz.isAssignableFrom(sobj.getClass())) {
 					return sobj;
 				}
-				if (!Modifier.isAbstract(clazz.getModifiers())) {
-					Object value = BeanUtils.instantiate(clazz);
-					BeanWrapperImpl wrapper = new BeanWrapperImpl(value);
-					for (String propertyName : scriptObject.getOwnKeys(true)) {
-						try {
-							PropertyDescriptor descriptor = wrapper.getPropertyDescriptor(propertyName);
-							Type fieldType = descriptor.getReadMethod().getGenericReturnType();
-							String processorName = valueLocation.getFunctionName();
-							ValueLocation propertyValueSource = ValueLocation.makeProperty(processorName, propertyName);
-							wrapper.setPropertyValue(propertyName, convertScriptValue(propertyValueSource, fieldType, scriptObject.get(propertyName), exceptionFactory));
-						} catch (InvalidPropertyException e) {
-							throw exceptionFactory.make("invalid property \"" + propertyName + "\"");
-						}
-					}
-					return value;
+				return convertBinding(valueLocation, clazz, scriptObject, scriptObject.getOwnKeys(true), exceptionFactory);
+			}
+		}
+		if (scriptValue instanceof Map) {
+			Map mapObject = (Map) scriptValue;
+			String[] properties = new String[mapObject.size()];
+			mapObject.keySet().toArray(properties);
+			return convertBinding(valueLocation, clazz, mapObject, properties, exceptionFactory);
+		}
+		throw exceptionFactory.make("invalid " + valueLocation.describeAsValue() + ", expected " + documentationService.typeName(clazz) + ", got: " + scriptValue);
+	}
+
+	private Object convertBinding(ValueLocation valueLocation, Class<?> clazz, Map scriptValue, String[] properties, RuntimeExceptionFactory exceptionFactory) {
+		if (clazz.isAssignableFrom(scriptValue.getClass())) {
+			return scriptValue;
+		}
+		try {
+			Object value = BeanUtils.instantiate(clazz);
+			BeanWrapperImpl wrapper = new BeanWrapperImpl(value);
+			for (String propertyName : properties) {
+				try {
+					PropertyDescriptor descriptor = wrapper.getPropertyDescriptor(propertyName);
+					Type fieldType = descriptor.getReadMethod().getGenericReturnType();
+					String processorName = valueLocation.getFunctionName();
+					ValueLocation propertyValueSource = ValueLocation.makeProperty(processorName, propertyName);
+					wrapper.setPropertyValue(propertyName, convertScriptValue(propertyValueSource, fieldType, scriptValue.get(propertyName), exceptionFactory));
+				} catch (InvalidPropertyException e) {
+					throw exceptionFactory.make("invalid property \"" + propertyName + "\"");
 				}
 			}
+			return value;
+		} catch (BeanInstantiationException e) {
+			// BeanUtils.instantiate raised an error. The class is either abstract or doesn't have a default constructor.
+			// Fall back to error
 		}
 		throw exceptionFactory.make("invalid " + valueLocation.describeAsValue() + ", expected " + documentationService.typeName(clazz) + ", got: " + scriptValue);
 	}
@@ -431,7 +471,7 @@ public class ScriptService {
 			try {
 				for (PropertyDescriptor propertyDescriptor : Introspector.getBeanInfo(object.getClass()).getPropertyDescriptors()) {
 					String key = propertyDescriptor.getName();
-					if (!key.equals("class")) {
+					if ((!key.equals("class") && (propertyDescriptor.getReadMethod() != null))) {
 						Object value = propertyDescriptor.getReadMethod().invoke(object);
 						handler.handle(key, value);
 					}
@@ -466,7 +506,7 @@ public class ScriptService {
 	/**
 	 * Exported for scripting purposes
 	 */
-	public static Object eval(String str, String location) throws ScriptException {
+	public Object eval(String str, String location) throws ScriptException {
 		ScriptContext context = scriptEngine.getContext();
 		context.setAttribute(ScriptEngine.FILENAME, location, ScriptContext.ENGINE_SCOPE);
 		return scriptEngine.eval(str, context);

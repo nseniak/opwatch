@@ -25,8 +25,9 @@ public class Collect extends Filter<CollectConfig> {
 			long timestamp = System.currentTimeMillis();
 			queue.add(new SeriesObject(value, timestamp));
 			if (queue.size() == count) {
-				ObjectSeries list = new ObjectSeries(queue);
-				outputTransformed(list, payload);
+				SeriesObject[] objects = new SeriesObject[queue.size()];
+				queue.toArray(objects);
+				outputTransformed(ObjectSeries.toJavascript(processorService.getScriptService(), objects), payload);
 			}
 		}
 	}

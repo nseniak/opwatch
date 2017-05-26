@@ -29,12 +29,11 @@ public class PushoverChannel extends ThrottledChannel<PushoverConfiguration> {
 	private String name;
 	private PushoverConfiguration config;
 	private PushoverMessageService service;
-	private ProcessorService processorService;
 	private RateLimiter rateLimiter;
 	private PushoverKey pushoverKey;
 
 	public PushoverChannel(String name, PushoverConfiguration config, PushoverMessageService service, ProcessorService processorService) {
-		super(service);
+		super(processorService, service);
 		this.name = name;
 		this.config = config;
 		this.service = service;
@@ -104,24 +103,18 @@ public class PushoverChannel extends ThrottledChannel<PushoverConfiguration> {
 		StringWriter writer = new StringWriter();
 		MessageContext scope = message.getContext();
 		writer.append("Hostname: " + scope.getHostname()).append("\n");
-		writeDetails(writer, message.getDetails());
+		writeDetails(writer, message);
 		String bodyText = writer.toString();
 		bodyText = truncate(bodyText, MAX_MESSAGE_LENGTH);
 		PushoverMessage pushoverMessage = makePushoverMessage(pushoverKey, title, bodyText, priority);
 		send(pushoverMessage);
 	}
 
-	private void writeDetails(StringWriter writer, Object object) {
-		if (object == null) {
-			return;
-		} else if (!processorService.getScriptService().bean(object)) {
-			writer.append(object.toString());
-		} else {
-			processorService.getScriptService().mapFields(object, (key, value) -> {
-				if (value != null) {
-					writer.append(key).append(": ").append(value.toString()).append("\n");
-				}
-			});
+	private void writeDetails(StringWriter writer, Message message) {
+		String detailsPrefix = (message.getType().isSystem()) ? "" : "Details: ";
+		String detailsString = detailsString(message);
+		if (detailsString != null) {
+			writer.append(detailsPrefix + detailsString);
 		}
 	}
 

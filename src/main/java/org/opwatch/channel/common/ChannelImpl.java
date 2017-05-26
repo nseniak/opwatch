@@ -1,12 +1,19 @@
 package org.opwatch.channel.common;
 
 import org.opwatch.processor.common.Message;
+import org.opwatch.service.ProcessorService;
 
 import static org.opwatch.processor.common.RuntimeError.DEFAULT_ERROR_MESSAGE_LEVEL;
 import static org.opwatch.service.ProcessorService.INFO_DEFAULT_MESSAGE_LEVEL;
 import static org.springframework.util.StringUtils.capitalize;
 
 public abstract class ChannelImpl implements Channel {
+
+	protected ProcessorService processorService;
+
+	public ChannelImpl(ProcessorService processorService) {
+		this.processorService = processorService;
+	}
 
 	protected String displayTitle(Message message) {
 		String typeDesc = capitalize(message.getType().getDescriptor());
@@ -43,6 +50,17 @@ public abstract class ChannelImpl implements Channel {
 				return "(EMERGENCY)";
 		}
 		throw new IllegalStateException("unknown level: " + level.name());
+	}
+
+	protected String detailsString(Message message) {
+		Object details = message.getDetails();
+		if (details == null) {
+			return null;
+		} else if (message.getType().isSystem()) {
+			return details.toString();
+		} else {
+			return processorService.getScriptService().pretty(details);
+		}
 	}
 
 }

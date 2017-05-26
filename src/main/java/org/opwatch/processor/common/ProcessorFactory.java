@@ -1,6 +1,5 @@
 package org.opwatch.processor.common;
 
-import jdk.nashorn.internal.objects.NativeRegExp;
 import org.opwatch.processor.config.*;
 import org.opwatch.service.ProcessorService;
 import org.slf4j.Logger;
@@ -13,8 +12,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 public abstract class ProcessorFactory<C extends ProcessorConfig, P extends Processor> {
 

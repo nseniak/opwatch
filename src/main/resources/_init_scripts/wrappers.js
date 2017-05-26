@@ -1,4 +1,9 @@
 //
+function __stringify(object) {
+	return JSON.stringify(object);
+}
+
+
 function factory_wrapper(factory) {
 	var ctor = function () {
 		return make_processor(factory, arguments);

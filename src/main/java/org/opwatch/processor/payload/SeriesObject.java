@@ -1,6 +1,6 @@
 package org.opwatch.processor.payload;
 
-public class SeriesObject {
+public class SeriesObject extends PayloadPojoValue {
 
 	private Object value;
 	private Long timestamp;

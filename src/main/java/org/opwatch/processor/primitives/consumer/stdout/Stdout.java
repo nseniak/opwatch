@@ -12,7 +12,7 @@ public class Stdout extends Consumer<StdoutConfig> {
 
 	@Override
 	public void consume(Payload<?> payload) {
-		processorService.printStdout(processorService.json(payload.getValue()));
+		processorService.printStdout(processorService.getScriptService().stringify(payload.getValue()));
 	}
 
 }

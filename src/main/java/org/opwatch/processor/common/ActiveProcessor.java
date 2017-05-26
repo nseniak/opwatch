@@ -45,12 +45,12 @@ public abstract class ActiveProcessor<D extends ActiveProcessorConfig> extends P
 		switch (signature.getInputRequirement()) {
 			case Data:
 				if (producers.isEmpty()) {
-					joiner.add("input is missing");
+					joiner.add("input is required");
 				}
 				break;
 			case NoData:
 				if (!producers.isEmpty()) {
-					joiner.add("should not have an input");
+					joiner.add("cannot receive an input");
 				}
 				break;
 			case Any:
@@ -59,19 +59,19 @@ public abstract class ActiveProcessor<D extends ActiveProcessorConfig> extends P
 		switch (signature.getOutputRequirement()) {
 			case Data:
 				if (consumers.isEmpty()) {
-					joiner.add("output is ignored");
+					joiner.add("output should be used");
 				}
 				break;
 			case NoData:
 				if (!consumers.isEmpty()) {
-					joiner.add("has no output but expected to have one");
+					joiner.add("does not generate an output");
 				}
 				break;
 			case Any:
 				break;
 		}
 		if (joiner.length() != 0) {
-			throw new RuntimeError(joiner.toString(), new ProcessorVoidExecutionScope(this));
+			throw new RuntimeError("incorrect use in a pipeline: " + joiner.toString(), new ProcessorVoidExecutionScope(this));
 		}
 	}
 

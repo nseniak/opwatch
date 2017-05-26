@@ -3,6 +3,7 @@ package org.opwatch.channel.common.throttled;
 import org.opwatch.channel.common.ChannelImpl;
 import org.opwatch.channel.common.ServiceConfiguration;
 import org.opwatch.processor.common.Message;
+import org.opwatch.service.ProcessorService;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,7 +17,8 @@ public abstract class ThrottledChannel<S extends ServiceConfiguration> extends C
 	private Rate currentLimit;
 	private Date mutedOn;
 
-	protected ThrottledChannel(ThrottledMessageService<S> throttledMessageService) {
+	protected ThrottledChannel(ProcessorService processorService, ThrottledMessageService<S> throttledMessageService) {
+		super(processorService);
 		this.throttledMessageService = throttledMessageService;
 		this.currentLimit = null;
 		this.waitingQueue = new ConcurrentLinkedQueue<>();

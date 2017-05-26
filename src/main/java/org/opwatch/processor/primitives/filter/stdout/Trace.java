@@ -3,6 +3,7 @@ package org.opwatch.processor.primitives.filter.stdout;
 import org.opwatch.processor.payload.Payload;
 import org.opwatch.processor.primitives.consumer.Consumer;
 import org.opwatch.service.ProcessorService;
+import org.opwatch.service.ScriptService;
 
 public class Trace extends Consumer<TraceConfig> {
 
@@ -12,7 +13,8 @@ public class Trace extends Consumer<TraceConfig> {
 
 	@Override
 	public void consume(Payload<?> payload) {
-		processorService.printStdout(processorService.json(payload));
+		ScriptService scriptService = processorService.getScriptService();
+		processorService.printStdout(scriptService.pretty(payload.getValue()));
 		outputTransformed(payload.getValue(), payload);
 	}
 

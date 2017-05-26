@@ -61,7 +61,7 @@ public class CommandRunner {
 			throw new RuntimeError("command process has exited", new ProcessorPayloadExecutionScope(processor, payload));
 		}
 		try {
-			process.getOutputStream().write(processorService.json(payload).getBytes());
+			process.getOutputStream().write(processorService.json(payload.getValue()).getBytes());
 			process.getOutputStream().write('\n');
 			process.getOutputStream().flush();
 		} catch (IOException e) {
@@ -86,10 +86,7 @@ public class CommandRunner {
 					}
 					Thread.sleep(profile.cronScriptOutputCheckDelay());
 				}
-				CommandOutput output = new CommandOutput();
-				output.command = command;
-				output.line = line;
-				processor.outputProduced(output);
+				processor.outputProduced(line);
 			}
 		} catch (IOException e) {
 			if (e.getMessage().equals("Stream closed")) {
@@ -129,25 +126,6 @@ public class CommandRunner {
 					new ProcessorVoidExecutionScope(processor));
 		}
 		return false;
-	}
-
-	public static class CommandOutput {
-
-		private String command;
-		private String line;
-
-		public String getCommand() {
-			return command;
-		}
-
-		public String getLine() {
-			return line;
-		}
-
-	}
-
-	public String getCommand() {
-		return command;
 	}
 
 }

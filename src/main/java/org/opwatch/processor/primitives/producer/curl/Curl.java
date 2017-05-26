@@ -1,7 +1,7 @@
 package org.opwatch.processor.primitives.producer.curl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.opwatch.processor.payload.PayloadObjectValue;
+import org.opwatch.processor.payload.PayloadPojoValue;
 import org.opwatch.processor.primitives.producer.ScheduledExecutor;
 import org.opwatch.processor.primitives.producer.ScheduledProducer;
 import org.opwatch.service.ProcessorService;
@@ -90,10 +90,10 @@ public class Curl extends ScheduledProducer<CurlConfig> {
 			result.status = -1;
 			result.error = e.getCause().getMessage();
 		}
-		outputProduced(result);
+		outputProduced(result.toJavascript(processorService.getScriptService()));
 	}
 
-	public static class Response extends PayloadObjectValue {
+	public static class Response extends PayloadPojoValue {
 
 		private String url;
 		private int status;

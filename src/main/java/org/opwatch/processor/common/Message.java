@@ -4,20 +4,26 @@ public class Message {
 
 	public enum Type {
 
-		error("error"),
-		info("info"),
-		alert("alert"),
-		alertOn("alert ON"),
-		alertOff("alert OFF");
+		error("error", true),
+		info("info", true),
+		alert("alert", false),
+		alertOn("alert ON", false),
+		alertOff("alert OFF", false);
 
-		String descriptor;
+		private String descriptor;
+		private boolean system;
 
-		Type(String descriptor) {
+		Type(String descriptor, boolean system) {
 			this.descriptor = descriptor;
+			this.system = system;
 		}
 
 		public String getDescriptor() {
 			return descriptor;
+		}
+
+		public boolean isSystem() {
+			return system;
 		}
 
 	}

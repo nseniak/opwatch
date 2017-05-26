@@ -1,247 +1,177 @@
-// Largely copied from https://github.com/cvadillo/js-object-pretty-print
+pretty = (function () {
 
-pretty = function (jsObject, expandAlias, indentLength) {
-	var indentString,
-			fullFunction = true,
-			newLine,
-			newLineJoin,
-			TOSTRING,
-			TYPES,
-			valueType,
-			processor,
-			repeatString,
-			prettyObjectPrint,
-			prettyArray,
-			functionSignature,
-			pretty,
-			visited;
-
-	TOSTRING = Object.prototype.toString;
-
-	TYPES = {
-		'undefined': 'undefined',
-		'number': 'number',
-		'boolean': 'boolean',
-		'string': 'string',
-		'[object Function]': 'function',
-		'[object RegExp]': 'regexp',
-		'[object Array]': 'array',
-		'[object java.util.ArrayList]': 'array',
-		'[object Date]': 'date',
-		'[object Error]': 'error'
-	};
-
-	valueType = function (o) {
-		var type = TYPES[typeof o] || TYPES[TOSTRING.call(o)] || processor(o) || processorFunction(o)
-				|| stringConstant(o) || stringFilter(o)
-				|| durationMilliseconds(o) || durationText(o)
-				|| (o ? 'object' : 'null');
-		return type;
-	};
-
-	processor = function (d) {
-		if (d.processor) {
-			return "processor";
+	var prettyObject = function (object, depth, options) {
+		if (depth > options.maxDepth) {
+			return "...";
+		}
+		var type = Object.prototype.toString.call(object);
+		if (type === "[object Null]") {
+			return "null";
+		} else if (type === "[object Undefined]") {
+			return "undefined";
+		} else if (type === "[object Boolean]") {
+			return object.toString();
+		} else if (type === "[object Number]"
+				|| (type === "[object java.lang.Long]")
+				|| (type === "[object java.lang.Integer]")
+				|| (type === "[object java.lang.Float]")
+				|| (type === "[object java.lang.Double]")) {
+			return prettyNumber(object, depth, options);
+		} else if (type === "[object String]") {
+			return prettyString(object, depth, options);
+		} else if (type === "[object Date]") {
+			return "new Date(" + JSON.stringify(object.toString()) + ")";
+		} else if (type === "[object RegExp]") {
+			return object.toString();
+		} else if ((type === "[object Function]")
+				|| (type === "[object org.opwatch.processor.config.JavascriptPredicate]")
+				|| (type === "[object org.opwatch.processor.config.JavascriptFilter]")
+				|| (type === "[object org.opwatch.processor.config.JavascriptProducer]")) {
+			return prettyFunction(object);
+		} else if ((type === "[object Array]") || object.__payloadArray) {
+			return prettyArray(object, depth, options);
+		} else if (type.startsWith("[object org.opwatch.processor.") && object.processor) {
+			return prettyProcessor(object, depth, options);
+		} else if (type === "[object org.opwatch.processor.config.Duration]") {
+			return prettyDuration(object, depth, options);
+		} else if (type === "[object org.opwatch.processor.config.ConstantOrFilter]") {
+			return prettyConstantOrFilter(object, depth, options);
 		} else {
-			return null;
-		}
-	}
-
-	processorFunction = function (d) {
-		if (d && d.function) {
-			return "processorFunction"
-		} else {
-			return null;
-		}
-	}
-
-	stringConstant = function (d) {
-		if (d && d.constant) {
-			return "stringConstant"
-		} else {
-			return null;
-		}
-	}
-
-	stringFilter = function (d) {
-		if (d && d.producer) {
-			return "stringFilter"
-		} else {
-			return null;
-		}
-	}
-
-	durationMilliseconds = function (d) {
-		if (d && d.milliseconds) {
-			return "durationMilliseconds"
-		} else {
-			return null;
-		}
-	}
-
-	durationText = function (d) {
-		if (d && d.text) {
-			return "durationText"
-		} else {
-			return null;
-		}
-	}
-
-	repeatString = function (src, length) {
-		var dst = '',
-				index;
-		for (index = 0; index < length; index += 1) {
-			dst += src;
-		}
-
-		return dst;
-	};
-
-	prettyObjectPrint = function (object, indent) {
-		var value = [],
-				property,
-				newIndent = indent + indentString;
-		for (property in object) {
-			if (object.hasOwnProperty(property)) {
-				value.push(newIndent + property + ': ' + pretty(object[property], newIndent));
-			}
-		}
-		if (value.length != 0) {
-			return '{' + newLine + value.join(newLineJoin) + newLine + indent + '}';
-		} else {
-			return '{}';
+			return prettyObjectProperties(object, depth, options);
 		}
 	};
 
-	prettyProcessorPrint = function (processor, indent) {
-		var value = [],
-				newIndent = indent + indentString,
-				config,
-				factory,
-				name,
-				properties,
-				property,
-				i;
+	var prettyString = function (string, depth, options) {
+		return JSON.stringify(string);
+	};
 
-		config = processor.configuration;
-		factory = processor.factory;
-		name = factory.name();
-		if ((name == "alias") && !expandAlias) {
-			return config.name + '(' + prettyObjectPrint(config.configuration, indent) + ')';
+	var prettyNumber = function (number, depth, options) {
+		return number.toString();
+	};
+
+	var prettyFunction = function (fn) {
+		return fn.toString();
+	}
+
+	var prettyArray = function (array, depth, options) {
+		if (array.length === 0) {
+			return "[]";
+		} else if (array.length === 1) {
+			return "[ " + prettyObject(array[0], depth + 1, options) + " ]";
 		} else {
-			properties = config.properties();
-			if (properties.length == 0) {
-				return name + '({})' + newLine;
-			} else {
-				for (i = 0; i < properties.length; i++) {
-					property = properties[i];
-					if (config[property]) {
-						value.push(newIndent + property + ': ' + pretty(config[property], newIndent));
-					}
+			var lines = [];
+			lines.push("[");
+			var prefix = indent(depth + 1, options);
+			for (var i = 0; i < array.length; i++) {
+				if (i > options.maxArrayLength) {
+					lines.push(prefix + "...");
+					break;
 				}
+				var element = prettyObject(array[i], depth + 1, options);
+				var comma = (i < array.length - 1) ? "," : "";
+				lines.push(prefix + element + comma);
 			}
-			return name + '({' + newLine + value.join(newLineJoin) + newLine + indent + '})';
+			lines.push(indent(depth, options) + "]");
+			return joinLines(lines, options);
+		}
+	};
+
+	var prettyObjectProperties = function (object, depth, options) {
+		var properties = [];
+		for (property in object) {
+			if (!object.hasOwnProperty // Java object
+					|| object.hasOwnProperty(property)) {
+				properties.push(property);
+			}
+		}
+		return prettyProperties(object, properties, depth, options);
+	}
+
+	var prettyProperties = function (object, properties, depth, options) {
+		if (properties.length === 0) {
+			return "{}";
+		} else if (properties.length === 1) {
+			return "{ " + properties[0] + ": " + prettyObject(object[properties[0]], depth + 1, options) + " }";
+		} else {
+			var lines = [];
+			lines.push("{");
+			var prefix = indent(depth + 1, options);
+			for (var i = 0; i < properties.length; i++) {
+				var value = prettyObject(object[properties[i]], depth + 1, options);
+				var comma = (i < properties.length - 1) ? "," : "";
+				lines.push(prefix + properties[i] + ": " + value + comma);
+			}
+			lines.push(indent(depth, options) + "}");
+			return joinLines(lines, options);
+		}
+	};
+
+	var prettyProcessor = function (processor, depth, options) {
+		var config = processor.configuration;
+		var properties = config.properties();
+		var factory = processor.factory;
+		var name = factory.name();
+		if ((name === "alias") && !options.expandAlias) {
+			return config.name + '(' + prettyObjectProperties(config.configuration, depth + 1, options) + ')';
+		} else {
+			return name + "(" + prettyProperties(config, nonNullProperties(config, properties), depth + 1, options) + ")";
+		}
+	};
+
+	var nonNullProperties = function (object, properties) {
+		var nonNull = [];
+		for (var i = 0; i < properties.length; i++) {
+			if (object[properties[i]] !== null) {
+				nonNull.push(properties[i]);
+			}
+		}
+		return nonNull;
+	};
+
+	var prettyDuration = function (duration, depth, options) {
+		if (duration.milliseconds) {
+			return prettyNumber(duration.milliseconds, depth, options);
+		} else {
+			return prettyString(duration.text, depth, options);
 		}
 	}
 
-	prettyArray = function (array, indent) {
-		var index,
-				length = array.length,
-				newIndent = indent + indentString,
-				value = [];
-		if (length == 0) {
+	var indentations = {};
+
+	var indent = function (depth, options) {
+		if (options.indent) {
+			if (!indentations[depth]) {
+				var dst = "";
+				for (var index = 0; index < depth * options.indent; index += 1) {
+					dst += " ";
+				}
+				indentations[depth] = dst;
+			}
+			return indentations[depth];
+		} else {
 			return "";
 		}
-		for (index = 0; index < length; index += 1) {
-			value.push(pretty(array[index], newIndent, newIndent));
+	};
+
+	var joinLines = function (array, options) {
+		if (options.indent) {
+			return array.join("\n");
+		} else {
+			return array.join(" ");
 		}
-
-		return newLine + value.join(newLineJoin) + newLine + indent;
-	};
-
-	functionSignature = function (element) {
-		var signatureExpression,
-				signature;
-
-		element = element.toString();
-		signatureExpression = new RegExp('function\\s*.*\\s*\\(.*\\)');
-		signature = signatureExpression.exec(element);
-		signature = signature ? signature[0] : '[object Function]';
-		return fullFunction ? element : '"' + signature + '"';
-	};
-
-	pretty = function (element, indent, fromArray) {
-		var type;
-
-		type = valueType(element);
-		fromArray = fromArray || '';
-		if (visited.indexOf(element) === -1) {
-			switch (type) {
-				case 'array':
-					visited.push(element);
-					return fromArray + '[' + prettyArray(element, indent) + ']';
-
-				case 'boolean':
-					return fromArray + (element ? 'true' : 'false');
-
-				case 'date':
-					return fromArray + '"' + element.toString() + '"';
-
-				case 'number':
-					return fromArray + element;
-
-				case 'object':
-					visited.push(element);
-					return fromArray + prettyObjectPrint(element, indent);
-
-				case 'string':
-					return fromArray + JSON.stringify(element);
-
-				case 'function':
-					return fromArray + functionSignature(element);
-
-				case 'processorFunction':
-					return fromArray + functionSignature(element.function);
-
-				case 'stringConstant':
-					return fromArray + JSON.stringify(element.constant);
-
-				case 'stringFilter':
-					return fromArray + functionSignature(element.producer.function);
-
-				case 'durationMilliseconds':
-					return fromArray + element.milliseconds;
-
-				case 'durationText':
-					return fromArray + JSON.stringify(element.text);
-
-				case 'undefined':
-					return fromArray + 'undefined';
-
-				case 'processor':
-					return fromArray + prettyProcessorPrint(element, indent);
-
-				case 'null':
-					return fromArray + 'null';
-
-				default:
-					if (element.toString) {
-						return fromArray + '"' + element.toString() + '"';
-					}
-					return fromArray + '<<<ERROR>>> Cannot get the string value of the element';
-			}
-		}
-		return fromArray + 'circular reference to ' + element.toString();
-	};
-
-	if (indentLength === undefined) {
-		indentLength = 4;
 	}
 
-	indentString = repeatString(' ', indentLength);
-	newLine = '\n';
-	newLineJoin = ',' + newLine;
-	visited = [];
-	return pretty(jsObject, '');
-
-};
+	return function (object, options) {
+		var actualOptions = {indent: 2, expandAlias: false, maxDepth: 5, maxArrayLength: 100};
+		if (options) {
+			for (var property in options) {
+				actualOptions[property] = options[property];
+			}
+		}
+		try {
+			return prettyObject(object, 0, actualOptions);
+		} catch (error) {
+			return "<cannot pretty print object>";
+		}
+	};
+})();
