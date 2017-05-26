@@ -1,10 +1,10 @@
-package org.opwatch.processor.primitives.filter.sh;
+package org.opwatch.processor.primitives.producer.cron;
 
-import org.opwatch.processor.config.ActiveProcessorConfig;
 import org.opwatch.processor.config.ImplicitProperty;
+import org.opwatch.processor.config.ScheduledProcessorConfig;
 import org.opwatch.processor.primitives.producer.CommandExecutorDesc;
 
-public class ShConfig extends ActiveProcessorConfig implements CommandExecutorDesc {
+public class ShConfig extends ScheduledProcessorConfig implements CommandExecutorDesc {
 
 	private String command;
 

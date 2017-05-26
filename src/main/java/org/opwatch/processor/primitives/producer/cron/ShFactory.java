@@ -1,11 +1,12 @@
-package org.opwatch.processor.primitives.filter.sh;
+package org.opwatch.processor.primitives.producer.cron;
 
-import org.opwatch.processor.common.ActiveProcessorFactory;
 import org.opwatch.processor.common.ProcessorSignature;
 import org.opwatch.processor.primitives.producer.CommandRunner;
+import org.opwatch.processor.primitives.producer.ScheduledExecutor;
+import org.opwatch.processor.primitives.producer.ScheduledExecutorFactory;
 import org.opwatch.service.ProcessorService;
 
-public class ShFactory extends ActiveProcessorFactory<ShConfig, Sh> {
+public class ShFactory extends ScheduledExecutorFactory<ShConfig, Sh> {
 
 	public ShFactory(ProcessorService processorService) {
 		super(processorService);
@@ -28,14 +29,15 @@ public class ShFactory extends ActiveProcessorFactory<ShConfig, Sh> {
 
 	@Override
 	public ProcessorSignature staticSignature() {
-		return ProcessorSignature.makeAny();
+		return ProcessorSignature.makeProducer();
 	}
 
 	@Override
 	public Sh make(Object scriptObject) {
 		ShConfig config = convertProcessorConfig(scriptObject);
-		CommandRunner producer = makeCommandOutputProducer(config);
-		return new Sh(getProcessorService(), config, name(), producer);
+		ScheduledExecutor executor = makeScheduledExecutor(config);
+		CommandRunner runner = makeCommandOutputProducer(config);
+		return new Sh(getProcessorService(), config, name(), executor, runner);
 	}
 
 }

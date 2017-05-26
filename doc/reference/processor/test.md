@@ -1,6 +1,6 @@
 ## `test`
 
-Predicate-based filter.
+Callback-based filter.
 
 ### Input and output
 

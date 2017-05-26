@@ -1,6 +1,6 @@
 ## `apply`
 
-Computes its output using a callback.
+Transforms its input using a callback.
 
 ### Input and output
 
@@ -11,8 +11,8 @@ Computes its output using a callback.
 ### Synopsis
 
 ```js
-grep(lambda)
-grep(configuration_object)
+apply(lambda)
+apply(configuration_object)
 ```
 
 ### Configuration properties

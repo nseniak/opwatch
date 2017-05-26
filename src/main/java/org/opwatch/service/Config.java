@@ -31,7 +31,7 @@ public class Config {
 	private String defaultPostHostname;
 	private int defaultPostPort;
 	private long cronScriptOutputCheckDelay;
-	private long cronCommandExitTimeout;
+	private long shCommandExitTimeout;
 	private long commandStartTimeout;
 	private long commandStartSleepTime;
 
@@ -53,7 +53,7 @@ public class Config {
 		this.defaultPostHostname = ApplicationUtil.property("opwatch.post.hostname", "localhost");
 		this.defaultPostPort = ApplicationUtil.property("opwatch.post.port", DEFAULT_HTTP_PORT);
 		this.cronScriptOutputCheckDelay = TimeUnit.SECONDS.toMillis(100);
-		this.cronCommandExitTimeout = TimeUnit.MINUTES.toMillis(3);
+		this.shCommandExitTimeout = TimeUnit.MINUTES.toMillis(3);
 		this.commandStartTimeout = TimeUnit.MINUTES.toMillis(1);
 		this.commandStartSleepTime = TimeUnit.MILLISECONDS.toMillis(200);
 	}
@@ -197,11 +197,11 @@ public class Config {
 	}
 
 	public long cronCommandExitTimeout() {
-		return cronCommandExitTimeout;
+		return shCommandExitTimeout;
 	}
 
 	public void cronCommandExitTimeout(long cronCommandExitTimeout) {
-		this.cronCommandExitTimeout = cronCommandExitTimeout;
+		this.shCommandExitTimeout = cronCommandExitTimeout;
 	}
 
 	public long commandStartTimeout() {

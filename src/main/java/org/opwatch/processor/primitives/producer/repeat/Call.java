@@ -5,11 +5,11 @@ import org.opwatch.processor.primitives.producer.ScheduledExecutor;
 import org.opwatch.processor.primitives.producer.ScheduledProducer;
 import org.opwatch.service.ProcessorService;
 
-public class Repeat extends ScheduledProducer<RepeatConfig> {
+public class Call extends ScheduledProducer<CallConfig> {
 
 	private JavascriptProducer producer;
 
-	public Repeat(ProcessorService processorService, RepeatConfig configuration, String name, ScheduledExecutor scheduledExecutor, JavascriptProducer producer) {
+	public Call(ProcessorService processorService, CallConfig configuration, String name, ScheduledExecutor scheduledExecutor, JavascriptProducer producer) {
 		super(processorService, configuration, name, scheduledExecutor);
 		this.producer = producer;
 	}

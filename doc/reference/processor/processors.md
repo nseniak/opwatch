@@ -97,11 +97,16 @@ This section lists processors by category.
 ### Filters
 
 * [`alert`](alert.md) -- triggers an alert
-* [`apply`](apply.md) -- computes its output using a callback
+* [`apply`](apply.md) -- transforms its input using a callback
+* [`shapply`](shapply.md) -- transforms its input using a shell command
+* [`call`](call.md) -- generates output using a callback
 * [`collect`](collect.md) -- collects the last `count` received inputs
 * [`grep`](grep.md) -- regexp-based filter
+* [`json`](json.md) -- parses a string into a Json object
 * [`jstack`](jstack.md) -- parses java Java exception stack
-* [`test`](test.md) -- predicate-based filter
+* [`sh`](sh.md) -- generates output by executing a shell command
+* [`shapply`](shapply.md) -- transforms its input using a shell command
+* [`test`](test.md) -- callback-based filter
 * [`trail`](trail.md) -- collects the inputs received during the last `duration` milliseconds
 
 ### Consumers

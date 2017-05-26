@@ -8,12 +8,12 @@ import org.opwatch.service.ProcessorService;
 
 import java.util.concurrent.Future;
 
-public class Sh extends Filter<ShConfig> {
+public class Shapply extends Filter<ShapplyConfig> {
 
 	protected Future<?> commandConsumerThreadFuture;
 	private CommandRunner commandRunner;
 
-	public Sh(ProcessorService processorService, ShConfig configuration, String name, CommandRunner commandRunner) {
+	public Shapply(ProcessorService processorService, ShapplyConfig configuration, String name, CommandRunner commandRunner) {
 		super(processorService, configuration, name);
 		this.commandRunner = commandRunner;
 	}

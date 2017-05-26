@@ -6,25 +6,25 @@ import org.opwatch.processor.primitives.producer.ScheduledExecutor;
 import org.opwatch.processor.primitives.producer.ScheduledExecutorFactory;
 import org.opwatch.service.ProcessorService;
 
-public class RepeatFactory extends ScheduledExecutorFactory<RepeatConfig, Repeat> {
+public class CallFactory extends ScheduledExecutorFactory<CallConfig, Call> {
 
-	public RepeatFactory(ProcessorService processorService) {
+	public CallFactory(ProcessorService processorService) {
 		super(processorService);
 	}
 
 	@Override
 	public String name() {
-		return "repeat";
+		return "call";
 	}
 
 	@Override
-	public Class<RepeatConfig> configurationClass() {
-		return RepeatConfig.class;
+	public Class<CallConfig> configurationClass() {
+		return CallConfig.class;
 	}
 
 	@Override
-	public Class<Repeat> processorClass() {
-		return Repeat.class;
+	public Class<Call> processorClass() {
+		return Call.class;
 	}
 
 	@Override
@@ -33,11 +33,11 @@ public class RepeatFactory extends ScheduledExecutorFactory<RepeatConfig, Repeat
 	}
 
 	@Override
-	public Repeat make(Object scriptObject) {
-		RepeatConfig config = convertProcessorConfig(scriptObject);
+	public Call make(Object scriptObject) {
+		CallConfig config = convertProcessorConfig(scriptObject);
 		ScheduledExecutor executor = makeScheduledExecutor(config);
 		JavascriptProducer producer = checkPropertyValue("lambda", config.getLambda());
-		return new Repeat(getProcessorService(), config, name(), executor, producer);
+		return new Call(getProcessorService(), config, name(), executor, producer);
 	}
 
 }

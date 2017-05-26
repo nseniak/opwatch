@@ -4,7 +4,7 @@ import org.opwatch.processor.config.ImplicitProperty;
 import org.opwatch.processor.config.JavascriptProducer;
 import org.opwatch.processor.config.ScheduledProcessorConfig;
 
-public class RepeatConfig extends ScheduledProcessorConfig {
+public class CallConfig extends ScheduledProcessorConfig {
 
 	private JavascriptProducer lambda;
 

@@ -5,11 +5,11 @@ import org.opwatch.processor.primitives.producer.ScheduledExecutor;
 import org.opwatch.processor.primitives.producer.ScheduledProducer;
 import org.opwatch.service.ProcessorService;
 
-public class Cron extends ScheduledProducer<CronConfig> {
+public class Sh extends ScheduledProducer<ShConfig> {
 
 	private CommandRunner commandRunner;
 
-	public Cron(ProcessorService processorService, CronConfig configuration, String name, ScheduledExecutor scheduledExecutor, CommandRunner commandRunner) {
+	public Sh(ProcessorService processorService, ShConfig configuration, String name, ScheduledExecutor scheduledExecutor, CommandRunner commandRunner) {
 		super(processorService, configuration, name, scheduledExecutor);
 		this.commandRunner = commandRunner;
 	}
