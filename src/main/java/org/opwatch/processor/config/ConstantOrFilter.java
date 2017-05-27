@@ -51,4 +51,8 @@ public class ConstantOrFilter<T> extends ConfigPropertyValue {
 		return filter;
 	}
 
+	public ValueType getType() {
+		return type;
+	}
+
 }

@@ -51,7 +51,12 @@ pretty = (function () {
 
 	var prettyFunction = function (fn) {
 		return fn.toString();
-	}
+	};
+
+	var prettyConstantOrFilter = function (object, depth, options) {
+		var obj = (object.type == "constant") ? object.constant : object.filter;
+		return prettyObject(obj, depth, options);
+	};
 
 	var prettyArray = function (array, depth, options) {
 		if (array.length === 0) {
