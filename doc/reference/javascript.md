@@ -1,4 +1,4 @@
-# Javascript reference
+# Building and running processors in Javascript
 
 We assume you've already read the [Overview](../../overview.md) which contains important information about processors.
 The manual covers mostly contains information that's not covered in the overview.
