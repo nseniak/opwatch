@@ -39,7 +39,7 @@ public class Shapply extends Filter<ShapplyConfig> {
 	}
 
 	@Override
-	public void consume(Payload<?> payload) {
+	public void consume(Payload payload) {
 		commandRunner.consume(this, payload);
 	}
 

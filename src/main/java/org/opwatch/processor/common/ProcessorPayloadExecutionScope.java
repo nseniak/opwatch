@@ -4,14 +4,14 @@ import org.opwatch.processor.payload.Payload;
 
 public class ProcessorPayloadExecutionScope extends ProcessorExecutionScope {
 
-	private Payload<?> payload;
+	private Payload payload;
 
-	public ProcessorPayloadExecutionScope(Processor<?> processor, Payload<?> payload) {
+	public ProcessorPayloadExecutionScope(Processor<?> processor, Payload payload) {
 		super(processor);
 		this.payload = payload;
 	}
 
-	public Payload<?> getPayload() {
+	public Payload getPayload() {
 		return payload;
 	}
 

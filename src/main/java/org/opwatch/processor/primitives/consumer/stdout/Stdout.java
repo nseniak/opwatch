@@ -11,7 +11,7 @@ public class Stdout extends Consumer<StdoutConfig> {
 	}
 
 	@Override
-	public void consume(Payload<?> payload) {
+	public void consume(Payload payload) {
 		processorService.printStdout(processorService.getScriptService().jsonStringify(payload.getValue()));
 	}
 

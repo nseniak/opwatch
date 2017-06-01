@@ -85,21 +85,21 @@ public abstract class ActiveProcessor<D extends ActiveProcessorConfig> extends P
 		// By default, do nothing
 	}
 
-	public <V> void outputTransformed(V value, Payload<?> input) {
-		Payload<V> payload = Payload.makeTransformed(processorService, this, input, value);
+	public void outputTransformed(Object value, Payload input) {
+		Payload payload = Payload.makeTransformed(processorService, this, input, value);
 		output(consumers, payload);
 	}
 
-	public <V> void outputProduced(V value) {
-		Payload<V> payload = Payload.makeRoot(processorService, this, value);
+	public void outputProduced(Object value) {
+		Payload payload = Payload.makeRoot(processorService, this, value);
 		output(consumers, payload);
 	}
 
-	public void output(Payload<?> payload) {
+	public void output(Payload payload) {
 		output(consumers, payload);
 	}
 
-	private void output(List<Processor<?>> consumers, Payload<?> payload) {
+	private void output(List<Processor<?>> consumers, Payload payload) {
 		if (processorService.config().trace()) {
 			logger.info("Output: " + getName() + " ==> " + processorService.json(payload));
 		}

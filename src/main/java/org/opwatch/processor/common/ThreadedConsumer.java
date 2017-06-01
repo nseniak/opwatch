@@ -32,10 +32,10 @@ public abstract class ThreadedConsumer<D extends ActiveProcessorConfig> extends 
 	}
 
 	@Override
-	public void consume(Payload<?> payload) {
+	public void consume(Payload payload) {
 		consumerThreadRunner.consume(payload);
 	}
 
-	public abstract void consumeInOwnThread(Payload<?> payload);
+	public abstract void consumeInOwnThread(Payload payload);
 
 }

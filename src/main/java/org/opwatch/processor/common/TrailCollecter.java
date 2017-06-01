@@ -27,7 +27,7 @@ public abstract class TrailCollecter<D extends ScheduledProcessorConfig> extends
 	}
 
 	@Override
-	public void consume(Payload<?> payload) {
+	public void consume(Payload payload) {
 		long timestamp = System.currentTimeMillis();
 		Object result = collectedObject(payload);
 		if (result != null) {

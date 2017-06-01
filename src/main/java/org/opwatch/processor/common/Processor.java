@@ -81,7 +81,7 @@ public abstract class Processor<C extends ProcessorConfig> {
 
 	public abstract void stop();
 
-	public abstract void consume(Payload<?> payload);
+	public abstract void consume(Payload payload);
 
 	public abstract void inferSignature();
 

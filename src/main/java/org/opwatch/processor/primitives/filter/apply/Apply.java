@@ -15,7 +15,7 @@ public class Apply extends Filter<ApplyConfig> {
 	}
 
 	@Override
-	public void consume(Payload<?> payload) {
+	public void consume(Payload payload) {
 		Object result = lambda.call(payload, this);
 		outputTransformed(result, payload);
 	}

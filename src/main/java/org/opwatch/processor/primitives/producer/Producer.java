@@ -14,7 +14,7 @@ public abstract class Producer<D extends ActiveProcessorConfig> extends ActivePr
 	}
 
 	@Override
-	public void consume(Payload<?> payload) {
+	public void consume(Payload payload) {
 		throw new RuntimeError("producer should not receive input", new ProcessorVoidExecutionScope(this));
 	}
 

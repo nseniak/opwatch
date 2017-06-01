@@ -24,7 +24,7 @@ public class Send extends Consumer<SendConfig> {
 	}
 
 	@Override
-	public void consume(Payload<?> payload) {
+	public void consume(Payload payload) {
 		String payloadString = processorService.getScriptService().jsonStringify(payload);
 		processorService.postForEntityWithErrors(uri, payloadString, Void.class, hostname, port, path,
 				() -> new ProcessorPayloadExecutionScope(this, payload));

@@ -29,7 +29,7 @@ public class AlertProducer extends ThreadedConsumer<AlertProducerConfig> {
 	}
 
 	@Override
-	public void consumeInOwnThread(Payload<?> payload) {
+	public void consumeInOwnThread(Payload payload) {
 		boolean alert = (trigger == null) || trigger.call(payload, this);
 		Channel channel;
 		if (channelName == null) {
@@ -54,7 +54,7 @@ public class AlertProducer extends ThreadedConsumer<AlertProducerConfig> {
 		}
 	}
 
-	private Message makeAlertMessage(Message.Type type, Payload<?> payload) {
+	private Message makeAlertMessage(Message.Type type, Payload payload) {
 		ExecutionScope scope = new ProcessorPayloadExecutionScope(this, payload);
 		MessageContext context = scope.makeContext(processorService, constructionStack);
 		Object detailsValue = null;

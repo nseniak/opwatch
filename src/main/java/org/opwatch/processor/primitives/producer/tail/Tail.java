@@ -27,7 +27,7 @@ public class Tail extends Producer<TailConfig> {
 			if (ignoreBlankLine && line.trim().isEmpty()) {
 				return;
 			}
-			Payload<String> payload = Payload.makeRoot(processorService, this, line);
+			Payload payload = Payload.makeRoot(processorService, this, line);
 			payload.setMetadata(new TailPayloadMetadata(file.toAbsolutePath().toString(), lineNumber));
 			output(payload);
 		});

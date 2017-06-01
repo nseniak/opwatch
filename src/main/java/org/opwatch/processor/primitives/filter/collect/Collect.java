@@ -19,7 +19,7 @@ public class Collect extends Filter<CollectConfig> {
 	}
 
 	@Override
-	public synchronized void consume(Payload<?> payload) {
+	public synchronized void consume(Payload payload) {
 		Object value = payload.getValue();
 		if (value != null) {
 			long timestamp = System.currentTimeMillis();

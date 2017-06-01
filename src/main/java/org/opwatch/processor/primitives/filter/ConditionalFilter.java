@@ -11,7 +11,7 @@ public abstract class ConditionalFilter<D extends ActiveProcessorConfig> extends
 	}
 
 	@Override
-	public void consume(Payload<?> input) {
+	public void consume(Payload input) {
 		if (predicateValue(input)) {
 			outputTransformed(input.getValue(), input);
 		}

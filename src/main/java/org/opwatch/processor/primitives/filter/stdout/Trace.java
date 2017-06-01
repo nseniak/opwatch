@@ -12,7 +12,7 @@ public class Trace extends Consumer<TraceConfig> {
 	}
 
 	@Override
-	public void consume(Payload<?> payload) {
+	public void consume(Payload payload) {
 		ScriptService scriptService = processorService.getScriptService();
 		processorService.printStdout(scriptService.pretty(payload.getValue()));
 		outputTransformed(payload.getValue(), payload);

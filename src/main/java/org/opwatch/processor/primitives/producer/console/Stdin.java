@@ -23,7 +23,7 @@ public class Stdin extends Producer<StdinConfig> implements ConsoleService.Conso
 
 	@Override
 	public void consume(ConsoleService.ConsoleLine line) {
-		Payload<String> payload = Payload.makeRoot(processorService, this, line.getText());
+		Payload payload = Payload.makeRoot(processorService, this, line.getText());
 		payload.setMetadata(new StdinPayloadMetadata(line.getLine()));
 		output(payload);
 	}

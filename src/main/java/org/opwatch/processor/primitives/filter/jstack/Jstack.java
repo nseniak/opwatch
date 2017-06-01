@@ -28,7 +28,7 @@ public class Jstack extends Filter<JstackConfig> {
 	}
 
 	@Override
-	public synchronized void consume(Payload<?> input) {
+	public synchronized void consume(Payload input) {
 		String text = payloadValue(input, String.class);
 		String[] lines = text.split("\n");
 		for (String line : lines) {
@@ -48,7 +48,7 @@ public class Jstack extends Filter<JstackConfig> {
 	private static Pattern omittedPattern = Pattern.compile("^\\p{Space}+\\.{3} \\p{N}+ (?:more|common frames omitted)");
 	private static Pattern blankLine = Pattern.compile("^\\p{Space}*$");
 
-	public ParsedException parseNextLine(String line, Payload<?> input) {
+	public ParsedException parseNextLine(String line, Payload input) {
 		String latestNonBlank = state.getLatestNonBlankLine();
 		if (!blankLine.matcher(line).matches()) {
 			state.setLatestNonBlankLine(line);

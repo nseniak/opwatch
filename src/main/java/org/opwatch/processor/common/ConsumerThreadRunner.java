@@ -14,7 +14,7 @@ public class ConsumerThreadRunner implements Runnable {
 
 	protected ProcessorService processorService;
 	protected ThreadedConsumer<?> processor;
-	protected ArrayBlockingQueue<Payload<?>> inputQueue;
+	protected ArrayBlockingQueue<Payload> inputQueue;
 
 	public ConsumerThreadRunner(ProcessorService processorService, ThreadedConsumer<?> processor) {
 		this.processorService = processorService;
@@ -23,7 +23,7 @@ public class ConsumerThreadRunner implements Runnable {
 		this.inputQueue = new ArrayBlockingQueue<>(inputQueueSize);
 	}
 
-	public void consume(Payload<?> payload) {
+	public void consume(Payload payload) {
 		long timeout = processorService.config().processorInputQueueTimeout();
 		try {
 			while (!inputQueue.offer(payload, timeout, TimeUnit.MILLISECONDS)) {
@@ -41,7 +41,7 @@ public class ConsumerThreadRunner implements Runnable {
 			processorService.withExceptionHandling("error reading input",
 					() -> new ProcessorVoidExecutionScope(processor),
 					() -> {
-						Payload<?> payload = inputQueue.take();
+						Payload payload = inputQueue.take();
 						processorService.withExceptionHandling("error processing input",
 								() -> new ProcessorPayloadExecutionScope(processor, payload),
 								() -> processor.consumeInOwnThread(payload));

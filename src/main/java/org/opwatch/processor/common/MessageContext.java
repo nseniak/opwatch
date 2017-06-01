@@ -13,7 +13,7 @@ public class MessageContext {
 	private String hostname;
 	private String serviceId;
 	private String processorName;
-	private Payload<?> payload;
+	private Payload payload;
 	private ScriptStack stack;
 
 	private MessageContext() {
@@ -23,7 +23,7 @@ public class MessageContext {
 												 String hostname,
 												 String serviceId,
 												 String processorName,
-												 Payload<?> payload,
+												 Payload payload,
 												 ScriptStack stack) {
 		this.emitterType = emitterType;
 		this.hostname = hostname;
@@ -39,7 +39,7 @@ public class MessageContext {
 		return new MessageContext(EmitterType.global, hostname, serviceId, null, null, stack);
 	}
 
-	public static MessageContext makeProcessor(ProcessorService processorService, String processorName, Payload<?> payload, ScriptStack stack) {
+	public static MessageContext makeProcessor(ProcessorService processorService, String processorName, Payload payload, ScriptStack stack) {
 		String hostname = processorService.hostName();
 		String serviceId = processorService.getId();
 		return new MessageContext(EmitterType.global, hostname, serviceId, processorName, payload, stack);
@@ -94,11 +94,11 @@ public class MessageContext {
 		this.processorName = processorName;
 	}
 
-	public Payload<?> getPayload() {
+	public Payload getPayload() {
 		return payload;
 	}
 
-	public void setPayload(Payload<?> payload) {
+	public void setPayload(Payload payload) {
 		this.payload = payload;
 	}
 

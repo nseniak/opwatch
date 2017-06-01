@@ -7,7 +7,7 @@ import sun.jvm.hotspot.utilities.soql.ScriptObject;
 /**
  * Represents the output of a processor.
  */
-public class Payload<V> extends PayloadPojoValue {
+public class Payload extends PayloadPojoValue {
 
 	/**
 	 * Time at which the payload was generated.
@@ -32,11 +32,11 @@ public class Payload<V> extends PayloadPojoValue {
 	/**
 	 * The previous payload, or null if this is a root payload.
 	 */
-	private Payload<?> previous;
+	private Payload previous;
 	/**
 	 * The payload value.
 	 */
-	private V value;
+	private Object value;
 	/**
 	 * Optional metadata
 	 */
@@ -45,7 +45,7 @@ public class Payload<V> extends PayloadPojoValue {
 	private Payload() {
 	}
 
-	private Payload(long timestamp, String hostname, Integer port, String producerId, String producer, Payload<?> previous, V value) {
+	private Payload(long timestamp, String hostname, Integer port, String producerId, String producer, Payload previous, Object value) {
 		this.timestamp = timestamp;
 		this.hostname = hostname;
 		this.port = port;
@@ -55,12 +55,12 @@ public class Payload<V> extends PayloadPojoValue {
 		this.value = value;
 	}
 
-	public static <V> Payload<V> makeRoot(ProcessorService processorService, Processor producer, V value) {
-		return new Payload<>(System.currentTimeMillis(), processorService.hostName(), processorService.port(), producer.getId(), producer.getName(), null, value);
+	public static Payload makeRoot(ProcessorService processorService, Processor producer, Object value) {
+		return new Payload(System.currentTimeMillis(), processorService.hostName(), processorService.port(), producer.getId(), producer.getName(), null, value);
 	}
 
-	public static <V> Payload<V> makeTransformed(ProcessorService processorService, Processor producer, Payload<?> previous, V value) {
-		return new Payload<>(System.currentTimeMillis(), processorService.hostName(), processorService.port(), producer.getId(), producer.getName(), previous, value);
+	public static Payload makeTransformed(ProcessorService processorService, Processor producer, Payload previous, Object value) {
+		return new Payload(System.currentTimeMillis(), processorService.hostName(), processorService.port(), producer.getId(), producer.getName(), previous, value);
 	}
 
 	public long getTimestamp() {
@@ -103,19 +103,19 @@ public class Payload<V> extends PayloadPojoValue {
 		this.producer = producer;
 	}
 
-	public Payload<?> getPrevious() {
+	public Payload getPrevious() {
 		return previous;
 	}
 
-	public void setPrevious(Payload<?> previous) {
+	public void setPrevious(Payload previous) {
 		this.previous = previous;
 	}
 
-	public V getValue() {
+	public Object getValue() {
 		return value;
 	}
 
-	public void setValue(V value) {
+	public void setValue(Object value) {
 		this.value = value;
 	}
 
