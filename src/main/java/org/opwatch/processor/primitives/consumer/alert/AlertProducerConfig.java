@@ -2,11 +2,11 @@ package org.opwatch.processor.primitives.consumer.alert;
 
 import org.opwatch.processor.config.*;
 
-public class AlertGeneratorConfig extends ActiveProcessorConfig {
+public class AlertProducerConfig extends ActiveProcessorConfig {
 
 	private String level = "medium";
 	private String title;
-	private ConstantOrFilter<Object> details;
+	private ValueOrFilter<Object> details;
 	private JavascriptPredicate trigger;
 	private Boolean toggle = false;
 	private String channel;
@@ -30,11 +30,11 @@ public class AlertGeneratorConfig extends ActiveProcessorConfig {
 	}
 
 	@OptionalProperty
-	public ConstantOrFilter<Object> getDetails() {
+	public ValueOrFilter<Object> getDetails() {
 		return details;
 	}
 
-	public void setDetails(ConstantOrFilter<Object> details) {
+	public void setDetails(ValueOrFilter<Object> details) {
 		this.details = details;
 	}
 

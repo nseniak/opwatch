@@ -1,8 +1,11 @@
 //
-function __stringify(object) {
+function __json_stringify(object) {
 	return JSON.stringify(object);
 }
 
+function __json_parse(object) {
+	return JSON.parse(object);
+}
 
 function factory_wrapper(factory) {
 	var ctor = function () {
@@ -55,7 +58,7 @@ function printHelp(schema, varargs) {
 	print();
 	var props = schema.properties;
 	if (varargs) {
-			print(tab1 + schema.name + "(<processor>, ...);");
+		print(tab1 + schema.name + "(<processor>, ...);");
 	}
 	var implicit = implicit_property(schema);
 	var mandatory = [];
@@ -81,12 +84,16 @@ function printHelp(schema, varargs) {
 	}
 	all = all.concat(mandatory);
 	all = all.concat(optional);
-	print(tab1 + schema.name + "({");
-	for (var i = 0; i < all.length; i++) {
-		var prop = all[i];
-		print(tab2 + property_help(prop));
+	if (all.length == 0) {
+		print(tab1 + schema.name + "();");
+	} else {
+		print(tab1 + schema.name + "({");
+		for (var i = 0; i < all.length; i++) {
+			var prop = all[i];
+			print(tab2 + property_help(prop));
+		}
+		print(tab1 + "});");
 	}
-	print(tab1 + "});");
 }
 
 function prop_compare(p1, p2) {
@@ -133,7 +140,7 @@ function vararg_make_processor(factory, args) {
 }
 //
 function help() {
-	print("Processor constructors, by category:");
+	print("Predefined processors by category:");
 	var factories = __factories();
 	var by_category = {};
 	for (var i = 0; i < factories.length; i++) {
@@ -148,19 +155,28 @@ function help() {
 	}
 	for (category in by_category) {
 		print(tab1 + capitalizeFirstLetter(category) + ":");
-		by_category[category].map(function (schema) { print(tab2 + constructor_short_help(schema)); })
+		by_category[category].map(function (schema) {
+			print(tab2 + processor_short_help(schema));
+		})
 	}
-	print("Type constructor.help() for help about a scpecific constructor");
+	print("Type processor.help() for help about a specific processor");
 }
 
-function constructor_short_help(schema) {
+function processor_short_help(schema) {
 	var all = [];
 	var props = schema.properties;
 	for (var i = 0; i < props.length; i++) {
 		all.push(props[i]);
 	}
 	all.sort(prop_compare);
-	var conf = "{ " + all.map(function (prop) { return prop.name; }).join(", ") + " }";
+	var conf;
+	if (all.length == 0) {
+		conf = "{}";
+	} else {
+		conf = "{ " + all.map(function (prop) {
+					return prop.name;
+				}).join(", ") + " }";
+	}
 	return schema.name + "(" + conf + ")";
 }
 

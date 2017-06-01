@@ -1,5 +1,6 @@
 package org.opwatch.processor.primitives.producer.stat;
 
+import jdk.nashorn.internal.runtime.ScriptRuntime;
 import org.opwatch.processor.payload.PayloadPojoValue;
 import org.opwatch.processor.primitives.producer.ScheduledExecutor;
 import org.opwatch.processor.primitives.producer.ScheduledProducer;
@@ -34,8 +35,8 @@ public class Stat extends ScheduledProducer<StatConfig> {
 
 		private String file;
 		private boolean exists;
-		private Long size;
-		private long lastModified;
+		private Object size = ScriptRuntime.UNDEFINED;
+		private Object lastModified = ScriptRuntime.UNDEFINED;
 
 		public String getFile() {
 			return file;
@@ -45,11 +46,11 @@ public class Stat extends ScheduledProducer<StatConfig> {
 			return exists;
 		}
 
-		public Long getSize() {
+		public Object getSize() {
 			return size;
 		}
 
-		public long getLastModified() {
+		public Object getLastModified() {
 			return lastModified;
 		}
 

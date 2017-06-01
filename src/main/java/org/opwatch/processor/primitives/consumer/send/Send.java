@@ -10,15 +10,13 @@ import static org.opwatch.service.HttpService.RECEIVE_PATH_PREFIX;
 
 public class Send extends Consumer<SendConfig> {
 
-	private String pathString;
 	private String hostname;
 	private int port;
 	private String path;
 	private String uri;
 
-	public Send(ProcessorService processorService, SendConfig configuration, String name, String pathString, String hostname, int port, String path) {
+	public Send(ProcessorService processorService, SendConfig configuration, String name, String hostname, int port, String path) {
 		super(processorService, configuration, name);
-		this.pathString = pathString;
 		this.hostname = hostname;
 		this.port = port;
 		this.path = path;
@@ -27,7 +25,8 @@ public class Send extends Consumer<SendConfig> {
 
 	@Override
 	public void consume(Payload<?> payload) {
-		processorService.postForEntityWithErrors(uri, payload, Void.class, hostname, port, path,
+		String payloadString = processorService.getScriptService().jsonStringify(payload);
+		processorService.postForEntityWithErrors(uri, payloadString, Void.class, hostname, port, path,
 				() -> new ProcessorPayloadExecutionScope(this, payload));
 	}
 

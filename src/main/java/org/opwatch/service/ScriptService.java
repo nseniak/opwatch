@@ -10,6 +10,7 @@ import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import jdk.nashorn.api.scripting.ScriptUtils;
 import jdk.nashorn.internal.runtime.Context;
 import jdk.nashorn.internal.runtime.JSType;
+import org.javatuples.Pair;
 import org.opwatch.documentation.DocumentationService;
 import org.opwatch.processor.common.*;
 import org.opwatch.processor.config.*;
@@ -22,7 +23,6 @@ import org.opwatch.processor.primitives.control.parallel.ParallelFactory;
 import org.opwatch.processor.primitives.control.pipe.PipeFactory;
 import org.opwatch.processor.primitives.filter.apply.ApplyFactory;
 import org.opwatch.processor.primitives.filter.collect.CollectFactory;
-import org.opwatch.processor.primitives.filter.count.CountFactory;
 import org.opwatch.processor.primitives.filter.grep.GrepFactory;
 import org.opwatch.processor.primitives.filter.json.JsonFactory;
 import org.opwatch.processor.primitives.filter.jstack.JstackFactory;
@@ -109,7 +109,6 @@ public class ScriptService {
 			createSimpleFactoryFunction(new AliasFactory(processorService));
 			createSimpleFactoryFunction(new ApplyFactory(processorService));
 			createSimpleFactoryFunction(new CollectFactory(processorService));
-			createSimpleFactoryFunction(new CountFactory(processorService));
 			createSimpleFactoryFunction(new ShFactory(processorService));
 			createSimpleFactoryFunction(new CurlFactory(processorService));
 			createSimpleFactoryFunction(new DfFactory(processorService));
@@ -231,10 +230,20 @@ public class ScriptService {
 		}
 	}
 
-	public String stringify(Object object) {
+	public String jsonStringify(Object object) {
 		synchronized (this) {
 			try {
-				return (String) scriptEngine.invokeFunction("__stringify", object);
+				return (String) scriptEngine.invokeFunction("__json_stringify", object);
+			} catch (NoSuchMethodException | ScriptException e) {
+				throw new RuntimeError(e);
+			}
+		}
+	}
+
+	public Object jsonParse(String string) {
+		synchronized (this) {
+			try {
+				return scriptEngine.invokeFunction("__json_parse", string);
 			} catch (NoSuchMethodException | ScriptException e) {
 				throw new RuntimeError(e);
 			}
@@ -337,23 +346,33 @@ public class ScriptService {
 		}
 		if (type instanceof ParameterizedType) {
 			ParameterizedType paramType = (ParameterizedType) type;
-			Type elementType = documentationService.parameterizedTypeParameter(paramType, List.class);
-			if (elementType != null) {
-				List<Object> scriptList = (List<Object>) ScriptUtils.convert(scriptValue, List.class);
-				return convertList(valueLocation, type, elementType, scriptList, exceptionFactory);
-			} else {
-				Type valueType = documentationService.parameterizedTypeParameter(paramType, ConstantOrFilter.class);
-				if (valueType != null) {
-					return convertConstantOrFilter(valueLocation, type, valueType, scriptValue, exceptionFactory);
-				} else {
-					return convertScriptValue(valueLocation, paramType.getRawType(), scriptValue, exceptionFactory);
-				}
+			Type listElementType = documentationService.singleTypeParameter(paramType, List.class);
+			if (listElementType != null) {
+				return convertList(valueLocation, type, listElementType, scriptValue, exceptionFactory);
 			}
+			Type valueOrFilterValueType = documentationService.singleTypeParameter(paramType, ValueOrFilter.class);
+			if (valueOrFilterValueType != null) {
+				return convertValueOrFilter(valueLocation, type, valueOrFilterValueType, scriptValue, exceptionFactory);
+			}
+			Type valueOrListValueType = documentationService.singleTypeParameter(paramType, ValueOrList.class);
+			if (valueOrListValueType != null) {
+				return convertValueOrList(valueLocation, type, valueOrListValueType, scriptValue, exceptionFactory);
+			}
+			Pair<Type, Type> mapTypes = documentationService.pairTypeParameter(paramType, Map.class);
+			if ((mapTypes != null) && (mapTypes.getValue0() == String.class)) {
+				return convertStringMap(valueLocation, type, mapTypes.getValue1(), scriptValue, exceptionFactory);
+			}
+			return convertScriptValue(valueLocation, paramType.getRawType(), scriptValue, exceptionFactory);
 		}
+		return throwError(valueLocation, type, scriptValue, exceptionFactory);
+	}
+
+	private Void throwError(ValueLocation valueLocation, Type type, Object scriptValue, RuntimeExceptionFactory exceptionFactory) {
 		throw exceptionFactory.make("invalid " + valueLocation.describeAsValue() + ", expected " + documentationService.typeName(type) + ", got: " + scriptValue);
 	}
 
-	private Object convertList(ValueLocation valueLocation, Type listType, Type elementType, List<Object> scriptList, RuntimeExceptionFactory exceptionFactory) {
+	private List<Object> convertList(ValueLocation valueLocation, Type listType, Type elementType, Object scriptValue, RuntimeExceptionFactory exceptionFactory) {
+		List<Object> scriptList = (List<Object>) ScriptUtils.convert(scriptValue, List.class);
 		List<Object> list = new ArrayList<>();
 		for (Object scriptListObject : scriptList) {
 			list.add(convertScriptValue(valueLocation.toListElement(), elementType, scriptListObject, exceptionFactory));
@@ -361,11 +380,37 @@ public class ScriptService {
 		return list;
 	}
 
-	private Object convertConstantOrFilter(ValueLocation valueLocation, Type type, Type valueType, Object scriptValue, RuntimeExceptionFactory exceptionFactory) {
+	private Object convertValueOrFilter(ValueLocation valueLocation, Type type, Type valueType, Object scriptValue, RuntimeExceptionFactory exceptionFactory) {
 		if ((scriptValue instanceof ScriptObjectMirror) && ((ScriptObjectMirror) scriptValue).isFunction()) {
-			return ConstantOrFilter.makeFunctional(new JavascriptFilter((ScriptObjectMirror) scriptValue, valueLocation, processorService), valueLocation);
+			return ValueOrFilter.makeFunction(new JavascriptFilter((ScriptObjectMirror) scriptValue, valueLocation, processorService));
 		}
-		return ConstantOrFilter.makeConstant(convertScriptValue(valueLocation, valueType, scriptValue, exceptionFactory));
+		return ValueOrFilter.makeValue(convertScriptValue(valueLocation, valueType, scriptValue, exceptionFactory));
+	}
+
+	private <T> Object convertValueOrList(ValueLocation valueLocation, Type type, Type valueType, Object scriptValue, RuntimeExceptionFactory exceptionFactory) {
+		if ((scriptValue instanceof ScriptObjectMirror) && ((ScriptObjectMirror) scriptValue).isArray()) {
+			List<T> list = new ArrayList<>();
+			for (Object element : convertList(valueLocation, type, valueType, scriptValue, exceptionFactory)) {
+				list.add((T) element);
+			}
+			return ValueOrList.makeList(list);
+		}
+		return ValueOrList.makeValue(convertScriptValue(valueLocation, valueType, scriptValue, exceptionFactory));
+	}
+
+	private <T> Map<String, T> convertStringMap(ValueLocation valueLocation, Type type, Type valueType, Object scriptValue, RuntimeExceptionFactory exceptionFactory) {
+		if (!(scriptValue instanceof ScriptObjectMirror)) {
+			throwError(valueLocation, type, scriptValue, exceptionFactory);
+		}
+		ScriptObjectMirror som = (ScriptObjectMirror) scriptValue;
+		Map<String, T> result = new LinkedHashMap<>();
+		for (String key : som.getOwnKeys(true)) {
+			String processorName = valueLocation.getFunctionName();
+			ValueLocation keyValueLocation = ValueLocation.makeProperty(processorName, key);
+			T value = (T) convertScriptValue(keyValueLocation, valueType, som.get(key), exceptionFactory);
+			result.put(key, value);
+		}
+		return result;
 	}
 
 	private Object convertScriptValueToClass(ValueLocation valueLocation, Class<?> clazz, Object scriptValue, RuntimeExceptionFactory exceptionFactory) {
@@ -411,7 +456,7 @@ public class ScriptService {
 			mapObject.keySet().toArray(properties);
 			return convertBinding(valueLocation, clazz, mapObject, properties, exceptionFactory);
 		}
-		throw exceptionFactory.make("invalid " + valueLocation.describeAsValue() + ", expected " + documentationService.typeName(clazz) + ", got: " + scriptValue);
+		return throwError(valueLocation, clazz, scriptValue, exceptionFactory);
 	}
 
 	private Object convertBinding(ValueLocation valueLocation, Class<?> clazz, Map scriptValue, String[] properties, RuntimeExceptionFactory exceptionFactory) {
@@ -437,7 +482,7 @@ public class ScriptService {
 			// BeanUtils.instantiate raised an error. The class is either abstract or doesn't have a default constructor.
 			// Fall back to error
 		}
-		throw exceptionFactory.make("invalid " + valueLocation.describeAsValue() + ", expected " + documentationService.typeName(clazz) + ", got: " + scriptValue);
+		return throwError(valueLocation, clazz, scriptValue, exceptionFactory);
 	}
 
 	private Object convertScriptValueToNumber(Class<? extends Number> clazz, Object scriptValue) {

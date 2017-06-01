@@ -34,8 +34,10 @@ pretty = (function () {
 			return prettyProcessor(object, depth, options);
 		} else if (type === "[object org.opwatch.processor.config.Duration]") {
 			return prettyDuration(object, depth, options);
-		} else if (type === "[object org.opwatch.processor.config.ConstantOrFilter]") {
-			return prettyConstantOrFilter(object, depth, options);
+		} else if (type === "[object org.opwatch.processor.config.ValueOrFilter]") {
+			return prettyValueOrFilter(object, depth, options);
+		} else if (type === "[object org.opwatch.processor.config.ValueOrList]") {
+			return prettyValueOrList(object, depth, options);
 		} else {
 			return prettyObjectProperties(object, depth, options);
 		}
@@ -53,9 +55,17 @@ pretty = (function () {
 		return fn.toString();
 	};
 
-	var prettyConstantOrFilter = function (object, depth, options) {
-		var obj = (object.type == "constant") ? object.constant : object.filter;
+	var prettyValueOrFilter = function (object, depth, options) {
+		var obj = (object.type == "value") ? object.value : object.filter;
 		return prettyObject(obj, depth, options);
+	};
+
+	var prettyValueOrList = function (object, depth, options) {
+		if (object.type == "value") {
+			return prettyObject(object.value, depth, options);
+		} else {
+			return prettyArray(object.list, depth, options);
+		}
 	};
 
 	var prettyArray = function (array, depth, options) {
@@ -89,7 +99,7 @@ pretty = (function () {
 				properties.push(property);
 			}
 		}
-		return prettyProperties(object, properties, depth, options);
+		return prettyProperties(object, definedProperties(object, properties), depth, options);
 	}
 
 	var prettyProperties = function (object, properties, depth, options) {
@@ -119,14 +129,14 @@ pretty = (function () {
 		if ((name === "alias") && !options.expandAlias) {
 			return config.name + '(' + prettyObjectProperties(config.configuration, depth + 1, options) + ')';
 		} else {
-			return name + "(" + prettyProperties(config, nonNullProperties(config, properties), depth + 1, options) + ")";
+			return name + "(" + prettyProperties(config, definedProperties(config, properties), depth + 1, options) + ")";
 		}
 	};
 
-	var nonNullProperties = function (object, properties) {
+	var definedProperties = function (object, properties) {
 		var nonNull = [];
 		for (var i = 0; i < properties.length; i++) {
-			if (object[properties[i]] !== null) {
+			if ((object[properties[i]] !== null) && (object[properties[i]] !== undefined)) {
 				nonNull.push(properties[i]);
 			}
 		}

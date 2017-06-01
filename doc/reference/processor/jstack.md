@@ -5,8 +5,8 @@ Parses java Java exception stack.
 ### Input and output
 
 * Category: Filter
-* Input: String representing a line of text
-* Output: Exception object
+* Input: String representing an input line
+* Output: Exception object built from parsing multiple input lines
 
 ### Synopsis
 
@@ -21,16 +21,18 @@ jstack(configuration_object)
 | :--- | :--- | :--- | :--- |
 | `methodRegexp` | regexp used to select the stack trace element | RegExp | *Optional* |
  
- ### Exception object properties
+ ### Exception object
  
-| Property | Description | Type |
+ The Exception object has the following properties:
+ 
+| Property | Description | Type | Presence |
 | :--- | :--- | :--- | :--- |
-| `exceptionClass` | fully qualified name of the exception class | String |
-| `exceptionMessage` | exception message | String |
-| `method` | fully qualified name of the method throwing the exception | String |
-| `location` | source location of the code throwing the exception | String |
-| `previousLine` | last non empty line preceding the stack trace | String |
-| `stack` | exception stack trace | Array of String |
+| `exceptionClass` | fully qualified name of the exception class | String | *Always* |
+| `exceptionMessage` | exception message | String | *Always* |
+| `method` | fully qualified name of the method throwing the exception | String | *Always* |
+| `location` | source location of the code throwing the exception | String | *Always* |
+| `previousLine` | last non empty line preceding the stack trace, if any | String | *Optional* |
+| `stack` | exception stack trace | Array of String | *Always* |
 
 ### Description
 

@@ -1,6 +1,8 @@
 package org.opwatch.processor.primitives.producer.tail;
 
-public class TailPayloadMetadata {
+import org.opwatch.processor.payload.PayloadPojoValue;
+
+public class TailPayloadMetadata extends PayloadPojoValue {
 
 	private String file;
 	private int line;

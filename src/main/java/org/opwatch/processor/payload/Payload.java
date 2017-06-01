@@ -2,6 +2,7 @@ package org.opwatch.processor.payload;
 
 import org.opwatch.processor.common.Processor;
 import org.opwatch.service.ProcessorService;
+import sun.jvm.hotspot.utilities.soql.ScriptObject;
 
 /**
  * Represents the output of a processor.
@@ -39,7 +40,7 @@ public class Payload<V> extends PayloadPojoValue {
 	/**
 	 * Optional metadata
 	 */
-	private Object metadata;
+	private Object metadata = ScriptObject.UNDEFINED;
 
 	private Payload() {
 	}

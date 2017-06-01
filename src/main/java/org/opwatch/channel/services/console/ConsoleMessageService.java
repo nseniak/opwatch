@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 @Service
@@ -43,7 +44,10 @@ public class ConsoleMessageService implements MessageService<ConsoleConfiguratio
 	}
 
 	public ConsoleChannel makeDefaultChannel() {
-		return new ConsoleChannel(DEFAULT_CONSOLE_CHANNEL_NAME, new ConsoleConfiguration(), this, processorService);
+		ConsoleConfiguration config = new ConsoleConfiguration();
+		config.setChannels(new LinkedHashMap<>());
+		config.getChannels().put(DEFAULT_CONSOLE_CHANNEL_NAME, new ConsoleConfiguration.ChannelConfig());
+		return new ConsoleChannel(DEFAULT_CONSOLE_CHANNEL_NAME, config, this, processorService);
 	}
 
 	@Override

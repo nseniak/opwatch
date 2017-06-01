@@ -1,6 +1,8 @@
 package org.opwatch.processor.primitives.producer.console;
 
-public class StdinPayloadMetadata {
+import org.opwatch.processor.payload.PayloadPojoValue;
+
+public class StdinPayloadMetadata extends PayloadPojoValue {
 
 	private int line;
 

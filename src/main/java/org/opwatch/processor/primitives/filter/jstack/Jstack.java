@@ -1,6 +1,7 @@
 package org.opwatch.processor.primitives.filter.jstack;
 
 import jdk.nashorn.internal.objects.NativeRegExp;
+import jdk.nashorn.internal.runtime.ScriptRuntime;
 import org.opwatch.common.Assertion;
 import org.opwatch.processor.common.ProcessorPayloadExecutionScope;
 import org.opwatch.processor.common.RuntimeError;
@@ -194,7 +195,7 @@ public class Jstack extends Filter<JstackConfig> {
 		private String exceptionMessage;
 		private String method;
 		private String location;
-		private String previousLine;
+		private Object previousLine = ScriptRuntime.UNDEFINED;
 		private List<String> stack;
 
 		private ParsedException() {
@@ -243,7 +244,7 @@ public class Jstack extends Filter<JstackConfig> {
 			this.location = location;
 		}
 
-		public String getPreviousLine() {
+		public Object getPreviousLine() {
 			return previousLine;
 		}
 

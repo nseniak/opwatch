@@ -5,7 +5,7 @@ Collects the inputs received during the last `duration` milliseconds.
 ### Input and output
 
 * Category: Filter
-* Input: Any
+* Input: Any value or object
 * Output: Array of SeriesObject objects
 
 ### Synopsis
@@ -19,18 +19,18 @@ trail(configuration_object)
 
 | Property | Description | Type | Default |
 | :--- | :--- | :--- | :--- |
-| `duration` | duration over which inputs are collected | Number of milliseconds or String | *mandatory* |
-| `period` | period at which the output array is produced | Number of milliseconds or String | `1s"` |
+| `duration` | duration over which inputs are collected | Duration value | *Mandatory* |
+| `period` | period at which the output array is produced | Duration value | `1s"` |
  
- ### Output object
+### Output array
  
  The `trail` processor generates an array of SeriesObject objects representing the inputs received during
  the last `duration` milliseconds, ordered from oldest to newest. Each SeriesObject object has the following fields:
  
-| Property | Description | Type |
+| Property | Description | Type | Presence |
 | :--- | :--- | :--- | :--- |
-| `value` | the value of the input | Object |
-| `timestamp` | time at which the input was received | Number |
+| `value` | the value of the input | Object | *Always* |
+| `timestamp` | time at which the input was received | Number | *Always* |
 
 ### Description
 
@@ -42,10 +42,6 @@ has started running.
 For instance, if `duration` is `3000` and `period` is `"1s"`, then `trail` first waits for 3 seconds then
 starts generating every second an array of the inputs it has received during the last 3 seconds. 
  
-Both `duration` and `period` can be expressed as either a number of milliseconds or a String representing an 
-[ISO-8601 duration](https://en.wikipedia.org/wiki/ISO_8601#Durations), like for example `"30s"` for 30 seconds or
-`"1m"` for one minute.
-
 ### Examples
 
 #### Trigger an alert when a log file has more than 20 Java exception per second
@@ -59,7 +55,7 @@ pipe(
 	trail("10s"),
 	alert({
 		title: "Too many exceptions",
-		trigger: function (input) { return input.length > 20; },
+		trigger: function (trailOutput) { return trailOutput.length > 20; },
 		toggle: true
 	})
 ).run();
@@ -98,7 +94,7 @@ pipe(
 	trail("10m"),
 	alert({
 		title: "Log file is silent",
-		trigger: function (input) { return input.length == 0; },
+		trigger: function (trailOutput) { return trailOutput.length == 0; },
 		toggle: true
 	})
 ).run();

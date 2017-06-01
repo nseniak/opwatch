@@ -20,7 +20,7 @@ public class Df extends ScheduledProducer<DfConfig> {
 
 	@Override
 	protected void produce() {
-		PartitionInfo info = new PartitionInfo();
+		FilesystemInfo info = new FilesystemInfo();
 		info.file = file.getAbsolutePath();
 		if (!file.exists()) {
 			throw new RuntimeError("file not found: " + file, new ProcessorVoidExecutionScope(this));
@@ -35,7 +35,7 @@ public class Df extends ScheduledProducer<DfConfig> {
 		outputProduced(info.toJavascript(processorService.getScriptService()));
 	}
 
-	public static class PartitionInfo extends PayloadPojoValue {
+	public static class FilesystemInfo extends PayloadPojoValue {
 
 		private String file;
 		private Long size;

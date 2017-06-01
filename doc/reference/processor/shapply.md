@@ -5,8 +5,8 @@ Transforms its input using a shell command.
 ### Input and output
 
 * Category: Filter
-* Input: Any
-* Output: String
+* Input: Any value or object convertible to Json
+* Output: String representing a line of text produced by the shell command
 
 ### Synopsis
 

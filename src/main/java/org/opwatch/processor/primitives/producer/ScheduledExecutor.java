@@ -30,6 +30,8 @@ public class ScheduledExecutor {
 		}
 	}
 
-
+	public boolean running() {
+		return !scheduledFuture.isCancelled();
+	}
 
 }

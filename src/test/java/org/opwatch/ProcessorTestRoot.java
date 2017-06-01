@@ -7,6 +7,7 @@ import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 import com.google.common.util.concurrent.SimpleTimeLimiter;
 import com.google.common.util.concurrent.TimeLimiter;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opwatch.service.ProcessorService;
 import org.opwatch.service.ScriptService;
@@ -47,6 +48,8 @@ public class ProcessorTestRoot {
 	// Maximum time it should take for a processor to stop after being interrupted
 	protected static final long STOP_TIMEOUT = TimeUnit.SECONDS.toMillis(1);
 
+	protected static final int TEST_PORT = 28030;
+
 	protected <T> Callable<T> withIO(InputStream inputStream, OutputStream outputStream, Callable<T> callable) {
 		return () -> {
 			System.setIn(inputStream);
@@ -76,6 +79,7 @@ public class ProcessorTestRoot {
 			scriptService.setHomeDirectory(System.getProperty("user.dir") + "/distrib");
 			CommandLineOptions options = new CommandLineOptions();
 			options.setHostname("test_host");
+			options.setPort(TEST_PORT);
 			assertThat(processorService.initialize(options), is(true));
 			scriptService.runExpression(expression);
 			return null;
@@ -184,6 +188,11 @@ public class ProcessorTestRoot {
 
 	protected <T> void compareJson(String message, String actual, String expected, Class<T> clazz) throws IOException {
 		assertEquals(message, jsonPrettyString(jsonParse(actual, clazz)), jsonPrettyString(jsonParse(expected, clazz)));
+	}
+
+	@Test
+	public void dummyTest() {
+		// Nothing to do. Just to avoid errors from JUnit because this class contains no tests.
 	}
 
 }

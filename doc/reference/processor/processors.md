@@ -87,6 +87,19 @@ pipe(
 ).run();
 ```
 
+### Durations values
+
+Some processors have configuration properties that are expressed as duration values. For example, the `curl` processor
+has a `timeout` configuration property whose value is a duration. Durations can be expressed as either a number of 
+milliseconds, or a String representing an [ISO-8601 duration](https://en.wikipedia.org/wiki/ISO_8601#Durations).
+
+Example of valud durations include:
+
+* 5000: 5 seconds
+* `"30s"`: 30 seconds
+* `"1m"`: one minute
+* `"2m30s"`: two minutes and 30 seconds
+* `"2h"`: two hours 
 
 ## List of processors
 
@@ -94,22 +107,31 @@ This section lists processors by category.
 
 ### Producers
 
+* [`call`](call.md) -- generates output using a callback
+* [`curl`](curl.md) -- executes an URL request
+* [`df`](df.md) -- outputs free disk space info
+* [`sh`](sh.md) -- generates output by executing a shell command
+* [`stat`](stat.md) -- outputs file information
+* [`stdin`](stdin.md) -- reads lines from standard input
+* [`tail`](tail.md) -- outputs lines added to a file
+* [`top`](top.md) -- outputs system load information
+
 ### Filters
 
-* [`alert`](alert.md) -- triggers an alert
 * [`apply`](apply.md) -- transforms its input using a callback
 * [`shapply`](shapply.md) -- transforms its input using a shell command
-* [`call`](call.md) -- generates output using a callback
 * [`collect`](collect.md) -- collects the last `count` received inputs
 * [`grep`](grep.md) -- regexp-based filter
 * [`json`](json.md) -- parses a string into a Json object
 * [`jstack`](jstack.md) -- parses java Java exception stack
-* [`sh`](sh.md) -- generates output by executing a shell command
 * [`shapply`](shapply.md) -- transforms its input using a shell command
 * [`test`](test.md) -- callback-based filter
 * [`trail`](trail.md) -- collects the inputs received during the last `duration` milliseconds
 
 ### Consumers
+
+* [`alert`](alert.md) -- triggers an alert
+* [`stdout`](stdout.md) -- writes its input to the standard output
 
 ### Control processors
 

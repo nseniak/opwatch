@@ -27,4 +27,8 @@ public abstract class ScheduledProcessor<D extends ScheduledProcessorConfig> ext
 
 	protected abstract void produce();
 
+	protected boolean running() {
+		return scheduledExecutor.running();
+	}
+
 }

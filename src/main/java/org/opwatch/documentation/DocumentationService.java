@@ -2,11 +2,12 @@ package org.opwatch.documentation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jdk.nashorn.internal.objects.NativeRegExp;
+import org.javatuples.Pair;
 import org.opwatch.processor.common.*;
-import org.opwatch.processor.config.ConstantOrFilter;
 import org.opwatch.processor.config.Duration;
 import org.opwatch.processor.config.JavascriptFunction;
 import org.opwatch.processor.config.ProcessorConfig;
+import org.opwatch.processor.config.ValueOrFilter;
 import org.opwatch.processor.payload.PayloadScriptValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,11 +114,11 @@ public class DocumentationService {
 		}
 		if (type instanceof ParameterizedType) {
 			ParameterizedType paramType = (ParameterizedType) type;
-			Type listType = parameterizedTypeParameter(paramType, List.class);
+			Type listType = singleTypeParameter(paramType, List.class);
 			if (listType != null) {
 				return listTypeName(listType);
 			}
-			Type valueType = parameterizedTypeParameter(paramType, ConstantOrFilter.class);
+			Type valueType = singleTypeParameter(paramType, ValueOrFilter.class);
 			if (valueType != null) {
 				return constantOrFilterTypeName(valueType);
 			}
@@ -163,10 +164,19 @@ public class DocumentationService {
 		}
 	}
 
-	public Type parameterizedTypeParameter(ParameterizedType paramType, Class<?> clazz) {
+	public Type singleTypeParameter(ParameterizedType paramType, Class<?> clazz) {
 		Type[] args = paramType.getActualTypeArguments();
 		if ((paramType.getRawType() instanceof Class) && (clazz.isAssignableFrom((Class) paramType.getRawType())) && (args.length == 1)) {
 			return args[0];
+		} else {
+			return null;
+		}
+	}
+
+	public Pair<Type, Type> pairTypeParameter(ParameterizedType paramType, Class<?> clazz) {
+		Type[] args = paramType.getActualTypeArguments();
+		if ((paramType.getRawType() instanceof Class) && (clazz.isAssignableFrom((Class) paramType.getRawType())) && (args.length == 2)) {
+			return new Pair<>(args[0], args[1]);
 		} else {
 			return null;
 		}

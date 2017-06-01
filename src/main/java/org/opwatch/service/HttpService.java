@@ -16,7 +16,7 @@ import java.util.Collection;
 @RestController
 public class HttpService {
 
-	public static final String RECEIVE_PATH_PREFIX = "/receive";
+	public static final String RECEIVE_PATH_PREFIX = "/receive/";
 
 	private Multimap<String, PostBodyHandle> consumers = HashMultimap.create();
 
@@ -29,7 +29,7 @@ public class HttpService {
 	}
 
 	@RequestMapping(value = "/receive/**", method = RequestMethod.POST)
-	public ResponseEntity<Void> put(HttpServletRequest request, @RequestBody Object body) throws JsonProcessingException {
+	public ResponseEntity<Void> receive(HttpServletRequest request, @RequestBody String body) throws JsonProcessingException {
 		String urlPath = request.getServletPath().substring(RECEIVE_PATH_PREFIX.length());
 		Collection<PostBodyHandle> pathConsumers = consumers.get(urlPath);
 		if (pathConsumers.isEmpty()) {
@@ -43,7 +43,7 @@ public class HttpService {
 
 	public interface PostBodyHandle {
 
-		void handlePost(Object object);
+		void handlePost(String object);
 
 	}
 

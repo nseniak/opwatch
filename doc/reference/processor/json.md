@@ -6,7 +6,7 @@ Parses a string into a Json object.
 
 * Category: Filter
 * Input: String
-* Output: Any
+* Output: Value or object parsed from the input
 
 ### Synopsis
 

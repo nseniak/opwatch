@@ -2,23 +2,23 @@ package org.opwatch.processor.primitives.consumer.alert;
 
 import org.opwatch.channel.common.Channel;
 import org.opwatch.processor.common.*;
-import org.opwatch.processor.config.ConstantOrFilter;
+import org.opwatch.processor.config.ValueOrFilter;
 import org.opwatch.processor.config.JavascriptPredicate;
 import org.opwatch.processor.payload.Payload;
 import org.opwatch.service.ProcessorService;
 
-public class AlertGenerator extends ThreadedConsumer<AlertGeneratorConfig> {
+public class AlertProducer extends ThreadedConsumer<AlertProducerConfig> {
 
 	private Message.Level level;
 	private String title;
-	private ConstantOrFilter<Object> details;
+	private ValueOrFilter<Object> details;
 	private JavascriptPredicate trigger;
 	private boolean toggle;
 	private boolean toggleOn;
 	private String channelName;
 
-	public AlertGenerator(ProcessorService processorService, AlertGeneratorConfig configuration, String name, String title,
-												ConstantOrFilter<Object> details, Message.Level level, JavascriptPredicate trigger, boolean toggle, String channelName) {
+	public AlertProducer(ProcessorService processorService, AlertProducerConfig configuration, String name, String title,
+											 ValueOrFilter<Object> details, Message.Level level, JavascriptPredicate trigger, boolean toggle, String channelName) {
 		super(processorService, configuration, name);
 		this.level = level;
 		this.title = title;

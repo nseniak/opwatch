@@ -4,9 +4,9 @@ Executes processors in parallel.
 
 ### Input and output
 
-* Category: Special
-* Input: Same as the input of the processors
-* Output: Same as the output of the processors
+* Category: Control
+* Input: Constrained by the type of input of the processors
+* Output: Output of the processors, if any
 
 ### Synopsis
 
@@ -15,7 +15,7 @@ parallel(processor1, processor2, ...)
 parallel([ processor1, processor2, ... ])
 parallel(configuration_object)
 ```
-### Configuration object properties
+### Configuration properties
 
 | Property | Description | Type | Default |
 | :--- | :--- | :--- | :--- |

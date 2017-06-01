@@ -8,25 +8,25 @@ import org.opwatch.service.ProcessorService;
 
 public class Receive extends Producer<ReceiveConfig> implements HttpService.PostBodyHandle {
 
-	private String urlPath;
+	private String path;
 
-	public Receive(ProcessorService processorService, ReceiveConfig configuration, String name, String urlPath) {
+	public Receive(ProcessorService processorService, ReceiveConfig configuration, String name, String path) {
 		super(processorService, configuration, name);
-		this.urlPath = urlPath;
+		this.path = path;
 	}
 
 	@Override
 	public void start() {
-		processorService.getHttpService().addPostBodyConsumer(urlPath, this);
+		processorService.getHttpService().addPostBodyConsumer(path, this);
 	}
 
 	@Override
 	public void stop() {
-		processorService.getHttpService().removePostBodyConsumer(urlPath, this);
+		processorService.getHttpService().removePostBodyConsumer(path, this);
 	}
 
 	@Override
-	public void handlePost(Object input) {
+	public void handlePost(String input) {
 		processorService.withExceptionHandling("error consuming http post",
 				() -> new ProcessorVoidExecutionScope(this),
 				() -> {

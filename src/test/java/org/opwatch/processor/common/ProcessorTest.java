@@ -17,18 +17,21 @@ import static org.hamcrest.core.Is.is;
 @DirtiesContext
 public class ProcessorTest extends ProcessorTestRoot {
 
+	private static final long STARTUP_WAIT = TimeUnit.SECONDS.toMillis(3);
+	private static final long EXECUTION_TIMEOUT = TimeUnit.SECONDS.toMillis(30);
+
 	@Test
 	public void testRun() throws Exception {
 		PipedOutputStream outputStream = new PipedOutputStream();
 		PipedInputStream os = new PipedInputStream(outputStream);
 		Future<Void> future = run(
 				withOutput(outputStream,
-						withTimeout(TimeUnit.SECONDS.toMillis(3),
+						withTimeout(EXECUTION_TIMEOUT,
 								expression("pipe(top(), stdout())"))));
 		BufferedReader outputReader = new BufferedReader(new InputStreamReader(os));
 		List<String> lines = new ArrayList<>();
 		Future<Void> outputFuture = readLines(outputReader, lines);
-		Thread.sleep(TimeUnit.SECONDS.toMillis(1));
+		Thread.sleep(STARTUP_WAIT);
 		processorService.stopRunningProcessor();
 		outputFuture.cancel(false);
 		future.get();

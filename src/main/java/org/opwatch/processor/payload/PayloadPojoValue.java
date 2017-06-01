@@ -13,11 +13,6 @@ import java.util.*;
 public abstract class PayloadPojoValue extends PayloadScriptValue {
 
 	@Override
-	public Object toJavascript(ScriptService scriptService) {
-		return this;
-	}
-
-	@Override
 	public Object getSlot(int index) {
 		return ScriptRuntime.UNDEFINED;
 	}

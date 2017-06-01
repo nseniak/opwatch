@@ -6,7 +6,7 @@ Generates output using a callback.
 
 * Category: Producer
 * Input: None
-* Output: Any
+* Output: Callback result
 
 ### Synopsis
 
@@ -20,7 +20,7 @@ call(configuration_object)
 | Property | Description | Type | Default |
 | :--- | :--- | :--- | :--- |
 | `lambda` | callback that computes the processor's output | () => Object | *Mandatory* | 
-| `period` | period at which the callback is called | Number of milliseconds or String | `1s"` |
+| `period` | period at which the callback is called | Duration value | `1s"` |
 
 ### Description
 

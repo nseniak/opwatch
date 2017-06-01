@@ -1,7 +1,7 @@
 package org.opwatch.processor.primitives.consumer.alert;
 
 import org.opwatch.processor.common.*;
-import org.opwatch.processor.config.ConstantOrFilter;
+import org.opwatch.processor.config.ValueOrFilter;
 import org.opwatch.processor.config.JavascriptPredicate;
 import org.opwatch.service.ProcessorService;
 
@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class AlertGeneratorFactory extends ActiveProcessorFactory<AlertGeneratorConfig, AlertGenerator> {
+public class AlertGeneratorFactory extends ActiveProcessorFactory<AlertProducerConfig, AlertProducer> {
 
 	public AlertGeneratorFactory(ProcessorService processorService) {
 		super(processorService);
@@ -21,13 +21,13 @@ public class AlertGeneratorFactory extends ActiveProcessorFactory<AlertGenerator
 	}
 
 	@Override
-	public Class<AlertGeneratorConfig> configurationClass() {
-		return AlertGeneratorConfig.class;
+	public Class<AlertProducerConfig> configurationClass() {
+		return AlertProducerConfig.class;
 	}
 
 	@Override
-	public Class<AlertGenerator> processorClass() {
-		return AlertGenerator.class;
+	public Class<AlertProducer> processorClass() {
+		return AlertProducer.class;
 	}
 
 	@Override
@@ -36,8 +36,8 @@ public class AlertGeneratorFactory extends ActiveProcessorFactory<AlertGenerator
 	}
 
 	@Override
-	public AlertGenerator make(Object scriptObject) {
-		AlertGeneratorConfig config = convertProcessorConfig(scriptObject);
+	public AlertProducer make(Object scriptObject) {
+		AlertProducerConfig config = convertProcessorConfig(scriptObject);
 		String priorityName = checkPropertyValue("priority", config.getLevel());
 		Message.Level level;
 		try {
@@ -55,8 +55,8 @@ public class AlertGeneratorFactory extends ActiveProcessorFactory<AlertGenerator
 		if ((channelName != null) && (processorService.getMessagingService().findChannel(channelName) == null)) {
 			throw new RuntimeError("channel not found: \"" + channelName + "\"", new FactoryExecutionScope(this));
 		}
-		ConstantOrFilter<Object> details = config.getDetails();
-		return new AlertGenerator(getProcessorService(), config, name(), title, details, level, trigger, toggle, channelName);
+		ValueOrFilter<Object> details = config.getDetails();
+		return new AlertProducer(getProcessorService(), config, name(), title, details, level, trigger, toggle, channelName);
 	}
 
 }

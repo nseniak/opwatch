@@ -44,7 +44,7 @@ processor applies a Javascript function to its input, and lets it pass if and on
 boolean value:
 
 ```js
-pipe(df("/tmp"), test(function (input) { return input.percentUsed > 90 }), alert("Not enough space left")).run();
+pipe(df("/tmp"), test(function (dfOutput) { return dfOutput.percentUsed > 90 }), alert("Not enough space left")).run();
 ```
 
 ## Combining processors

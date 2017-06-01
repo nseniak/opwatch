@@ -6,7 +6,7 @@ Generates output by executing a shell command.
 
 * Category: Producer
 * Input: None
-* Output: String
+* Output: String representing a line of text produced by the shell command
 
 ### Synopsis
 
@@ -20,7 +20,7 @@ call(configuration_object)
 | Property | Description | Type | Default |
 | :--- | :--- | :--- | :--- |
 | `command` | shell command to execute | String | *Mandatory* | 
-| `period` | period at which the callback is called | Number of milliseconds or String | `1s"` |
+| `period` | period at which the callback is called | Duration value | `"1s"` |
 
 ### Description
 
@@ -52,7 +52,7 @@ pipe(
 	sh("pgrep -q mongod && echo UP || echo DOWN"),
   alert({
   	title: "mongod is down",
-  	trigger: function (input) { return input === "DOWN"; },
+  	trigger: function (shOutput) { return shOutput === "DOWN"; },
   	toggle: true
   })
 ).run();

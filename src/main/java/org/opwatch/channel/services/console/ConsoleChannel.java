@@ -2,6 +2,7 @@ package org.opwatch.channel.services.console;
 
 import org.opwatch.channel.common.ChannelImpl;
 import org.opwatch.processor.common.Message;
+import org.opwatch.processor.common.RuntimeError;
 import org.opwatch.service.ProcessorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,9 @@ public class ConsoleChannel extends ChannelImpl {
 		this.name = name;
 		this.config = config;
 		this.service = service;
+		if ((config.getChannels() == null) || (config.getChannels().get(name) == null)) {
+			throw new RuntimeError("Console channel configuration not found: " + name);
+		}
 	}
 
 	@Override
@@ -49,7 +53,9 @@ public class ConsoleChannel extends ChannelImpl {
 			processorService.printStdout(logMessage);
 		} else {
 			processorService.printStdout(consolePrefix + displayTitle(message));
-			processorService.printStdout(contentPrefix + "time: " + dateFormat.format(new Date(message.getTimestamp())));
+			if (config.getChannels().get(name).isAddTimestamp()) {
+				processorService.printStdout(contentPrefix + "time: " + dateFormat.format(new Date(message.getTimestamp())));
+			}
 			String hostname = message.getContext().getHostname();
 			if (!hostname.equals(processorService.hostName())) {
 				processorService.printStdout(contentPrefix + "hostname: " + hostname);

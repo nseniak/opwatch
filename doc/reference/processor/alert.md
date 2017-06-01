@@ -5,8 +5,8 @@ Triggers an alert.
 ### Input and output
 
 * Category: Consumer
-* Input: Any
-* Output: N/A
+* Input: Any value or object
+* Output: None
 
 ### Synopsis
 
@@ -63,7 +63,7 @@ For example, this code displays an alert whose details are the output of [`df`](
 ```js
 pipe(df("/tmp"), alert({
 	title: "not enough space left",
-	trigger: function (input) { return input.usageRatio > .8; }
+	trigger: function (dfOutput) { return dfOutput.usageRatio > .8; }
 })).run();
 ```
 
@@ -72,8 +72,8 @@ This code displays an alert whose details are the disk usage ratio:
 ```js
 pipe(df("/tmp"), alert({
 	title: "not enough space left",
-	details: function (input) { return input.usageRatio; }
-	trigger: function (input) { return input.usageRatio > .8; }
+	details: function (dfOutput) { return dfOutput.usageRatio; }
+	trigger: function (dfOutput) { return dfOutput.usageRatio > .8; }
 })).run();
 ```
 
@@ -83,7 +83,7 @@ This code displays an alert whose details are the text `"/tmp"`:
 pipe(df("/tmp"), alert({
 	title: "not enough space left",
 	details: "/tmp",
-	trigger: function (input) { return input.usageRatio > .8; }
+	trigger: function (dfOutput) { return dfOutput.usageRatio > .8; }
 })).run();
 ```
 
@@ -108,7 +108,7 @@ alert message when it goes back under 80%.
 ```js
 pipe(df("/tmp"), alert({
 	title: "not enough space left",
-	trigger: function (input) { return input.usageRatio > .8; },
+	trigger: function (dfOutput) { return dfOutput.usageRatio > .8; },
 	toggle: true
 })).run();
 ```

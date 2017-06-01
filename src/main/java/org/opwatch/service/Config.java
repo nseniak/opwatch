@@ -148,6 +148,14 @@ public class Config {
 		return Duration.makeText("10s");
 	}
 
+	public static int defaultMaxRedirects() {
+		return 50;
+	}
+
+	public static boolean defaultFollowRedirects() {
+		return true;
+	}
+
 	public int lineBufferSize() {
 		return lineBufferSize;
 	}

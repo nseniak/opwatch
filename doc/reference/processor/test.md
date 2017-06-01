@@ -5,8 +5,8 @@ Callback-based filter.
 ### Input and output
 
 * Category: Filter
-* Input: Any
-* Output: Any
+* Input: Any value or object
+* Output: The input value or object
 
 ### Synopsis
 

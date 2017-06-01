@@ -39,10 +39,13 @@ public class SendFactory extends ActiveProcessorFactory<SendConfig, Send> {
 	public Send make(Object scriptObject) {
 		SendConfig config = convertProcessorConfig(scriptObject);
 		String path = checkPropertyValue("path", config.getPath());
+		if (path.startsWith("/")) {
+			path = path.substring(1);
+		}
 		Config profile = processorService.config();
 		String hostname = checkPropertyValue("hostname", config.getHostname());
 		int port =  (config.getPort() != null) ? config.getPort() : profile.defaultPostPort();
-		return new Send(getProcessorService(), config, name(), path, hostname, port, path);
+		return new Send(getProcessorService(), config, name(), hostname, port, path);
 	}
 
 }

@@ -9,7 +9,17 @@ public class ConsoleConfiguration extends ServiceConfiguration {
 	private Map<String, ChannelConfig> channels;
 
 	public static class ChannelConfig {
-		// No options
+
+		private boolean addTimestamp;
+
+		public boolean isAddTimestamp() {
+			return addTimestamp;
+		}
+
+		public void setAddTimestamp(boolean addTimestamp) {
+			this.addTimestamp = addTimestamp;
+		}
+
 	}
 
 	public Map<String, ChannelConfig> getChannels() {

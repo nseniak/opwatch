@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.StringJoiner;
 
 /**
- * A processor that runs in its own thread
+ * A processor that does some processing of its own, as opposed to control processors that combine other processors.
  */
 public abstract class ActiveProcessor<D extends ActiveProcessorConfig> extends Processor<D> {
 

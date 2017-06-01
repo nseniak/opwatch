@@ -5,8 +5,8 @@ Transforms its input using a callback.
 ### Input and output
 
 * Category: Filter
-* Input: Any
-* Output: Any
+* Input: Any value or object
+* Output: Callback result
 
 ### Synopsis
 

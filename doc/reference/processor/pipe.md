@@ -4,8 +4,8 @@ Chains processors.
 
 ### Input and output
 
-* Category: Special
-* Input: Same as the first processor of the chain
+* Category: Control
+* Input: Sams as the first processor of the chain
 * Output: Same as the last processor of the chain
 
 ### Synopsis
@@ -16,7 +16,7 @@ pipe([ processor1, processor2, ... ])
 pipe(configuration_object)
 ```
 
-### Configuration object properties
+### Configuration properties
 
 | Property | Description | Type | Default |
 | :--- | :--- | :--- | :--- |

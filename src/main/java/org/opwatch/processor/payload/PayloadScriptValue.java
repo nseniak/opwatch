@@ -5,7 +5,9 @@ import org.opwatch.service.ScriptService;
 
 public abstract class PayloadScriptValue extends AbstractJSObject {
 
-	public abstract Object toJavascript(ScriptService scriptService);
+	public Object toJavascript(ScriptService scriptService) {
+		return this;
+	}
 
 	public static String javascriptClassName(Class<?> clazz) {
 		return clazz.getSimpleName();

@@ -61,7 +61,7 @@ public class CommandRunner {
 			throw new RuntimeError("command process has exited", new ProcessorPayloadExecutionScope(processor, payload));
 		}
 		try {
-			process.getOutputStream().write(processorService.getScriptService().stringify(payload.getValue()).getBytes());
+			process.getOutputStream().write(processorService.getScriptService().jsonStringify(payload.getValue()).getBytes());
 			process.getOutputStream().write('\n');
 			process.getOutputStream().flush();
 		} catch (IOException e) {

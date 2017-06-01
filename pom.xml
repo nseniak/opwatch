@@ -33,6 +33,7 @@
 		<pushover-client.version>1.0.2-SNAPSHOT</pushover-client.version>
 		<nashorn-commonjs.version>1.0.7</nashorn-commonjs.version>
 		<jsoup.version>1.10.2</jsoup.version>
+		<javatuple.version>1.2</javatuple.version>
 	</properties>
 
 	<dependencies>
@@ -98,6 +99,12 @@
 			<groupId>com.coveo</groupId>
 			<artifactId>nashorn-commonjs-modules</artifactId>
 			<version>${nashorn-commonjs.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.javatuples</groupId>
+			<artifactId>javatuples</artifactId>
+			<version>${javatuple.version}</version>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- TESTS -->

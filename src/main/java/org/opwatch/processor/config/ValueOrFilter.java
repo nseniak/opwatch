@@ -6,36 +6,36 @@ import org.opwatch.processor.common.RuntimeError;
 import org.opwatch.processor.common.ValueLocation;
 import org.opwatch.processor.payload.Payload;
 
-public class ConstantOrFilter<T> extends ConfigPropertyValue {
+public class ValueOrFilter<T> extends ConfigPropertyValue {
 
-	public enum ValueType {
-		constant, functional
+	public enum Type {
+		value, filter
 	}
 
-	private ValueType type;
-	private T constant;
+	private Type type;
+	private T value;
 	private JavascriptFilter filter;
 
-	private ConstantOrFilter() {
+	private ValueOrFilter() {
 	}
 
-	public static <T> ConstantOrFilter<T> makeConstant(T constant) {
-		ConstantOrFilter<T> producer = new ConstantOrFilter();
-		producer.type = ValueType.constant;
-		producer.constant = constant;
-		return producer;
+	public static <T> ValueOrFilter<T> makeValue(T value) {
+		ValueOrFilter<T> vof = new ValueOrFilter();
+		vof.type = Type.value;
+		vof.value = value;
+		return vof;
 	}
 
-	public static ConstantOrFilter makeFunctional(JavascriptFilter function, ValueLocation valueLocation) {
-		ConstantOrFilter producer = new ConstantOrFilter();
-		producer.type = ValueType.functional;
-		producer.filter = function;
-		return producer;
+	public static <T> ValueOrFilter<T> makeFunction(JavascriptFilter function) {
+		ValueOrFilter<T> vof = new ValueOrFilter<>();
+		vof.type = Type.filter;
+		vof.filter = function;
+		return vof;
 	}
 
 	public T value(Processor processor, Payload payload, Class<T> clazz) {
-		if (type == ValueType.constant) {
-			return constant;
+		if (type == Type.value) {
+			return value;
 		} else {
 			Object value = filter.call(payload, processor);
 			return (T) processor.getProcessorService().getScriptService().convertScriptValue(filter.getValueLocation(), clazz, value,
@@ -43,15 +43,15 @@ public class ConstantOrFilter<T> extends ConfigPropertyValue {
 		}
 	}
 
-	public T getConstant() {
-		return constant;
+	public T getValue() {
+		return value;
 	}
 
 	public JavascriptFilter getFilter() {
 		return filter;
 	}
 
-	public ValueType getType() {
+	public Type getType() {
 		return type;
 	}
 
