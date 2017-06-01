@@ -184,9 +184,10 @@ pretty = (function () {
 			}
 		}
 		try {
-			return prettyObject(object, 0, actualOptions);
+			print(prettyObject(object, 0, actualOptions));
 		} catch (error) {
-			return "<cannot pretty print object>";
+			print("<cannot pretty print object>");
 		}
+		return undefined;
 	};
 })();

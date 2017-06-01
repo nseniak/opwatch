@@ -27,12 +27,11 @@ public class Receive extends Producer<ReceiveConfig> implements HttpService.Post
 
 	@Override
 	public void handlePost(String input) {
-		processorService.withExceptionHandling("error consuming http post",
+		Object object = processorService.getScriptService().jsonParse(input);
+		Payload payload = Payload.makeReceived(processorService, this, object);
+		processorService.withExceptionHandling("error consuming HTTP post",
 				() -> new ProcessorVoidExecutionScope(this),
-				() -> {
-					Payload remotePayload = processorService.getObjectMapperService().objectMapper().convertValue(input, Payload.class);
-					outputTransformed(remotePayload.getValue(), remotePayload);
-				});
+				() -> output(payload));
 	}
 
 }

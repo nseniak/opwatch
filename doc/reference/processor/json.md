@@ -11,7 +11,7 @@ Parses a string into a Json object.
 ### Synopsis
 
 ```js
-apply(json)
+json(json)
 json(configuration_object)
 ```
 
@@ -21,7 +21,7 @@ None.
 
 ### Description
 
-The `json` parses the string it receives as its input into a Json object which is sent to its output. Any parsing
+The `json` processor parses the string it receives as its input into a Json object which is sent to its output. Any parsing
 error triggers an alert.
 
 ### Example

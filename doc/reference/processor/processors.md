@@ -111,6 +111,7 @@ This section lists processors by category.
 * [`curl`](curl.md) -- executes an URL request
 * [`df`](df.md) -- outputs free disk space info
 * [`sh`](sh.md) -- generates output by executing a shell command
+* [`receive`](receive.md) -- receives values and objects from a remote Opwatch instance.
 * [`stat`](stat.md) -- outputs file information
 * [`stdin`](stdin.md) -- reads lines from standard input
 * [`tail`](tail.md) -- outputs lines added to a file
@@ -131,6 +132,7 @@ This section lists processors by category.
 ### Consumers
 
 * [`alert`](alert.md) -- triggers an alert
+* [`send`](send.md) -- sends its input to a remote Opwatch instance
 * [`stdout`](stdout.md) -- writes its input to the standard output
 
 ### Control processors

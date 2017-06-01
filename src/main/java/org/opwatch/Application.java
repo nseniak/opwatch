@@ -49,7 +49,7 @@ public class Application implements CommandLineRunner {
 			System.setProperty("server.port", Integer.toString(port));
 			new SpringApplicationBuilder(Application.class).web(!options.isNoServer()).run(args);
 		} catch (ConnectorStartFailedException e) {
-			System.err.println("Cannot start the embedded http server on port " + e.getPort());
+			System.err.println("Cannot start the embedded HTTP server on port " + e.getPort());
 			System.err.println("The port may already be in use. To specify another port, use --port <port>");
 			System.err.println("To start without an http server, use --no-server");
 			System.exit(1);
@@ -66,8 +66,8 @@ public class Application implements CommandLineRunner {
 		OptionSpec<String> configFile = parser.accepts("config", "specify the filename or url of the configuration script, lo be loaded startup instead of the default one (config.js)").withRequiredArg().ofType(String.class);
 		OptionSpec<Void> noConfig = parser.accepts("no-config", "do not load the configuration script at startup");
 		OptionSpec<String> runExpression = parser.accepts("run", "evaluate the given Javascript expression to a processor, and run it").withRequiredArg().ofType(String.class);
-		OptionSpec<Void> noServer = parser.accepts("no-server", "do not start the embedded http server");
-		OptionSpec<Integer> port = parser.accepts("port","use the specified port for the embedded http server").withRequiredArg().ofType(Integer.class);
+		OptionSpec<Void> noServer = parser.accepts("no-server", "do not start the embedded HTTP server");
+		OptionSpec<Integer> port = parser.accepts("port","use the specified port for the embedded HTTP server").withRequiredArg().ofType(Integer.class);
 		OptionSpec<Void> traceChannels = parser.accepts("trace-channels","print sent messages to standard output, instead of sending them");
 		OptionSpec<Void> help = parser.accepts("help","print this help").forHelp();
 		OptionSpec<Void> version = parser.accepts("version","print the version and exit").forHelp();

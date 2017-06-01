@@ -1,13 +1,20 @@
 package org.opwatch.processor.payload;
 
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.opwatch.processor.common.Processor;
+import org.opwatch.processor.primitives.producer.receive.Receive;
 import org.opwatch.service.ProcessorService;
+import org.opwatch.service.ScriptService;
 import sun.jvm.hotspot.utilities.soql.ScriptObject;
 
 /**
  * Represents the output of a processor.
  */
 public class Payload extends PayloadPojoValue {
+
+	public enum Field {
+		timestamp, hostname, port, producerId, producer, previous, value, metadata
+	}
 
 	/**
 	 * Time at which the payload was generated.
@@ -53,6 +60,49 @@ public class Payload extends PayloadPojoValue {
 		this.producer = producer;
 		this.previous = previous;
 		this.value = value;
+	}
+
+	public static Payload makeReceived(ProcessorService processorService, Receive receive, Object object) {
+		if (object instanceof ScriptObjectMirror) {
+			ScriptObjectMirror objectMirror = (ScriptObjectMirror) object;
+			Payload payload = makeFromScriptObject(objectMirror, processorService);;
+			if (payload != null) {
+				return makeTransformed(processorService, receive, payload, payload.getValue());
+			}
+		}
+		return makeRoot(processorService, receive, object);
+	}
+
+	private static Payload makeFromScriptObject(ScriptObjectMirror so, ProcessorService processorService) {
+		try {
+			ScriptService scriptService = processorService.getScriptService();
+			Payload payload = new Payload();
+			payload.timestamp = (long) scriptService.convertScriptValueToNumber(Long.class, so.get(Field.timestamp.name()));
+			payload.hostname = (String) so.get(Field.hostname.name());
+			if (payload.hostname == null) {
+				return  null;
+			}
+			payload.port = (int) scriptService.convertScriptValueToNumber(Integer.class, so.get(Field.port.name()));
+			payload.producerId = (String) so.get(Field.producerId.name());
+			if (payload.producerId == null) {
+				return  null;
+			}
+			payload.producer = (String) so.get(Field.producer.name());
+			if (payload.producer == null) {
+				return  null;
+			}
+			Object previous = so.get(Field.previous.name());
+			if (previous != null) {
+				payload.previous = makeFromScriptObject((ScriptObjectMirror) previous, processorService);
+			}
+			payload.value = so.get(Field.value.name());
+			if (so.hasMember(Field.metadata.name())) {
+				payload.metadata = so.get(Field.metadata.name());
+			}
+			return payload;
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	public static Payload makeRoot(ProcessorService processorService, Processor producer, Object value) {

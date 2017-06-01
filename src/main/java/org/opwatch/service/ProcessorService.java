@@ -299,7 +299,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		} catch (HttpStatusCodeException e) {
 			HttpStatus status = e.getStatusCode();
 			if (status == HttpStatus.NOT_FOUND) {
-				throw new RuntimeError("receiver endpoint not found on " + hostname + ":" + port + ": \"" + path + "\"",
+				throw new RuntimeError("no receiver for path \"" + path + "\" found on " + hostname + ":" + port,
 						scopeFactory.make());
 			}
 			String errorMessage = e.getResponseBodyAsString();

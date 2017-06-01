@@ -259,8 +259,8 @@ pipelines are useful for aggregating data from several hosts in a single Opwatch
 global statistics and alerts.
 
 Distributed pipelines are created using the `send` and `receive` processors. The `send`
-processor sends whatever input it receives to another Opwatch process using the http protocol. The `receive` 
-processor listens for any incoming input on Opwatch's http port.
+processor sends whatever input it receives to another Opwatch process using the HTTP protocol. The `receive` 
+processor listens for any incoming input on Opwatch's HTTP port.
 
 For example, assume you have two machines named `host1` and `host2`. The following code running on `host1`
 sends any log file line that contains the ERROR keyword to an Opwatch endpoint called `logError` on `host2`:

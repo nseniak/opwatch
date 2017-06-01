@@ -485,7 +485,7 @@ public class ScriptService {
 		return throwError(valueLocation, clazz, scriptValue, exceptionFactory);
 	}
 
-	private Object convertScriptValueToNumber(Class<? extends Number> clazz, Object scriptValue) {
+	public Object convertScriptValueToNumber(Class<? extends Number> clazz, Object scriptValue) {
 		try {
 			if (clazz == Integer.class) {
 				return ((Number) scriptValue).intValue();
