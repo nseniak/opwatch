@@ -65,5 +65,6 @@ $ ./opwatch
 * [Code snippets](snippets.md)
 * [Reference manual](doc/reference/reference.md)
   * [Command line arguments and options](doc/reference/command.md)
-  * [Javascript reference](doc/reference/javascript.md)
-  * [Processors](doc/reference/processor/processors.md)
+  * [Building and running processors in Javascript](doc/reference/javascript.md)
+  * [Channels](doc/reference/channels.md) 
+  * [Processor index](doc/reference/processor/processors.md)
