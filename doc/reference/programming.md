@@ -162,16 +162,16 @@ The `value` property of the SeriesObject objects must all be a numbers, otherwis
 
 This function returns a Stats object with the following fields:
 
-| Argument | Description | Type |
+| Argument | Description | Type | Presence |
 | :--- | :--- | :--- | :--- |
-| `mean` | the mean of the array values | Number |
-| `variance` | the variance of the array values | Number |
-| `standardDeviation` | the standard deviation of the array values | Number |
-| `max` | the maximum of the array values | Number |
-| `min` | the minimum of the array values | Number |
-| `N` | the number of array values | Number |
-| `sum` | the sum of the array values | Number |
-| `slope` | the slope of the estimated regression line | Number |
+| `mean` | the mean of the array values | Number | *Always* |
+| `variance` | the variance of the array values | Number | *Always* |
+| `standardDeviation` | the standard deviation of the array values | Number | *Always* |
+| `max` | the maximum of the array values | Number | *Always* |
+| `min` | the minimum of the array values | Number | *Always* |
+| `N` | the number of array values | Number | *Always* |
+| `sum` | the sum of the array values | Number | *Always* |
+| `slope` | the slope of the estimated regression line | Number | *Always* |
 
 ### Function: `pretty(data)`
 
@@ -180,7 +180,7 @@ This function pretty-prints the passed data. It is notably useful for pretty-pri
 #### Arguments
 
 | Argument | Description | Type | Default |
-| :--- | :--- | :--- | :--- |
+| :--- | :--- | :--- |
 | `data` | any data | *Mandatory* |
 
 ### Function: `help()`
