@@ -3,7 +3,7 @@
 ## Javascript implementation
 
 Opwatch is based on [Nashorn](https://wiki.openjdk.java.net/display/Nashorn/Nashorn+Documentation/), the Javascript
-implementation that is part of Java 8. Nashorn is compliant with [ECMAScript 5.1](ECMAScript 5.1 specification).
+implementation that is part of Java 8. Nashorn is compliant with [ECMAScript 5.1](https://www.ecma-international.org/ecma-262/5.1/).
 
 Nashorn provides several utility Javascript built-in functions and global objects, including:
 
@@ -162,7 +162,7 @@ The `value` property of the SeriesObject objects must all be a numbers, otherwis
 
 This function returns a Stats object with the following fields:
 
-| Argument | Description | Type | Presence |
+| Property | Description | Type | Presence |
 | :--- | :--- | :--- | :--- |
 | `mean` | the mean of the array values | Number | *Always* |
 | `variance` | the variance of the array values | Number | *Always* |
