@@ -30,7 +30,7 @@
 * [`send`](send.md) -- sends its input to a remote Opwatch instance
 * [`stdout`](stdout.md) -- writes its input to the standard output
 
-### Control processors
+### Control
 
-* [`parallel`](parallel.md) -- chains processors
+* [`parallel`](parallel.md) -- executes processors in parallel
 * [`pipe`](pipe.md) -- chains processors

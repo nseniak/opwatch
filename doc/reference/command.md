@@ -1,3 +1,5 @@
+# Command line arguments
+
 NAME
 
 `opwatch` -- monitors a live system to detect problems and generate alerts.

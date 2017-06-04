@@ -10,7 +10,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Stats {
+public class Stats extends PayloadPojoValue {
 
 	private DescriptiveStatistics stats;
 	private SimpleRegression regression;
@@ -22,7 +22,7 @@ public class Stats {
 		List<SeriesObject> objectSeries = (List<SeriesObject>) service.getScriptService().convertScriptValue(ValueLocation.makeToplevel(), type, objectSeriesArray, RuntimeError::new);
 		stats.regression = new SimpleRegression(true);
 		for (SeriesObject object : objectSeries) {
-			stats.regression.addData(object.getTimestamp(), doubleValue(service, "timestamp", object.getValue()));
+			stats.regression.addData(object.getTimestamp(), doubleValue(service, "value", object.getValue()));
 		}
 		stats.stats = new DescriptiveStatistics();
 		for (SeriesObject object : objectSeries) {
@@ -63,25 +63,12 @@ public class Stats {
 		return regression.getSlope();
 	}
 
-	public double getIntercept() {
-		return regression.getIntercept();
-	}
-
-	public double predict(double x) {
-		return regression.predict(x);
-	}
-
 	private static double doubleValue(ProcessorService service, String fieldName, Object object) {
 		return (double) service.getScriptService().convertScriptValue(ValueLocation.makeProperty("stats", fieldName), Double.class, object, RuntimeError::new);
 	}
 
 	public abstract static class SeriesObjectList extends ArrayList<SeriesObject> {
 
-	}
-
-	@Override
-	public String toString() {
-		return "[object " + this.getClass().getSimpleName() + "]";
 	}
 
 }

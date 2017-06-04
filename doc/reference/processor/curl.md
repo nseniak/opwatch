@@ -26,9 +26,9 @@ curl(configuration_object)
 | `followRedirects` | in case of a 3XX return status, redo the requesy with the new location | Boolean | `true` |
 | `maxRedirects` | maximum number of redirects | Number | `50` |
 | `insecure` | in case of an SSL connection, proceed even for connections otherwise considered insecure | Boolean | `false` |
-| `timeout` | maximum time allowed for reading the result | Duration value | `"10s"` |
-| `connectTimeout` | maximum time allowed for the connection | Duration value | `"5s"` |
-| `period` | period at which a request is executed | Duration value | `1s"` |
+| `timeout` | maximum time allowed for reading the result | [Duration](../programming.md#Durations) | `"10s"` |
+| `connectTimeout` | maximum time allowed for the connection | [Duration](../programming.md#Durations) | `"5s"` |
+| `period` | period at which a request is executed | [Duration](../programming.md#Durations) | `"1s"` |
  
  ### Response object
  

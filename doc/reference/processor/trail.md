@@ -6,7 +6,7 @@ Collects the inputs received during the last `duration` milliseconds.
 
 * Category: Filter
 * Input: Any value or object
-* Output: Array of SeriesObject objects
+* Output: Array of [SeriesObject](../programming.md#seriesobject) objects
 
 ### Synopsis
 
@@ -20,21 +20,16 @@ trail(configuration_object)
 | Property | Description | Type | Default |
 | :--- | :--- | :--- | :--- |
 | `duration` | duration over which inputs are collected | Duration value | *Mandatory* |
-| `period` | period at which the output array is produced | Duration value | `1s"` |
+| `period` | period at which the output array is produced | [Duration](../programming.md#Durations) | `"1s"` |
  
 ### Output array
  
  The `trail` processor generates an array of SeriesObject objects representing the inputs received during
- the last `duration` milliseconds, ordered from oldest to newest. Each SeriesObject object has the following fields:
- 
-| Property | Description | Type | Presence |
-| :--- | :--- | :--- | :--- |
-| `value` | the value of the input | Object | *Always* |
-| `timestamp` | time at which the input was received | Number | *Always* |
+ the last `duration` milliseconds, ordered from oldest to newest.
 
 ### Description
 
-The `trail` processor generates an array of SeriesObject objects representing the inputs it has received
+The `trail` processor generates an array of [SeriesObject](../programming.md#seriesobject) objects representing the inputs it has received
 during the last `duration` milliseconds. This array is generated as a regular interval, defined by the `period`
 property, which defaults to 1 second. The first array is generated `duration` milliseconds after the processor 
 has started running. 

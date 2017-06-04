@@ -1,6 +1,6 @@
 # Opwatch reference manual
 
-* [Command line arguments and options](command.md)
-* [Building and running processors in Javascript](javascript.md) 
-* [Channel reference](channels.md) 
+* [Command line arguments](command.md)
+* [Programming reference](programming.md) 
 * [Processor index](processor/processors.md)
+* [Channels](channels.md)

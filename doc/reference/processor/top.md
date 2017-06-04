@@ -19,7 +19,7 @@ top(configuration_object)
 
 | Property | Description | Type | Default |
 | :--- | :--- | :--- | :--- |
-| `period` | period at which an output is generated | Duration value | `1s"` |
+| `period` | period at which an output is generated | [Duration](../programming.md#Durations) | `"1s"` |
  
  ### FilesystemInfo object
  

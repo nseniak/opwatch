@@ -40,7 +40,7 @@ properties. The specific way these properties are displayed depends on the type 
 general display rules apply to all channel types:
 
 * If the channel supports a notion of level, (a.k.a. severity or priority), the alert level is assigned to it; 
-* If `details` is not null, it is pretty printed using the [`pretty`](javascript.md) function.
+* If `details` is not null, it is pretty printed using the [`pretty`](programming.md) function.
 * The title and details text are truncated to the maximum length supported by the channel, which depends on
   the channel type. To ensure that an alert can be displayed on any channel, keep the title below 200 characters and the 
   details below 500 characters. These are the limits of the most constraining channel type (Pushover). 

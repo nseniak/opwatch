@@ -20,7 +20,7 @@ stat(configuration_object)
 | Property | Description | Type | Default |
 | :--- | :--- | :--- | :--- |
 | `file` | file to probe | String | *Mandatory* |
-| `period` | period at which an output is generated | Duration value | `1s"` |
+| `period` | period at which an output is generated | [Duration](../programming.md#Durations) | `"1s"` |
  
  ### FileInfo object
  

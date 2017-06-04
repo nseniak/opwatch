@@ -20,7 +20,7 @@ call(configuration_object)
 | Property | Description | Type | Default |
 | :--- | :--- | :--- | :--- |
 | `lambda` | callback that computes the processor's output | () => Object | *Mandatory* | 
-| `period` | period at which the callback is called | Duration value | `1s"` |
+| `period` | period at which the callback is called | [Duration](../programming.md#Durations) | `"1s"` |
 
 ### Description
 

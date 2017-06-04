@@ -6,7 +6,7 @@ Collects the last `count` received inputs.
 
 * Category: Filter
 * Input: Any value or object
-* Output: Array of SeriesObject objects
+* Output: Array of [SeriesObject](../programming.md#seriesobject) objects
 
 ### Synopsis
 
@@ -21,15 +21,10 @@ collect(configuration_object)
 | :--- | :--- | :--- | :--- |
 | `count` | number of inputs to collect | Number | *Mandatory* |
  
- ### Output array
+### Output array
  
- The `collect` processor generates an array of SeriesObject objects representing the last `count` inputs,
- ordered from oldest to newest. Each SeriesObject object has the following fields:
- 
-| Property | Description | Type | Presence |
-| :--- | :--- | :--- | :--- |
-| `value` | the value of the input | Object | *Always* |
-| `timestamp` | time at which the input was received | Number | *Always* |
+The `collect` processor generates an array of [SeriesObject](../programming.md#seriesobject) objects representing the last `count` inputs,
+ordered from oldest to newest.
 
 ### Description
 
