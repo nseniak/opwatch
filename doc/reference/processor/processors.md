@@ -2,8 +2,6 @@
 
 ### Producers
 
-* [`call`](call.md) -- generates output using a callback
-* [`call_f`](call_f.md) -- process input and generate output using a callback
 * [`curl`](curl.md) -- executes an URL request
 * [`df`](df.md) -- outputs free disk space info
 * [`sh`](sh.md) -- generates output by executing a shell command
@@ -30,6 +28,10 @@
 * [`alert`](alert.md) -- triggers an alert
 * [`send`](send.md) -- sends its input to a remote Opwatch instance
 * [`stdout`](stdout.md) -- writes its input to the standard output
+
+### Producers/Filters
+
+* [`call`](call.md) -- generates output using a callback
 
 ### Control
 
