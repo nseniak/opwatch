@@ -47,6 +47,10 @@ public class ProcessorSignature {
 		return new ProcessorSignature(PipeRequirement.Data, PipeRequirement.Data);
 	}
 
+	public static ProcessorSignature makeProducerOrFilter() {
+		return new ProcessorSignature(PipeRequirement.Any, PipeRequirement.Data);
+	}
+
 	public static ProcessorSignature makeAny() {
 		return new ProcessorSignature(PipeRequirement.Any, PipeRequirement.Any);
 	}

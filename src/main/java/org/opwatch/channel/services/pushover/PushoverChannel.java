@@ -157,8 +157,8 @@ public class PushoverChannel extends ThrottledChannel<PushoverConfiguration> {
 				.setTitle(title)
 				.setMessage(message)
 				.setPriority(priority)
-				.setRetry(retry)
-				.setExpire(expire)
+//				.setRetry(retry)
+//				.setExpire(expire)
 				.build();
 	}
 

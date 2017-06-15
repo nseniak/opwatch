@@ -1,4 +1,4 @@
-package org.opwatch.processor.primitives.filter.stdout;
+package org.opwatch.processor.primitives.filter.trace;
 
 import org.opwatch.processor.config.ActiveProcessorConfig;
 

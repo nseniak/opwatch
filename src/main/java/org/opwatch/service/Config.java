@@ -121,7 +121,11 @@ public class Config {
 	}
 
 	public static Duration defaultScheduledProducerPeriod() {
-		return Duration.makeText("1s");
+		return Duration.makeText("10s");
+	}
+
+	public static Duration defaultScheduledProducerDelay() {
+		return Duration.makeText("0s");
 	}
 
 	public boolean channelDebug() {

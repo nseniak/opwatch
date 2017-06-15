@@ -30,9 +30,7 @@ public abstract class TrailCollecter<D extends ScheduledProcessorConfig> extends
 	public void consume(Payload payload) {
 		long timestamp = System.currentTimeMillis();
 		Object result = collectedObject(payload);
-		if (result != null) {
-			queue.add(new SeriesObject(result, timestamp));
-		}
+		queue.add(new SeriesObject(result, timestamp));
 	}
 
 	@Override

@@ -177,17 +177,23 @@ pretty = (function () {
 	}
 
 	return function (object, options) {
-		var actualOptions = {indent: 2, expandAlias: false, maxDepth: 5, maxArrayLength: 100};
+		var actualOptions = {indent: 2, expandAlias: false, maxDepth: 5, maxArrayLength: 100, asString: false };
 		if (options) {
 			for (var property in options) {
 				actualOptions[property] = options[property];
 			}
 		}
+		var str;
 		try {
-			print(prettyObject(object, 0, actualOptions));
+			str = prettyObject(object, 0, actualOptions);
 		} catch (error) {
-			print("<cannot pretty print object>");
+			str = print("<cannot pretty print object>");
 		}
-		return undefined;
+		if (actualOptions.asString) {
+			return str;
+		} else {
+			print(str);
+			return undefined;
+		}
 	};
 })();

@@ -20,12 +20,15 @@ call(configuration_object)
 | Property | Description | Type | Default |
 | :--- | :--- | :--- | :--- |
 | `command` | shell command to execute | String | *Mandatory* | 
-| `period` | period at which the callback is called | [Duration](../programming.md#Durations) | `"1s"` |
+| `delay` | initial delay after which the command is first executed | [Duration](../programming.md#Durations) | `"0s"` |
+| `period` | period at which the command is repeatedly executed | [Duration](../programming.md#Durations) | `"10s"` |
 
 ### Description
 
 The `sh` processor executes `command` using `sh -c <command>` at a regular interval. The command's
 output is sent to the processor's output. Each line produced by the command is considered a separate output.
+
+See also: [`sh_f`](sh_f.md).
 
 ### Example
 

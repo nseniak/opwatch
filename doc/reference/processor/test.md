@@ -11,7 +11,7 @@ Callback-based filter.
 ### Synopsis
 
 ```js
-test(lambda)
+test(predicate)
 test(configuration_object)
 ```
 
@@ -19,11 +19,11 @@ test(configuration_object)
 
 | Property | Description | Type | Default |
 | :--- | :--- | :--- | :--- |
-| `lambda` | predicate that determines if the input should be sent to output | (input, payload) => Boolean | *Mandatory* | 
+| `predicate` | function that determines if the input should be sent to output | (input, payload) => Boolean | *Mandatory* | 
 
 ### Description
 
-The `test` processor invokes the `lambda` predicate on any received input. If the returned value is true, the input
+The `test` processor invokes the `predicate` function on any received input. If the returned value is true, the input
 is sent to the processor's output.
 
 ### Example

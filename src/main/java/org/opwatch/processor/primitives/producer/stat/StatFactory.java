@@ -34,7 +34,7 @@ public class StatFactory extends ScheduledExecutorFactory<StatConfig, Stat> {
 	public Stat make(Object scriptObject) {
 		StatConfig config = convertProcessorConfig(scriptObject);
 		String file = checkPropertyValue("file", config.getFile());
-		return new Stat(getProcessorService(), config, name(), makeScheduledExecutor(config), new java.io.File(file));
+		return new Stat(getProcessorService(), config, name(), makeScheduledExecutor(config, false), new java.io.File(file));
 	}
 
 }

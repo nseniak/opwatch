@@ -20,7 +20,8 @@ stat(configuration_object)
 | Property | Description | Type | Default |
 | :--- | :--- | :--- | :--- |
 | `file` | file to probe | String | *Mandatory* |
-| `period` | period at which an output is generated | [Duration](../programming.md#Durations) | `"1s"` |
+| `delay` | initial delay after which the file is first probed | [Duration](../programming.md#Durations) | `"0s"` |
+| `period` | period at which the file is repeatedly probed | [Duration](../programming.md#Durations) | `"10s"` |
  
  ### FileInfo object
  

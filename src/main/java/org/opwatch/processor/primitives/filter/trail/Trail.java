@@ -1,4 +1,4 @@
-package org.opwatch.processor.primitives.producer.trail;
+package org.opwatch.processor.primitives.filter.trail;
 
 import org.opwatch.processor.common.TrailCollecter;
 import org.opwatch.processor.payload.ObjectSeries;

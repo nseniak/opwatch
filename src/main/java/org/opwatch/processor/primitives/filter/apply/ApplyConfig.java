@@ -6,15 +6,15 @@ import org.opwatch.processor.config.JavascriptFilter;
 
 public class ApplyConfig extends ActiveProcessorConfig {
 
-	private JavascriptFilter lambda;
+	private JavascriptFilter output;
 
 	@ImplicitProperty
-	public JavascriptFilter getLambda() {
-		return lambda;
+	public JavascriptFilter getOutput() {
+		return output;
 	}
 
-	public void setLambda(JavascriptFilter lambda) {
-		this.lambda = lambda;
+	public void setOutput(JavascriptFilter output) {
+		this.output = output;
 	}
 
 }

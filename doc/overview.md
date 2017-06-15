@@ -188,9 +188,9 @@ A channel corresponds to a configuration of a messaging service with all the nec
 depend on the type of service. For instance, a Slack channel is parameterized  with a webhook URL that you 
 obtain from the Slack admin interface, and which Opwatch uses to push alert messages.
 
-Channels are configured using the `config.channels()` function, which takes a channel descriptor as its argument. For 
-example, the code below defines three channels called `developers`, `devops` and `marketing` that are connected to 
-Slack:
+Channels are configured using the [`config.channels(configuration)`](reference/channels.md) function, which takes a 
+configuration object as its argument. For example, the code below defines three channels called `developers`, 
+`devops` and `marketing` that are connected to Slack:
 
 ```js
 config.channels({

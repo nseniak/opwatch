@@ -1,4 +1,4 @@
-package org.opwatch.processor.primitives.producer.cron;
+package org.opwatch.processor.primitives.producer.sh;
 
 import org.opwatch.processor.primitives.producer.CommandRunner;
 import org.opwatch.processor.primitives.producer.ScheduledExecutor;

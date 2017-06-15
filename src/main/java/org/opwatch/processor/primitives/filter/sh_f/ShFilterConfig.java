@@ -1,10 +1,10 @@
-package org.opwatch.processor.primitives.filter.sh;
+package org.opwatch.processor.primitives.filter.sh_f;
 
 import org.opwatch.processor.config.ActiveProcessorConfig;
 import org.opwatch.processor.config.ImplicitProperty;
 import org.opwatch.processor.primitives.producer.CommandExecutorDesc;
 
-public class ShapplyConfig extends ActiveProcessorConfig implements CommandExecutorDesc {
+public class ShFilterConfig extends ActiveProcessorConfig implements CommandExecutorDesc {
 
 	private String command;
 

@@ -34,7 +34,7 @@ public class DfFactory extends ScheduledExecutorFactory<DfConfig, Df> {
 	public Df make(Object scriptObject) {
 		DfConfig config = convertProcessorConfig(scriptObject);
 		String file = checkPropertyValue("file", config.getFile());
-		return new Df(getProcessorService(), config, name(), makeScheduledExecutor(config), new java.io.File(file));
+		return new Df(getProcessorService(), config, name(), makeScheduledExecutor(config, false), new java.io.File(file));
 	}
 
 }

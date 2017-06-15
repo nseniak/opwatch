@@ -1,7 +1,5 @@
 package org.opwatch.service;
 
-import com.coveo.nashorn_modules.FilesystemFolder;
-import com.coveo.nashorn_modules.Require;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.primitives.Primitives;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
@@ -26,19 +24,19 @@ import org.opwatch.processor.primitives.filter.collect.CollectFactory;
 import org.opwatch.processor.primitives.filter.grep.GrepFactory;
 import org.opwatch.processor.primitives.filter.json.JsonFactory;
 import org.opwatch.processor.primitives.filter.jstack.JstackFactory;
-import org.opwatch.processor.primitives.filter.sh.ShapplyFactory;
-import org.opwatch.processor.primitives.filter.stdout.TraceFactory;
+import org.opwatch.processor.primitives.filter.sh_f.ShFilterFactory;
 import org.opwatch.processor.primitives.filter.test.TestFactory;
+import org.opwatch.processor.primitives.filter.trace.TraceFactory;
+import org.opwatch.processor.primitives.filter.trail.TrailFactory;
+import org.opwatch.processor.primitives.producer.call.CallFactory;
 import org.opwatch.processor.primitives.producer.console.StdinFactory;
-import org.opwatch.processor.primitives.producer.cron.ShFactory;
 import org.opwatch.processor.primitives.producer.curl.CurlFactory;
 import org.opwatch.processor.primitives.producer.df.DfFactory;
 import org.opwatch.processor.primitives.producer.receive.ReceiveFactory;
-import org.opwatch.processor.primitives.producer.repeat.CallFactory;
+import org.opwatch.processor.primitives.producer.sh.ShFactory;
 import org.opwatch.processor.primitives.producer.stat.StatFactory;
 import org.opwatch.processor.primitives.producer.tail.TailFactory;
 import org.opwatch.processor.primitives.producer.top.TopFactory;
-import org.opwatch.processor.primitives.producer.trail.TrailFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanInstantiationException;
@@ -84,7 +82,7 @@ public class ScriptService {
 	@Autowired
 	private DocumentationService documentationService;
 
-	private String homeDirectory = System.getProperty("app.home");
+	private static String homeDirectory = System.getProperty("app.home");
 
 	public static final String INIT_SCRIPT_PATH = "_init_scripts/";
 
@@ -97,9 +95,7 @@ public class ScriptService {
 	public void initialize() {
 		NashornScriptEngineFactory scriptEngineFactory = new NashornScriptEngineFactory();
 		scriptEngine = (NashornScriptEngine) scriptEngineFactory.getScriptEngine("-scripting");
-		FilesystemFolder moduleFolder = FilesystemFolder.create(new File(homeDirectory + "/modules"), "UTF-8");
 		try {
-			Require.enable(scriptEngine, moduleFolder);
 			loadScriptResources();
 			createSimplePrimitiveFunction("__factories", this::factories);
 			createSimplePrimitiveFunction("__stats", Stats::makeStats);
@@ -118,7 +114,7 @@ public class ScriptService {
 			createSimpleFactoryFunction(new ReceiveFactory(processorService));
 			createSimpleFactoryFunction(new CallFactory(processorService));
 			createSimpleFactoryFunction(new SendFactory(processorService));
-			createSimpleFactoryFunction(new ShapplyFactory(processorService));
+			createSimpleFactoryFunction(new ShFilterFactory(processorService));
 			createSimpleFactoryFunction(new StatFactory(processorService));
 			createSimpleFactoryFunction(new StdinFactory(processorService));
 			createSimpleFactoryFunction(new StdoutFactory(processorService));
@@ -439,6 +435,8 @@ public class ScriptService {
 					return new JavascriptFilter(scriptObject, valueLocation, processorService);
 				} else if (clazz == JavascriptPredicate.class) {
 					return new JavascriptPredicate(scriptObject, valueLocation, processorService);
+				} else if (clazz == JavascriptConsumer.class) {
+					return new JavascriptConsumer(scriptObject, valueLocation, processorService);
 				} else if (clazz == JavascriptProducer.class) {
 					return new JavascriptProducer(scriptObject, valueLocation, processorService);
 				}
@@ -561,8 +559,12 @@ public class ScriptService {
 		return scriptEngine;
 	}
 
-	public void setHomeDirectory(String homeDirectory) {
-		this.homeDirectory = homeDirectory;
+	public static void setHomeDirectory(String homeDirectory) {
+		ScriptService.homeDirectory = homeDirectory;
+	}
+
+	public static String getHomeDirectory() {
+		return homeDirectory;
 	}
 
 }

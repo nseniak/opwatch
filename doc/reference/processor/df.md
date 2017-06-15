@@ -20,7 +20,8 @@ df(configuration_object)
 | Property | Description | Type | Default |
 | :--- | :--- | :--- | :--- |
 | `file` | determines the filesystem to probe | String | *Mandatory* |
-| `period` | period at which an output is generated | [Duration](../programming.md#Durations) | `"1s"` |
+| `delay` | initial delay after which the filesystem is first probed | [Duration](../programming.md#Durations) | `"0s"` |
+| `period` | period at which the filesystem is repeatedly probed | [Duration](../programming.md#Durations) | `"10s"` |
  
  ### FilesystemInfo object
  

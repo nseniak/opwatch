@@ -3,8 +3,8 @@ exports.clock = function (config) {
 	return alias({
 		name: "clock",
 		configuration: config,
-		processor: repeat(merge_config(config, {
-			lambda: function() {
+		processor: call(merge_config(config, {
+			output: function() {
 				return i++;
 			}
 		}))

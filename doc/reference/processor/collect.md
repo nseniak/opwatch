@@ -33,11 +33,11 @@ objects representing these inputs. When a new input is received, a new array wit
 
 ### Examples
 
-#### Trigger an alert if three consecutive http requests at a 10 second interval are unsuccessful
+#### Trigger an alert if three consecutive http requests at a 30 second interval are unsuccessful
 
 ```js
 pipe(
-		curl({ url: "http://www.mywebsite.com", period: "10s" }),
+		curl({ url: "http://www.mywebsite.com", period: "30s" }),
 		collect(3),
 		alert({
 			title: "Website is down",

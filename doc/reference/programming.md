@@ -5,19 +5,17 @@
 Opwatch is based on [Nashorn](https://wiki.openjdk.java.net/display/Nashorn/Nashorn+Documentation/), the Javascript
 implementation that is part of Java 8. Nashorn is compliant with [ECMAScript 5.1](https://www.ecma-international.org/ecma-262/5.1/).
 
-Nashorn provides several utility Javascript built-in functions and global objects, including:
+Nashorn provides several utility built-in functions and global objects, including:
 
 * `$ENV` to access environment variables, e.g. `$ENV.USER`;
 * `load()` to load a script (see also [Module system](#module-system));
 * `print()` to print data on the console;
 * `quit()` to exit the Opwatch shell
 
-For a complete list of Nashorn's built-ins, see
+For a complete list of Nashorn built-ins, see
 [Nashorn and Shell Scripting](https://docs.oracle.com/javase/8/docs/technotes/guides/scripting/nashorn/shell.html).
 
 ## Processors
-
-Processors are the objects created and combined to build monitoring applications. 
 
 For a general presentation of processors, see the [Overview](../../overview.md).
 
@@ -44,7 +42,7 @@ pipe(
 ).run();
 ```
 
-Another example is the [`repeat`](processor/repeat.md) processor which invokes a callback at a regular interval (1 second by default),
+Another example is the [`repeat`](processor/repeat.md) processor which invokes a callback at a regular interval (10 seconds by default),
 without any arguments, and outputs the returned value. For example, the following code prints the sequence of numbers
 starting from 0:
 
@@ -142,7 +140,12 @@ parallel(
 // => Correct!
 ```
 
-## Other Opwatch built-ins
+## Module system
+
+Opwatch includes a module system based on the [npm module specification](https://nodejs.org/api/modules.html#modules_modules).
+This module system uses the implementation provided by [jvm-npm](https://github.com/nodyn/jvm-npm).
+
+## Opwatch built-in functions
 
 ### Function: `stats(data)`
 
@@ -192,6 +195,3 @@ This function prints information about the built-in processors.
 This method of all processor constructors (e.g., `pipe` or `tail`) prints information about the processor
 configuration arguments.
 
-## Module system
-
-TODO

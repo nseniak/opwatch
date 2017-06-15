@@ -3,6 +3,7 @@
 ### Producers
 
 * [`call`](call.md) -- generates output using a callback
+* [`call_f`](call_f.md) -- process input and generate output using a callback
 * [`curl`](curl.md) -- executes an URL request
 * [`df`](df.md) -- outputs free disk space info
 * [`sh`](sh.md) -- generates output by executing a shell command
@@ -15,12 +16,12 @@
 ### Filters
 
 * [`apply`](apply.md) -- transforms its input using a callback
-* [`shapply`](shapply.md) -- transforms its input using a shell command
+* [`sh_f`](sh_f.md) -- transforms its input using a shell command
 * [`collect`](collect.md) -- collects the last `count` received inputs
 * [`grep`](grep.md) -- regexp-based filter
 * [`json`](json.md) -- parses a string into a Json object
 * [`jstack`](jstack.md) -- parses java Java exception stack
-* [`shapply`](shapply.md) -- transforms its input using a shell command
+* [`sh_f`](sh_f.md) -- transforms its input using a shell command
 * [`test`](test.md) -- callback-based filter
 * [`trail`](trail.md) -- collects the inputs received during the last `duration` milliseconds
 

@@ -6,15 +6,15 @@ import org.opwatch.processor.config.JavascriptPredicate;
 
 public class TestConfig extends ActiveProcessorConfig {
 
-	private JavascriptPredicate lambda;
+	private JavascriptPredicate predicate;
 
 	@ImplicitProperty
-	public JavascriptPredicate getLambda() {
-		return lambda;
+	public JavascriptPredicate getPredicate() {
+		return predicate;
 	}
 
-	public void setLambda(JavascriptPredicate lambda) {
-		this.lambda = lambda;
+	public void setPredicate(JavascriptPredicate predicate) {
+		this.predicate = predicate;
 	}
 
 }

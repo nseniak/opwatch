@@ -1,4 +1,4 @@
-package org.opwatch.processor.primitives.filter.sh;
+package org.opwatch.processor.primitives.filter.sh_f;
 
 import org.opwatch.processor.common.ProcessorVoidExecutionScope;
 import org.opwatch.processor.payload.Payload;
@@ -8,12 +8,12 @@ import org.opwatch.service.ProcessorService;
 
 import java.util.concurrent.Future;
 
-public class Shapply extends Filter<ShapplyConfig> {
+public class ShFilter extends Filter<ShFilterConfig> {
 
 	protected Future<?> commandConsumerThreadFuture;
 	private CommandRunner commandRunner;
 
-	public Shapply(ProcessorService processorService, ShapplyConfig configuration, String name, CommandRunner commandRunner) {
+	public ShFilter(ProcessorService processorService, ShFilterConfig configuration, String name, CommandRunner commandRunner) {
 		super(processorService, configuration, name);
 		this.commandRunner = commandRunner;
 	}

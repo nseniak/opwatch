@@ -7,16 +7,16 @@ import org.opwatch.service.ProcessorService;
 
 public class Test extends ConditionalFilter<TestConfig> {
 
-	private JavascriptPredicate lambda;
+	private JavascriptPredicate predicate;
 
-	public Test(ProcessorService processorService, TestConfig configuration, String name, JavascriptPredicate lambda) {
+	public Test(ProcessorService processorService, TestConfig configuration, String name, JavascriptPredicate predicate) {
 		super(processorService, configuration, name);
-		this.lambda = lambda;
+		this.predicate = predicate;
 	}
 
 	@Override
 	public boolean predicateValue(Payload input) {
-		return lambda.call(input, this);
+		return predicate.call(input, this);
 	}
 
 }

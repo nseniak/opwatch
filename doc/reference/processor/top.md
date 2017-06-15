@@ -19,7 +19,8 @@ top(configuration_object)
 
 | Property | Description | Type | Default |
 | :--- | :--- | :--- | :--- |
-| `period` | period at which an output is generated | [Duration](../programming.md#Durations) | `"1s"` |
+| `delay` | initial delay after which the system information is first generated | [Duration](../programming.md#Durations) | `"0s"` |
+| `period` | period at which the system information is repeatedly generated | [Duration](../programming.md#Durations) | `"10s"` |
  
  ### FilesystemInfo object
  

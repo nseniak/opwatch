@@ -11,16 +11,18 @@ import java.util.concurrent.TimeUnit;
 public class ScheduledExecutor {
 
 	private ProcessorService processorService;
+	private long delay;
 	private long period;
 	private ScheduledFuture<?> scheduledFuture;
 
-	public ScheduledExecutor(ProcessorService processorService, long period) {
+	public ScheduledExecutor(ProcessorService processorService, long delay, long period) {
 		this.processorService = processorService;
+		this.delay = delay;
 		this.period = period;
 	}
 
 	public void schedule(Runnable command) {
-		scheduledFuture = processorService.getScheduledExecutor().scheduleAtFixedRate(command, 0, period, TimeUnit.MILLISECONDS);
+		scheduledFuture = processorService.getScheduledExecutor().scheduleAtFixedRate(command, delay, period, TimeUnit.MILLISECONDS);
 	}
 
 	public void stop(Processor<?> processor) {

@@ -13,13 +13,18 @@ public abstract class ScheduledExecutorFactory<D extends ScheduledProcessorConfi
 		super(processorService);
 	}
 
-	protected ScheduledExecutor makeScheduledExecutor(ScheduledProcessorConfig descriptor) {
+	protected ScheduledExecutor makeScheduledExecutor(ScheduledProcessorConfig descriptor, boolean hasInitialDelay) {
 		long period = checkPropertyValue("period", descriptor.getPeriod()).value(this);
+		long delay = checkPropertyValue("delay", descriptor.getDelay()).value(this);
 		if (period <= 0) {
 			throw new RuntimeError("duration must be strictly positive: " + descriptor.getPeriod(),
 					new FactoryExecutionScope(this));
 		}
-		return new ScheduledExecutor(processorService, period);
+		if (delay < 0) {
+			throw new RuntimeError("delay must be positive: " + descriptor.getDelay(),
+					new FactoryExecutionScope(this));
+		}
+		return new ScheduledExecutor(processorService, delay, period);
 	}
 
 }

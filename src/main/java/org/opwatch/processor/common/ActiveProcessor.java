@@ -85,6 +85,10 @@ public abstract class ActiveProcessor<D extends ActiveProcessorConfig> extends P
 		// By default, do nothing
 	}
 
+	protected void producerInputError() {
+		producerInputError();
+	}
+
 	public void outputTransformed(Object value, Payload input) {
 		Payload payload = Payload.makeTransformed(processorService, this, input, value);
 		output(consumers, payload);

@@ -20,22 +20,25 @@ trail(configuration_object)
 | Property | Description | Type | Default |
 | :--- | :--- | :--- | :--- |
 | `duration` | duration over which inputs are collected | Duration value | *Mandatory* |
-| `period` | period at which the output array is produced | [Duration](../programming.md#Durations) | `"1s"` |
+| `delay` | initial delay after which the output is first generated | [Duration](../programming.md#Durations) | `"0s"` |
+| `period` | period at which the output is repeatedly generated | [Duration](../programming.md#Durations) | `"10s"` |
  
 ### Output array
  
- The `trail` processor generates an array of SeriesObject objects representing the inputs received during
- the last `duration` milliseconds, ordered from oldest to newest.
+The `trail` processor generates an array of SeriesObject objects representing the inputs received during
+the last `duration` milliseconds, ordered from oldest to newest.
 
 ### Description
 
 The `trail` processor generates an array of [SeriesObject](../programming.md#seriesobject) objects representing the inputs it has received
 during the last `duration` milliseconds. This array is generated as a regular interval, defined by the `period`
-property, which defaults to 1 second. The first array is generated `duration` milliseconds after the processor 
+property, which defaults to 10 seconds. The first array is generated `duration` milliseconds after the processor 
 has started running. 
  
-For instance, if `duration` is `3000` and `period` is `"1s"`, then `trail` first waits for 3 seconds then
-starts generating every second an array of the inputs it has received during the last 3 seconds. 
+For instance, if `duration` is `30000` and `period` is `"20s"`, then `trail` first waits for 30 seconds then
+starts generating every 20 seconds an array of the inputs it has received during the last 30 seconds.
+ 
+If `delay` is defined, the first output is generated after max(`delay`, `duration`) milliseconds.
  
 ### Examples
 

@@ -11,7 +11,7 @@ Transforms its input using a callback.
 ### Synopsis
 
 ```js
-apply(lambda)
+apply(output)
 apply(configuration_object)
 ```
 
@@ -19,11 +19,14 @@ apply(configuration_object)
 
 | Property | Description | Type | Default |
 | :--- | :--- | :--- | :--- |
-| `lambda` | callback that computes the processor's output | (input, payload) => Object | *Mandatory* | 
+| `output` | callback that computes the processor's output | (input, payload) => Object | *Mandatory* | 
 
 ### Description
 
-The `apply` processor invokes the `lambda` callback on any received input and sends the returned value to its output.
+The `apply` processor invokes the `output` callback on any received input. If the returned value is different
+from `undefined`, it is sent to the processor's output.
+
+See also: [`call`](call.md).
 
 ### Example
 

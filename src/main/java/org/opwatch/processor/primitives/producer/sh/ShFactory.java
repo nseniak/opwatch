@@ -1,4 +1,4 @@
-package org.opwatch.processor.primitives.producer.cron;
+package org.opwatch.processor.primitives.producer.sh;
 
 import org.opwatch.processor.common.ProcessorSignature;
 import org.opwatch.processor.primitives.producer.CommandRunner;
@@ -35,7 +35,7 @@ public class ShFactory extends ScheduledExecutorFactory<ShConfig, Sh> {
 	@Override
 	public Sh make(Object scriptObject) {
 		ShConfig config = convertProcessorConfig(scriptObject);
-		ScheduledExecutor executor = makeScheduledExecutor(config);
+		ScheduledExecutor executor = makeScheduledExecutor(config, false);
 		CommandRunner runner = makeCommandOutputProducer(config);
 		return new Sh(getProcessorService(), config, name(), executor, runner);
 	}

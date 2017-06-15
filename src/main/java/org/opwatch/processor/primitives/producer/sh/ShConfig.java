@@ -1,4 +1,4 @@
-package org.opwatch.processor.primitives.producer.cron;
+package org.opwatch.processor.primitives.producer.sh;
 
 import org.opwatch.processor.config.ImplicitProperty;
 import org.opwatch.processor.config.ScheduledProcessorConfig;

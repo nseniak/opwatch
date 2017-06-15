@@ -34,8 +34,8 @@ public class TestFactory extends ActiveProcessorFactory<TestConfig, Test> {
 	@Override
 	public Test make(Object scriptObject) {
 		TestConfig config = convertProcessorConfig(scriptObject);
-		JavascriptPredicate lambda = checkPropertyValue("lambda", config.getLambda());
-		return new Test(getProcessorService(), config, name(), lambda);
+		JavascriptPredicate predicate = checkPropertyValue("predicate", config.getPredicate());
+		return new Test(getProcessorService(), config, name(), predicate);
 	}
 
 }

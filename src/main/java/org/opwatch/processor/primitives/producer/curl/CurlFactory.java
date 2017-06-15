@@ -65,7 +65,7 @@ public class CurlFactory extends ScheduledExecutorFactory<CurlConfig, Curl> {
 		int maxRedirects = config.getMaxRedirects();
 		Map<String, ValueOrList<String>> headers = config.getHeaders();
 		Object data = config.getData();
-		return new Curl(getProcessorService(), config, name(), makeScheduledExecutor(config), uri, method, headers, data,
+		return new Curl(getProcessorService(), config, name(), makeScheduledExecutor(config, false), uri, method, headers, data,
 				connectTimeout, readTimeout, insecure, followRedirects, maxRedirects);
 	}
 

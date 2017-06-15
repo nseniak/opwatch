@@ -77,6 +77,8 @@ public class DocumentationService {
 				switch (outputRequirement) {
 					case Any:
 						return "wildcard";
+					case Data:
+						return "producer or filter";
 				}
 		}
 		return signatureDescriptor(signature);

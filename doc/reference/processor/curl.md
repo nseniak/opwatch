@@ -28,7 +28,8 @@ curl(configuration_object)
 | `insecure` | in case of an SSL connection, proceed even for connections otherwise considered insecure | Boolean | `false` |
 | `timeout` | maximum time allowed for reading the result | [Duration](../programming.md#Durations) | `"10s"` |
 | `connectTimeout` | maximum time allowed for the connection | [Duration](../programming.md#Durations) | `"5s"` |
-| `period` | period at which a request is executed | [Duration](../programming.md#Durations) | `"1s"` |
+| `delay` | initial delay after which `url` is first requested | [Duration](../programming.md#Durations) | `"0s"` |
+| `period` | period at which the `url` is repeatedly requested | [Duration](../programming.md#Durations) | `"10s"` |
  
  ### Response object
  

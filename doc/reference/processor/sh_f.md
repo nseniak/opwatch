@@ -1,4 +1,4 @@
-## `shapply`
+## `sh_f`
 
 Transforms its input using a shell command.
 
@@ -11,8 +11,8 @@ Transforms its input using a shell command.
 ### Synopsis
 
 ```js
-shapply(command)
-shapply(configuration_object)
+sh_f(command)
+sh_f(configuration_object)
 ```
 
 ### Configuration properties
@@ -23,9 +23,9 @@ shapply(configuration_object)
 
 ### Description
 
-The `shapply` processor starts `command` in a separate process using `sh -c <command>`. Every input received by
-`shapply` is converted to a string using `JSON.stringify` and sent to this process's input. Every line produced
-by the process is sent to `shapply`'s output as a String.
+The `sh_f` processor starts `command` in a separate process using `sh -c <command>`. Every input received by
+`sh_f` is converted to a string using `JSON.stringify` and sent to this process's input. Every line produced
+by the process is sent to `sh_f`'s output as a String.
 
 ### Example
 
@@ -34,7 +34,7 @@ by the process is sent to `shapply`'s output as a String.
 ```js
 pipe(
   tail("application.log"),
-  shapply("grep --line-buffered \"pattern\""),
+  sh_f("grep --line-buffered \"pattern\""),
   alert({
   	title: "error in log",
   })
