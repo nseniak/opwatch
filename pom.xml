@@ -12,7 +12,7 @@
 	<artifactId>opwatch</artifactId>
 	<name>Opwatch</name>
 	<description>A tool for monitoring live systems to detect problems and generate alerts</description>
-	<version>v0.9.1-SNAPSHOT</version>
+	<version>v0.9.2-SNAPSHOT</version>
 
 	<repositories>
 		<repository>
