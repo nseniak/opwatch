@@ -5,8 +5,8 @@
 #   JAVA_OPTS -- Java Options to be passed to the JVM
 #
 
-HOME_DIR=$(dirname $0)
-cd ${HOME_DIR}
+cd $(dirname $0)
+HOME_DIR=$(pwd)
 
 if [ -x "${JAVA_HOME}/bin/java" ]
 then
