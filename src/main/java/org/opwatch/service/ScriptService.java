@@ -25,7 +25,6 @@ import org.opwatch.processor.primitives.filter.grep.GrepFactory;
 import org.opwatch.processor.primitives.filter.json.JsonFactory;
 import org.opwatch.processor.primitives.filter.jstack.JstackFactory;
 import org.opwatch.processor.primitives.filter.sh_f.ShFilterFactory;
-import org.opwatch.processor.primitives.filter.test.TestFactory;
 import org.opwatch.processor.primitives.filter.trace.TraceFactory;
 import org.opwatch.processor.primitives.filter.trail.TrailFactory;
 import org.opwatch.processor.primitives.producer.call.CallFactory;
@@ -119,7 +118,6 @@ public class ScriptService {
 			createSimpleFactoryFunction(new StdinFactory(processorService));
 			createSimpleFactoryFunction(new StdoutFactory(processorService));
 			createSimpleFactoryFunction(new TailFactory(processorService));
-			createSimpleFactoryFunction(new TestFactory(processorService));
 			createSimpleFactoryFunction(new TopFactory(processorService));
 			createSimpleFactoryFunction(new TraceFactory(processorService));
 			createSimpleFactoryFunction(new TrailFactory(processorService));

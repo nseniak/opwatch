@@ -44,3 +44,16 @@ pipe(
   })
 ).run();
 ```
+
+#### Print non-empty log file lines 
+
+```js
+pipe(
+  tail("application.log"),
+  apply(function (line) { 
+  	if (line.length !== 0) return line;
+  	// Otherwise undefined is returned
+  }),
+  stdout()
+).run();
+```

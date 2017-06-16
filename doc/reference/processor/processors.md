@@ -14,13 +14,11 @@
 ### Filters
 
 * [`apply`](apply.md) -- transforms its input using a callback
-* [`sh_f`](sh_f.md) -- transforms its input using a shell command
 * [`collect`](collect.md) -- collects the last `count` received inputs
 * [`grep`](grep.md) -- regexp-based filter
 * [`json`](json.md) -- parses a string into a Json object
 * [`jstack`](jstack.md) -- parses java Java exception stack
 * [`sh_f`](sh_f.md) -- transforms its input using a shell command
-* [`test`](test.md) -- callback-based filter
 * [`trail`](trail.md) -- collects the inputs received during the last `duration` milliseconds
 
 ### Consumers
@@ -29,7 +27,7 @@
 * [`send`](send.md) -- sends its input to a remote Opwatch instance
 * [`stdout`](stdout.md) -- writes its input to the standard output
 
-### Producers/Filters
+### Producer/Filters
 
 * [`call`](call.md) -- generates output using a callback
 
