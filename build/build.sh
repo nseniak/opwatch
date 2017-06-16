@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-(cd ..;mvn clean deploy) || exit 1
+(cd ..;mvn clean install) || exit 1
