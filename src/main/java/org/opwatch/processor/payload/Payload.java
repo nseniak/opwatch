@@ -1,11 +1,11 @@
 package org.opwatch.processor.payload;
 
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
+import jdk.nashorn.internal.runtime.ScriptRuntime;
 import org.opwatch.processor.common.Processor;
 import org.opwatch.processor.primitives.producer.receive.Receive;
 import org.opwatch.service.ProcessorService;
 import org.opwatch.service.ScriptService;
-import sun.jvm.hotspot.utilities.soql.ScriptObject;
 
 /**
  * Represents the output of a processor.
@@ -47,7 +47,7 @@ public class Payload extends PayloadPojoValue {
 	/**
 	 * Optional metadata
 	 */
-	private Object metadata = ScriptObject.UNDEFINED;
+	private Object metadata = ScriptRuntime.UNDEFINED;
 
 	private Payload() {
 	}
