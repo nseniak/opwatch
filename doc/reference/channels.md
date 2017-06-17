@@ -19,11 +19,11 @@ where the configuration object has the form:
 
 ```js
 {
-	"services": {
-		"<channel type 1>": <channel definitions>, 	
-		"<channel type 2>": <channel definitions>
-		// etc
-	}
+  "services": {
+	"<channel type 1>": <channel definitions>, 	
+	"<channel type 2>": <channel definitions>
+	// etc
+  }
   "applicationChannel": "<channel name>", 
   "systemChannel": "<channel name>", 
   "fallbackChannel": "<channel name>" 
