@@ -62,7 +62,7 @@ $ ./opwatch
 
 * [Quick start](doc/quickstart.md)
 * [Overview](doc/overview.md)
-* [Code snippets](doc/snippets.md)
+* [Example index](doc/examples.md)
 * [Reference manual](doc/reference/reference.md)
   * [Command line arguments](doc/reference/command.md)
   * [Programming reference](doc/reference/programming.md) 
