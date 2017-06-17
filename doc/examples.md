@@ -3,6 +3,38 @@
 This page contains all the code examples provided in the documentation. Click a title to go to the page that includes
 the example and see it in context.
 
+<!-- example-index-begin -->
+- [Display an alert if disk usage is > 80%; version 1](#display-an-alert-if-disk-usage-is--80-version-1)
+- [Display an alert if disk usage is > 80%; version 2](#display-an-alert-if-disk-usage-is--80-version-2)
+- [Display an alert if disk usage is > 80%; version 3](#display-an-alert-if-disk-usage-is--80-version-3)
+- [Trigger an alert if the average free swap space over 5 minutes is smaller than 10 megabytes](#trigger-an-alert-if-the-average-free-swap-space-over-5-minutes-is-smaller-than-10-megabytes)
+- [Print non-empty log file lines](#print-nonempty-log-file-lines)
+- [Count seconds](#count-seconds)
+- [Every hour, publish the number of lines containing SIGNUP that were added to a log file](#every-hour-publish-the-number-of-lines-containing-signup-that-were-added-to-a-log-file)
+- [Trigger an alert if three consecutive http requests at a 30 second interval are unsuccessful](#trigger-an-alert-if-three-consecutive-http-requests-at-a-30-second-interval-are-unsuccessful)
+- [Trigger an alert if a Web site is down](#trigger-an-alert-if-a-web-site-is-down)
+- [Trigger an alert if a Web site is found to be down for at least 2 of the 10 last requests](#trigger-an-alert-if-a-web-site-is-found-to-be-down-for-at-least-2-of-the-10-last-requests)
+- [Trigger an alert if a REST API returns a wrong value](#trigger-an-alert-if-a-rest-api-returns-a-wrong-value)
+- [Trigger an alert when a filesystem usage ratio is greater than 80%](#trigger-an-alert-when-a-filesystem-usage-ratio-is-greater-than-80)
+- [Trigger an alert for each line in a log file that contains `error` or `warning`](#trigger-an-alert-for-each-line-in-a-log-file-that-contains-error-or-warning)
+- [Trigger an alert for each line in a log file that does *not* contain `info`](#trigger-an-alert-for-each-line-in-a-log-file-that-does-not-contain-info)
+- [Trigger an alert if a json object log contains an error](#trigger-an-alert-if-a-json-object-log-contains-an-error)
+- [Trigger an alert if the file `application.log` contains `ERROR` or `WARNING`](#trigger-an-alert-if-the-file-applicationlog-contains-error-or-warning)
+- [Trigger an alert if either `application1.log` or `application2.log` contains `ERROR`](#trigger-an-alert-if-either-application1log-or-application2log-contains-error)
+- [Centralize logs from several servers and trigger an alert if they contain too many errors overall](#centralize-logs-from-several-servers-and-trigger-an-alert-if-they-contain-too-many-errors-overall)
+- [Centralize system load information from several servers and trigger an alert if the average CPU is too high](#centralize-system-load-information-from-several-servers-and-trigger-an-alert-if-the-average-cpu-is-too-high)
+- [Triggers an alert if the number of files in a directory is greater than 100](#triggers-an-alert-if-the-number-of-files-in-a-directory-is-greater-than-100)
+- [Trigger an alert if there's no `mongod` running process](#trigger-an-alert-if-theres-no-mongod-running-process)
+- [Use the `grep` unix command to filter payload](#use-the-grep-unix-command-to-filter-payload)
+- [Trigger an alert when a file hasn't been updated since 10 minutes](#trigger-an-alert-when-a-file-hasnt-been-updated-since-10-minutes)
+- [Write system load information to standard output](#write-system-load-information-to-standard-output)
+- [Trigger an alert when the log file gets bigger than 100,000 lines](#trigger-an-alert-when-the-log-file-gets-bigger-than-100000-lines)
+- [Trigger an alert when the CPU is higher than 80%](#trigger-an-alert-when-the-cpu-is-higher-than-80)
+- [Trigger an alert when a log file has more than 20 Java exception per second](#trigger-an-alert-when-a-log-file-has-more-than-20-java-exception-per-second)
+- [Trigger an alert when the disk usage increases by more than 20% in an hour](#trigger-an-alert-when-the-disk-usage-increases-by-more-than-20-in-an-hour)
+- [Trigger an alert when a log file remains silent for more than 10 minutes](#trigger-an-alert-when-a-log-file-remains-silent-for-more-than-10-minutes)
+<!-- example-index-end -->
+
 <!-- example-list-begin -->
 ---
 #### [Display an alert if disk usage is > 80%; version 1](reference/processor/alert.md#display-an-alert-if-disk-usage-is--80-version-1)

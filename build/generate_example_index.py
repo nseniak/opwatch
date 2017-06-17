@@ -33,21 +33,28 @@ def file_examples(file):
     return examples
 
 
+index_begin = '<!-- example-index-begin -->'
+index_end = '<!-- example-index-end -->'
+index_regex = re.compile(re.escape(index_begin) + '\n.*' + re.escape(index_end), re.DOTALL)
 list_begin = '<!-- example-list-begin -->'
 list_end = '<!-- example-list-end -->'
 list_regex = re.compile(re.escape(list_begin) + '\n.*' + re.escape(list_end), re.DOTALL)
 
-items = []
+index = []
+examples = []
 for file in md_files(doc_root_dir):
     for example in file_examples(file):
         title = example['title']
         body = example['body']
         anchor = example['anchor']
-        items.append('---\n#### [' + title + '](' + file[len(doc_root_dir):] + "#" + anchor + ')' + body)
-list = '\n'.join(items)
+        examples.append('---\n#### [' + title + '](' + file[len(doc_root_dir):] + "#" + anchor + ')' + body)
+        index.append('- [' + title + '](#' + anchor + ')')
+index_list = '\n'.join(index)
+example_list = '\n'.join(examples)
 with open(list_file, 'r') as list_file_desc:
     content = list_file_desc.read()
-new_content = list_regex.sub(list_begin + '\n' + list + '\n' + list_end, content)
+new_content = list_regex.sub(list_begin + '\n' + example_list + '\n' + list_end, content)
+new_content = index_regex.sub(index_begin + '\n' + index_list + '\n' + index_end, new_content)
 
 with open(list_file, 'w') as list_file_desc:
     list_file_desc.write(new_content)
