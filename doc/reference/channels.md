@@ -86,7 +86,6 @@ administration interface:
 To define one or more Pushover channels, use the following syntax:
 
 ```js
-{
   "pushover": {
     "channels": {
       "<channel name 1>": {
@@ -100,7 +99,6 @@ To define one or more Pushover channels, use the following syntax:
       // add Pushover channels here
     }
   }
-}
 ```
 
 ## Slack
@@ -114,7 +112,6 @@ display the Incoming WebHook URL that you can copy and use in the Opwatch channe
 To define one or more Slack channels, use the following syntax:
 
 ```js
-{
   "slack": {
     "channels": {
       "<channel name 1>": {
@@ -126,7 +123,6 @@ To define one or more Slack channels, use the following syntax:
       // add Slack channels here
     }
   }
-}
 ```
 
 ## Remote
@@ -135,7 +131,6 @@ Remote channels send alerts to other Opwatch servers, in order to let them publi
 more remote channels, use the following syntax: 
 
 ```js
-{
   "remote": {
     "channels": {
       "<channel name 1>": {
@@ -151,5 +146,4 @@ more remote channels, use the following syntax:
       // add remote channels here
     }
   }
-}
 ```
