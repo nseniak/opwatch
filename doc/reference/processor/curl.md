@@ -100,7 +100,7 @@ pipe(
 ).run();
 ```
 
-#### Trogger an alert if a REST API returns an wrong value
+#### Trigger an alert if a REST API returns an wrong value
 
 
 ```js
