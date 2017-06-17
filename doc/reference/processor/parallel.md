@@ -28,6 +28,7 @@ each processor, and the output of each processor is sent to the output of the `p
 
 ### Examples
 
+<!-- example-begin -->
 #### Trigger an alert if the file `application.log` contains `ERROR` or `WARNING`
 
 ```js
@@ -37,7 +38,9 @@ pipe(
   alert("Error or warning")
 ).run();
 ```
+<!-- example-end -->
 
+<!-- example-begin -->
 #### Trigger an alert if either `application1.log` or `application2.log` contains `ERROR`
 
 ```js
@@ -50,3 +53,4 @@ pipe(
   alert("Error or warning")
 ).run();
 ```
+<!-- example-end -->

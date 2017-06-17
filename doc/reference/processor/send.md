@@ -32,6 +32,7 @@ The input value or object is serialized using `JSON.stringify` and deserialized 
 
 ### Example
 
+<!-- example-begin -->
 #### Centralize logs from several servers and trigger an alert if they contain too many errors overall
 
 Execute on the servers running the application:
@@ -57,7 +58,9 @@ pipe(
 	})
 ).run();
 ```
+<!-- example-end -->
 
+<!-- example-begin -->
 #### Centralize system load information from several servers and trigger an alert if the average CPU is too high
 
 Run on the servers running the application:
@@ -108,3 +111,4 @@ pipe(
 	})
 ).run();
 ```
+<!-- example-end -->

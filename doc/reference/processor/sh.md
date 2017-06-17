@@ -32,6 +32,7 @@ See also: [`sh_f`](sh_f.md).
 
 ### Example
 
+<!-- example-begin -->
 #### Triggers an alert if the number of files in a directory is greater than 100 
 
 Note the use of `json` to convert the string output of `sh` to a number: 
@@ -47,7 +48,9 @@ pipe(
   })
 ).run();
 ```
+<!-- example-end -->
 
+<!-- example-begin -->
 #### Trigger an alert if there's no `mongod` running process
 
 ```js
@@ -74,3 +77,4 @@ pipe(
   })
 ).run();
 ```
+<!-- example-end -->

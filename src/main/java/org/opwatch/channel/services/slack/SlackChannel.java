@@ -10,6 +10,7 @@ import org.opwatch.channel.common.throttled.MessageAggregate;
 import org.opwatch.channel.common.throttled.Rate;
 import org.opwatch.channel.common.throttled.RateLimiter;
 import org.opwatch.channel.common.throttled.ThrottledChannel;
+import org.opwatch.channel.services.slack.SlackConfiguration.ChannelConfig;
 import org.opwatch.processor.common.Message;
 import org.opwatch.processor.common.RuntimeError;
 import org.opwatch.service.ProcessorService;
@@ -39,9 +40,10 @@ public class SlackChannel extends ThrottledChannel<SlackConfiguration> {
 		this.config = config;
 		this.service = service;
 		this.processorService = processorService;
-		this.webhookUrl = findWebhookUrl(name);
+		ChannelConfig channelConfig = channelConfiguration(name, config);
+		this.webhookUrl = findWebhookUrl(name, channelConfig);
 		this.client = SlackClientFactory.createWebhookClient(webhookUrl);
-		Rate limit = new Rate((int) TimeUnit.MINUTES.toSeconds(1), config.getMaxPerMinute());
+		Rate limit = new Rate((int) TimeUnit.MINUTES.toSeconds(1), channelConfig.getMaxPerMinute());
 		this.rateLimiter = new RateLimiter(service.timestampSeconds(), Arrays.asList(limit), null);
 	}
 
@@ -100,16 +102,19 @@ public class SlackChannel extends ThrottledChannel<SlackConfiguration> {
 		client.post(payload);
 	}
 
-	private String findWebhookUrl(String channelName) {
-		if ((config.getChannels() == null) || (config.getChannels().get(channelName) == null)) {
-			throw new RuntimeError("Slack channel configuration not found: " + channelName);
-		}
-		SlackConfiguration.ChannelConfig channelConfig = config.getChannels().get(channelName);
+	private String findWebhookUrl(String channelName, ChannelConfig channelConfig) {
 		String webhookUrl = channelConfig.getWebhookUrl();
 		if (webhookUrl == null) {
 			throw new RuntimeError("Slack webhookUrl not defined for channel \"" + channelName + "\"");
 		}
 		return webhookUrl;
+	}
+
+	private ChannelConfig channelConfiguration(String channelName, SlackConfiguration config) {
+		if ((config.getChannels() == null) || (config.getChannels().get(channelName) == null)) {
+			throw new RuntimeError("Slack channel configuration not found: " + channelName);
+		}
+		return config.getChannels().get(channelName);
 	}
 
 	private void addMainAttachment(Payload payload, Message message) {

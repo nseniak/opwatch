@@ -20,6 +20,7 @@ The `stdout` processor converts its input to text using `JSON.stringify` and wri
 
 ### Examples
 
+<!-- example-begin -->
 #### Write system load information to standard output
 
 ```js
@@ -28,3 +29,4 @@ pipe(
 	stdout()
 ).run();
 ```
+<!-- example-end -->

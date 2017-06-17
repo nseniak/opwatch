@@ -5,6 +5,7 @@ import org.opwatch.channel.common.throttled.MessageAggregate;
 import org.opwatch.channel.common.throttled.Rate;
 import org.opwatch.channel.common.throttled.RateLimiter;
 import org.opwatch.channel.common.throttled.ThrottledChannel;
+import org.opwatch.channel.services.pushover.PushoverConfiguration.ChannelConfig;
 import org.opwatch.processor.common.GlobalExecutionScope;
 import org.opwatch.processor.common.Message;
 import org.opwatch.processor.common.MessageContext;
@@ -31,6 +32,8 @@ public class PushoverChannel extends ThrottledChannel<PushoverConfiguration> {
 	private PushoverMessageService service;
 	private RateLimiter rateLimiter;
 	private PushoverKey pushoverKey;
+	private int emergencyRetry;
+	private int emergencyExpire;
 
 	public PushoverChannel(String name, PushoverConfiguration config, PushoverMessageService service, ProcessorService processorService) {
 		super(processorService, service);
@@ -38,17 +41,16 @@ public class PushoverChannel extends ThrottledChannel<PushoverConfiguration> {
 		this.config = config;
 		this.service = service;
 		this.processorService = processorService;
-		this.pushoverKey = makeKey(name);
+		ChannelConfig channelConfig = channelConfiguration(name, config);
+		this.pushoverKey = makeKey(name, channelConfig);
 		this.rateLimiter = new RateLimiter(service.timestampSeconds(),
-				Arrays.asList(new Rate((int) TimeUnit.MINUTES.toSeconds(1), config.getMaxPerMinute())),
+				Arrays.asList(new Rate((int) TimeUnit.MINUTES.toSeconds(1), channelConfig.getMaxPerMinute())),
 				service.apiTokenRateLimit(pushoverKey.getApiToken()));
+		this.emergencyRetry = channelConfig.getEmergencyRetry();
+		this.emergencyExpire = channelConfig.getEmergencyExpire();
 	}
 
-	private PushoverKey makeKey(String channelName) {
-		if ((config.getChannels() == null) || (config.getChannels().get(channelName) == null)) {
-			throw new RuntimeError("Pushover channel configuration not found: " + channelName);
-		}
-		PushoverConfiguration.ChannelConfig channelConfig = config.getChannels().get(channelName);
+	private PushoverKey makeKey(String channelName, ChannelConfig channelConfig) {
 		String apiToken = channelConfig.getApiToken();
 		if (apiToken == null) {
 			throw new RuntimeError("Pushover apiToken not defined for channel \"" + channelName + "\"");
@@ -59,6 +61,14 @@ public class PushoverChannel extends ThrottledChannel<PushoverConfiguration> {
 		}
 		return new PushoverKey(apiToken, userKey);
 	}
+
+	private ChannelConfig channelConfiguration(String channelName, PushoverConfiguration config) {
+		if ((config.getChannels() == null) || (config.getChannels().get(channelName) == null)) {
+			throw new RuntimeError("Pushover channel configuration not found: " + channelName);
+		}
+		return config.getChannels().get(channelName);
+	}
+
 
 	@Override
 	public String name() {
@@ -149,16 +159,16 @@ public class PushoverChannel extends ThrottledChannel<PushoverConfiguration> {
 		Integer retry = null;
 		Integer expire = null;
 		if (priority == MessagePriority.EMERGENCY) {
-			retry = config.getEmergencyRetry();
-			expire = config.getEmergencyExpire();
+			retry = emergencyRetry;
+			expire = emergencyExpire;
 		}
 		return PushoverMessage.builderWithApiToken(pushoverKey.getApiToken())
 				.setUserId(pushoverKey.getUserKey())
 				.setTitle(title)
 				.setMessage(message)
 				.setPriority(priority)
-//				.setRetry(retry)
-//				.setExpire(expire)
+				.setRetry(retry)
+				.setExpire(expire)
 				.build();
 	}
 

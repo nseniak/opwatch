@@ -42,6 +42,7 @@ If `delay` is defined, the first output is generated after max(`delay`, `duratio
  
 ### Examples
 
+<!-- example-begin -->
 #### Trigger an alert when a log file has more than 20 Java exception per second
 
 This alert is in toggle mode, thus it will stay up as long as the exception frequency stays high:
@@ -58,7 +59,9 @@ pipe(
 	})
 ).run();
 ```
+<!-- example-end -->
 
+<!-- example-begin -->
 #### Trigger an alert when the disk usage increases by more than 20% in an hour
 
 ```js
@@ -83,7 +86,9 @@ period of `df` can be decreased, which will reduce Opwatch memory consumption:
 ```js
 df({ file: "/tmp", period: "10m" })
 ```
+<!-- example-end -->
 
+<!-- example-begin -->
 #### Trigger an alert when a log file remains silent for more than 10 minutes
 
 ```js
@@ -97,3 +102,4 @@ pipe(
 	})
 ).run();
 ```
+<!-- example-end -->

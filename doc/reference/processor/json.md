@@ -26,6 +26,7 @@ error triggers an alert.
 
 ### Example
 
+<!-- example-begin -->
 #### Trigger an alert if a json object log contains an error
 
 This example assumes that an application appends Json objects to the structured log file `application.log.json`: 
@@ -40,3 +41,4 @@ pipe(
   })
 ).run();
 ```
+<!-- example-end -->

@@ -30,7 +30,7 @@
 		<jline.version>2.14.2</jline.version>
 		<jopt.version>5.0.3</jopt.version>
 		<prettytime.version>3.2.7.Final</prettytime.version>
-		<pushover-client.version>1.0.1-SNAPSHOT</pushover-client.version>
+		<pushover-client.version>1.0.4</pushover-client.version>
 		<nashorn-commonjs.version>1.0.7</nashorn-commonjs.version>
 		<jsoup.version>1.10.2</jsoup.version>
 		<javatuple.version>1.2</javatuple.version>
@@ -85,8 +85,8 @@
 			<version>${jopt.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.github.sps.pushover.net</groupId>
-			<artifactId>pushover-client</artifactId>
+			<groupId>com.github.nseniak</groupId>
+			<artifactId>pushover4j</artifactId>
 			<version>${pushover-client.version}</version>
 		</dependency>
 		<dependency>

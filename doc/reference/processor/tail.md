@@ -37,8 +37,12 @@ In addition to its output, `tail` produces a metadata object that has the follow
 | `file` | the absolute path of the tailed file | String | *Always* |
 | `line` | line number in the tailed file | Number | *Always* |
 
-This object can be accessed by the `metadata` property of the [payload](processors.md) object. For example, the
-following code triggers an alert when the log file gets bigger than 100,000 lines:
+This object can be accessed by the `metadata` property of the [payload](processors.md) object.
+
+### Examples
+
+<!-- example-begin -->
+#### Trigger an alert when the log file gets bigger than 100,000 lines
 
 ```js
 pipe(
@@ -50,3 +54,4 @@ pipe(
 	})
 ).run();
 ```
+<!-- example-end -->

@@ -32,7 +32,7 @@ The matching is performed using the RegExp `test` method.
 
 ### Examples
 
-<!-- example -->
+<!-- example-begin -->
 #### Trigger an alert for each line in a log file that contains `error` or `warning`
 
 ```js
@@ -42,8 +42,9 @@ pipe(
   alert("Problem found!")
 ).run();
 ```
+<!-- example-end -->
 
-<!-- example -->
+<!-- example-begin -->
 #### Trigger an alert for each line in a log file that does *not* contain `info`
 
 ```js
@@ -53,3 +54,4 @@ pipe(
   alert("Problem found!")
 ).run();
 ```
+<!-- example-end -->

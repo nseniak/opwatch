@@ -97,18 +97,26 @@ To define one or more Pushover channels, use the following syntax:
 ```js
   "pushover": {
     "channels": {
-      "<channel name 1>": {
-        "apiToken": "<Pushover API token 1>",
-        "userKey": "<Pushover user key 1>"
-      },
-      "<channel name 2>": {
-        "apiToken": "<Pushover API token 2>",
-        "userKey": "<Pushover user key 2>"
-      }
-      // add Pushover channels here
+      "<channel name 1>": <Pushover channel definition 1>
+      "<channel name 2>": <Pushover channe definition 2>
+    // add Pushover channels here
     }
   }
 ```
+
+A Pushover channel definition is an object with the following properties:
+
+| Property | Description | Type | Default |
+| :--- | :--- | :--- | :--- |
+| `apiToken` | Pushover API token | String | *Mandatory* | 
+| `userKey` | Pushover user key  | String | *Mandatory* |
+| `retry` | how many seconds between retries for emergency messages | Number | 60 |
+| `expire` | how many seconds an emergency notification will continue to be retried for | Number | 3600 |
+| `maxPerMinute` | maximum number of notifications per minute, after which alerts are throttled | Number | 10 |
+
+Alerts with level `lowest` are pushed as Pushover notifications with priority `lowest`, alerts with level `low` as 
+notifications with priority `low`, etc. For an explanation of Pushover levels, retry and expire policies, see
+[Pishover API documentation for Message priority](https://pushover.net/api#priority).
 
 ### Slack
 
@@ -123,16 +131,19 @@ To define one or more Slack channels, use the following syntax:
 ```js
   "slack": {
     "channels": {
-      "<channel name 1>": {
-        "webhookUrl": "<Incoming WebHook URL 1>"
-      },
-      "<channel name 2>": {
-        "webhookUrl": "<Incoming WebHook URL 2>"
-      }
+      "<channel name 1>": <Slack channel definition 1>,
+      "<channel name 2>": <Slack channel definition 2>
       // add Slack channels here
     }
   }
 ```
+
+A Slack channel definition is an object with the following properties:
+
+| Property | Description | Type | Default |
+| :--- | :--- | :--- | :--- |
+| `webhookUrl` | Slack incoming webhook URL | String | *Mandatory* | 
+| `maxPerMinute` | maximum number of notifications per minute, after which alerts are throttled | Number | 10 |
 
 ### Remote
 
@@ -142,17 +153,17 @@ more remote channels, use the following syntax:
 ```js
   "remote": {
     "channels": {
-      "<channel name 1>": {
-        "hostname": "<remote Opwatch instance hostname>",
-        "port": <remote Opwatch instance http port number (28018 by default)>,
-        "channel": "<name of the channel on the remote Opwatch instance>"
-      },
-      "<channel name 2>": {
-        "hostname": "<remote Opwatch instance hostname>",
-        "port": <remote Opwatch instance http port number (28018 by default)>,
-        "channel": "<name of the channel on the remote Opwatch instance>"
-      }
+      "<channel name 1>": <remote channel definition 1>,
+      "<channel name 2>": <remote channel definition 2>
       // add remote channels here
     }
   }
 ```
+
+A remote channel definition is an object with the following properties:
+
+| Property | Description | Type | Default |
+| :--- | :--- | :--- | :--- |
+| `hostname` | remote Opwatch instance hostname | String | *Mandatory* | 
+| `port` | remote Opwatch instance http port number | Number | 28018 |
+| `channel` | name of the channel on the remote Opwatch instance | String | *Mandatory* |

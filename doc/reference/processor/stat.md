@@ -40,6 +40,7 @@ The `stat` processor generates file information at a regular interval.
  
 ### Examples
 
+<!-- example-begin -->
 #### Trigger an alert when a file hasn't been updated since 10 minutes
 
 ```js
@@ -59,3 +60,4 @@ pipe(
 	})
 ).run();
 ```
+<!-- example-end -->

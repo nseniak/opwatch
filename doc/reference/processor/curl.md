@@ -70,6 +70,7 @@ a request is still pending when the following request is executed, and the latte
 
 ### Examples
 
+<!-- example-begin -->
 #### Trigger an alert if a Web site is down
 
 ```js
@@ -79,7 +80,9 @@ pipe(
   alert("Website is down")
 ).run();
 ```
+<!-- example-end -->
 
+<!-- example-begin -->
 #### Trigger an alert if a Web site is found to be down for at least 2 of the 10 last requests 
 
 ```js
@@ -99,7 +102,9 @@ pipe(
   })
 ).run();
 ```
+<!-- example-end -->
 
+<!-- example-begin -->
 #### Trigger an alert if a REST API returns a wrong value
 
 
@@ -125,3 +130,4 @@ pipe(
   })
 ).run();
 ```
+<!-- example-end -->

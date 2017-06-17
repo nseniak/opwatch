@@ -33,6 +33,7 @@ objects representing these inputs. When a new input is received, a new array wit
 
 ### Examples
 
+<!-- example-begin -->
 #### Trigger an alert if three consecutive http requests at a 30 second interval are unsuccessful
 
 ```js
@@ -50,3 +51,4 @@ pipe(
 		})
 ).run();
 ```
+<!-- example-end -->

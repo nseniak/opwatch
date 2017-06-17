@@ -29,6 +29,7 @@ by the process is sent to `sh_f`'s output as a String.
 
 ### Example
 
+<!-- example-begin -->
 #### Use the `grep` unix command to filter payload
 
 ```js
@@ -45,3 +46,4 @@ The `--line-buffered` option forces `grep`'s output to be line buffered. By defa
 block buffered when standard output is not a terminal, which is the case here; without this option, the output 
 would be delayed until the buffer is full, which would also delay the alarm. In general, you should use
 shell commands with buffered output with care, as they might not yield to the natural behavior you would expected.
+<!-- example-end -->

@@ -30,6 +30,7 @@ See also: [`call`](call.md).
 
 ### Example
 
+<!-- example-begin -->
 #### Trigger an alert if the average free swap space over 5 minutes is smaller than 10 megabytes
 
 ```js
@@ -44,7 +45,9 @@ pipe(
   })
 ).run();
 ```
+<!-- example-end -->
 
+<!-- example-begin -->
 #### Print non-empty log file lines 
 
 ```js
@@ -57,3 +60,4 @@ pipe(
   stdout()
 ).run();
 ```
+<!-- example-end -->

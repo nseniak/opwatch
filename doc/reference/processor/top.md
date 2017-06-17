@@ -40,6 +40,7 @@ The `top` processor generates system load information at a regular interval.
  
 ### Examples
 
+<!-- example-begin -->
 #### Trigger an alert when the CPU is higher than 80%
 
 ```js
@@ -55,3 +56,4 @@ pipe(
 	})
 ).run();
 ```
+<!-- example-end -->

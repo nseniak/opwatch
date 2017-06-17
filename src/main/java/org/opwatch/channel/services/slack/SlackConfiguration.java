@@ -7,57 +7,11 @@ import java.util.Map;
 public class SlackConfiguration extends ServiceConfiguration {
 
 	private Map<String, ChannelConfig> channels;
-	private int maxPerMinute = 10;
-
-	public static class Application {
-
-		private String name;
-		private String apiToken;
-
-		public String getName() {
-			return name;
-		}
-
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		public String getApiToken() {
-			return apiToken;
-		}
-
-		public void setApiToken(String apiToken) {
-			this.apiToken = apiToken;
-		}
-
-	}
-
-	public static class User {
-
-		private String name;
-		private String userKey;
-
-		public String getName() {
-			return name;
-		}
-
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		public String getUserKey() {
-			return userKey;
-		}
-
-		public void setUserKey(String userKey) {
-			this.userKey = userKey;
-		}
-
-	}
 
 	public static class ChannelConfig {
 
 		private String webhookUrl;
+		private int maxPerMinute = 10;
 
 		public String getWebhookUrl() {
 			return webhookUrl;
@@ -65,6 +19,14 @@ public class SlackConfiguration extends ServiceConfiguration {
 
 		public void setWebhookUrl(String webhookUrl) {
 			this.webhookUrl = webhookUrl;
+		}
+
+		public int getMaxPerMinute() {
+			return maxPerMinute;
+		}
+
+		public void setMaxPerMinute(int maxPerMinute) {
+			this.maxPerMinute = maxPerMinute;
 		}
 
 	}
@@ -75,14 +37,6 @@ public class SlackConfiguration extends ServiceConfiguration {
 
 	public void setChannels(Map<String, ChannelConfig> channels) {
 		this.channels = channels;
-	}
-
-	public int getMaxPerMinute() {
-		return maxPerMinute;
-	}
-
-	public void setMaxPerMinute(int maxPerMinute) {
-		this.maxPerMinute = maxPerMinute;
 	}
 
 }

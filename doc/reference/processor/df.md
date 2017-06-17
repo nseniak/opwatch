@@ -41,6 +41,7 @@ The `df` processor generates file system information at a regular interval.
  
 ### Examples
 
+<!-- example-begin -->
 #### Trigger an alert when a filesystem usage ratio is greater than 80%
 
 ```js
@@ -55,3 +56,4 @@ pipe(
 	})
 ).run();
 ```
+<!-- example-end -->

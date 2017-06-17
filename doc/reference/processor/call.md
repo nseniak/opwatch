@@ -36,6 +36,7 @@ See also: [`apply`](sh_f.md).
 
 ### Example
 
+<!-- example-begin -->
 #### Count seconds
 
 ```js
@@ -46,7 +47,9 @@ pipe(
   stdout()
 ).run();
 ```
+<!-- example-end -->
 
+<!-- example-begin -->
 #### Every hour, publish the number of lines containing SIGNUP that were added to a log file
 
 ```js
@@ -73,3 +76,4 @@ pipe(
   })
 ).run();
 ```
+<!-- example-end -->

@@ -58,34 +58,70 @@ If the `details` property is provided, it can be either:
 
 If `details` is not provided, the alert's details are the `alert` processor input.
 
-For example, this code displays an alert whose details are the output of [`df`](df.md):
+Here are a few examples illustrating the use of the `details` field. 
+
+<!-- example-begin -->
+##### Display an alert if disk usage is > 80%; version 1
 
 ```js
-pipe(df("/tmp"), alert({
-	title: "not enough space left",
-	trigger: function (dfOutput) { return dfOutput.usageRatio > .8; }
-})).run();
+pipe(
+	df("/tmp"), 
+	alert({
+	  title: "not enough space left",
+	  trigger: function (dfOutput) { 
+	  	return dfOutput.usageRatio > .8; 
+	  },
+	  toggle: true
+	})
+).run();
 ```
 
-This code displays an alert whose details are the disk usage ratio:
+Since the `alert` processor doesn't have a `details` callback, the output of [`df`](df.md) is used for the displayed
+alert details.
+<!-- example-end -->
+ 
+<!-- example-begin -->
+##### Display an alert if disk usage is > 80%; version 2
 
 ```js
-pipe(df("/tmp"), alert({
-	title: "not enough space left",
-	details: function (dfOutput) { return dfOutput.usageRatio; }
-	trigger: function (dfOutput) { return dfOutput.usageRatio > .8; }
-})).run();
+pipe(
+	df("/tmp"), 
+	alert({
+	  title: "not enough space left",
+	  details: function (dfOutput) { 
+	  	return dfOutput.usageRatio; 
+	  },
+	  trigger: function (dfOutput) { 
+	  	return dfOutput.usageRatio > .8; 
+	  },
+    toggle: true
+  })
+).run();
 ```
+The `details` callback returns the usage ratio, so this ratio is displayed as the alert details rather than the
+output of [`df`](df.md).
+<!-- example-end -->
 
-This code displays an alert whose details are the text `"/tmp"`:
+<!-- example-begin -->
+##### Display an alert if disk usage is > 80%; version 3
 
 ```js
-pipe(df("/tmp"), alert({
-	title: "not enough space left",
-	details: "/tmp",
-	trigger: function (dfOutput) { return dfOutput.usageRatio > .8; }
-})).run();
+pipe(
+	df("/tmp"), 
+	alert({
+	  title: "not enough space left",
+	  details: "/tmp",
+	  trigger: function (dfOutput) {
+	  	return dfOutput.usageRatio > .8; 
+	  },
+    toggle: true
+  })
+).run();
 ```
+
+The `details` property is defined as the string `"/tmp"` and therefore this string is displayed as the alert details.
+<!-- example-end -->
+
 
 #### Trigger
 
@@ -106,9 +142,14 @@ For example, this code displays an "on" alert message when the `/tmp` volume rea
 alert message when it goes back under 80%.
 
 ```js
-pipe(df("/tmp"), alert({
-	title: "not enough space left",
-	trigger: function (dfOutput) { return dfOutput.usageRatio > .8; },
-	toggle: true
-})).run();
+pipe(
+	df("/tmp"), 
+	alert({
+	  title: "not enough space left",
+	  trigger: function (dfOutput) { 
+	  	return dfOutput.usageRatio > .8; 
+	  },
+	  toggle: true
+  })
+).run();
 ```
