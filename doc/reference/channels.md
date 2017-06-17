@@ -1,5 +1,13 @@
 # Channels
 
+- [Channels](#channels)
+  * [Channel configuration](#channel-configuration)
+  * [Channel definitions](#channel-definitions)
+  * [Console](#console)
+  * [Pushover](#pushover)
+  * [Slack](#slack)
+  * [Remote](#remote)
+
 Opwatch displays alerts and other messages on *channels*. Opwatch supports the following types of channels:
 
 * The *Console* channel, which prints alerts on the standard output;
