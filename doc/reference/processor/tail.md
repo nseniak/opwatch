@@ -46,12 +46,12 @@ This object can be accessed by the `metadata` property of the [payload](processo
 
 ```js
 pipe(
-	tail("application.log"),
-	alert({
-		title: "Log file has too many lines",
-		trigger: function (trailOutput, trailPayload) { return trailPayload.metadata.line > 100000; },
-		toggle: true
-	})
+  tail("application.log"),
+  alert({
+    title: "Log file has too many lines",
+    trigger: function (trailOutput, trailPayload) { return trailPayload.metadata.line > 100000; },
+    toggle: true
+  })
 ).run();
 ```
 <!-- example-end -->

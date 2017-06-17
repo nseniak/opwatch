@@ -45,15 +45,15 @@ The `top` processor generates system load information at a regular interval.
 
 ```js
 pipe(
-	top(),
-	alert({
-		title: "CPU is too high",
-		trigger: function (topOutput) {
-			var cpu = topOutput.loadAverage / topOutput.availableProcessors;
-			return cpu > 0.8;
-		},
-		toggle: true
-	})
+  top(),
+  alert({
+    title: "CPU is too high",
+    trigger: function (topOutput) {
+      var cpu = topOutput.loadAverage / topOutput.availableProcessors;
+      return cpu > 0.8;
+    },
+    toggle: true
+  })
 ).run();
 ```
 <!-- example-end -->

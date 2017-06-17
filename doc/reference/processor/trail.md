@@ -49,14 +49,14 @@ This alert is in toggle mode, thus it will stay up as long as the exception freq
 
 ```js
 pipe(
-	tail("application.log"),
-	jstack(),
-	trail("10s"),
-	alert({
-		title: "Too many exceptions",
-		trigger: function (trailOutput) { return trailOutput.length > 20; },
-		toggle: true
-	})
+  tail("application.log"),
+  jstack(),
+  trail("10s"),
+  alert({
+    title: "Too many exceptions",
+    trigger: function (trailOutput) { return trailOutput.length > 20; },
+    toggle: true
+  })
 ).run();
 ```
 <!-- example-end -->
@@ -66,16 +66,16 @@ pipe(
 
 ```js
 pipe(
-	df("/tmp"),
-	trail("1h"),
-	alert({
-		title: "/tmp usage grew by more than 20% during the last hour",
-		trigger: function (trail) { 
-			var len = trail.length;
-			return (len >= 2) && (trail[len - 1].usage / trail[0].usage) > 1.2; 
-		},
-		toggle: true
-	})
+  df("/tmp"),
+  trail("1h"),
+  alert({
+    title: "/tmp usage grew by more than 20% during the last hour",
+    trigger: function (trail) { 
+      var len = trail.length;
+      return (len >= 2) && (trail[len - 1].usage / trail[0].usage) > 1.2; 
+    },
+    toggle: true
+  })
 ).run();
 ```
 
@@ -93,13 +93,13 @@ df({ file: "/tmp", period: "10m" })
 
 ```js
 pipe(
-	tail("application.log"),
-	trail("10m"),
-	alert({
-		title: "Log file is silent",
-		trigger: function (trailOutput) { return trailOutput.length == 0; },
-		toggle: true
-	})
+  tail("application.log"),
+  trail("10m"),
+  alert({
+    title: "Log file is silent",
+    trigger: function (trailOutput) { return trailOutput.length == 0; },
+    toggle: true
+  })
 ).run();
 ```
 <!-- example-end -->

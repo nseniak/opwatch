@@ -43,7 +43,7 @@ for file in md_files(doc_root_dir):
         title = example['title']
         body = example['body']
         anchor = example['anchor']
-        items.append('#### [' + title + '](' + file[len(doc_root_dir):] + "#" + anchor + ')' + body)
+        items.append('---\n#### [' + title + '](' + file[len(doc_root_dir):] + "#" + anchor + ')' + body)
 list = '\n'.join(items)
 with open(index_file, 'r') as index_file_desc:
     content = index_file_desc.read()
