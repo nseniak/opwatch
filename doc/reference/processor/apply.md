@@ -39,9 +39,9 @@ pipe(
   apply(function (topOutput) { return topOutput.freeSwapSpace; }),
   trail("5m"),
   alert({
-  	title: "free swap space is low",
-  	trigger: function (freeSwapSpaceTrail) { return stats(freeSwapSpaceTrail).mean < 1e7; },
-  	toggle: true
+    title: "free swap space is low",
+    trigger: function (freeSwapSpaceTrail) { return stats(freeSwapSpaceTrail).mean < 1e7; },
+    toggle: true
   })
 ).run();
 ```
@@ -54,8 +54,8 @@ pipe(
 pipe(
   tail("application.log"),
   apply(function (line) { 
-  	if (line.length !== 0) return line;
-  	// Otherwise undefined is returned
+    if (line.length !== 0) return line;
+    // Otherwise undefined is returned
   }),
   stdout()
 ).run();

@@ -104,9 +104,9 @@ pipe(
   apply(function (topOutput) { return topOutput.freeSwapSpace; }),
   trail("5m"),
   alert({
-  	title: "free swap space is low",
-  	trigger: function (freeSwapSpaceTrail) { return stats(freeSwapSpaceTrail).mean < 1e7; },
-  	toggle: true
+    title: "free swap space is low",
+    trigger: function (freeSwapSpaceTrail) { return stats(freeSwapSpaceTrail).mean < 1e7; },
+    toggle: true
   })
 ).run();
 ```
@@ -118,8 +118,8 @@ pipe(
 pipe(
   tail("application.log"),
   apply(function (line) { 
-  	if (line.length !== 0) return line;
-  	// Otherwise undefined is returned
+    if (line.length !== 0) return line;
+    // Otherwise undefined is returned
   }),
   stdout()
 ).run();
@@ -147,15 +147,15 @@ pipe(
   tail("application.log"),
   grep(/SIGNUP/),
   call({
-        input: function () { count++; },
-        output: function () { 
-          var result = count;
-          count = 0;
-          return result; 
-        },
-        delay: "1h",
-        period: "1h"
-      }),
+    input: function () { count++; },
+    output: function () { 
+      var result = count;
+      count = 0;
+      return result; 
+    },
+    delay: "1h",
+    period: "1h"
+  }),
   alert({
     title: "New lines in log file during the last hour",
     level: "low"
@@ -168,17 +168,17 @@ pipe(
 
 ```js
 pipe(
-		curl({ url: "http://www.mywebsite.com", period: "30s" }),
-		collect(3),
-		alert({
-			title: "Website is down",
-			trigger: function (curlOutputArray) {
-				return curlOutputArray.every(function (seriesObject) {
-					return seriesObject.value.status != 200;
-				});
-			},
-			toggle: true
-		})
+    curl({ url: "http://www.mywebsite.com", period: "30s" }),
+    collect(3),
+    alert({
+      title: "Website is down",
+      trigger: function (curlOutputArray) {
+        return curlOutputArray.every(function (seriesObject) {
+          return seriesObject.value.status != 200;
+        });
+      },
+      toggle: true
+    })
 ).run();
 ```
 
@@ -289,8 +289,8 @@ pipe(
   tail("application.log.json"),
   json(),
   alert({
-  	title: "error occurred in the log",
-  	trigger: function (logObject) { return logObject.level === "ERROR"; }
+    title: "error occurred in the log",
+    trigger: function (logObject) { return logObject.level === "ERROR"; }
   })
 ).run();
 ```
@@ -312,8 +312,8 @@ pipe(
 ```js
 pipe(
   parallel(
-      tail("application1.log"),
-      tail("application2.log")
+    tail("application1.log"),
+    tail("application2.log")
   ),
   grep(/ERROR/), 
   alert("Error or warning")

@@ -36,8 +36,8 @@ pipe(
   tail("application.log.json"),
   json(),
   alert({
-  	title: "error occurred in the log",
-  	trigger: function (logObject) { return logObject.level === "ERROR"; }
+    title: "error occurred in the log",
+    trigger: function (logObject) { return logObject.level === "ERROR"; }
   })
 ).run();
 ```

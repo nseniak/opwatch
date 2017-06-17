@@ -38,17 +38,17 @@ objects representing these inputs. When a new input is received, a new array wit
 
 ```js
 pipe(
-		curl({ url: "http://www.mywebsite.com", period: "30s" }),
-		collect(3),
-		alert({
-			title: "Website is down",
-			trigger: function (curlOutputArray) {
-				return curlOutputArray.every(function (seriesObject) {
-					return seriesObject.value.status != 200;
-				});
-			},
-			toggle: true
-		})
+    curl({ url: "http://www.mywebsite.com", period: "30s" }),
+    collect(3),
+    alert({
+      title: "Website is down",
+      trigger: function (curlOutputArray) {
+        return curlOutputArray.every(function (seriesObject) {
+          return seriesObject.value.status != 200;
+        });
+      },
+      toggle: true
+    })
 ).run();
 ```
 <!-- example-end -->
