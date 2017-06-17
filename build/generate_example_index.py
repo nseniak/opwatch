@@ -3,7 +3,7 @@ import re
 from os.path import join
 
 doc_root_dir = '../doc/'
-index_file = doc_root_dir + 'examples.md'
+list_file = doc_root_dir + 'examples.md'
 
 md_file_regex = re.compile('.*\.md$')
 
@@ -33,9 +33,9 @@ def file_examples(file):
     return examples
 
 
-index_begin = '<!-- example-list-begin -->'
-index_end = '<!-- example-list-end -->'
-index_regex = re.compile(re.escape(index_begin) + '\n.*' + re.escape(index_end), re.DOTALL)
+list_begin = '<!-- example-list-begin -->'
+list_end = '<!-- example-list-end -->'
+list_regex = re.compile(re.escape(list_begin) + '\n.*' + re.escape(list_end), re.DOTALL)
 
 items = []
 for file in md_files(doc_root_dir):
@@ -45,10 +45,10 @@ for file in md_files(doc_root_dir):
         anchor = example['anchor']
         items.append('---\n#### [' + title + '](' + file[len(doc_root_dir):] + "#" + anchor + ')' + body)
 list = '\n'.join(items)
-with open(index_file, 'r') as index_file_desc:
-    content = index_file_desc.read()
-new_content = index_regex.sub(index_begin + '\n' + list + '\n' + index_end, content)
+with open(list_file, 'r') as list_file_desc:
+    content = list_file_desc.read()
+new_content = list_regex.sub(list_begin + '\n' + list + '\n' + list_end, content)
 
-with open(index_file, 'w') as index_file_desc:
-    index_file_desc.write(new_content)
+with open(list_file, 'w') as list_file_desc:
+    list_file_desc.write(new_content)
 
