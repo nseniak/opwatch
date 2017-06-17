@@ -83,7 +83,6 @@ Opwatch supports the following types of channels:
 The `"console"` channel is predefined, and doesn't need to be explicitly defined in the 
 `config.channels(configuration)` call.
 
-<!-- example -->
 ### Pushover
 
 [Pushover](https://pushover.net/) is a tool for sending notifications to desktop or mobiles devices. A Pushover 
