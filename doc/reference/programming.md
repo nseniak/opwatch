@@ -183,7 +183,7 @@ This function pretty-prints the passed data. It is notably useful for pretty-pri
 #### Arguments
 
 | Argument | Description | Type | Default |
-| :--- | :--- | :--- |
+| :--- | :--- | :--- | :--- |
 | `data` | pretty-prints an object or value | any object or value | *Mandatory* |
 
 ### Function: `help()`
