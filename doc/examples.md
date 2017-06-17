@@ -114,8 +114,7 @@ var count = 0;
 pipe(
   tail("application.log"),
   grep(/SIGNUP/),
-  call(
-      {
+  call({
         input: function () { count++; },
         output: function () { 
           var result = count;
@@ -124,8 +123,7 @@ pipe(
         },
         delay: "1h",
         period: "1h"
-      }
-  ),
+      }),
   alert({
     title: "New lines in log file during the last hour",
     level: "low"
