@@ -1,5 +1,21 @@
 # Programming reference
 
+- [Programming reference](#programming-reference)
+  * [Javascript implementation](#javascript-implementation)
+  * [Processors](#processors)
+    + [Opwatch object and function types](#opwatch-object-and-function-types)
+      - [Callbacks](#callbacks)
+      - [Payload](#payload)
+      - [Durations](#durations)
+      - [SeriesObject](#seriesobject)
+    + [The single reference rule](#the-single-reference-rule)
+  * [Module system](#module-system)
+  * [Opwatch built-in functions](#opwatch-built-in-functions)
+    + [`stats(data)`](#-stats-data--)
+    + [`pretty(data)`](#-pretty-data--)
+    + [`help()`](#-help---)
+    + [`<constructor>.help()`](#--constructor-help---)
+    
 ## Javascript implementation
 
 Opwatch is based on [Nashorn](https://wiki.openjdk.java.net/display/Nashorn/Nashorn+Documentation/), the Javascript
@@ -147,7 +163,7 @@ This module system uses the implementation provided by [jvm-npm](https://github.
 
 ## Opwatch built-in functions
 
-### Function: `stats(data)`
+### `stats(data)`
 
 This function allows performing common statistic functions on arrays produced by the 
 [`trail`](processor/trail.md) and [`collect`](processor/collect.md) processors, when their inputs are numbers, i.e.
@@ -176,7 +192,9 @@ This function returns a Stats object with the following fields:
 | `sum` | the sum of the array values | Number | *Always* |
 | `slope` | the slope of the estimated regression line | Number | *Always* |
 
-### Function: `pretty(data)`
+---
+
+### `pretty(data)`
 
 This function pretty-prints the passed data. It is notably useful for pretty-printing processors. 
 
@@ -186,11 +204,15 @@ This function pretty-prints the passed data. It is notably useful for pretty-pri
 | :--- | :--- | :--- | :--- |
 | `data` | pretty-prints an object or value | any object or value | *Mandatory* |
 
-### Function: `help()`
+---
+
+### `help()`
 
 This function prints information about the built-in processors.
  
-### Method: `<constructor>.help()`
+---
+
+### `<constructor>.help()`
 
 This method of all processor constructors (e.g., `pipe` or `tail`) prints information about the processor
 configuration arguments.
