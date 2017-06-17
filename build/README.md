@@ -1,19 +1,15 @@
-## Install the required libraries on the build machine
+#  Build instructions
 
-The first time you build, you need to install the required libraries. 
-
-### Install pushover4j
-
-	$ git clone https://github.com/nseniak/pushover4j.git
-	$ cd pushover4j
-	$ mvn clean install
-
-## Build the alerter
-
-Don't forget to commit and push alerter.
+## Build the documentation example index
 
 Then on the build machine:
 
-    $ cd 1.0/alerter
     $ cd build
-    $ sh update.sh
+    $ python3.5 generate_example_index.py
+
+Then commit any changes to doc/examples.md
+
+### Build the opwatch distribution
+
+	$ cd opwatch/build
+	$ sh build.sh

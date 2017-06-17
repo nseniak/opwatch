@@ -48,8 +48,8 @@ pipe(
 
 ```js
 pipe(
-	tail("application.log"), 
-	grep({ regexp: /info:/, invert: true }), 
-	alert("Problem found!")
+  tail("application.log"), 
+  grep({ regexp: /info:/, invert: true }), 
+  alert("Problem found!")
 ).run();
 ```

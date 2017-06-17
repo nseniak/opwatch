@@ -41,6 +41,8 @@ $ opwatch
 
 The [Quick start](doc/quickstart.md) guide takes you through this example in a little more details.
 
+The [Example index](doc/examples.md) points to other Opwatch usage examples.
+
 ## Installation
 
 ### Prerequisites
