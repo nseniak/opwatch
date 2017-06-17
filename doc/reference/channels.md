@@ -71,7 +71,7 @@ This section describes channel definitions for each channel type.
 
 ## Console
 
-The `"console"` channel is predefined, and doesn't need to be explicitly defined in the ` 
+The `"console"` channel is predefined, and doesn't need to be explicitly defined in the 
 `config.channels(configuration)` call.
 
 ## Pushover
