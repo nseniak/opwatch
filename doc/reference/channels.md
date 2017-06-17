@@ -3,11 +3,11 @@
 - [Channels](#channels)
   * [Channel configuration](#channel-configuration)
   * [Channel definitions](#channel-definitions)
-  * [Console](#console)
-  * [Pushover](#pushover)
-  * [Slack](#slack)
-  * [Remote](#remote)
-
+    + [Console](#console)
+    + [Pushover](#pushover)
+    + [Slack](#slack)
+    + [Remote](#remote)
+    
 Opwatch displays alerts and other messages on *channels*. Opwatch supports the following types of channels:
 
 * The *Console* channel, which prints alerts on the standard output;
@@ -77,12 +77,12 @@ config.channels({
 
 This section describes channel definitions for each channel type. 
 
-## Console
+### Console
 
 The `"console"` channel is predefined, and doesn't need to be explicitly defined in the 
 `config.channels(configuration)` call.
 
-## Pushover
+### Pushover
 
 [Pushover](https://pushover.net/) is a tool for sending notifications to desktop or mobiles devices. A Pushover 
 channel definition is parameterized by the following information that you can copy from your Pushover account's 
@@ -109,7 +109,7 @@ To define one or more Pushover channels, use the following syntax:
   }
 ```
 
-## Slack
+### Slack
 
 [Slack](https://slack.com/) is a real-time messaging platform for teams. A Slack channel definition is parameterized 
 by a Slack *Incoming WebHook* URL. To obtain a Slack Incoming WebHook URL, go to your Slack account's
@@ -133,7 +133,7 @@ To define one or more Slack channels, use the following syntax:
   }
 ```
 
-## Remote
+### Remote
 
 Remote channels send alerts to other Opwatch servers, in order to let them publish them. To define one or
 more remote channels, use the following syntax: 
