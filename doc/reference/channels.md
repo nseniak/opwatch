@@ -8,16 +8,10 @@
     + [Slack](#slack)
     + [Remote](#remote)
     
-Opwatch displays alerts and other messages on *channels*. Opwatch supports the following types of channels:
-
-* The *Console* channel, which prints alerts on the standard output;
-* *[Slack](https://slack.com/)* channels, which displays alerts as messages in Slack;
-* *[Pushover](https://pushover.net/)* channels, which displays alerts as Pushover notifications;
-* *Remote* channels, which send alerts to other Opwatch servers in order to let them display them.
-
 ## Channel configuration
 
-The Opwatch channels are configured using the following function call:
+Opwatch displays alerts and other messages on *channels*. To configure the channels used by Opwatch,
+use the following call:
 
 ```js
 config.channels(configuration)
@@ -76,6 +70,13 @@ config.channels({
 ## Channel definitions
 
 This section describes channel definitions for each channel type. 
+
+Opwatch supports the following types of channels:
+
+* The *Console* channel, which prints alerts on the standard output;
+* *[Slack](https://slack.com/)* channels, which displays alerts as messages in Slack;
+* *[Pushover](https://pushover.net/)* channels, which displays alerts as Pushover notifications;
+* *Remote* channels, which send alerts to other Opwatch servers in order to let them display them.
 
 ### Console
 
