@@ -1,6 +1,6 @@
 # Opwatch reference manual
 
-* [Command line arguments](command.md)
-* [Programming reference](programming.md) 
 * [Processor index](processor/processors.md)
+* [Programming reference](programming.md) 
 * [Channels](channels.md)
+* [Command line arguments](command.md)
