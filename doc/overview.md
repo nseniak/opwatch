@@ -194,24 +194,24 @@ configuration object as its argument. For example, the code below defines three 
 
 ```js
 config.channels({
-	"services": {
-		"slack": {
-			"channels": {
-				"developers": {
-					"webhookUrl": "https://hooks.slack.com/services/thisisafakeurl1"
-				},
-				"devops": {
-					"webhookUrl": "https://hooks.slack.com/services/thisisafakeurl2"
-				},
-				"marketing": {
-					"webhookUrl": "https://hooks.slack.com/services/thisisafakeurl3"
-				}
-			}
-		}
-	},
-	"applicationChannel": "developers",
-	"systemChannel": "devops",
-	"fallbackChannel": "console"
+  "services": {
+    "slack": {
+      "channels": {
+        "developers": {
+          "webhookUrl": "https://hooks.slack.com/services/thisisafakeurl1"
+        },
+        "devops": {
+          "webhookUrl": "https://hooks.slack.com/services/thisisafakeurl2"
+        },
+        "marketing": {
+          "webhookUrl": "https://hooks.slack.com/services/thisisafakeurl3"
+        }
+      }
+    }
+  },
+  "applicationChannel": "developers",
+  "systemChannel": "devops",
+  "fallbackChannel": "console"
 });
 ```
 
