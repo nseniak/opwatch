@@ -39,12 +39,12 @@ Note the use of `json` to convert the string output of `sh` to a number:
 
 ```js
 pipe(
-	sh("ls /tmp | wc -l"),
+  sh("ls /tmp | wc -l"),
   json(),
   alert({
-  	title: "Too many files",
-  	trigger: function (count) { return count > 100; },
-  	toggle: true
+    title: "Too many files",
+    trigger: function (count) { return count > 100; },
+    toggle: true
   })
 ).run();
 ```
@@ -55,11 +55,11 @@ pipe(
 
 ```js
 pipe(
-	sh("pgrep -q mongod && echo UP || echo DOWN"),
+  sh("pgrep -q mongod && echo UP || echo DOWN"),
   alert({
-  	title: "mongod is down",
-  	trigger: function (shOutput) { return shOutput === "DOWN"; },
-  	toggle: true
+    title: "mongod is down",
+    trigger: function (shOutput) { return shOutput === "DOWN"; },
+    toggle: true
   })
 ).run();
 ```
@@ -71,9 +71,9 @@ when the `mongod` process is restarted. This is to be contrasted with the less g
 ```js
 // Not great: triggers an alert every second as long as mongod is down. 
 pipe(
-	sh("pgrep -q mongod || echo DOWN"),
+  sh("pgrep -q mongod || echo DOWN"),
   alert({
-  	title: "mongod is down",
+    title: "mongod is down",
   })
 ).run();
 ```

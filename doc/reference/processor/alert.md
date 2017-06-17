@@ -65,14 +65,14 @@ Here are a few examples illustrating the use of the `details` field.
 
 ```js
 pipe(
-	df("/tmp"), 
-	alert({
-	  title: "not enough space left",
-	  trigger: function (dfOutput) { 
-	  	return dfOutput.usageRatio > .8; 
-	  },
-	  toggle: true
-	})
+  df("/tmp"), 
+  alert({
+    title: "not enough space left",
+    trigger: function (dfOutput) { 
+      return dfOutput.usageRatio > .8; 
+    },
+    toggle: true
+  })
 ).run();
 ```
 
@@ -85,15 +85,15 @@ alert details.
 
 ```js
 pipe(
-	df("/tmp"), 
-	alert({
-	  title: "not enough space left",
-	  details: function (dfOutput) { 
-	  	return dfOutput.usageRatio; 
-	  },
-	  trigger: function (dfOutput) { 
-	  	return dfOutput.usageRatio > .8; 
-	  },
+  df("/tmp"), 
+  alert({
+    title: "not enough space left",
+    details: function (dfOutput) { 
+      return dfOutput.usageRatio; 
+    },
+    trigger: function (dfOutput) { 
+      return dfOutput.usageRatio > .8; 
+    },
     toggle: true
   })
 ).run();
@@ -107,13 +107,13 @@ output of [`df`](df.md).
 
 ```js
 pipe(
-	df("/tmp"), 
-	alert({
-	  title: "not enough space left",
-	  details: "/tmp",
-	  trigger: function (dfOutput) {
-	  	return dfOutput.usageRatio > .8; 
-	  },
+  df("/tmp"), 
+  alert({
+    title: "not enough space left",
+    details: "/tmp",
+    trigger: function (dfOutput) {
+      return dfOutput.usageRatio > .8; 
+    },
     toggle: true
   })
 ).run();
@@ -143,13 +143,13 @@ alert message when it goes back under 80%.
 
 ```js
 pipe(
-	df("/tmp"), 
-	alert({
-	  title: "not enough space left",
-	  trigger: function (dfOutput) { 
-	  	return dfOutput.usageRatio > .8; 
-	  },
-	  toggle: true
+  df("/tmp"), 
+  alert({
+    title: "not enough space left",
+    trigger: function (dfOutput) { 
+      return dfOutput.usageRatio > .8; 
+    },
+    toggle: true
   })
 ).run();
 ```

@@ -46,14 +46,14 @@ The `df` processor generates file system information at a regular interval.
 
 ```js
 pipe(
-	df(),
-	alert({
-		title: "Filesystem is near full",
-		trigger: function (dfOutput) {
-			return dfOutput.usageRatio > 0.8;
-		},
-		toggle: true
-	})
+  df(),
+  alert({
+    title: "Filesystem is near full",
+    trigger: function (dfOutput) {
+      return dfOutput.usageRatio > 0.8;
+    },
+    toggle: true
+  })
 ).run();
 ```
 <!-- example-end -->

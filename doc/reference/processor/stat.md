@@ -45,19 +45,19 @@ The `stat` processor generates file information at a regular interval.
 
 ```js
 pipe(
-	stat("application.log"),
-	alert({
-		title: "Log file is inactive",
-		trigger: function (statOutput) {
-			if (!statOutput.exists) {
-				return false;
-			}
-			var now = (new Date()).getTime();
-			var minutes10 = 10 * 60 * 1000;
-			return (now - statOutput.lastModified) > minutes10;
-		},
-		toggle: true
-	})
+  stat("application.log"),
+  alert({
+    title: "Log file is inactive",
+    trigger: function (statOutput) {
+      if (!statOutput.exists) {
+        return false;
+      }
+      var now = (new Date()).getTime();
+      var minutes10 = 10 * 60 * 1000;
+      return (now - statOutput.lastModified) > minutes10;
+    },
+    toggle: true
+  })
 ).run();
 ```
 <!-- example-end -->

@@ -41,7 +41,7 @@ $ opwatch
 
 The [Quick start](doc/quickstart.md) guide takes you through this example in a little more details.
 
-The [Example index](doc/examples.md) points to other Opwatch usage examples.
+The [Example list](doc/examples.md) points to other Opwatch usage examples.
 
 ## Installation
 
@@ -64,7 +64,7 @@ $ ./opwatch
 
 * [Quick start](doc/quickstart.md)
 * [Overview](doc/overview.md)
-* [Example index](doc/examples.md)
+* [Example list](doc/examples.md)
 * [Reference manual](doc/reference/reference.md)
   * [Command line arguments](doc/reference/command.md)
   * [Programming reference](doc/reference/programming.md) 

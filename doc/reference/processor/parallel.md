@@ -45,10 +45,10 @@ pipe(
 
 ```js
 pipe(
-	parallel(
-			tail("application1.log"),
-			tail("application2.log")
-	),
+  parallel(
+      tail("application1.log"),
+      tail("application2.log")
+  ),
   grep(/ERROR/), 
   alert("Error or warning")
 ).run();

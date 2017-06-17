@@ -59,20 +59,20 @@ pipe(
   tail("application.log"),
   grep(/SIGNUP/),
   call(
-  		{
-  			input: function () { count++; },
-  			output: function () { 
-  				var result = count;
-  				count = 0;
-  				return result; 
-  			},
-  			delay: "1h",
-  			period: "1h"
-  		}
+      {
+        input: function () { count++; },
+        output: function () { 
+          var result = count;
+          count = 0;
+          return result; 
+        },
+        delay: "1h",
+        period: "1h"
+      }
   ),
   alert({
-  	title: "New lines in log file during the last hour",
-  	level: "low"
+    title: "New lines in log file during the last hour",
+    level: "low"
   })
 ).run();
 ```

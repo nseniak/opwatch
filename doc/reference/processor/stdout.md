@@ -25,8 +25,8 @@ The `stdout` processor converts its input to text using `JSON.stringify` and wri
 
 ```js
 pipe(
-	top(),
-	stdout()
+  top(),
+  stdout()
 ).run();
 ```
 <!-- example-end -->

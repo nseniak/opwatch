@@ -39,8 +39,8 @@ Execute on the servers running the application:
 
 ```js
 pipe(
-	tail("application.log"),
-	send({ hostname: "centralizer.mydomain.com", path: "countLogErrors" })
+  tail("application.log"),
+  send({ hostname: "centralizer.mydomain.com", path: "countLogErrors" })
 ).run();
 ```
 
@@ -48,14 +48,14 @@ Execute on `centralizer.mydomain.com`:
 
 ```js
 pipe(
-	receive("countLogErrors"),
-	grep(/ERROR/),
-	trail("10s"),
-	alert({
-		title: "Too many errors overall",
-		trigger: function (trailOutput) { return trailOutput.length > 10; },
-		toggle: true
-	})
+  receive("countLogErrors"),
+  grep(/ERROR/),
+  trail("10s"),
+  alert({
+    title: "Too many errors overall",
+    trigger: function (trailOutput) { return trailOutput.length > 10; },
+    toggle: true
+  })
 ).run();
 ```
 <!-- example-end -->
@@ -67,8 +67,8 @@ Run on the servers running the application:
 
 ```js
 pipe(
-	top(),
-	send({ hostname: "centralizer.mydomain.com", path: "checkCpu" })
+  top(),
+  send({ hostname: "centralizer.mydomain.com", path: "checkCpu" })
 ).run();
 ```
 
@@ -76,39 +76,39 @@ Run on `centralizer.mydomain.com`:
 
 ```js
 pipe(
-	receive("checkCpu"),
-	apply(function (topOutput, payload) {
-		// Create an object associating the hostname (retrieved from the payload) and its topOutput
-		return { 
-			hostname: payload.hostname,
-			topOutput: topOutput
-		};
-	}),
-	trail("1m"),
-	alert({
-		title: "Average CPU too high",
-		trigger: function (trailOutput) {
-			if (trailOutput.length == 0) {
-				return false;
-			}
-			// Keep the most recent top info for each server from which we've received info during the last minute 
-			var serverInfo = {};
-			for (var i = 0; i < trailOutput.length; i++) {
-				var value = trailOutput[i].value;
-				serverInfo[value.hostname] = value.topOutput; 
-			}
-			// Compute the CPU 
-			var processors = 0;
-			var loadAverage = 0;
-			for (var hostname in serverInfo) {
-				processors = processors + serverInfo[hostname].availableProcessors;
-				loadAverage = loadAverage + serverInfo[hostname].loadAverage;
-			}
-			var cpu = loadAverage / processors;
-			return cpu > .8; 
-		},
-		toggle: true
-	})
+  receive("checkCpu"),
+  apply(function (topOutput, payload) {
+    // Create an object associating the hostname (retrieved from the payload) and its topOutput
+    return { 
+      hostname: payload.hostname,
+      topOutput: topOutput
+    };
+  }),
+  trail("1m"),
+  alert({
+    title: "Average CPU too high",
+    trigger: function (trailOutput) {
+      if (trailOutput.length == 0) {
+        return false;
+      }
+      // Keep the most recent top info for each server from which we've received info during the last minute 
+      var serverInfo = {};
+      for (var i = 0; i < trailOutput.length; i++) {
+        var value = trailOutput[i].value;
+        serverInfo[value.hostname] = value.topOutput; 
+      }
+      // Compute the CPU 
+      var processors = 0;
+      var loadAverage = 0;
+      for (var hostname in serverInfo) {
+        processors = processors + serverInfo[hostname].availableProcessors;
+        loadAverage = loadAverage + serverInfo[hostname].loadAverage;
+      }
+      var cpu = loadAverage / processors;
+      return cpu > .8; 
+    },
+    toggle: true
+  })
 ).run();
 ```
 <!-- example-end -->

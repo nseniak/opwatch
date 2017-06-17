@@ -1,40 +1,74 @@
-# Example index
+# Example list
 
 This page contains all the code examples provided in the documentation. Click a title to go to the page that includes
 the example and see it in context.
 
+- [Example list](#example-list)
+      - [[Display an alert if disk usage is > 80%; version 1](reference/processor/alert.md#display-an-alert-if-disk-usage-is--80-version-1)](#-display-an-alert-if-disk-usage-is---80---version-1--reference-processor-alertmd-display-an-alert-if-disk-usage-is--80-version-1-)
+      - [[Display an alert if disk usage is > 80%; version 2](reference/processor/alert.md#display-an-alert-if-disk-usage-is--80-version-2)](#-display-an-alert-if-disk-usage-is---80---version-2--reference-processor-alertmd-display-an-alert-if-disk-usage-is--80-version-2-)
+      - [[Display an alert if disk usage is > 80%; version 3](reference/processor/alert.md#display-an-alert-if-disk-usage-is--80-version-3)](#-display-an-alert-if-disk-usage-is---80---version-3--reference-processor-alertmd-display-an-alert-if-disk-usage-is--80-version-3-)
+      - [[Trigger an alert if the average free swap space over 5 minutes is smaller than 10 megabytes](reference/processor/apply.md#trigger-an-alert-if-the-average-free-swap-space-over-5-minutes-is-smaller-than-10-megabytes)](#-trigger-an-alert-if-the-average-free-swap-space-over-5-minutes-is-smaller-than-10-megabytes--reference-processor-applymd-trigger-an-alert-if-the-average-free-swap-space-over-5-minutes-is-smaller-than-10-megabytes-)
+      - [[Print non-empty log file lines](reference/processor/apply.md#print-nonempty-log-file-lines)](#-print-non-empty-log-file-lines--reference-processor-applymd-print-nonempty-log-file-lines-)
+      - [[Count seconds](reference/processor/call.md#count-seconds)](#-count-seconds--reference-processor-callmd-count-seconds-)
+      - [[Every hour, publish the number of lines containing SIGNUP that were added to a log file](reference/processor/call.md#every-hour-publish-the-number-of-lines-containing-signup-that-were-added-to-a-log-file)](#-every-hour--publish-the-number-of-lines-containing-signup-that-were-added-to-a-log-file--reference-processor-callmd-every-hour-publish-the-number-of-lines-containing-signup-that-were-added-to-a-log-file-)
+      - [[Trigger an alert if three consecutive http requests at a 30 second interval are unsuccessful](reference/processor/collect.md#trigger-an-alert-if-three-consecutive-http-requests-at-a-30-second-interval-are-unsuccessful)](#-trigger-an-alert-if-three-consecutive-http-requests-at-a-30-second-interval-are-unsuccessful--reference-processor-collectmd-trigger-an-alert-if-three-consecutive-http-requests-at-a-30-second-interval-are-unsuccessful-)
+      - [[Trigger an alert if a Web site is down](reference/processor/curl.md#trigger-an-alert-if-a-web-site-is-down)](#-trigger-an-alert-if-a-web-site-is-down--reference-processor-curlmd-trigger-an-alert-if-a-web-site-is-down-)
+      - [[Trigger an alert if a Web site is found to be down for at least 2 of the 10 last requests](reference/processor/curl.md#trigger-an-alert-if-a-web-site-is-found-to-be-down-for-at-least-2-of-the-10-last-requests)](#-trigger-an-alert-if-a-web-site-is-found-to-be-down-for-at-least-2-of-the-10-last-requests--reference-processor-curlmd-trigger-an-alert-if-a-web-site-is-found-to-be-down-for-at-least-2-of-the-10-last-requests-)
+      - [[Trigger an alert if a REST API returns a wrong value](reference/processor/curl.md#trigger-an-alert-if-a-rest-api-returns-a-wrong-value)](#-trigger-an-alert-if-a-rest-api-returns-a-wrong-value--reference-processor-curlmd-trigger-an-alert-if-a-rest-api-returns-a-wrong-value-)
+      - [[Trigger an alert when a filesystem usage ratio is greater than 80%](reference/processor/df.md#trigger-an-alert-when-a-filesystem-usage-ratio-is-greater-than-80)](#-trigger-an-alert-when-a-filesystem-usage-ratio-is-greater-than-80---reference-processor-dfmd-trigger-an-alert-when-a-filesystem-usage-ratio-is-greater-than-80-)
+      - [[Trigger an alert for each line in a log file that contains `error` or `warning`](reference/processor/grep.md#trigger-an-alert-for-each-line-in-a-log-file-that-contains-error-or-warning)](#-trigger-an-alert-for-each-line-in-a-log-file-that-contains--error--or--warning---reference-processor-grepmd-trigger-an-alert-for-each-line-in-a-log-file-that-contains-error-or-warning-)
+      - [[Trigger an alert for each line in a log file that does *not* contain `info`](reference/processor/grep.md#trigger-an-alert-for-each-line-in-a-log-file-that-does-not-contain-info)](#-trigger-an-alert-for-each-line-in-a-log-file-that-does--not--contain--info---reference-processor-grepmd-trigger-an-alert-for-each-line-in-a-log-file-that-does-not-contain-info-)
+      - [[Trigger an alert if a json object log contains an error](reference/processor/json.md#trigger-an-alert-if-a-json-object-log-contains-an-error)](#-trigger-an-alert-if-a-json-object-log-contains-an-error--reference-processor-jsonmd-trigger-an-alert-if-a-json-object-log-contains-an-error-)
+      - [[Trigger an alert if the file `application.log` contains `ERROR` or `WARNING`](reference/processor/parallel.md#trigger-an-alert-if-the-file-applicationlog-contains-error-or-warning)](#-trigger-an-alert-if-the-file--applicationlog--contains--error--or--warning---reference-processor-parallelmd-trigger-an-alert-if-the-file-applicationlog-contains-error-or-warning-)
+      - [[Trigger an alert if either `application1.log` or `application2.log` contains `ERROR`](reference/processor/parallel.md#trigger-an-alert-if-either-application1log-or-application2log-contains-error)](#-trigger-an-alert-if-either--application1log--or--application2log--contains--error---reference-processor-parallelmd-trigger-an-alert-if-either-application1log-or-application2log-contains-error-)
+      - [[Centralize logs from several servers and trigger an alert if they contain too many errors overall](reference/processor/send.md#centralize-logs-from-several-servers-and-trigger-an-alert-if-they-contain-too-many-errors-overall)](#-centralize-logs-from-several-servers-and-trigger-an-alert-if-they-contain-too-many-errors-overall--reference-processor-sendmd-centralize-logs-from-several-servers-and-trigger-an-alert-if-they-contain-too-many-errors-overall-)
+      - [[Centralize system load information from several servers and trigger an alert if the average CPU is too high](reference/processor/send.md#centralize-system-load-information-from-several-servers-and-trigger-an-alert-if-the-average-cpu-is-too-high)](#-centralize-system-load-information-from-several-servers-and-trigger-an-alert-if-the-average-cpu-is-too-high--reference-processor-sendmd-centralize-system-load-information-from-several-servers-and-trigger-an-alert-if-the-average-cpu-is-too-high-)
+      - [[Triggers an alert if the number of files in a directory is greater than 100](reference/processor/sh.md#triggers-an-alert-if-the-number-of-files-in-a-directory-is-greater-than-100)](#-triggers-an-alert-if-the-number-of-files-in-a-directory-is-greater-than-100--reference-processor-shmd-triggers-an-alert-if-the-number-of-files-in-a-directory-is-greater-than-100-)
+      - [[Trigger an alert if there's no `mongod` running process](reference/processor/sh.md#trigger-an-alert-if-theres-no-mongod-running-process)](#-trigger-an-alert-if-there-s-no--mongod--running-process--reference-processor-shmd-trigger-an-alert-if-theres-no-mongod-running-process-)
+      - [[Use the `grep` unix command to filter payload](reference/processor/sh_f.md#use-the-grep-unix-command-to-filter-payload)](#-use-the--grep--unix-command-to-filter-payload--reference-processor-sh-fmd-use-the-grep-unix-command-to-filter-payload-)
+      - [[Trigger an alert when a file hasn't been updated since 10 minutes](reference/processor/stat.md#trigger-an-alert-when-a-file-hasnt-been-updated-since-10-minutes)](#-trigger-an-alert-when-a-file-hasn-t-been-updated-since-10-minutes--reference-processor-statmd-trigger-an-alert-when-a-file-hasnt-been-updated-since-10-minutes-)
+      - [[Write system load information to standard output](reference/processor/stdout.md#write-system-load-information-to-standard-output)](#-write-system-load-information-to-standard-output--reference-processor-stdoutmd-write-system-load-information-to-standard-output-)
+      - [[Trigger an alert when the log file gets bigger than 100,000 lines](reference/processor/tail.md#trigger-an-alert-when-the-log-file-gets-bigger-than-100000-lines)](#-trigger-an-alert-when-the-log-file-gets-bigger-than-100-000-lines--reference-processor-tailmd-trigger-an-alert-when-the-log-file-gets-bigger-than-100000-lines-)
+      - [[Trigger an alert when the CPU is higher than 80%](reference/processor/top.md#trigger-an-alert-when-the-cpu-is-higher-than-80)](#-trigger-an-alert-when-the-cpu-is-higher-than-80---reference-processor-topmd-trigger-an-alert-when-the-cpu-is-higher-than-80-)
+      - [[Trigger an alert when a log file has more than 20 Java exception per second](reference/processor/trail.md#trigger-an-alert-when-a-log-file-has-more-than-20-java-exception-per-second)](#-trigger-an-alert-when-a-log-file-has-more-than-20-java-exception-per-second--reference-processor-trailmd-trigger-an-alert-when-a-log-file-has-more-than-20-java-exception-per-second-)
+      - [[Trigger an alert when the disk usage increases by more than 20% in an hour](reference/processor/trail.md#trigger-an-alert-when-the-disk-usage-increases-by-more-than-20-in-an-hour)](#-trigger-an-alert-when-the-disk-usage-increases-by-more-than-20--in-an-hour--reference-processor-trailmd-trigger-an-alert-when-the-disk-usage-increases-by-more-than-20-in-an-hour-)
+      - [[Trigger an alert when a log file remains silent for more than 10 minutes](reference/processor/trail.md#trigger-an-alert-when-a-log-file-remains-silent-for-more-than-10-minutes)](#-trigger-an-alert-when-a-log-file-remains-silent-for-more-than-10-minutes--reference-processor-trailmd-trigger-an-alert-when-a-log-file-remains-silent-for-more-than-10-minutes-)
+
+<!-- <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small> -->
+
+
 <!-- example-list-begin -->
-## [Display an alert if disk usage is > 80%; version 1](reference/processor/alert.md#display-an-alert-if-disk-usage-is--80-version-1)
+#### [Display an alert if disk usage is > 80%; version 1](reference/processor/alert.md#display-an-alert-if-disk-usage-is--80-version-1)
 
 ```js
 pipe(
-	df("/tmp"), 
-	alert({
-	  title: "not enough space left",
-	  trigger: function (dfOutput) { 
-	  	return dfOutput.usageRatio > .8; 
-	  },
-	  toggle: true
-	})
+  df("/tmp"), 
+  alert({
+    title: "not enough space left",
+    trigger: function (dfOutput) { 
+      return dfOutput.usageRatio > .8; 
+    },
+    toggle: true
+  })
 ).run();
 ```
 
 Since the `alert` processor doesn't have a `details` callback, the output of [`df`](df.md) is used for the displayed
 alert details.
 
-## [Display an alert if disk usage is > 80%; version 2](reference/processor/alert.md#display-an-alert-if-disk-usage-is--80-version-2)
+#### [Display an alert if disk usage is > 80%; version 2](reference/processor/alert.md#display-an-alert-if-disk-usage-is--80-version-2)
 
 ```js
 pipe(
-	df("/tmp"), 
-	alert({
-	  title: "not enough space left",
-	  details: function (dfOutput) { 
-	  	return dfOutput.usageRatio; 
-	  },
-	  trigger: function (dfOutput) { 
-	  	return dfOutput.usageRatio > .8; 
-	  },
+  df("/tmp"), 
+  alert({
+    title: "not enough space left",
+    details: function (dfOutput) { 
+      return dfOutput.usageRatio; 
+    },
+    trigger: function (dfOutput) { 
+      return dfOutput.usageRatio > .8; 
+    },
     toggle: true
   })
 ).run();
@@ -42,17 +76,17 @@ pipe(
 The `details` callback returns the usage ratio, so this ratio is displayed as the alert details rather than the
 output of [`df`](df.md).
 
-## [Display an alert if disk usage is > 80%; version 3](reference/processor/alert.md#display-an-alert-if-disk-usage-is--80-version-3)
+#### [Display an alert if disk usage is > 80%; version 3](reference/processor/alert.md#display-an-alert-if-disk-usage-is--80-version-3)
 
 ```js
 pipe(
-	df("/tmp"), 
-	alert({
-	  title: "not enough space left",
-	  details: "/tmp",
-	  trigger: function (dfOutput) {
-	  	return dfOutput.usageRatio > .8; 
-	  },
+  df("/tmp"), 
+  alert({
+    title: "not enough space left",
+    details: "/tmp",
+    trigger: function (dfOutput) {
+      return dfOutput.usageRatio > .8; 
+    },
     toggle: true
   })
 ).run();
@@ -60,7 +94,7 @@ pipe(
 
 The `details` property is defined as the string `"/tmp"` and therefore this string is displayed as the alert details.
 
-## [Trigger an alert if the average free swap space over 5 minutes is smaller than 10 megabytes](reference/processor/apply.md#trigger-an-alert-if-the-average-free-swap-space-over-5-minutes-is-smaller-than-10-megabytes)
+#### [Trigger an alert if the average free swap space over 5 minutes is smaller than 10 megabytes](reference/processor/apply.md#trigger-an-alert-if-the-average-free-swap-space-over-5-minutes-is-smaller-than-10-megabytes)
 
 ```js
 pipe(
@@ -75,7 +109,7 @@ pipe(
 ).run();
 ```
 
-## [Print non-empty log file lines](reference/processor/apply.md#print-nonempty-log-file-lines)
+#### [Print non-empty log file lines](reference/processor/apply.md#print-nonempty-log-file-lines)
 
 ```js
 pipe(
@@ -88,7 +122,7 @@ pipe(
 ).run();
 ```
 
-## [Count seconds](reference/processor/call.md#count-seconds)
+#### [Count seconds](reference/processor/call.md#count-seconds)
 
 ```js
 var count = 0;
@@ -99,7 +133,7 @@ pipe(
 ).run();
 ```
 
-## [Every hour, publish the number of lines containing SIGNUP that were added to a log file](reference/processor/call.md#every-hour-publish-the-number-of-lines-containing-signup-that-were-added-to-a-log-file)
+#### [Every hour, publish the number of lines containing SIGNUP that were added to a log file](reference/processor/call.md#every-hour-publish-the-number-of-lines-containing-signup-that-were-added-to-a-log-file)
 
 ```js
 var count = 0;
@@ -108,25 +142,25 @@ pipe(
   tail("application.log"),
   grep(/SIGNUP/),
   call(
-  		{
-  			input: function () { count++; },
-  			output: function () { 
-  				var result = count;
-  				count = 0;
-  				return result; 
-  			},
-  			delay: "1h",
-  			period: "1h"
-  		}
+      {
+        input: function () { count++; },
+        output: function () { 
+          var result = count;
+          count = 0;
+          return result; 
+        },
+        delay: "1h",
+        period: "1h"
+      }
   ),
   alert({
-  	title: "New lines in log file during the last hour",
-  	level: "low"
+    title: "New lines in log file during the last hour",
+    level: "low"
   })
 ).run();
 ```
 
-## [Trigger an alert if three consecutive http requests at a 30 second interval are unsuccessful](reference/processor/collect.md#trigger-an-alert-if-three-consecutive-http-requests-at-a-30-second-interval-are-unsuccessful)
+#### [Trigger an alert if three consecutive http requests at a 30 second interval are unsuccessful](reference/processor/collect.md#trigger-an-alert-if-three-consecutive-http-requests-at-a-30-second-interval-are-unsuccessful)
 
 ```js
 pipe(
@@ -144,7 +178,7 @@ pipe(
 ).run();
 ```
 
-## [Trigger an alert if a Web site is down](reference/processor/curl.md#trigger-an-alert-if-a-web-site-is-down)
+#### [Trigger an alert if a Web site is down](reference/processor/curl.md#trigger-an-alert-if-a-web-site-is-down)
 
 ```js
 pipe(
@@ -154,68 +188,68 @@ pipe(
 ).run();
 ```
 
-## [Trigger an alert if a Web site is found to be down for at least 2 of the 10 last requests](reference/processor/curl.md#trigger-an-alert-if-a-web-site-is-found-to-be-down-for-at-least-2-of-the-10-last-requests)
+#### [Trigger an alert if a Web site is found to be down for at least 2 of the 10 last requests](reference/processor/curl.md#trigger-an-alert-if-a-web-site-is-found-to-be-down-for-at-least-2-of-the-10-last-requests)
 
 ```js
 pipe(
   curl("https://httpbin.org"), 
   collect(10), 
   alert({
-  	title: "Website is wobbly or down",
-  	trigger: function (curlOutputArray) {
-  		var down = 0;
-  		for (var i = 0; i < curlOutputArray.length; i++) {
-  			if (curlOutputArray[i].status != 200) down++;
-  		}
-  		return down >= 2;
-  	},
-  	toggle: true
+    title: "Website is wobbly or down",
+    trigger: function (curlOutputArray) {
+      var down = 0;
+      for (var i = 0; i < curlOutputArray.length; i++) {
+        if (curlOutputArray[i].status != 200) down++;
+      }
+      return down >= 2;
+    },
+    toggle: true
   })
 ).run();
 ```
 
-## [Trigger an alert if a REST API returns a wrong value](reference/processor/curl.md#trigger-an-alert-if-a-rest-api-returns-a-wrong-value)
+#### [Trigger an alert if a REST API returns a wrong value](reference/processor/curl.md#trigger-an-alert-if-a-rest-api-returns-a-wrong-value)
 
 
 ```js
 pipe(
   curl({
-  	url: "https://jsonplaceholder.typicode.com/posts",
-  	method: "post",
-  	data: {
+    url: "https://jsonplaceholder.typicode.com/posts",
+    method: "post",
+    data: {
         name: 'foo',
         body: 'bar',
         userId: 1
       }
   }), 
   alert({
-  	title: "API is down or buggy",
-  	trigger: function (curlOutput) {
-  		return (curlOutput.status != 201)
-  			|| !curlOutput.json
-  			|| (curlOutput.json.name !== "foo");
-  	},
-  	toggle: true
+    title: "API is down or buggy",
+    trigger: function (curlOutput) {
+      return (curlOutput.status != 201)
+        || !curlOutput.json
+        || (curlOutput.json.name !== "foo");
+    },
+    toggle: true
   })
 ).run();
 ```
 
-## [Trigger an alert when a filesystem usage ratio is greater than 80%](reference/processor/df.md#trigger-an-alert-when-a-filesystem-usage-ratio-is-greater-than-80)
+#### [Trigger an alert when a filesystem usage ratio is greater than 80%](reference/processor/df.md#trigger-an-alert-when-a-filesystem-usage-ratio-is-greater-than-80)
 
 ```js
 pipe(
-	df(),
-	alert({
-		title: "Filesystem is near full",
-		trigger: function (dfOutput) {
-			return dfOutput.usageRatio > 0.8;
-		},
-		toggle: true
-	})
+  df(),
+  alert({
+    title: "Filesystem is near full",
+    trigger: function (dfOutput) {
+      return dfOutput.usageRatio > 0.8;
+    },
+    toggle: true
+  })
 ).run();
 ```
 
-## [Trigger an alert for each line in a log file that contains `error` or `warning`](reference/processor/grep.md#trigger-an-alert-for-each-line-in-a-log-file-that-contains-error-or-warning)
+#### [Trigger an alert for each line in a log file that contains `error` or `warning`](reference/processor/grep.md#trigger-an-alert-for-each-line-in-a-log-file-that-contains-error-or-warning)
 
 ```js
 pipe(
@@ -225,7 +259,7 @@ pipe(
 ).run();
 ```
 
-## [Trigger an alert for each line in a log file that does *not* contain `info`](reference/processor/grep.md#trigger-an-alert-for-each-line-in-a-log-file-that-does-not-contain-info)
+#### [Trigger an alert for each line in a log file that does *not* contain `info`](reference/processor/grep.md#trigger-an-alert-for-each-line-in-a-log-file-that-does-not-contain-info)
 
 ```js
 pipe(
@@ -235,7 +269,7 @@ pipe(
 ).run();
 ```
 
-## [Trigger an alert if a json object log contains an error](reference/processor/json.md#trigger-an-alert-if-a-json-object-log-contains-an-error)
+#### [Trigger an alert if a json object log contains an error](reference/processor/json.md#trigger-an-alert-if-a-json-object-log-contains-an-error)
 
 This example assumes that an application appends Json objects to the structured log file `application.log.json`: 
 
@@ -250,7 +284,7 @@ pipe(
 ).run();
 ```
 
-## [Trigger an alert if the file `application.log` contains `ERROR` or `WARNING`](reference/processor/parallel.md#trigger-an-alert-if-the-file-applicationlog-contains-error-or-warning)
+#### [Trigger an alert if the file `application.log` contains `ERROR` or `WARNING`](reference/processor/parallel.md#trigger-an-alert-if-the-file-applicationlog-contains-error-or-warning)
 
 ```js
 pipe(
@@ -260,27 +294,27 @@ pipe(
 ).run();
 ```
 
-## [Trigger an alert if either `application1.log` or `application2.log` contains `ERROR`](reference/processor/parallel.md#trigger-an-alert-if-either-application1log-or-application2log-contains-error)
+#### [Trigger an alert if either `application1.log` or `application2.log` contains `ERROR`](reference/processor/parallel.md#trigger-an-alert-if-either-application1log-or-application2log-contains-error)
 
 ```js
 pipe(
-	parallel(
-			tail("application1.log"),
-			tail("application2.log")
-	),
+  parallel(
+      tail("application1.log"),
+      tail("application2.log")
+  ),
   grep(/ERROR/), 
   alert("Error or warning")
 ).run();
 ```
 
-## [Centralize logs from several servers and trigger an alert if they contain too many errors overall](reference/processor/send.md#centralize-logs-from-several-servers-and-trigger-an-alert-if-they-contain-too-many-errors-overall)
+#### [Centralize logs from several servers and trigger an alert if they contain too many errors overall](reference/processor/send.md#centralize-logs-from-several-servers-and-trigger-an-alert-if-they-contain-too-many-errors-overall)
 
 Execute on the servers running the application:
 
 ```js
 pipe(
-	tail("application.log"),
-	send({ hostname: "centralizer.mydomain.com", path: "countLogErrors" })
+  tail("application.log"),
+  send({ hostname: "centralizer.mydomain.com", path: "countLogErrors" })
 ).run();
 ```
 
@@ -288,25 +322,25 @@ Execute on `centralizer.mydomain.com`:
 
 ```js
 pipe(
-	receive("countLogErrors"),
-	grep(/ERROR/),
-	trail("10s"),
-	alert({
-		title: "Too many errors overall",
-		trigger: function (trailOutput) { return trailOutput.length > 10; },
-		toggle: true
-	})
+  receive("countLogErrors"),
+  grep(/ERROR/),
+  trail("10s"),
+  alert({
+    title: "Too many errors overall",
+    trigger: function (trailOutput) { return trailOutput.length > 10; },
+    toggle: true
+  })
 ).run();
 ```
 
-## [Centralize system load information from several servers and trigger an alert if the average CPU is too high](reference/processor/send.md#centralize-system-load-information-from-several-servers-and-trigger-an-alert-if-the-average-cpu-is-too-high)
+#### [Centralize system load information from several servers and trigger an alert if the average CPU is too high](reference/processor/send.md#centralize-system-load-information-from-several-servers-and-trigger-an-alert-if-the-average-cpu-is-too-high)
 
 Run on the servers running the application:
 
 ```js
 pipe(
-	top(),
-	send({ hostname: "centralizer.mydomain.com", path: "checkCpu" })
+  top(),
+  send({ hostname: "centralizer.mydomain.com", path: "checkCpu" })
 ).run();
 ```
 
@@ -314,67 +348,67 @@ Run on `centralizer.mydomain.com`:
 
 ```js
 pipe(
-	receive("checkCpu"),
-	apply(function (topOutput, payload) {
-		// Create an object associating the hostname (retrieved from the payload) and its topOutput
-		return { 
-			hostname: payload.hostname,
-			topOutput: topOutput
-		};
-	}),
-	trail("1m"),
-	alert({
-		title: "Average CPU too high",
-		trigger: function (trailOutput) {
-			if (trailOutput.length == 0) {
-				return false;
-			}
-			// Keep the most recent top info for each server from which we've received info during the last minute 
-			var serverInfo = {};
-			for (var i = 0; i < trailOutput.length; i++) {
-				var value = trailOutput[i].value;
-				serverInfo[value.hostname] = value.topOutput; 
-			}
-			// Compute the CPU 
-			var processors = 0;
-			var loadAverage = 0;
-			for (var hostname in serverInfo) {
-				processors = processors + serverInfo[hostname].availableProcessors;
-				loadAverage = loadAverage + serverInfo[hostname].loadAverage;
-			}
-			var cpu = loadAverage / processors;
-			return cpu > .8; 
-		},
-		toggle: true
-	})
+  receive("checkCpu"),
+  apply(function (topOutput, payload) {
+    // Create an object associating the hostname (retrieved from the payload) and its topOutput
+    return { 
+      hostname: payload.hostname,
+      topOutput: topOutput
+    };
+  }),
+  trail("1m"),
+  alert({
+    title: "Average CPU too high",
+    trigger: function (trailOutput) {
+      if (trailOutput.length == 0) {
+        return false;
+      }
+      // Keep the most recent top info for each server from which we've received info during the last minute 
+      var serverInfo = {};
+      for (var i = 0; i < trailOutput.length; i++) {
+        var value = trailOutput[i].value;
+        serverInfo[value.hostname] = value.topOutput; 
+      }
+      // Compute the CPU 
+      var processors = 0;
+      var loadAverage = 0;
+      for (var hostname in serverInfo) {
+        processors = processors + serverInfo[hostname].availableProcessors;
+        loadAverage = loadAverage + serverInfo[hostname].loadAverage;
+      }
+      var cpu = loadAverage / processors;
+      return cpu > .8; 
+    },
+    toggle: true
+  })
 ).run();
 ```
 
-## [Triggers an alert if the number of files in a directory is greater than 100](reference/processor/sh.md#triggers-an-alert-if-the-number-of-files-in-a-directory-is-greater-than-100)
+#### [Triggers an alert if the number of files in a directory is greater than 100](reference/processor/sh.md#triggers-an-alert-if-the-number-of-files-in-a-directory-is-greater-than-100)
 
 Note the use of `json` to convert the string output of `sh` to a number: 
 
 ```js
 pipe(
-	sh("ls /tmp | wc -l"),
+  sh("ls /tmp | wc -l"),
   json(),
   alert({
-  	title: "Too many files",
-  	trigger: function (count) { return count > 100; },
-  	toggle: true
+    title: "Too many files",
+    trigger: function (count) { return count > 100; },
+    toggle: true
   })
 ).run();
 ```
 
-## [Trigger an alert if there's no `mongod` running process](reference/processor/sh.md#trigger-an-alert-if-theres-no-mongod-running-process)
+#### [Trigger an alert if there's no `mongod` running process](reference/processor/sh.md#trigger-an-alert-if-theres-no-mongod-running-process)
 
 ```js
 pipe(
-	sh("pgrep -q mongod && echo UP || echo DOWN"),
+  sh("pgrep -q mongod && echo UP || echo DOWN"),
   alert({
-  	title: "mongod is down",
-  	trigger: function (shOutput) { return shOutput === "DOWN"; },
-  	toggle: true
+    title: "mongod is down",
+    trigger: function (shOutput) { return shOutput === "DOWN"; },
+    toggle: true
   })
 ).run();
 ```
@@ -386,14 +420,14 @@ when the `mongod` process is restarted. This is to be contrasted with the less g
 ```js
 // Not great: triggers an alert every second as long as mongod is down. 
 pipe(
-	sh("pgrep -q mongod || echo DOWN"),
+  sh("pgrep -q mongod || echo DOWN"),
   alert({
-  	title: "mongod is down",
+    title: "mongod is down",
   })
 ).run();
 ```
 
-## [Use the `grep` unix command to filter payload](reference/processor/sh_f.md#use-the-grep-unix-command-to-filter-payload)
+#### [Use the `grep` unix command to filter payload](reference/processor/sh_f.md#use-the-grep-unix-command-to-filter-payload)
 
 ```js
 pipe(
@@ -410,36 +444,36 @@ block buffered when standard output is not a terminal, which is the case here; w
 would be delayed until the buffer is full, which would also delay the alarm. In general, you should use
 shell commands with buffered output with care, as they might not yield to the natural behavior you would expected.
 
-## [Trigger an alert when a file hasn't been updated since 10 minutes](reference/processor/stat.md#trigger-an-alert-when-a-file-hasnt-been-updated-since-10-minutes)
+#### [Trigger an alert when a file hasn't been updated since 10 minutes](reference/processor/stat.md#trigger-an-alert-when-a-file-hasnt-been-updated-since-10-minutes)
 
 ```js
 pipe(
-	stat("application.log"),
-	alert({
-		title: "Log file is inactive",
-		trigger: function (statOutput) {
-			if (!statOutput.exists) {
-				return false;
-			}
-			var now = (new Date()).getTime();
-			var minutes10 = 10 * 60 * 1000;
-			return (now - statOutput.lastModified) > minutes10;
-		},
-		toggle: true
-	})
+  stat("application.log"),
+  alert({
+    title: "Log file is inactive",
+    trigger: function (statOutput) {
+      if (!statOutput.exists) {
+        return false;
+      }
+      var now = (new Date()).getTime();
+      var minutes10 = 10 * 60 * 1000;
+      return (now - statOutput.lastModified) > minutes10;
+    },
+    toggle: true
+  })
 ).run();
 ```
 
-## [Write system load information to standard output](reference/processor/stdout.md#write-system-load-information-to-standard-output)
+#### [Write system load information to standard output](reference/processor/stdout.md#write-system-load-information-to-standard-output)
 
 ```js
 pipe(
-	top(),
-	stdout()
+  top(),
+  stdout()
 ).run();
 ```
 
-## [Trigger an alert when the log file gets bigger than 100,000 lines](reference/processor/tail.md#trigger-an-alert-when-the-log-file-gets-bigger-than-100000-lines)
+#### [Trigger an alert when the log file gets bigger than 100,000 lines](reference/processor/tail.md#trigger-an-alert-when-the-log-file-gets-bigger-than-100000-lines)
 
 ```js
 pipe(
@@ -452,7 +486,7 @@ pipe(
 ).run();
 ```
 
-## [Trigger an alert when the CPU is higher than 80%](reference/processor/top.md#trigger-an-alert-when-the-cpu-is-higher-than-80)
+#### [Trigger an alert when the CPU is higher than 80%](reference/processor/top.md#trigger-an-alert-when-the-cpu-is-higher-than-80)
 
 ```js
 pipe(
@@ -468,7 +502,7 @@ pipe(
 ).run();
 ```
 
-## [Trigger an alert when a log file has more than 20 Java exception per second](reference/processor/trail.md#trigger-an-alert-when-a-log-file-has-more-than-20-java-exception-per-second)
+#### [Trigger an alert when a log file has more than 20 Java exception per second](reference/processor/trail.md#trigger-an-alert-when-a-log-file-has-more-than-20-java-exception-per-second)
 
 This alert is in toggle mode, thus it will stay up as long as the exception frequency stays high:
 
@@ -485,7 +519,7 @@ pipe(
 ).run();
 ```
 
-## [Trigger an alert when the disk usage increases by more than 20% in an hour](reference/processor/trail.md#trigger-an-alert-when-the-disk-usage-increases-by-more-than-20-in-an-hour)
+#### [Trigger an alert when the disk usage increases by more than 20% in an hour](reference/processor/trail.md#trigger-an-alert-when-the-disk-usage-increases-by-more-than-20-in-an-hour)
 
 ```js
 pipe(
@@ -510,7 +544,7 @@ period of `df` can be decreased, which will reduce Opwatch memory consumption:
 df({ file: "/tmp", period: "10m" })
 ```
 
-## [Trigger an alert when a log file remains silent for more than 10 minutes](reference/processor/trail.md#trigger-an-alert-when-a-log-file-remains-silent-for-more-than-10-minutes)
+#### [Trigger an alert when a log file remains silent for more than 10 minutes](reference/processor/trail.md#trigger-an-alert-when-a-log-file-remains-silent-for-more-than-10-minutes)
 
 ```js
 pipe(

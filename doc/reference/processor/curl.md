@@ -90,15 +90,15 @@ pipe(
   curl("https://httpbin.org"), 
   collect(10), 
   alert({
-  	title: "Website is wobbly or down",
-  	trigger: function (curlOutputArray) {
-  		var down = 0;
-  		for (var i = 0; i < curlOutputArray.length; i++) {
-  			if (curlOutputArray[i].status != 200) down++;
-  		}
-  		return down >= 2;
-  	},
-  	toggle: true
+    title: "Website is wobbly or down",
+    trigger: function (curlOutputArray) {
+      var down = 0;
+      for (var i = 0; i < curlOutputArray.length; i++) {
+        if (curlOutputArray[i].status != 200) down++;
+      }
+      return down >= 2;
+    },
+    toggle: true
   })
 ).run();
 ```
@@ -111,22 +111,22 @@ pipe(
 ```js
 pipe(
   curl({
-  	url: "https://jsonplaceholder.typicode.com/posts",
-  	method: "post",
-  	data: {
+    url: "https://jsonplaceholder.typicode.com/posts",
+    method: "post",
+    data: {
         name: 'foo',
         body: 'bar',
         userId: 1
       }
   }), 
   alert({
-  	title: "API is down or buggy",
-  	trigger: function (curlOutput) {
-  		return (curlOutput.status != 201)
-  			|| !curlOutput.json
-  			|| (curlOutput.json.name !== "foo");
-  	},
-  	toggle: true
+    title: "API is down or buggy",
+    trigger: function (curlOutput) {
+      return (curlOutput.status != 201)
+        || !curlOutput.json
+        || (curlOutput.json.name !== "foo");
+    },
+    toggle: true
   })
 ).run();
 ```
