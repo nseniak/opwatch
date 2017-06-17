@@ -11,10 +11,10 @@
     + [The single reference rule](#the-single-reference-rule)
   * [Module system](#module-system)
   * [Opwatch built-in functions](#opwatch-built-in-functions)
-    + [`stats(data)`](#`stats(data)`)
-    + [`pretty(data)`](#-pretty-data--)
-    + [`help()`](#-help---)
-    + [`<constructor>.help()`](#--constructor-help---)
+    + [`stats(data)`](#statsdata)
+    + [`pretty(data)`](#prettydata)
+    + [`help()`](#help)
+    + [`<constructor>.help()`](#constructorhelp)
     
 ## Javascript implementation
 
