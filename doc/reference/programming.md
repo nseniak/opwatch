@@ -36,9 +36,9 @@ For example, the following code prints the length of any line of text you type a
 
 ```js
 pipe(
-	stdin(), 
-	apply(function (input) { return input.length; }), 
-	stdout()
+  stdin(), 
+  apply(function (input) { return input.length; }), 
+  stdout()
 ).run();
 ```
 
@@ -120,8 +120,8 @@ used in any other construct. For instance, the code below triggers an error:
 ```js
 a = alert("Alert!");
 parallel(
-	pipe(tail("file1.log"), a),
-	pipe(tail("file2.log"), a)
+  pipe(tail("file1.log"), a),
+  pipe(tail("file2.log"), a)
 )
 // => error: alert: a processor can only be used once; this one is already used in pipe
 ```
@@ -130,12 +130,12 @@ The common way of reusing a processor definition is to encapsulate it in a funct
 
 ```js
 function myAlert() {
-	return alert("Alert!");
+  return alert("Alert!");
 }
 
 parallel(
-	pipe(tail("file1.log"), myAlert()),
-	pipe(tail("file2.log"), myAlert())
+  pipe(tail("file1.log"), myAlert()),
+  pipe(tail("file2.log"), myAlert())
 )
 // => Correct!
 ```
