@@ -9,4 +9,4 @@ exports.clock = function (config) {
 			}
 		}))
 	})
-}
+};
