@@ -31,7 +31,7 @@ import static org.hamcrest.core.Is.is;
 @DirtiesContext
 public class ProcessorTest extends ProcessorTestRoot {
 
-	private static final long STARTUP_WAIT = TimeUnit.SECONDS.toMillis(3);
+	private static final long STARTUP_WAIT = TimeUnit.SECONDS.toMillis(10);
 	private static final long EXECUTION_TIMEOUT = TimeUnit.SECONDS.toMillis(30);
 
 	@Test

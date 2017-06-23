@@ -129,12 +129,18 @@ public class ProcessorTestRoot {
 		}
 	}
 
-	protected Future<Void> readLines(BufferedReader reader, List<String> lines) throws Exception {
+	protected Future<Void> readLines(BufferedReader reader, List<String> lines) {
 		ExecutorService es = Executors.newSingleThreadExecutor();
 		return es.submit(() -> {
-			while (true) {
-				lines.add(reader.readLine());
+			String line;
+			try {
+				while ((line = reader.readLine()) != null) {
+					lines.add(line);
+				}
+			} catch (IOException e) {
+				// Nothing to do
 			}
+			return null;
 		});
 	}
 

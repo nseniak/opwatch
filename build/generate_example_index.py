@@ -2,7 +2,9 @@ import os
 import re
 from os.path import join
 
+# Root of the documentation directory
 doc_root_dir = '../doc/'
+# Target file for the list of examples
 list_file = doc_root_dir + 'examples.md'
 
 md_file_regex = re.compile('.*\.md$')
@@ -40,6 +42,8 @@ list_begin = '<!-- example-list-begin -->'
 list_end = '<!-- example-list-end -->'
 list_regex = re.compile(re.escape(list_begin) + '\n.*' + re.escape(list_end), re.DOTALL)
 
+print('Generating the example list in', list_file)
+
 index = []
 examples = []
 for file in md_files(doc_root_dir):
@@ -56,6 +60,9 @@ with open(list_file, 'r') as list_file_desc:
 new_content = list_regex.sub(list_begin + '\n' + example_list + '\n' + list_end, content)
 new_content = index_regex.sub(index_begin + '\n' + index_list + '\n' + index_end, new_content)
 
-with open(list_file, 'w') as list_file_desc:
-    list_file_desc.write(new_content)
-
+if (new_content == content):
+    print('The content of', list_file, ' has not changed.')
+else:
+    with open(list_file, 'w') as list_file_desc:
+        list_file_desc.write(new_content)
+    print('The content of', list_file, ' has changed. Please commit it.')
