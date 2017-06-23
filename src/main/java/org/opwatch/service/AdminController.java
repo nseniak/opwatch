@@ -20,16 +20,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api")
-public class ApiController {
+@RequestMapping("/admin")
+public class AdminController {
 
 	@Autowired
 	private ProcessorService processorService;
-
-	@RequestMapping(value = "/stop", method = RequestMethod.POST)
-	public void pause() {
-		processorService.stopRunningProcessor();
-	}
 
 	@RequestMapping(value = "/trace/start", method = RequestMethod.POST)
 	public void startTrace() {
