@@ -3,5 +3,6 @@
   "exceptionMessage" : "file.txt",
   "location" : "FileInputStream.java",
   "method" : "java.io.FileInputStream.<init>",
-  "previousLine" : ""
+  "previousLine" : "",
+  "stack" : [ "java.io.FileNotFoundException: file.txt", "        at java.io.FileInputStream.<init>(FileInputStream.java)", "        at java.io.FileInputStream.<init>(FileInputStream.java)", "        at org.myproject.FileReader.readMyFile(FileReader.java:19)", "        at org.myproject.Main.main(Main.java:27)" ]
 } ]

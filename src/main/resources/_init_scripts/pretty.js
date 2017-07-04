@@ -44,7 +44,7 @@ __prettyObject = (function () {
 				|| (type === "[object org.opwatch.processor.config.JavascriptFilter]")
 				|| (type === "[object org.opwatch.processor.config.JavascriptProducer]")) {
 			return prettyFunction(object, depth, options);
-		} else if ((type === "[object Array]") || object.__payloadArray) {
+		} else if ((type === "[object Array]") || type ==="[object java.util.ArrayList]" || object.__payloadArray) {
 			return prettyArray(object, depth, options);
 		} else if (type.startsWith("[object org.opwatch.processor.") && object.processor) {
 			return prettyProcessor(object, depth, options);
