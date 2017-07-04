@@ -28,6 +28,7 @@ the example and see it in context.
 - [Use the `grep` unix command to filter payload](#use-the-grep-unix-command-to-filter-payload)
 - [Trigger an alert when a file hasn't been updated since 10 minutes](#trigger-an-alert-when-a-file-hasnt-been-updated-since-10-minutes)
 - [Write system load information to standard output](#write-system-load-information-to-standard-output)
+- [Write data received from another Opwatch instance to a file](#write-data-received-from-another-opwatch-instance-to-a-file)
 - [Trigger an alert when the log file gets bigger than 100,000 lines](#trigger-an-alert-when-the-log-file-gets-bigger-than-100000-lines)
 - [Trigger an alert when the CPU is higher than 80%](#trigger-an-alert-when-the-cpu-is-higher-than-80)
 - [Trigger an alert when a log file has more than 20 Java exception per second](#trigger-an-alert-when-a-log-file-has-more-than-20-java-exception-per-second)
@@ -490,6 +491,16 @@ pipe(
 pipe(
   top(),
   stdout()
+).run();
+```
+
+---
+#### [Write data received from another Opwatch instance to a file](reference/processor/stdout.md#write-data-received-from-another-opwatch-instance-to-a-file)
+
+```js
+pipe(
+  receive("data"),
+  stdout({ file: "remote-data.log.json" })
 ).run();
 ```
 
