@@ -12,7 +12,9 @@
  * the specific language governing permissions and limitations under the License.
  */
 
-pretty = (function () {
+__prettyObject = (function () {
+
+	var invalidJsonObjectResult = "not_a_json_object";
 
 	var prettyObject = function (object, depth, options) {
 		if (depth > options.maxDepth) {
@@ -22,9 +24,9 @@ pretty = (function () {
 		if (type === "[object Null]") {
 			return "null";
 		} else if (type === "[object Undefined]") {
-			return "undefined";
+			return prettyUndefined(object, depth, options);
 		} else if (type === "[object Boolean]") {
-			return object.toString();
+			return prettyBoolean(object, depth, options);
 		} else if (type === "[object Number]"
 				|| (type === "[object java.lang.Long]")
 				|| (type === "[object java.lang.Integer]")
@@ -34,14 +36,14 @@ pretty = (function () {
 		} else if (type === "[object String]") {
 			return prettyString(object, depth, options);
 		} else if (type === "[object Date]") {
-			return "new Date(" + JSON.stringify(object.toString()) + ")";
+			return prettyDate(object, depth, options);
 		} else if (type === "[object RegExp]") {
-			return object.toString();
+			return prettyRegExp(object, depth, options);
 		} else if ((type === "[object Function]")
 				|| (type === "[object org.opwatch.processor.config.JavascriptPredicate]")
 				|| (type === "[object org.opwatch.processor.config.JavascriptFilter]")
 				|| (type === "[object org.opwatch.processor.config.JavascriptProducer]")) {
-			return prettyFunction(object);
+			return prettyFunction(object, depth, options);
 		} else if ((type === "[object Array]") || object.__payloadArray) {
 			return prettyArray(object, depth, options);
 		} else if (type.startsWith("[object org.opwatch.processor.") && object.processor) {
@@ -61,12 +63,44 @@ pretty = (function () {
 		return JSON.stringify(string);
 	};
 
+	var prettyDate = function (date, depth, options) {
+		if (options.json) {
+			return JSON.stringify(date);
+		} else {
+			return "new Date(" + JSON.stringify(object.toString()) + ")";
+		}
+	};
+
 	var prettyNumber = function (number, depth, options) {
 		return number.toString();
 	};
 
-	var prettyFunction = function (fn) {
-		return fn.toString();
+	var prettyBoolean = function (boolean, depth, options) {
+		return boolean.toString();
+	};
+
+	var prettyUndefined = function (undef, depth, options) {
+		if (options.json) {
+			return invalidJsonObjectResult;
+		} else {
+			return "undefined";
+		}
+	};
+
+	var prettyFunction = function (fn, depth, options) {
+		if (options.json) {
+			return invalidJsonObjectResult;
+		} else {
+			return fn.toString();
+		}
+	};
+
+	var prettyRegExp = function (regexp, depth, options) {
+		if (options.json) {
+			return "{}";
+		} else {
+			return regexp.toString();
+		}
 	};
 
 	var prettyValueOrFilter = function (object, depth, options) {
@@ -86,7 +120,7 @@ pretty = (function () {
 		if (array.length === 0) {
 			return "[]";
 		} else if (array.length === 1) {
-			return "[ " + prettyObject(array[0], depth + 1, options) + " ]";
+			return "[" + options.space + prettyObject(array[0], depth + 1, options) + options.space + "]";
 		} else {
 			var lines = [];
 			lines.push("[");
@@ -120,7 +154,9 @@ pretty = (function () {
 		if (properties.length === 0) {
 			return "{}";
 		} else if (properties.length === 1) {
-			return "{ " + properties[0] + ": " + prettyObject(object[properties[0]], depth + 1, options) + " }";
+			return "{" + options.space
+					+ prettyProperty(properties[0], options) + ":" + options.space + prettyObject(object[properties[0]], depth + 1, options)
+					+ options.space + "}";
 		} else {
 			var lines = [];
 			lines.push("{");
@@ -128,7 +164,8 @@ pretty = (function () {
 			for (var i = 0; i < properties.length; i++) {
 				var value = prettyObject(object[properties[i]], depth + 1, options);
 				var comma = (i < properties.length - 1) ? "," : "";
-				lines.push(prefix + properties[i] + ": " + value + comma);
+				var property = prettyProperty(properties[i], options);
+				lines.push(prefix + property + ":" + options.space + value + comma);
 			}
 			lines.push(indent(depth, options) + "}");
 			return joinLines(lines, options);
@@ -144,6 +181,14 @@ pretty = (function () {
 			return config.name + '(' + prettyObjectProperties(config.configuration, depth + 1, options) + ')';
 		} else {
 			return name + "(" + prettyProperties(config, definedProperties(config, properties), depth + 1, options) + ")";
+		}
+	};
+
+	var prettyProperty = function (property, options) {
+		if (options.json) {
+			return "\"" + property + "\"";
+		} else {
+			return property;
 		}
 	};
 
@@ -163,7 +208,7 @@ pretty = (function () {
 		} else {
 			return prettyString(duration.text, depth, options);
 		}
-	}
+	};
 
 	var indentations = {};
 
@@ -186,28 +231,46 @@ pretty = (function () {
 		if (options.indent) {
 			return array.join("\n");
 		} else {
-			return array.join(" ");
+			return array.join(options.space);
 		}
 	}
 
-	return function (object, options) {
-		var actualOptions = {indent: 2, expandAlias: false, maxDepth: 5, maxArrayLength: 100, asString: false };
-		if (options) {
-			for (var property in options) {
-				actualOptions[property] = options[property];
-			}
-		}
-		var str;
-		try {
-			str = prettyObject(object, 0, actualOptions);
-		} catch (error) {
-			str = print("<cannot pretty print object>");
-		}
-		if (actualOptions.asString) {
-			return str;
-		} else {
-			print(str);
-			return undefined;
-		}
-	};
+	return prettyObject;
 })();
+
+function pretty(object, options) {
+	var actualOptions = {
+		indent: 2,
+		expandAlias: false,
+		maxDepth: 5,
+		maxArrayLength: 100,
+		json: false,
+		space: " ",
+		asString: false
+	};
+	if (options) {
+		for (var property in options) {
+			actualOptions[property] = options[property];
+		}
+	}
+	var str;
+	try {
+		str = __prettyObject(object, 0, actualOptions);
+	} catch (error) {
+		str = "<cannot pretty print object>";
+	}
+	if (actualOptions.asString) {
+		return str;
+	} else {
+		print(str);
+		return undefined;
+	}
+}
+
+function __json_stringify(object) {
+	return pretty(object, {indent: 0, json: true, asString: true, maxArrayLength: 1000, maxDepth: 20, space: ""})
+}
+
+function __json_parse(object) {
+	return JSON.parse(object);
+}
