@@ -14,13 +14,10 @@
 
 package org.opwatch.processor.primitives.consumer.stdout;
 
-import org.opwatch.processor.common.ProcessorVoidExecutionScope;
 import org.opwatch.processor.payload.Payload;
 import org.opwatch.processor.primitives.consumer.Consumer;
 import org.opwatch.service.ProcessorService;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.PrintWriter;
 
 public class Stdout extends Consumer<StdoutConfig> {
@@ -28,32 +25,14 @@ public class Stdout extends Consumer<StdoutConfig> {
 	private String file;
 	private PrintWriter writer;
 
-	public Stdout(ProcessorService processorService, StdoutConfig configuration, String name, String file) {
+	public Stdout(ProcessorService processorService, StdoutConfig configuration, String name) {
 		super(processorService, configuration, name);
-		this.file = file;
-	}
-
-	@Override
-	public void start() {
-		super.start();
-		if (file != null) {
-			processorService.withExceptionHandling("cannot create file " + file,
-					() -> new ProcessorVoidExecutionScope(this),
-					() -> {
-						writer = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
-					});
-		}
 	}
 
 	@Override
 	public void consume(Payload payload) {
 		String output = processorService.getScriptService().jsonStringify(payload.getValue());
-		if (writer == null) {
-			processorService.printStdout(output);
-		} else {
-			writer.println(output);
-			writer.flush();
-		}
+		processorService.printStdout(output);
 	}
 
 }

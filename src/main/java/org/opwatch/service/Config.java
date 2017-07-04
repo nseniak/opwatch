@@ -246,4 +246,20 @@ public class Config {
 		this.commandStartSleepTime = commandStartSleepTime;
 	}
 
+	public static String defaultLogMaxSize() {
+		return "1mb";
+	}
+
+	public static String defaultLogTotalMaxSize() {
+		return "10mb";
+	}
+
+	public static int defaultLogMaxHistory() {
+		return 10;
+	}
+
+	public static String defaultLogCompression() {
+		return "gz";
+	}
+
 }

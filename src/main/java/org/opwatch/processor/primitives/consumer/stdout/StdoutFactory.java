@@ -47,8 +47,7 @@ public class StdoutFactory extends ActiveProcessorFactory<StdoutConfig, Stdout> 
 	@Override
 	public Stdout make(Object scriptObject) {
 		StdoutConfig config = convertProcessorConfig(scriptObject);
-		String file = config.getFile();
-		return new Stdout(getProcessorService(), config, name(), file);
+		return new Stdout(getProcessorService(), config, name());
 	}
 
 }

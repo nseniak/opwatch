@@ -24,8 +24,9 @@
 ### Consumers
 
 * [`alert`](alert.md) -- triggers an alert
+* [`log`](log.md) -- writes its input to a log file
 * [`send`](send.md) -- sends its input to a remote Opwatch instance
-* [`stdout`](stdout.md) -- writes its input to the standard output or a file
+* [`stdout`](stdout.md) -- writes its input to the standard output
 
 ### Producer/Filters
 

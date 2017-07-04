@@ -28,6 +28,7 @@ import org.opwatch.processor.common.*;
 import org.opwatch.processor.config.*;
 import org.opwatch.processor.payload.Stats;
 import org.opwatch.processor.primitives.consumer.alert.AlertGeneratorFactory;
+import org.opwatch.processor.primitives.consumer.log.LogFactory;
 import org.opwatch.processor.primitives.consumer.send.SendFactory;
 import org.opwatch.processor.primitives.consumer.stdout.StdoutFactory;
 import org.opwatch.processor.primitives.control.alias.AliasFactory;
@@ -39,7 +40,6 @@ import org.opwatch.processor.primitives.filter.grep.GrepFactory;
 import org.opwatch.processor.primitives.filter.json.JsonFactory;
 import org.opwatch.processor.primitives.filter.jstack.JstackFactory;
 import org.opwatch.processor.primitives.filter.sh_f.ShFilterFactory;
-import org.opwatch.processor.primitives.filter.trace.TraceFactory;
 import org.opwatch.processor.primitives.filter.trail.TrailFactory;
 import org.opwatch.processor.primitives.producer.call.CallFactory;
 import org.opwatch.processor.primitives.producer.console.StdinFactory;
@@ -124,8 +124,8 @@ public class ScriptService {
 			createSimpleFactoryFunction(new GrepFactory(processorService));
 			createSimpleFactoryFunction(new JsonFactory(processorService));
 			createSimpleFactoryFunction(new JstackFactory(processorService));
-			createSimpleFactoryFunction(new ReceiveFactory(processorService));
 			createSimpleFactoryFunction(new CallFactory(processorService));
+			createSimpleFactoryFunction(new LogFactory(processorService));
 			createSimpleFactoryFunction(new SendFactory(processorService));
 			createSimpleFactoryFunction(new ShFilterFactory(processorService));
 			createSimpleFactoryFunction(new StatFactory(processorService));
@@ -133,10 +133,10 @@ public class ScriptService {
 			createSimpleFactoryFunction(new StdoutFactory(processorService));
 			createSimpleFactoryFunction(new TailFactory(processorService));
 			createSimpleFactoryFunction(new TopFactory(processorService));
-			createSimpleFactoryFunction(new TraceFactory(processorService));
 			createSimpleFactoryFunction(new TrailFactory(processorService));
 			createVarargFactoryFunction(new ParallelFactory(processorService));
 			createVarargFactoryFunction(new PipeFactory(processorService));
+			createSimpleFactoryFunction(new ReceiveFactory(processorService));
 			loadConfigFile();
 		} catch (ScriptException e) {
 			throw new RuntimeError("initialization error: " + e.getMessage(), e);
