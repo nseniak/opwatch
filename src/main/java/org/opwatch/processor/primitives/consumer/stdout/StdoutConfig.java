@@ -19,4 +19,15 @@ import org.opwatch.processor.config.OptionalProperty;
 
 public class StdoutConfig extends ActiveProcessorConfig {
 
+	private String file;
+
+	@OptionalProperty
+	public String getFile() {
+		return file;
+	}
+
+	public void setFile(String file) {
+		this.file = file;
+	}
+
 }

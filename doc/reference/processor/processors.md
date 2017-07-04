@@ -25,7 +25,7 @@
 
 * [`alert`](alert.md) -- triggers an alert
 * [`send`](send.md) -- sends its input to a remote Opwatch instance
-* [`stdout`](stdout.md) -- writes its input to the standard output
+* [`stdout`](stdout.md) -- writes its input to the standard output or a file
 
 ### Producer/Filters
 
