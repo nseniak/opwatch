@@ -5,8 +5,7 @@
 #   JAVA_OPTS -- Java Options to be passed to the JVM
 #
 
-cd $(dirname $0)
-HOME_DIR=$(pwd)
+HOME_DIR=$(cd $(dirname $0);pwd)
 
 if [ -x "${JAVA_HOME}/bin/java" ]
 then
@@ -22,12 +21,12 @@ then
 fi
 
 LOG_DIR=${HOME_DIR}/log
-LOG_BASENAME=alerter
+LOG_BASENAME=opwatch
 mkdir -p ${LOG_DIR} || exit 1
 ${JAVA} \
 	${JAVA_OPTS} \
 	-Dapp.log.dir=${LOG_DIR} \
 	-Dapp.log.basename=${LOG_BASENAME} \
 	-Dapp.home=${HOME_DIR}/.. \
-	-jar lib/opwatch-*.jar \
+	-jar ${HOME_DIR}/lib/opwatch-*.jar \
 	"$@"
