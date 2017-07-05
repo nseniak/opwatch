@@ -231,7 +231,7 @@ public class ScriptService {
 	public String pretty(Object object) {
 		synchronized (this) {
 			try {
-				return (String) scriptEngine.invokeFunction("pretty", object);
+				return (String) scriptEngine.invokeFunction("__pretty_stringify", object);
 			} catch (NoSuchMethodException | ScriptException e) {
 				throw new RuntimeError(e);
 			}

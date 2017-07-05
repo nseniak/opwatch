@@ -274,3 +274,7 @@ function __json_stringify(object) {
 function __json_parse(object) {
 	return JSON.parse(object);
 }
+
+function __pretty_stringify(object) {
+	return pretty(object, {asString: true});
+}
