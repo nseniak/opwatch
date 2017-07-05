@@ -16,7 +16,6 @@ package org.opwatch.ioservice;
 
 import org.opwatch.common.ThreadUtil;
 import org.opwatch.processor.common.ApplicationInterruptedException;
-import org.opwatch.processor.common.GlobalExecutionScope;
 import org.opwatch.service.ProcessorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,11 +68,13 @@ public class FileTailingService implements DisposableBean {
 
 	public void tailFile(TailedFile tailedFile) {
 		try {
-			processorService.withExceptionHandling("error tailing file " + tailedFile.getFile().toString(),
-					GlobalExecutionScope::new,
-					tailedFile::tail);
+			tailedFile.tail();
+		} catch (InterruptedException e) {
+			throw new ApplicationInterruptedException(ApplicationInterruptedException.INTERRUPTION);
 		} catch (ApplicationInterruptedException e) {
-			// Exit
+			throw e;
+		} catch (Exception e) {
+			logger.error("Unexpected exception while tailing file", e);
 		}
 	}
 

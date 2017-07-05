@@ -122,7 +122,9 @@ public abstract class ActiveProcessor<D extends ActiveProcessorConfig> extends P
 			logger.info("Output: " + getName() + " ==> " + processorService.json(payload));
 		}
 		for (Processor<?> consumer : consumers) {
-			consumer.consume(payload);
+			processorService.withExceptionHandling("error processing input",
+					() -> new ProcessorVoidExecutionScope(consumer),
+					() -> consumer.consume(payload));
 		}
 	}
 

@@ -52,7 +52,7 @@ public class ConsumerThreadRunner implements Runnable {
 	@Override
 	public void run() {
 		while (true) {
-			processorService.withExceptionHandling("error reading input",
+			processorService.withExceptionHandling("error processing input",
 					() -> new ProcessorVoidExecutionScope(processor),
 					() -> {
 						Payload payload = inputQueue.take();
