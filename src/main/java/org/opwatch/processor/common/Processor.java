@@ -20,6 +20,7 @@ import org.opwatch.service.ProcessorService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
 
 import static jdk.nashorn.internal.runtime.ScriptRuntime.UNDEFINED;
@@ -57,8 +58,8 @@ public abstract class Processor<C extends ProcessorConfig> {
 	}
 
 	public Object run() {
-		inferSignature();
-		check();
+		checkInputCompatibility(ProcessorSignature.DataRequirement.NoData);
+		checkOutputCompatibility(ProcessorSignature.DataRequirement.NoData);
 		processorService.signalSystemInfo(PROCESSOR_RUNNING_MESSAGE);
 		start();
 		processorService.setRunningProcessorThread(Thread.currentThread());
@@ -97,9 +98,27 @@ public abstract class Processor<C extends ProcessorConfig> {
 
 	public abstract void consume(Payload payload);
 
-	public abstract void inferSignature();
+	public final void checkInputCompatibility(ProcessorSignature.DataRequirement input) {
+		checkCompatibility(errors -> signature.checkInputCompatibility(errors, input));
+	}
 
-	public abstract void check();
+	public final void checkOutputCompatibility(ProcessorSignature.DataRequirement output) {
+		checkCompatibility(errors -> signature.checkOutputCompatibility(errors, output));
+	}
+
+	private void checkCompatibility(CompatibilityChecker checker) {
+		StringJoiner errors = new StringJoiner(", ");
+		checker.check(errors);
+		if (errors.length() != 0) {
+			throw new RuntimeError("incorrect pipeline: " + errors.toString(), new ProcessorVoidExecutionScope(this));
+		}
+	}
+
+	private interface CompatibilityChecker {
+
+		void check(StringJoiner errors);
+
+	}
 
 	@Override
 	public String toString() {

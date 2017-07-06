@@ -34,9 +34,12 @@ public class Pipe extends ControlProcessor<PipeConfig> {
 			processor.assignContainer(this);
 			if (previous != null) {
 				processor.addProducer(previous);
+				previous.checkOutputCompatibility(processor.getSignature().getInputRequirement());
+				processor.checkInputCompatibility(previous.getSignature().getOutputRequirement());
 			}
 			previous = processor;
 		}
+		this.signature = new ProcessorSignature(first().getSignature().getInputRequirement(), last().getSignature().getOutputRequirement());
 	}
 
 	@Override
@@ -49,13 +52,6 @@ public class Pipe extends ControlProcessor<PipeConfig> {
 	public void addConsumer(Processor<?> consumer) {
 		super.addConsumer(consumer);
 		last().addConsumer(consumer);
-	}
-
-	@Override
-	public void check() {
-		for (Processor processor : processors) {
-			processor.check();
-		}
 	}
 
 	@Override
@@ -82,14 +78,6 @@ public class Pipe extends ControlProcessor<PipeConfig> {
 	@Override
 	public void consume(Payload payload) {
 		// Nothing to do. Producers and consumers are already connected.
-	}
-
-	@Override
-	public void inferSignature() {
-		for (Processor processor : processors) {
-			processor.inferSignature();
-		}
-		this.signature = new ProcessorSignature(first().getSignature().getInputRequirement(), last().getSignature().getOutputRequirement());
 	}
 
 }

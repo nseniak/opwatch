@@ -14,92 +14,126 @@
 
 package org.opwatch.processor.common;
 
+import java.util.StringJoiner;
+
 public class ProcessorSignature {
 
-	/**
-	 * 					Any
-	 * 					/	\
-	 * 			Data	Void
-	 * 				 \  /
-	 * 				 None
-	 */
-	public enum PipeRequirement {
+	public enum DataRequirement {
 		None,
-		// For input: means that the processor is not a consumer
-		// For output: means that the processor is not a producer
+		// As input: Should not receive any input data
+		// As output: Does not produces any data
 		NoData,
-		// For input: means that the processor is a consumer
-		// For output: means that the processor is a producer
+		// As input: Requires input data
+		// As output: Produces data that should not be ignored
 		Data,
-		// For input: means that the processor can be a consumer, but doesn't necessarily require data
-		// For output: means that the processor is a producer but also performs side effects so its output can be
-		// ignored
+		// As input: Can receive data but does not require it
+		// As output: Produces data but that data can be ignored
 		Any
 	}
 
-	private PipeRequirement inputRequirement;
-	private PipeRequirement outputRequirement;
+	private DataRequirement inputRequirement;
+	private DataRequirement outputRequirement;
 
-	public ProcessorSignature(PipeRequirement inputRequirement, PipeRequirement outputRequirement) {
+	public ProcessorSignature(DataRequirement inputRequirement, DataRequirement outputRequirement) {
 		this.inputRequirement = inputRequirement;
 		this.outputRequirement = outputRequirement;
 	}
 
 	public static ProcessorSignature makeProducer() {
-		return new ProcessorSignature(PipeRequirement.NoData, PipeRequirement.Data);
+		return new ProcessorSignature(DataRequirement.NoData, DataRequirement.Data);
 	}
 
 	public static ProcessorSignature makeConsumer() {
-		return new ProcessorSignature(PipeRequirement.Data, PipeRequirement.NoData);
+		return new ProcessorSignature(DataRequirement.Data, DataRequirement.NoData);
 	}
 
 	public static ProcessorSignature makeSideEffectFilter() {
-		return new ProcessorSignature(PipeRequirement.Data, PipeRequirement.Any);
+		return new ProcessorSignature(DataRequirement.Data, DataRequirement.Any);
 	}
 
 	public static ProcessorSignature makeFilter() {
-		return new ProcessorSignature(PipeRequirement.Data, PipeRequirement.Data);
+		return new ProcessorSignature(DataRequirement.Data, DataRequirement.Data);
 	}
 
 	public static ProcessorSignature makeProducerOrFilter() {
-		return new ProcessorSignature(PipeRequirement.Any, PipeRequirement.Data);
+		return new ProcessorSignature(DataRequirement.Any, DataRequirement.Data);
 	}
 
 	public static ProcessorSignature makeAny() {
-		return new ProcessorSignature(PipeRequirement.Any, PipeRequirement.Any);
+		return new ProcessorSignature(DataRequirement.Any, DataRequirement.Any);
 	}
 
-	public static PipeRequirement bottom(PipeRequirement req1, PipeRequirement req2) {
-		if (req1 == req2) {
-			return req1;
-		} if (req1 == PipeRequirement.Any) {
-			return req2;
-		} else if (req2 == PipeRequirement.Any) {
-			return req1;
-		} else {
-			return PipeRequirement.None;
+	public void checkInputCompatibility(StringJoiner errors, DataRequirement input) {
+		switch (input) {
+			case NoData:
+				if (inputRequirement == DataRequirement.Data) {
+					errors.add("input is required");
+				}
+				break;
+			case Data:
+			case Any:
+				if (inputRequirement == DataRequirement.NoData) {
+					errors.add("cannot receive an input");
+				}
+				break;
 		}
 	}
 
-	public ProcessorSignature bottom(ProcessorSignature other) {
-		PipeRequirement inputReq = bottom(inputRequirement, other.getInputRequirement());
-		PipeRequirement outputReq = bottom(outputRequirement, other.getOutputRequirement());
+	public void checkOutputCompatibility(StringJoiner errors, DataRequirement output) {
+		switch (outputRequirement) {
+			case NoData:
+				if (output == DataRequirement.Data) {
+					errors.add("does not generate an output");
+				}
+				break;
+			case Data:
+				if (output == DataRequirement.NoData) {
+					errors.add("output should be used");
+				}
+				break;
+			case Any:
+				break;
+		}
+	}
+
+	public static DataRequirement parallelRequirement(DataRequirement req1, DataRequirement req2) {
+		// Data x Data -> Data
+		// Data x NoData -> Data
+		// Data x Any -> Data
+		// NoData x Data -> Data
+		// NoData x NoData -> NoData
+		// NoData x Any -> Any
+		// Any x Data -> Data
+		// Any x NoData -> Any
+		// Any x Any -> Any
+		if ((req1 == DataRequirement.Data) || (req2 == DataRequirement.Data)) {
+			return DataRequirement.Data;
+		} if ((req1 == DataRequirement.Any) || (req2 == DataRequirement.Any)) {
+			return DataRequirement.Any;
+		} else {
+			return DataRequirement.NoData;
+		}
+	}
+
+	public ProcessorSignature parallel(ProcessorSignature other) {
+		DataRequirement inputReq = parallelRequirement(inputRequirement, other.getInputRequirement());
+		DataRequirement outputReq = parallelRequirement(outputRequirement, other.getOutputRequirement());
 		return new ProcessorSignature(inputReq, outputReq);
 	}
 
-	public PipeRequirement getInputRequirement() {
+	public DataRequirement getInputRequirement() {
 		return inputRequirement;
 	}
 
-	public void setInputRequirement(PipeRequirement inputRequirement) {
+	public void setInputRequirement(DataRequirement inputRequirement) {
 		this.inputRequirement = inputRequirement;
 	}
 
-	public PipeRequirement getOutputRequirement() {
+	public DataRequirement getOutputRequirement() {
 		return outputRequirement;
 	}
 
-	public void setOutputRequirement(PipeRequirement outputRequirement) {
+	public void setOutputRequirement(DataRequirement outputRequirement) {
 		this.outputRequirement = outputRequirement;
 	}
 

@@ -33,10 +33,6 @@ public class Call extends ScheduledProducer<CallConfig> {
 		super(processorService, configuration, name, scheduledExecutor);
 		this.input = input;
 		this.output = output;
-	}
-
-	@Override
-	public void inferSignature() {
 		if (input == null) {
 			signature = ProcessorSignature.makeProducer();
 		} else {

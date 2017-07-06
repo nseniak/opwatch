@@ -30,6 +30,10 @@ public class Parallel extends ControlProcessor<ParallelConfig> {
 		for (Processor<?> processor : processors) {
 			processor.assignContainer(this);
 		}
+		this.signature = new ProcessorSignature(ProcessorSignature.DataRequirement.Any, ProcessorSignature.DataRequirement.Any);
+		for (Processor<?> processor : processors) {
+			this.signature = this.signature.parallel(processor.getSignature());
+		}
 	}
 
 	@Override
@@ -61,41 +65,8 @@ public class Parallel extends ControlProcessor<ParallelConfig> {
 	}
 
 	@Override
-	public void check() {
-		for (Processor processor : processors) {
-			processor.check();
-		}
-	}
-
-	@Override
 	public void consume(Payload payload) {
 		// Nothing to do. Producers and consumers are already connected.
-	}
-
-	@Override
-	public void inferSignature() {
-		for (Processor<?> processor : processors) {
-			processor.inferSignature();
-		}
-		signature = new ProcessorSignature(ProcessorSignature.PipeRequirement.Any, ProcessorSignature.PipeRequirement.Any);
-		Processor<?> previousProcessor = null;
-		int index = 1;
-		for (Processor<?> processor : processors) {
-			ProcessorSignature bottomSignature = signature.bottom(processor.getSignature());
-			String incompatible = null;
-			if (bottomSignature.getInputRequirement() == ProcessorSignature.PipeRequirement.None) {
-				incompatible = "inputs";
-			} else if (bottomSignature.getOutputRequirement() == ProcessorSignature.PipeRequirement.None) {
-				incompatible = "outputs";
-			}
-			if (incompatible != null) {
-				String message = incompatible + " of processors #" + (index - 1) + " (" + previousProcessor.getName() + ") and #" + index + " (" + processor.getName() + ") are incompatible";
-				throw new RuntimeError(message, new ProcessorVoidExecutionScope(this));
-			}
-			signature = bottomSignature;
-			previousProcessor = processor;
-			index = index + 1;
-		}
 	}
 
 }

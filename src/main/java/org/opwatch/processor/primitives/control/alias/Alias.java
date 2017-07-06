@@ -27,6 +27,7 @@ public class Alias extends ControlProcessor<AliasConfig> {
 		super(processorService, configuration, name);
 		this.processor = processor;
 		processor.assignContainer(this);
+		this.signature = processor.getSignature();
 	}
 
 	@Override
@@ -52,19 +53,8 @@ public class Alias extends ControlProcessor<AliasConfig> {
 	}
 
 	@Override
-	public void check() {
-		processor.check();
-	}
-
-	@Override
 	public void consume(Payload payload) {
 		// Nothing to do. The processor is already connected.
-	}
-
-	@Override
-	public void inferSignature() {
-		processor.inferSignature();
-		this.signature = processor.getSignature();
 	}
 
 }
