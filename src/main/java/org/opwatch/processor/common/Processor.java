@@ -110,7 +110,7 @@ public abstract class Processor<C extends ProcessorConfig> {
 		StringJoiner errors = new StringJoiner(", ");
 		checker.check(errors);
 		if (errors.length() != 0) {
-			throw new RuntimeError("incorrect pipeline: " + errors.toString(), new ProcessorVoidExecutionScope(this));
+			throw new RuntimeError("incorrect use in pipeline: " + errors.toString(), new ProcessorVoidExecutionScope(this));
 		}
 	}
 

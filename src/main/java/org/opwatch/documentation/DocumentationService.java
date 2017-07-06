@@ -112,8 +112,6 @@ public class DocumentationService {
 
 	private String requirementName(ProcessorSignature.DataRequirement requirement) {
 		switch (requirement) {
-			case None:
-				return "undefined";
 			case NoData:
 				return "forbidden";
 			case Data:

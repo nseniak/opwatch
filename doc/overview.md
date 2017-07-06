@@ -156,7 +156,7 @@ processors. For instance, if you try to pipeline a consumer into another consume
 
 ```js
 > pipe(alert("problem"), stdout()).run()
-[console] error: alert: input is missing, has no output but expected to have one
+[console] Error: alert: incorrect use in pipeline: does not generate an output
 [console] >> at <eval>:1
 ```
 
@@ -166,7 +166,7 @@ processor that breaks these rules, you get an error message:
 
 ```js
 > df("/tmp").run()
-[console] error: df: output is ignored
+[console] Error: df: incorrect use in pipeline: output should be used
 [console] >> at <eval>:1
 ```
 
@@ -174,7 +174,7 @@ To read from the keyboard or write to the screen, use the `stdin` and the `stdou
 example:
 
 ```js
-> pipe(stdin(), grep('ERROR'), stdout()).run()
+> pipe(stdin(), grep(/ERROR/), stdout()).run()
 // Type some text with the keyword ERROR
 ```
 

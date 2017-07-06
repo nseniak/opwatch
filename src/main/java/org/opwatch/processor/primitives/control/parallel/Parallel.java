@@ -40,7 +40,9 @@ public class Parallel extends ControlProcessor<ParallelConfig> {
 	public void addProducer(Processor<?> producer) {
 		super.addProducer(producer);
 		for (Processor<?> processor : processors) {
-			processor.addProducer(producer);
+			if (processor.getSignature().acceptsInput()) {
+				processor.addProducer(producer);
+			}
 		}
 	}
 
@@ -48,7 +50,9 @@ public class Parallel extends ControlProcessor<ParallelConfig> {
 	public void addConsumer(Processor<?> consumer) {
 		super.addConsumer(consumer);
 		for (Processor<?> processor : processors) {
-			processor.addConsumer(consumer);
+			if (processor.getSignature().producesOutput()) {
+				processor.addConsumer(consumer);
+			}
 		}
 	}
 

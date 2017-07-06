@@ -19,7 +19,6 @@ import java.util.StringJoiner;
 public class ProcessorSignature {
 
 	public enum DataRequirement {
-		None,
 		// As input: Should not receive any input data
 		// As output: Does not produces any data
 		NoData,
@@ -94,6 +93,14 @@ public class ProcessorSignature {
 			case Any:
 				break;
 		}
+	}
+
+	public boolean acceptsInput() {
+		return inputRequirement != DataRequirement.NoData;
+	}
+
+	public boolean producesOutput() {
+		return outputRequirement != DataRequirement.NoData;
 	}
 
 	public static DataRequirement parallelRequirement(DataRequirement req1, DataRequirement req2) {
