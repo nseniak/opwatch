@@ -26,7 +26,11 @@ call(configuration_object)
 ### Description
 
 The `sh` processor executes `command` using `sh -c <command>` at a regular interval. The command's
-output is sent to the processor's output. Each line produced by the command is considered a separate output.
+output is sent to the processor's output. Each line produced by the command is treated as a separate output.
+
+Shell commands are executed in sequence: `sh` waits for the current shell command to exit before launching the 
+next one after `delay` is passed. This allows using `sh` to execute blocking shell commands that won't exit
+and will generate output continuously, like `netstat`.
 
 See also: [`sh_f`](sh_f.md).
 

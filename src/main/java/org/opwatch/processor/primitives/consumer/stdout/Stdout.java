@@ -18,12 +18,7 @@ import org.opwatch.processor.payload.Payload;
 import org.opwatch.processor.primitives.consumer.Consumer;
 import org.opwatch.service.ProcessorService;
 
-import java.io.PrintWriter;
-
 public class Stdout extends Consumer<StdoutConfig> {
-
-	private String file;
-	private PrintWriter writer;
 
 	public Stdout(ProcessorService processorService, StdoutConfig configuration, String name) {
 		super(processorService, configuration, name);

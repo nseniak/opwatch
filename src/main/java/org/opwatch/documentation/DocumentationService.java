@@ -92,7 +92,7 @@ public class DocumentationService {
 					case Any:
 						return "wildcard";
 					case Data:
-						return "producer or filter";
+						return "producer or filter, depending on the configuration";
 				}
 		}
 		return signatureDescriptor(signature);

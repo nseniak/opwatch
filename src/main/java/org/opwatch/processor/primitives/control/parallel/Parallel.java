@@ -30,7 +30,7 @@ public class Parallel extends ControlProcessor<ParallelConfig> {
 		for (Processor<?> processor : processors) {
 			processor.assignContainer(this);
 		}
-		this.signature = new ProcessorSignature(ProcessorSignature.DataRequirement.Any, ProcessorSignature.DataRequirement.Any);
+		this.signature = new ProcessorSignature(ProcessorSignature.DataRequirement.NoData, ProcessorSignature.DataRequirement.NoData);
 		for (Processor<?> processor : processors) {
 			this.signature = this.signature.parallel(processor.getSignature());
 		}

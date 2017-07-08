@@ -4,7 +4,7 @@ Generates output using a callback.
 
 ### Input and output
 
-* Category: Producer of Filter, depending on the configuration
+* Category: Producer of Filter, depending on the configuration options
 * Input: Any object or value, or None, depending on the configuration
 * Output: Callback result
 
@@ -29,8 +29,9 @@ call(configuration_object)
 The `call` processor invokes the `output` callback at a regular interval. If the returned value is different
 from `undefined`, it is sent to the processor's output.
 
-If the `input` callback is defined, then `call` accepts inputs; the `input` callback is then invoked on any received 
-input. If `input` is not defined, then `call` does not accept any input.  
+If the `input` callback is defined, then `call` accepts inputs and can be used as a filter. The `input` callback is 
+then invoked on any received input. If `input` is not defined, then `call` does not accept any input and should
+be used as a consumer. 
 
 See also: [`apply`](sh_f.md).
 
