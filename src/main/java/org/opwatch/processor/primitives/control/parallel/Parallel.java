@@ -14,11 +14,16 @@
 
 package org.opwatch.processor.primitives.control.parallel;
 
-import org.opwatch.processor.common.*;
+import org.opwatch.processor.common.ControlProcessor;
+import org.opwatch.processor.common.DataRequirement;
+import org.opwatch.processor.common.InferenceResult;
+import org.opwatch.processor.common.Processor;
 import org.opwatch.processor.payload.Payload;
 import org.opwatch.service.ProcessorService;
 
 import java.util.List;
+
+import static org.opwatch.processor.common.ProcessorSignature.parallelOutput;
 
 public class Parallel extends ControlProcessor<ParallelConfig> {
 
@@ -30,9 +35,32 @@ public class Parallel extends ControlProcessor<ParallelConfig> {
 		for (Processor<?> processor : processors) {
 			processor.assignContainer(this);
 		}
-		this.signature = new ProcessorSignature(ProcessorSignature.DataRequirement.NoData, ProcessorSignature.DataRequirement.NoData);
+	}
+
+	@Override
+	public InferenceResult inferOutput(DataRequirement previousOutput) {
+		DataRequirement currentOutput = DataRequirement.NoData;
+		InferenceResult errorResult = null;
+		boolean success = false;
 		for (Processor<?> processor : processors) {
-			this.signature = this.signature.parallel(processor.getSignature());
+			InferenceResult outputResult = processor.inferOutput(previousOutput);
+			if (!outputResult.isError()) {
+				success = true;
+			} else {
+				errorResult = outputResult;
+				if (previousOutput == DataRequirement.Data) {
+					outputResult = processor.inferOutput(DataRequirement.NoData);
+				}
+			}
+			if (outputResult.isError()) {
+				return outputResult;
+			}
+			currentOutput = parallelOutput(currentOutput, outputResult.getRequirement());
+		}
+		if (success || (errorResult == null)) {
+			return InferenceResult.makeRequirement(this, currentOutput);
+		} else {
+			return errorResult;
 		}
 	}
 
@@ -40,9 +68,7 @@ public class Parallel extends ControlProcessor<ParallelConfig> {
 	public void addProducer(Processor<?> producer) {
 		super.addProducer(producer);
 		for (Processor<?> processor : processors) {
-			if (processor.getSignature().acceptsInput()) {
-				processor.addProducer(producer);
-			}
+			processor.addProducer(producer);
 		}
 	}
 
@@ -50,9 +76,7 @@ public class Parallel extends ControlProcessor<ParallelConfig> {
 	public void addConsumer(Processor<?> consumer) {
 		super.addConsumer(consumer);
 		for (Processor<?> processor : processors) {
-			if (processor.getSignature().producesOutput()) {
-				processor.addConsumer(consumer);
-			}
+			processor.addConsumer(consumer);
 		}
 	}
 

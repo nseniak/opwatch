@@ -20,8 +20,9 @@ pipe(configuration_object)
 
 | Property | Description | Type | Default |
 | :--- | :--- | :--- | :--- |
-| `processors` | processors to be chained | list of processors (at least one) | *Mandatory* |
+| `processors` | processors to be chained | list of processors | *Mandatory* |
  
 ### Description
 
 The `pipe` processor chains processors into one, piping the output of each processor to the input of the next one.
+With zero processors, `pipe` lets its input through.

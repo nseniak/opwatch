@@ -156,7 +156,7 @@ processors. For instance, if you try to pipeline a consumer into another consume
 
 ```js
 > pipe(alert("problem"), stdout()).run()
-[console] Error: alert: incorrect use in pipeline: does not generate an output
+[console] Error: stdout: should receive an input
 [console] >> at <eval>:1
 ```
 
@@ -166,7 +166,7 @@ processor that breaks these rules, you get an error message:
 
 ```js
 > df("/tmp").run()
-[console] Error: df: incorrect use in pipeline: output should be used
+[console] Error: df: generated output is lost
 [console] >> at <eval>:1
 ```
 

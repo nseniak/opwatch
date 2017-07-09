@@ -242,7 +242,7 @@ function pretty(object, options) {
 	var actualOptions = {
 		indent: 2,
 		expandAlias: false,
-		maxDepth: 5,
+		maxDepth: 20,
 		maxArrayLength: 100,
 		json: false,
 		space: " ",

@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static org.opwatch.common.Assertion.fail;
+import static org.opwatch.processor.common.ProcessorSignature.inputCompatibilityError;
 
 /**
  * A processor that does some processing of its own, as opposed to control processors that combine other processors.
@@ -34,13 +34,23 @@ public abstract class ActiveProcessor<D extends ActiveProcessorConfig> extends P
 
 	public ActiveProcessor(ProcessorService processorService, D configuration, String name) {
 		super(processorService, configuration, name);
+	}
+
+	@Override
+	public InferenceResult inferOutput(DataRequirement previousOutput) {
 		ActiveProcessorFactory<?, ?> factory = (ActiveProcessorFactory<?, ?>) processorService.getScriptService().factory(this.getClass());
 		if (factory == null) {
 			throw new IllegalStateException("cannot find factory for class " + this.getClass().getName());
 		}
-		signature = factory.staticSignature();
+		ProcessorSignature signature = factory.staticSignature();
 		if (signature == null) {
 			throw new IllegalStateException("no static signature for class " + this.getClass().getName());
+		}
+		String errorMessage = inputCompatibilityError(previousOutput, signature.getInputRequirement());
+		if (errorMessage == null) {
+			return InferenceResult.makeRequirement(this, signature.getOutputRequirement());
+		} else {
+			return InferenceResult.makeError(this, errorMessage);
 		}
 	}
 
@@ -58,10 +68,6 @@ public abstract class ActiveProcessor<D extends ActiveProcessorConfig> extends P
 	@Override
 	public void stop() {
 		// By default, do nothing
-	}
-
-	protected void producerInputError() {
-		fail("cannot receive input", this);
 	}
 
 	public void outputTransformed(Object value, Payload input) {

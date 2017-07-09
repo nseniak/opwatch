@@ -68,8 +68,8 @@ public class DocumentationService {
 		if (signature == null) {
 			return "control";
 		}
-		ProcessorSignature.DataRequirement inputRequirement = signature.getInputRequirement();
-		ProcessorSignature.DataRequirement outputRequirement = signature.getOutputRequirement();
+		DataRequirement inputRequirement = signature.getInputRequirement();
+		DataRequirement outputRequirement = signature.getOutputRequirement();
 		switch (inputRequirement) {
 			case NoData:
 				switch (outputRequirement) {
@@ -99,8 +99,8 @@ public class DocumentationService {
 	}
 
 	public String signatureDescriptor(ProcessorSignature signature) {
-		ProcessorSignature.DataRequirement inputRequirement = signature.getInputRequirement();
-		ProcessorSignature.DataRequirement outputRequirement = signature.getOutputRequirement();
+		DataRequirement inputRequirement = signature.getInputRequirement();
+		DataRequirement outputRequirement = signature.getOutputRequirement();
 		StringBuilder builder = new StringBuilder();
 		builder.append("<input from processor: ");
 		builder.append(requirementName(inputRequirement));
@@ -110,7 +110,7 @@ public class DocumentationService {
 		return builder.toString();
 	}
 
-	private String requirementName(ProcessorSignature.DataRequirement requirement) {
+	private String requirementName(DataRequirement requirement) {
 		switch (requirement) {
 			case NoData:
 				return "forbidden";

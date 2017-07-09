@@ -14,6 +14,8 @@
 
 package org.opwatch.processor.primitives.control.alias;
 
+import org.opwatch.processor.common.DataRequirement;
+import org.opwatch.processor.common.InferenceResult;
 import org.opwatch.processor.common.Processor;
 import org.opwatch.processor.common.ControlProcessor;
 import org.opwatch.processor.payload.Payload;
@@ -27,7 +29,11 @@ public class Alias extends ControlProcessor<AliasConfig> {
 		super(processorService, configuration, name);
 		this.processor = processor;
 		processor.assignContainer(this);
-		this.signature = processor.getSignature();
+	}
+
+	@Override
+	public InferenceResult inferOutput(DataRequirement previousOutput) {
+		return processor.inferOutput(previousOutput);
 	}
 
 	@Override

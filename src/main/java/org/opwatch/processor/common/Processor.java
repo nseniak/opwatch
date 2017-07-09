@@ -20,10 +20,10 @@ import org.opwatch.service.ProcessorService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
 
 import static jdk.nashorn.internal.runtime.ScriptRuntime.UNDEFINED;
+import static org.opwatch.processor.common.ProcessorSignature.outputCompatibilityError;
 
 public abstract class Processor<C extends ProcessorConfig> {
 
@@ -34,7 +34,6 @@ public abstract class Processor<C extends ProcessorConfig> {
 	protected List<Processor<?>> producers = new ArrayList<>();
 	protected List<Processor<?>> consumers = new ArrayList<>();
 	protected Processor<?> container;
-	protected ProcessorSignature signature;
 	protected ScriptStack constructionStack;
 
 	public static final String PROCESSOR_RUNNING_MESSAGE = "processor up and running";
@@ -58,8 +57,7 @@ public abstract class Processor<C extends ProcessorConfig> {
 	}
 
 	public Object run() {
-		checkInputCompatibility(ProcessorSignature.DataRequirement.NoData);
-		checkOutputCompatibility(ProcessorSignature.DataRequirement.NoData);
+		checkRunnable();
 		processorService.signalSystemInfo(PROCESSOR_RUNNING_MESSAGE);
 		start();
 		processorService.setRunningProcessorThread(Thread.currentThread());
@@ -98,26 +96,22 @@ public abstract class Processor<C extends ProcessorConfig> {
 
 	public abstract void consume(Payload payload);
 
-	public final void checkInputCompatibility(ProcessorSignature.DataRequirement input) {
-		checkCompatibility(errors -> signature.checkInputCompatibility(errors, input));
-	}
+	public abstract InferenceResult inferOutput(DataRequirement previousOutput);
 
-	public final void checkOutputCompatibility(ProcessorSignature.DataRequirement output) {
-		checkCompatibility(errors -> signature.checkOutputCompatibility(errors, output));
-	}
-
-	private void checkCompatibility(CompatibilityChecker checker) {
-		StringJoiner errors = new StringJoiner(", ");
-		checker.check(errors);
-		if (errors.length() != 0) {
-			throw new RuntimeError("incorrect use in pipeline: " + errors.toString(), new ProcessorVoidExecutionScope(this));
+	protected DataRequirement checkInferOutput(DataRequirement previousOutput) {
+		InferenceResult outputInference = inferOutput(previousOutput);
+		if (outputInference.isError()) {
+			outputInference.throwError();
 		}
+		return outputInference.getRequirement();
 	}
 
-	private interface CompatibilityChecker {
-
-		void check(StringJoiner errors);
-
+	public void checkRunnable() {
+		DataRequirement output = checkInferOutput(DataRequirement.NoData);
+		String errorMessage = outputCompatibilityError(output, DataRequirement.NoData);
+		if (errorMessage != null) {
+			throw new RuntimeError(errorMessage, new ProcessorVoidExecutionScope(this));
+		}
 	}
 
 	@Override
@@ -135,10 +129,6 @@ public abstract class Processor<C extends ProcessorConfig> {
 
 	public ScriptStack getConstructionStack() {
 		return constructionStack;
-	}
-
-	public ProcessorSignature getSignature() {
-		return signature;
 	}
 
 	public String getName() {

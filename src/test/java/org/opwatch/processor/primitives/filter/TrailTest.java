@@ -36,7 +36,7 @@ public class TrailTest extends ProcessorTestRoot {
 		PipedInputStream inputStream = new PipedInputStream(outputStream);
 		long execTime = TimeUnit.MILLISECONDS.toMillis(2000);
 		List<String> lines = runWithOutputLines(EXEC_TIME, inputStream,
-				expression("pipe(stdin(), trail('1s'), stdout())"));
+				runExpression("pipe(stdin(), trail('1s'), stdout())"));
 	}
 
 }

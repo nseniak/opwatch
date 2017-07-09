@@ -12,22 +12,19 @@
  * the specific language governing permissions and limitations under the License.
  */
 
-package org.opwatch.processor.primitives.producer;
+package org.opwatch.processor.common;
 
-import org.opwatch.processor.common.ActiveProcessor;
-import org.opwatch.processor.config.ActiveProcessorConfig;
-import org.opwatch.processor.payload.Payload;
-import org.opwatch.service.ProcessorService;
+public enum DataRequirement {
 
-public abstract class Producer<D extends ActiveProcessorConfig> extends ActiveProcessor<D> {
-
-	public Producer(ProcessorService processorService, D configuration, String name) {
-		super(processorService, configuration, name);
-	}
-
-	@Override
-	public void consume(Payload payload) {
-		// Do nothing
-	}
+	Unknown,
+	// As input: Should not receive any input data
+	// As output: Does not produces any data
+	NoData,
+	// As input: Requires input data
+	// As output: Produces data that should not be ignored
+	Data,
+	// As input: Can receive data but does not require it
+	// As output: Produces data but that data can be ignored
+	Any
 
 }

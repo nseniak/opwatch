@@ -15,13 +15,16 @@
 package org.opwatch.processor.primitives.producer.call;
 
 import jdk.nashorn.internal.runtime.ScriptRuntime;
-import org.opwatch.processor.common.ProcessorSignature;
+import org.opwatch.processor.common.DataRequirement;
+import org.opwatch.processor.common.InferenceResult;
 import org.opwatch.processor.config.JavascriptConsumer;
 import org.opwatch.processor.config.JavascriptProducer;
 import org.opwatch.processor.payload.Payload;
 import org.opwatch.processor.primitives.producer.ScheduledExecutor;
 import org.opwatch.processor.primitives.producer.ScheduledProducer;
 import org.opwatch.service.ProcessorService;
+
+import static org.opwatch.processor.common.ProcessorSignature.inputCompatibilityError;
 
 public class Call extends ScheduledProducer<CallConfig> {
 
@@ -33,10 +36,16 @@ public class Call extends ScheduledProducer<CallConfig> {
 		super(processorService, configuration, name, scheduledExecutor);
 		this.input = input;
 		this.output = output;
-		if (input == null) {
-			signature = ProcessorSignature.makeProducer();
+	}
+
+	@Override
+	public InferenceResult inferOutput(DataRequirement previousOutput) {
+		DataRequirement inputRequirement = (input == null) ? DataRequirement.NoData : DataRequirement.Data;
+		String errorMessage = inputCompatibilityError(previousOutput, inputRequirement);
+		if (errorMessage == null) {
+			return InferenceResult.makeRequirement(this, DataRequirement.Data);
 		} else {
-			signature = ProcessorSignature.makeFilter();
+			return InferenceResult.makeError(this, errorMessage);
 		}
 	}
 

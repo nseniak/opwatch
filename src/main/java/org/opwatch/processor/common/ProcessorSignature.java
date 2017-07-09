@@ -14,26 +14,16 @@
 
 package org.opwatch.processor.common;
 
-import java.util.StringJoiner;
+import org.opwatch.common.Assertion;
 
 public class ProcessorSignature {
-
-	public enum DataRequirement {
-		// As input: Should not receive any input data
-		// As output: Does not produces any data
-		NoData,
-		// As input: Requires input data
-		// As output: Produces data that should not be ignored
-		Data,
-		// As input: Can receive data but does not require it
-		// As output: Produces data but that data can be ignored
-		Any
-	}
 
 	private DataRequirement inputRequirement;
 	private DataRequirement outputRequirement;
 
 	public ProcessorSignature(DataRequirement inputRequirement, DataRequirement outputRequirement) {
+		Assertion.assertExecutionState(inputRequirement != DataRequirement.Unknown);
+		Assertion.assertExecutionState(outputRequirement != DataRequirement.Unknown);
 		this.inputRequirement = inputRequirement;
 		this.outputRequirement = outputRequirement;
 	}
@@ -62,70 +52,69 @@ public class ProcessorSignature {
 		return new ProcessorSignature(DataRequirement.Any, DataRequirement.Any);
 	}
 
-	public void checkInputCompatibility(StringJoiner errors, DataRequirement input) {
-		switch (input) {
-			case NoData:
-				if (inputRequirement == DataRequirement.Data) {
-					errors.add("input is required");
-				}
-				break;
-			case Data:
-			case Any:
-				if (inputRequirement == DataRequirement.NoData) {
-					errors.add("cannot receive an input");
-				}
-				break;
+	public static String inputCompatibilityError(DataRequirement previousOutput, DataRequirement input) {
+		// Data x Unknown -> OK
+		// Data x Data -> OK
+		// Data x NoData -> Error
+		// Data x Any -> OK
+		// NoData x Unknown -> OK
+		// NoData x Data -> Error
+		// NoData x NoData -> OK
+		// NoData x Any -> OK
+		// Any x Unknown -> OK
+		// Any x Data -> OK
+		// Any x NoData -> OK
+		// Any x Any -> OK
+		// Unknown x Unknown -> OK
+		// Unknown x Data -> OK
+		// Unknown x NoData -> OK
+		// Unknown x Any -> OK
+		if ((previousOutput == DataRequirement.Data) && (input == DataRequirement.NoData)) {
+			return "should not receive an input";
+		} else if ((previousOutput == DataRequirement.NoData) && (input == DataRequirement.Data)) {
+			return "should receive an input";
+		} else {
+			return null;
 		}
 	}
 
-	public void checkOutputCompatibility(StringJoiner errors, DataRequirement output) {
-		switch (outputRequirement) {
-			case NoData:
-				if (output == DataRequirement.Data) {
-					errors.add("does not generate an output");
-				}
-				break;
-			case Data:
-				if (output == DataRequirement.NoData) {
-					errors.add("output should be used");
-				}
-				break;
-			case Any:
-				break;
+	public static String outputCompatibilityError(DataRequirement output, DataRequirement nextInput) {
+		if ((output == DataRequirement.Data) && (nextInput == DataRequirement.NoData)) {
+			return "generated output is lost";
+		} else if ((output == DataRequirement.NoData) && (nextInput == DataRequirement.Data)) {
+			return "does not generate an output";
+		} else {
+			return null;
 		}
 	}
 
-	public boolean acceptsInput() {
-		return inputRequirement != DataRequirement.NoData;
-	}
-
-	public boolean producesOutput() {
-		return outputRequirement != DataRequirement.NoData;
-	}
-
-	public static DataRequirement parallelRequirement(DataRequirement req1, DataRequirement req2) {
+	public static DataRequirement parallelOutput(DataRequirement req1, DataRequirement req2) {
+		// Data x Unknown -> Data
 		// Data x Data -> Data
 		// Data x NoData -> Data
 		// Data x Any -> Data
+		// NoData x Unknown -> Unknown
 		// NoData x Data -> Data
 		// NoData x NoData -> NoData
 		// NoData x Any -> Any
+		// Any x Unknown -> Unknown
 		// Any x Data -> Data
 		// Any x NoData -> Any
 		// Any x Any -> Any
+		// Unknown x Unknown -> Unknown
+		// Unknown x Data -> Data
+		// Unknown x NoData -> Unknown
+		// Unknown x Any -> Unknown
 		if ((req1 == DataRequirement.Data) || (req2 == DataRequirement.Data)) {
 			return DataRequirement.Data;
-		} if ((req1 == DataRequirement.Any) || (req2 == DataRequirement.Any)) {
+		} else if ((req1 == DataRequirement.Unknown) || (req2 == DataRequirement.Unknown)) {
+			return DataRequirement.Unknown;
+		}
+		if ((req1 == DataRequirement.Any) || (req2 == DataRequirement.Any)) {
 			return DataRequirement.Any;
 		} else {
 			return DataRequirement.NoData;
 		}
-	}
-
-	public ProcessorSignature parallel(ProcessorSignature other) {
-		DataRequirement inputReq = parallelRequirement(inputRequirement, other.getInputRequirement());
-		DataRequirement outputReq = parallelRequirement(outputRequirement, other.getOutputRequirement());
-		return new ProcessorSignature(inputReq, outputReq);
 	}
 
 	public DataRequirement getInputRequirement() {

@@ -228,6 +228,15 @@ public class ScriptService {
 		}
 	}
 
+	public Object evalExpression(String expression) {
+		ScriptContext context = scriptEngine.getContext();
+		try {
+			return scriptEngine.eval(expression, context);
+		} catch (ScriptException e) {
+			throw new RuntimeError(e);
+		}
+	}
+
 	public String pretty(Object object) {
 		synchronized (this) {
 			try {

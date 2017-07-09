@@ -27,7 +27,7 @@ public abstract class ScheduledProducer<D extends ScheduledProcessorConfig> exte
 
 	@Override
 	public void consume(Payload payload) {
-		producerInputError();
+		// Do nothing
 	}
 
 }

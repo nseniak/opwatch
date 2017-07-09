@@ -14,9 +14,10 @@
 
 package org.opwatch.processor.primitives.control.pipe;
 
-import org.opwatch.processor.common.Processor;
-import org.opwatch.processor.common.ProcessorSignature;
 import org.opwatch.processor.common.ControlProcessor;
+import org.opwatch.processor.common.DataRequirement;
+import org.opwatch.processor.common.InferenceResult;
+import org.opwatch.processor.common.Processor;
 import org.opwatch.processor.payload.Payload;
 import org.opwatch.service.ProcessorService;
 
@@ -34,24 +35,42 @@ public class Pipe extends ControlProcessor<PipeConfig> {
 			processor.assignContainer(this);
 			if (previous != null) {
 				processor.addProducer(previous);
-				previous.checkOutputCompatibility(processor.getSignature().getInputRequirement());
-				processor.checkInputCompatibility(previous.getSignature().getOutputRequirement());
 			}
 			previous = processor;
 		}
-		this.signature = new ProcessorSignature(first().getSignature().getInputRequirement(), last().getSignature().getOutputRequirement());
+		checkInferOutput(DataRequirement.Unknown);
+	}
+
+	@Override
+	public InferenceResult inferOutput(DataRequirement previousOutput) {
+		InferenceResult result = InferenceResult.makeRequirement(this, previousOutput);
+		for (Processor<?> processor : processors) {
+			result = processor.inferOutput(result.getRequirement());
+			if (result.isError()) {
+				return result;
+			}
+		}
+		return result;
 	}
 
 	@Override
 	public void addProducer(Processor<?> producer) {
 		super.addProducer(producer);
-		first().addProducer(producer);
+		if (!processors.isEmpty()) {
+			first().addProducer(producer);
+		}
 	}
 
 	@Override
 	public void addConsumer(Processor<?> consumer) {
 		super.addConsumer(consumer);
-		last().addConsumer(consumer);
+		if (processors.isEmpty()) {
+			for (Processor<?> producer : producers) {
+				producer.addConsumer(consumer);
+			}
+		} else {
+			last().addConsumer(consumer);
+		}
 	}
 
 	@Override

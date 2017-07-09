@@ -43,11 +43,6 @@ public class CallFactory extends ScheduledExecutorFactory<CallConfig, Call> {
 	}
 
 	@Override
-	public ProcessorSignature staticSignature() {
-		return ProcessorSignature.makeProducerOrFilter();
-	}
-
-	@Override
 	public Call make(Object scriptObject) {
 		CallConfig config = convertProcessorConfig(scriptObject);
 		ScheduledExecutor executor = makeScheduledExecutor(config, false);

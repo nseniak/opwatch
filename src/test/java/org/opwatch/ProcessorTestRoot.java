@@ -23,6 +23,7 @@ import com.google.common.util.concurrent.SimpleTimeLimiter;
 import com.google.common.util.concurrent.TimeLimiter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.opwatch.processor.common.Processor;
 import org.opwatch.service.ProcessorService;
 import org.opwatch.service.ScriptService;
 import org.slf4j.Logger;
@@ -39,6 +40,7 @@ import java.util.concurrent.*;
 
 import static junit.framework.TestCase.fail;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -46,6 +48,7 @@ import static org.hamcrest.number.OrderingComparison.greaterThan;
 import static org.junit.Assert.assertEquals;
 import static org.opwatch.processor.common.Processor.PROCESSOR_RUNNING_MESSAGE;
 import static org.opwatch.processor.common.Processor.PROCESSOR_STOPPED_MESSAGE;
+import static org.opwatch.service.ScriptService.setHomeDirectory;
 
 @RunWith(SpringRunner.class)
 @Import(Application.class)
@@ -87,20 +90,36 @@ public class ProcessorTestRoot {
 		return withTimeout(duration + STOP_TIMEOUT, callable);
 	}
 
-	protected Callable<Void> expression(String expression) {
+	protected Callable<Void> runExpression(String expression) {
 		return () -> {
-			// Set the current directory to <home>/bin so config.js can be properly loaded
-			scriptService.setHomeDirectory(System.getProperty("user.dir") + "/distrib");
-			CommandLineOptions options = new CommandLineOptions();
-			options.setHostname("test_host");
-			options.setPort(TEST_PORT);
-			assertThat(processorService.initialize(options), is(true));
+			initTestEnvironment();
 			scriptService.runExpression(expression);
 			return null;
 		};
 	}
 
-	protected <T> Future<T> run(Callable<T> callable) {
+	protected Object evalExpression(String expression) {
+		initTestEnvironment();
+		return scriptService.evalExpression(expression);
+	}
+
+	protected Processor evalProcessor(String expression) {
+		initTestEnvironment();
+		Object value = scriptService.evalExpression(expression);
+		assertThat(value, instanceOf(Processor.class));
+		return (Processor) value;
+	}
+
+	private void initTestEnvironment() {
+		// Set the current directory to <home>/bin so config.js can be properly loaded
+		setHomeDirectory(System.getProperty("user.dir") + "/distrib");
+		CommandLineOptions options = new CommandLineOptions();
+		options.setHostname("test_host");
+		options.setPort(TEST_PORT);
+		assertThat(processorService.initialize(options), is(true));
+	}
+
+	protected <T> Future<T> future(Callable<T> callable) {
 		ExecutorService es = Executors.newSingleThreadExecutor();
 		return es.submit(callable);
 	}
@@ -110,7 +129,7 @@ public class ProcessorTestRoot {
 			PipedOutputStream outputStream = new PipedOutputStream();
 			BufferedReader outputReader = new BufferedReader(new InputStreamReader(new PipedInputStream(outputStream)));
 			List<String> outputLines = new ArrayList<>();
-			Future<Void> runFuture = run(withStop(duration, withIO(inputStream, outputStream, callable)));
+			Future<Void> runFuture = future(withStop(duration, withIO(inputStream, outputStream, callable)));
 			Future<Void> outputFuture = readLines(outputReader, outputLines);
 			runFuture.get();
 			outputFuture.cancel(false);
