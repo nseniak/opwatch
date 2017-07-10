@@ -16,7 +16,6 @@ package org.opwatch.processor.primitives.consumer.send;
 
 import org.opwatch.processor.common.ActiveProcessorFactory;
 import org.opwatch.processor.common.ProcessorSignature;
-import org.opwatch.service.Config;
 import org.opwatch.service.ProcessorService;
 
 import java.util.regex.Pattern;
@@ -56,9 +55,8 @@ public class SendFactory extends ActiveProcessorFactory<SendConfig, Send> {
 		if (path.startsWith("/")) {
 			path = path.substring(1);
 		}
-		Config profile = processorService.config();
 		String hostname = checkPropertyValue("hostname", config.getHostname());
-		int port =  (config.getPort() != null) ? config.getPort() : profile.defaultPostPort();
+		int port =  (config.getPort() != null) ? config.getPort() : processorService.config().defaultPostPort();
 		return new Send(getProcessorService(), config, name(), hostname, port, path);
 	}
 

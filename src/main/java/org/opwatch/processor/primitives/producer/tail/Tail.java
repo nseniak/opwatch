@@ -36,8 +36,8 @@ public class Tail extends Producer<TailConfig> {
 
 	@Override
 	public void start() {
-		Config profile = getProcessorService().config();
-		tailedFile = new TailedFile(profile, file, (line, lineNumber) -> {
+		Config config = getProcessorService().config();
+		tailedFile = new TailedFile(config, file, (line, lineNumber) -> {
 			if (ignoreBlankLine && line.trim().isEmpty()) {
 				return;
 			}

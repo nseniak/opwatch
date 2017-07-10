@@ -44,7 +44,7 @@ public class Config {
 	private long processorInputQueueTimeout;
 	private String defaultPostHostname;
 	private int defaultPostPort;
-	private long cronScriptOutputCheckDelay;
+	private long shScriptOutputCheckDelay;
 	private long shCommandExitTimeout;
 	private long commandStartTimeout;
 	private long commandStartSleepTime;
@@ -66,7 +66,7 @@ public class Config {
 		this.processorInputQueueTimeout = ApplicationUtil.property("opwatch.input.queue.timeout", TimeUnit.SECONDS.toMillis(60));
 		this.defaultPostHostname = ApplicationUtil.property("opwatch.post.hostname", "localhost");
 		this.defaultPostPort = ApplicationUtil.property("opwatch.post.port", DEFAULT_HTTP_PORT);
-		this.cronScriptOutputCheckDelay = TimeUnit.SECONDS.toMillis(100);
+		this.shScriptOutputCheckDelay = TimeUnit.SECONDS.toMillis(100);
 		this.shCommandExitTimeout = TimeUnit.MINUTES.toMillis(3);
 		this.commandStartTimeout = TimeUnit.MINUTES.toMillis(1);
 		this.commandStartSleepTime = TimeUnit.MILLISECONDS.toMillis(200);
@@ -214,20 +214,20 @@ public class Config {
 		this.defaultPostPort = defaultPostPort;
 	}
 
-	public long cronScriptOutputCheckDelay() {
-		return cronScriptOutputCheckDelay;
+	public long shScriptOutputCheckDelay() {
+		return shScriptOutputCheckDelay;
 	}
 
-	public void cronScriptOutputCheckDelay(long cronScriptOutputCheckDelay) {
-		this.cronScriptOutputCheckDelay = cronScriptOutputCheckDelay;
+	public void shScriptOutputCheckDelay(long shScriptOutputCheckDelay) {
+		this.shScriptOutputCheckDelay = shScriptOutputCheckDelay;
 	}
 
-	public long cronCommandExitTimeout() {
+	public long shCommandExitTimeout() {
 		return shCommandExitTimeout;
 	}
 
-	public void cronCommandExitTimeout(long cronCommandExitTimeout) {
-		this.shCommandExitTimeout = cronCommandExitTimeout;
+	public void shCommandExitTimeout(long shCommandExitTimeout) {
+		this.shCommandExitTimeout = shCommandExitTimeout;
 	}
 
 	public long commandStartTimeout() {

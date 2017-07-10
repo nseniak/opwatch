@@ -57,14 +57,14 @@ public class CommandRunner {
 
 	public void consume(Processor processor, Payload payload) {
 		if (process == null) {
-			Config profile = processorService.config();
+			Config config = processorService.config();
 			long start = System.currentTimeMillis();
 			while (process == null) {
-				if ((System.currentTimeMillis() - start) > profile.commandStartTimeout()) {
+				if ((System.currentTimeMillis() - start) > config.commandStartTimeout()) {
 					throw new RuntimeError("command process not started", new ProcessorVoidExecutionScope(processor));
 				}
 				try {
-					Thread.sleep(profile.commandStartSleepTime());
+					Thread.sleep(config.commandStartSleepTime());
 				} catch (InterruptedException e) {
 					// Shutting down.
 					throw new ApplicationInterruptedException(ApplicationInterruptedException.INTERRUPTION);
@@ -84,8 +84,8 @@ public class CommandRunner {
 	}
 
 	public void produce(ActiveProcessor processor, long exitTimeout) {
-		Config profile = processorService.config();
-		int bufferSize = profile.lineBufferSize();
+		Config config = processorService.config();
+		int bufferSize = config.lineBufferSize();
 		try (LineReader lineReader = new LineReader(new BufferedInputStream(process.getInputStream()), bufferSize, true)) {
 			while (true) {
 				String line;
@@ -98,7 +98,7 @@ public class CommandRunner {
 						throw new RuntimeError("timeout waiting for command output",
 								new ProcessorVoidExecutionScope(processor));
 					}
-					Thread.sleep(profile.cronScriptOutputCheckDelay());
+					Thread.sleep(config.shScriptOutputCheckDelay());
 				}
 				processor.outputProduced(line);
 			}
@@ -140,6 +140,10 @@ public class CommandRunner {
 					new ProcessorVoidExecutionScope(processor));
 		}
 		return false;
+	}
+
+	public boolean started() {
+		return process != null;
 	}
 
 }
