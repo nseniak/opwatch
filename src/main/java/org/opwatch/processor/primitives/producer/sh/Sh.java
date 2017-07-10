@@ -31,7 +31,7 @@ public class Sh extends ScheduledProducer<ShConfig> {
 	@Override
 	protected void produce() {
 		commandRunner.startProcess(this);
-		long exitTimeout = processorService.config().cronCommandExitTimeout();
+		long exitTimeout = processorService.config().shCommandExitTimeout();
 		commandRunner.produce(this, exitTimeout);
 	}
 
