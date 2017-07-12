@@ -14,6 +14,7 @@
 
 package org.opwatch.processor.primitives.control.alias;
 
+import org.opwatch.documentation.ProcessorCategory;
 import org.opwatch.processor.common.Processor;
 import org.opwatch.processor.common.ProcessorFactory;
 import org.opwatch.service.ProcessorService;
@@ -37,6 +38,11 @@ public class AliasFactory extends ProcessorFactory<AliasConfig, Alias> {
 	@Override
 	public Class<Alias> processorClass() {
 		return Alias.class;
+	}
+
+	@Override
+	public ProcessorCategory processorCategory() {
+		return ProcessorCategory.control;
 	}
 
 	@Override

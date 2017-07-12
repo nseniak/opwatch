@@ -14,6 +14,7 @@
 
 package org.opwatch.processor.primitives.producer.tail;
 
+import org.opwatch.documentation.ProcessorCategory;
 import org.opwatch.processor.common.ActiveProcessorFactory;
 import org.opwatch.processor.common.ProcessorSignature;
 import org.opwatch.service.ProcessorService;
@@ -44,6 +45,11 @@ public class TailFactory extends ActiveProcessorFactory<TailConfig, Tail> {
 	@Override
 	public ProcessorSignature staticSignature() {
 		return ProcessorSignature.makeProducer();
+	}
+
+	@Override
+	public ProcessorCategory processorCategory() {
+		return ProcessorCategory.producer;
 	}
 
 	@Override

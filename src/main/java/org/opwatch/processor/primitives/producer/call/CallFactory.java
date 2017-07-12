@@ -14,10 +14,10 @@
 
 package org.opwatch.processor.primitives.producer.call;
 
-import org.opwatch.processor.common.ProcessorSignature;
+import org.opwatch.documentation.ProcessorCategory;
+import org.opwatch.processor.common.SchedulingInfo;
 import org.opwatch.processor.config.JavascriptConsumer;
 import org.opwatch.processor.config.JavascriptProducer;
-import org.opwatch.processor.primitives.producer.ScheduledExecutor;
 import org.opwatch.processor.primitives.producer.ScheduledExecutorFactory;
 import org.opwatch.service.ProcessorService;
 
@@ -43,12 +43,17 @@ public class CallFactory extends ScheduledExecutorFactory<CallConfig, Call> {
 	}
 
 	@Override
+	public ProcessorCategory processorCategory() {
+		return ProcessorCategory.producer_or_filter;
+	}
+
+	@Override
 	public Call make(Object scriptObject) {
 		CallConfig config = convertProcessorConfig(scriptObject);
-		ScheduledExecutor executor = makeScheduledExecutor(config, false);
+		SchedulingInfo schedulingInfo = checkSchedulingInfo(config);
 		JavascriptConsumer input = config.getInput();
 		JavascriptProducer output = checkPropertyValue("output", config.getOutput());
-		return new Call(getProcessorService(), config, name(), executor, input, output);
+		return new Call(getProcessorService(), config, name(), schedulingInfo, input, output);
 	}
 
 }

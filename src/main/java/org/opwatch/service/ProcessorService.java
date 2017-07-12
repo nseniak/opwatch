@@ -89,9 +89,9 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	private ThreadPoolExecutor consumerExecutor = new ThreadPoolExecutor(0, Integer.MAX_VALUE,
 			60L, TimeUnit.SECONDS, new SynchronousQueue<>(),
-			ThreadUtil.threadFactory("Consumer"));
+			ThreadUtil.threadFactory("ConsumerTask"));
 
-	private ScheduledThreadPoolExecutor scheduledExecutor = new ScheduledThreadPoolExecutor(1, ThreadUtil.threadFactory("ScheduledTask"));
+	private ScheduledThreadPoolExecutor producerScheduledExecutor = new ScheduledThreadPoolExecutor(1, ThreadUtil.threadFactory("ScheduledProducerTask"));
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -103,7 +103,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		logger.info("Exiting");
 		stopRunningProcessor();
 		ThreadUtil.safeExecutorShutdownNow(consumerExecutor, "ConsumerExecutor", config().executorTerminationTimeout());
-		ThreadUtil.safeExecutorShutdownNow(scheduledExecutor, "ScheduledExecutor", config().executorTerminationTimeout());
+		ThreadUtil.safeExecutorShutdownNow(producerScheduledExecutor, "ScheduledProducerExecutor", config().executorTerminationTimeout());
 	}
 
 	public boolean initialize(CommandLineOptions options) {
@@ -403,8 +403,8 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		return httpService;
 	}
 
-	public ScheduledThreadPoolExecutor getScheduledExecutor() {
-		return scheduledExecutor;
+	public ScheduledThreadPoolExecutor getProducerScheduledExecutor() {
+		return producerScheduledExecutor;
 	}
 
 	public ThreadPoolExecutor getConsumerExecutor() {

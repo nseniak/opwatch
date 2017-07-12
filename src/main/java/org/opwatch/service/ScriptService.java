@@ -39,7 +39,6 @@ import org.opwatch.processor.primitives.filter.collect.CollectFactory;
 import org.opwatch.processor.primitives.filter.grep.GrepFactory;
 import org.opwatch.processor.primitives.filter.json.JsonFactory;
 import org.opwatch.processor.primitives.filter.jstack.JstackFactory;
-import org.opwatch.processor.primitives.filter.sh_f.ShFilterFactory;
 import org.opwatch.processor.primitives.filter.trail.TrailFactory;
 import org.opwatch.processor.primitives.producer.call.CallFactory;
 import org.opwatch.processor.primitives.producer.console.StdinFactory;
@@ -118,7 +117,6 @@ public class ScriptService {
 			createSimpleFactoryFunction(new AliasFactory(processorService));
 			createSimpleFactoryFunction(new ApplyFactory(processorService));
 			createSimpleFactoryFunction(new CollectFactory(processorService));
-			createSimpleFactoryFunction(new ShFactory(processorService));
 			createSimpleFactoryFunction(new CurlFactory(processorService));
 			createSimpleFactoryFunction(new DfFactory(processorService));
 			createSimpleFactoryFunction(new GrepFactory(processorService));
@@ -127,7 +125,7 @@ public class ScriptService {
 			createSimpleFactoryFunction(new CallFactory(processorService));
 			createSimpleFactoryFunction(new LogFactory(processorService));
 			createSimpleFactoryFunction(new SendFactory(processorService));
-			createSimpleFactoryFunction(new ShFilterFactory(processorService));
+			createSimpleFactoryFunction(new ShFactory(processorService));
 			createSimpleFactoryFunction(new StatFactory(processorService));
 			createSimpleFactoryFunction(new StdinFactory(processorService));
 			createSimpleFactoryFunction(new StdoutFactory(processorService));
@@ -556,8 +554,8 @@ public class ScriptService {
 		return documentationService.typeName(type);
 	}
 
-	public String processorCategoryName(ProcessorFactory<?, ?> factory) {
-		return documentationService.processorCategoryName(factory);
+	public String processorCategoryDescription(ProcessorFactory<?, ?> factory) {
+		return documentationService.processorCategoryDescription(factory);
 	}
 
 	/**

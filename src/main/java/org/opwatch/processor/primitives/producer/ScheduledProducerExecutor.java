@@ -15,28 +15,30 @@
 package org.opwatch.processor.primitives.producer;
 
 import org.opwatch.processor.common.Processor;
-import org.opwatch.processor.common.RuntimeError;
 import org.opwatch.processor.common.ProcessorVoidExecutionScope;
-import org.opwatch.service.ProcessorService;
+import org.opwatch.processor.common.RuntimeError;
+import org.opwatch.processor.common.SchedulingInfo;
 
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-public class ScheduledExecutor {
+public class ScheduledProducerExecutor {
 
-	private ProcessorService processorService;
-	private long delay;
-	private long period;
+	private ScheduledExecutorService executorService;
+	private SchedulingInfo schedulingInfo;
 	private ScheduledFuture<?> scheduledFuture;
 
-	public ScheduledExecutor(ProcessorService processorService, long delay, long period) {
-		this.processorService = processorService;
-		this.delay = delay;
-		this.period = period;
+	public ScheduledProducerExecutor(ScheduledExecutorService executorService, SchedulingInfo schedulingInfo) {
+		this.executorService = executorService;
+		this.schedulingInfo = schedulingInfo;
 	}
 
 	public void schedule(Runnable command) {
-		scheduledFuture = processorService.getScheduledExecutor().scheduleAtFixedRate(command, delay, period, TimeUnit.MILLISECONDS);
+		scheduledFuture = executorService.scheduleAtFixedRate(command,
+				schedulingInfo.getDelay(),
+				schedulingInfo.getPeriod(),
+				TimeUnit.MILLISECONDS);
 	}
 
 	public void stop(Processor<?> processor) {

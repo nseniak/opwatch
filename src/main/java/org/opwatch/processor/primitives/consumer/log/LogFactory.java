@@ -15,6 +15,7 @@
 package org.opwatch.processor.primitives.consumer.log;
 
 import ch.qos.logback.core.util.FileSize;
+import org.opwatch.documentation.ProcessorCategory;
 import org.opwatch.processor.common.ActiveProcessorFactory;
 import org.opwatch.processor.common.FactoryExecutionScope;
 import org.opwatch.processor.common.ProcessorSignature;
@@ -45,6 +46,11 @@ public class LogFactory extends ActiveProcessorFactory<LogConfig, Log> {
 	@Override
 	public ProcessorSignature staticSignature() {
 		return ProcessorSignature.makeConsumer();
+	}
+
+	@Override
+	public ProcessorCategory processorCategory() {
+		return ProcessorCategory.consumer;
 	}
 
 	@Override

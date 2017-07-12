@@ -14,6 +14,7 @@
 
 package org.opwatch.processor.primitives.consumer.alert;
 
+import org.opwatch.documentation.ProcessorCategory;
 import org.opwatch.processor.common.*;
 import org.opwatch.processor.config.ValueOrFilter;
 import org.opwatch.processor.config.JavascriptPredicate;
@@ -47,6 +48,11 @@ public class AlertGeneratorFactory extends ActiveProcessorFactory<AlertProducerC
 	@Override
 	public ProcessorSignature staticSignature() {
 		return ProcessorSignature.makeConsumer();
+	}
+
+	@Override
+	public ProcessorCategory processorCategory() {
+		return ProcessorCategory.consumer;
 	}
 
 	@Override

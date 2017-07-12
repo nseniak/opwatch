@@ -22,7 +22,6 @@ import org.opwatch.service.Config;
 import org.opwatch.service.ProcessorService;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
@@ -30,20 +29,18 @@ import java.util.List;
 public class CommandRunner {
 
 	private ProcessorService processorService;
-	private String command;
-	private File directory;
+	private CommandInfo commandInfo;
 	private Process process;
 
-	public CommandRunner(ProcessorService processorService, String command, File directory) {
+	public CommandRunner(ProcessorService processorService, CommandInfo commandInfo) {
 		this.processorService = processorService;
-		this.command = command;
-		this.directory = directory;
+		this.commandInfo = commandInfo;
 	}
 
 	public void startProcess(ActiveProcessor processor) {
 		try {
-			String[] cmdArray = {"/bin/sh", "-c", command};
-			process = Runtime.getRuntime().exec(cmdArray, null, directory);
+			String[] cmdArray = {"/bin/sh", "-c", commandInfo.getCommand()};
+			process = Runtime.getRuntime().exec(cmdArray, null, commandInfo.getDirectory());
 		} catch (Exception e) {
 			throw new RuntimeError("cannot run command: " + e.getMessage(), new ProcessorVoidExecutionScope(processor), e);
 		}
@@ -72,7 +69,7 @@ public class CommandRunner {
 			}
 		}
 		if (!checkAlive(processor)) {
-			throw new RuntimeError("command process has exited", new ProcessorPayloadExecutionScope(processor, payload));
+			throw new RuntimeError("input received but no command is currently running", new ProcessorPayloadExecutionScope(processor, payload));
 		}
 		try {
 			process.getOutputStream().write(processorService.getScriptService().jsonStringify(payload.getValue()).getBytes());

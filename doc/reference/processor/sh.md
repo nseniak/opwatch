@@ -4,8 +4,8 @@ Generates output by executing a shell command.
 
 ### Input and output
 
-* Category: Producer
-* Input: None
+* Category: Consumer, Filter and Producer
+* Input: Any value or object convertible to Json (optional)
 * Output: String representing a line of text produced by the shell command
 
 ### Synopsis
@@ -28,11 +28,12 @@ call(configuration_object)
 The `sh` processor executes `command` using `sh -c <command>` at a regular interval. The command's
 output is sent to the processor's output. Each line produced by the command is treated as a separate output.
 
-Shell commands are executed in sequence: `sh` waits for the current shell command to exit before launching the 
-next one after `delay` is passed. This allows using `sh` to execute blocking shell commands that won't exit
+Commands are executed in sequence: if a command takes longer than `delay` to execute, `sh` waits for its termination 
+before executing the next command. This allows using `sh` to execute blocking shell commands that won't exit
 and will generate output continuously, like `netstat`.
 
-See also: [`sh_f`](sh_f.md).
+The `sh` processor can optionally take an input. Every input received by `sh` is converted to a string using 
+`JSON.stringify` and sent to the command's input.
 
 ### Example
 
@@ -81,4 +82,37 @@ pipe(
   })
 ).run();
 ```
+<!-- example-end -->
+
+<!-- example-begin -->
+#### Use the `netstat` Unix command to trigger an alert if a certain remote host connects to the current one
+
+```js
+pipe(
+  sh("netstat"),
+  grep("some.hostname.com.*ESTABLISHED"),
+  alert({
+  	title: "Suspicious connection",
+  })
+).run();
+```
+<!-- example-end -->
+
+<!-- example-begin -->
+#### Use the `grep` Unix command to filter payload
+
+```js
+pipe(
+  tail("application.log"),
+  sh("grep --line-buffered \"pattern\""),
+  alert({
+  	title: "error in log",
+  })
+).run();
+```
+
+The `--line-buffered` option forces `grep`'s output to be line buffered. By default, `grep`'s output is 
+block buffered when standard output is not a terminal, which is the case here; without this option, the output 
+would be delayed until the buffer is full, which would also delay the alarm. In general, you should use
+shell commands with buffered output with care, as they might not yield to the natural behavior you would expected.
 <!-- example-end -->

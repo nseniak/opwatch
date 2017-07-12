@@ -15,20 +15,22 @@
 package org.opwatch.processor.common;
 
 import org.opwatch.processor.config.ScheduledProcessorConfig;
-import org.opwatch.processor.primitives.producer.ScheduledExecutor;
+import org.opwatch.processor.primitives.producer.ScheduledProducerExecutor;
 import org.opwatch.service.ProcessorService;
 
 public abstract class ScheduledProcessor<D extends ScheduledProcessorConfig> extends ActiveProcessor<D> {
 
-	private ScheduledExecutor scheduledExecutor;
+	private SchedulingInfo schedulingInfo;
+	private ScheduledProducerExecutor scheduledExecutor;
 
-	public ScheduledProcessor(ProcessorService processorService, D configuration, String name, ScheduledExecutor scheduledExecutor) {
+	public ScheduledProcessor(ProcessorService processorService, D configuration, String name, SchedulingInfo schedulingInfo) {
 		super(processorService, configuration, name);
-		this.scheduledExecutor = scheduledExecutor;
+		this.schedulingInfo = schedulingInfo;
 	}
 
 	@Override
 	public void start() {
+		this.scheduledExecutor = new ScheduledProducerExecutor(processorService.getProducerScheduledExecutor(), schedulingInfo);
 		scheduledExecutor.schedule(() -> processorService.withExceptionHandling("error running scheduled processor",
 				() -> new ProcessorVoidExecutionScope(this),
 				this::produce));

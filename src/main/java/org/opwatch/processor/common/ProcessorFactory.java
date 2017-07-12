@@ -14,6 +14,7 @@
 
 package org.opwatch.processor.common;
 
+import org.opwatch.documentation.ProcessorCategory;
 import org.opwatch.processor.config.*;
 import org.opwatch.service.ProcessorService;
 import org.slf4j.Logger;
@@ -50,6 +51,8 @@ public abstract class ProcessorFactory<C extends ProcessorConfig, P extends Proc
 		return null;
 	}
 
+	public abstract ProcessorCategory processorCategory();
+
 	public abstract P make(Object scriptObject);
 
 	public ProcessorSchema schema() {
@@ -75,7 +78,7 @@ public abstract class ProcessorFactory<C extends ProcessorConfig, P extends Proc
 			ProcessorSchema config = new ProcessorSchema();
 			config.setName(name());
 			config.setProperties(properties);
-			config.setCategory(processorService.getScriptService().processorCategoryName(this));
+			config.setCategory(processorService.getScriptService().processorCategoryDescription(this));
 			return config;
 		} catch (InvocationTargetException | InstantiationException | IllegalAccessException | IntrospectionException e) {
 			logger.error("Exception while fetching properties: " + configurationClass(), e);

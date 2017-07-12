@@ -67,7 +67,7 @@ public class Config {
 		this.defaultPostHostname = ApplicationUtil.property("opwatch.post.hostname", "localhost");
 		this.defaultPostPort = ApplicationUtil.property("opwatch.post.port", DEFAULT_HTTP_PORT);
 		this.shScriptOutputCheckDelay = TimeUnit.SECONDS.toMillis(100);
-		this.shCommandExitTimeout = TimeUnit.MINUTES.toMillis(3);
+		this.shCommandExitTimeout = -1;
 		this.commandStartTimeout = TimeUnit.MINUTES.toMillis(1);
 		this.commandStartSleepTime = TimeUnit.MILLISECONDS.toMillis(200);
 	}

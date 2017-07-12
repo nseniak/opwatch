@@ -14,22 +14,24 @@
 
 package org.opwatch.processor.common;
 
-import org.opwatch.processor.config.ActiveProcessorConfig;
-import org.opwatch.processor.primitives.producer.CommandExecutorDesc;
-import org.opwatch.service.ProcessorService;
-
 import java.io.File;
 
-public abstract class ActiveProcessorFactory<D extends ActiveProcessorConfig, P extends ActiveProcessor> extends ProcessorFactory<D, P> {
+public class CommandInfo {
 
-	public ActiveProcessorFactory(ProcessorService processorService) {
-		super(processorService);
+	private String command;
+	private File directory;
+
+	public CommandInfo(String command, File directory) {
+		this.command = command;
+		this.directory = directory;
 	}
 
-	protected CommandInfo makeCommandInfoCheck(CommandExecutorDesc config) {
-		String command = checkPropertyValue("command", config.getCommand());
-		File directory = new File(".");
-		return new CommandInfo(command, directory);
+	public String getCommand() {
+		return command;
+	}
+
+	public File getDirectory() {
+		return directory;
 	}
 
 }

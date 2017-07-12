@@ -14,9 +14,10 @@
 
 package org.opwatch.processor.primitives.producer.sh;
 
+import org.opwatch.documentation.ProcessorCategory;
+import org.opwatch.processor.common.CommandInfo;
 import org.opwatch.processor.common.ProcessorSignature;
-import org.opwatch.processor.primitives.producer.CommandRunner;
-import org.opwatch.processor.primitives.producer.ScheduledExecutor;
+import org.opwatch.processor.common.SchedulingInfo;
 import org.opwatch.processor.primitives.producer.ScheduledExecutorFactory;
 import org.opwatch.service.ProcessorService;
 
@@ -43,15 +44,20 @@ public class ShFactory extends ScheduledExecutorFactory<ShConfig, Sh> {
 
 	@Override
 	public ProcessorSignature staticSignature() {
-		return ProcessorSignature.makeProducer();
+		return ProcessorSignature.makeAny();
+	}
+
+	@Override
+	public ProcessorCategory processorCategory() {
+		return ProcessorCategory.any;
 	}
 
 	@Override
 	public Sh make(Object scriptObject) {
 		ShConfig config = convertProcessorConfig(scriptObject);
-		ScheduledExecutor executor = makeScheduledExecutor(config, false);
-		CommandRunner runner = makeCommandOutputProducer(config);
-		return new Sh(getProcessorService(), config, name(), executor, runner);
+		SchedulingInfo schedulingInfo = checkSchedulingInfo(config);
+		CommandInfo commandInfo = makeCommandInfoCheck(config);
+		return new Sh(getProcessorService(), config, name(), schedulingInfo, commandInfo);
 	}
 
 }

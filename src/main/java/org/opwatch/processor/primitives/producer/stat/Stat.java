@@ -15,8 +15,8 @@
 package org.opwatch.processor.primitives.producer.stat;
 
 import jdk.nashorn.internal.runtime.ScriptRuntime;
+import org.opwatch.processor.common.SchedulingInfo;
 import org.opwatch.processor.payload.PayloadPojoValue;
-import org.opwatch.processor.primitives.producer.ScheduledExecutor;
 import org.opwatch.processor.primitives.producer.ScheduledProducer;
 import org.opwatch.service.ProcessorService;
 
@@ -26,8 +26,8 @@ public class Stat extends ScheduledProducer<StatConfig> {
 
 	private File file;
 
-	public Stat(ProcessorService processorService, StatConfig configuration, String name, ScheduledExecutor scheduledExecutor, File file) {
-		super(processorService, configuration, name, scheduledExecutor);
+	public Stat(ProcessorService processorService, StatConfig configuration, String name, SchedulingInfo schedulingInfo, File file) {
+		super(processorService, configuration, name, schedulingInfo);
 		this.file = file;
 	}
 

@@ -14,6 +14,7 @@
 
 package org.opwatch.processor.primitives.filter.apply;
 
+import org.opwatch.documentation.ProcessorCategory;
 import org.opwatch.processor.common.ActiveProcessorFactory;
 import org.opwatch.processor.common.ProcessorSignature;
 import org.opwatch.processor.config.JavascriptFilter;
@@ -43,6 +44,11 @@ public class ApplyFactory extends ActiveProcessorFactory<ApplyConfig, Apply> {
 	@Override
 	public ProcessorSignature staticSignature() {
 		return ProcessorSignature.makeFilter();
+	}
+
+	@Override
+	public ProcessorCategory processorCategory() {
+		return ProcessorCategory.filter;
 	}
 
 	@Override

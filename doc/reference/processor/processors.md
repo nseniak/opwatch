@@ -18,7 +18,6 @@
 * [`grep`](grep.md) -- regexp-based filter
 * [`json`](json.md) -- parses a string into a Json object
 * [`jstack`](jstack.md) -- parses java Java exception stack
-* [`sh_f`](sh_f.md) -- transforms its input using a shell command
 * [`trail`](trail.md) -- collects the inputs received during the last `duration` milliseconds
 
 ### Consumers

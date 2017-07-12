@@ -14,17 +14,17 @@
 
 package org.opwatch.processor.primitives.filter.trail;
 
+import org.opwatch.processor.common.SchedulingInfo;
 import org.opwatch.processor.common.TrailCollecter;
 import org.opwatch.processor.payload.ObjectSeries;
 import org.opwatch.processor.payload.Payload;
 import org.opwatch.processor.payload.SeriesObject;
-import org.opwatch.processor.primitives.producer.ScheduledExecutor;
 import org.opwatch.service.ProcessorService;
 
 public class Trail extends TrailCollecter<TrailConfig> {
 
-	public Trail(ProcessorService processorService, TrailConfig configuration, String name, ScheduledExecutor scheduledExecutor, long duration) {
-		super(processorService, configuration, name, scheduledExecutor, duration);
+	public Trail(ProcessorService processorService, TrailConfig configuration, String name, SchedulingInfo schedulingInfo, long duration) {
+		super(processorService, configuration, name, schedulingInfo, duration);
 	}
 
 	@Override

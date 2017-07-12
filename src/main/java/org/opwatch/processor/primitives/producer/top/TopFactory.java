@@ -14,6 +14,7 @@
 
 package org.opwatch.processor.primitives.producer.top;
 
+import org.opwatch.documentation.ProcessorCategory;
 import org.opwatch.processor.common.ProcessorSignature;
 import org.opwatch.processor.primitives.producer.ScheduledExecutorFactory;
 import org.opwatch.service.ProcessorService;
@@ -45,9 +46,14 @@ public class TopFactory extends ScheduledExecutorFactory<TopConfig, Top> {
 	}
 
 	@Override
+	public ProcessorCategory processorCategory() {
+		return ProcessorCategory.producer;
+	}
+
+	@Override
 	public Top make(Object scriptObject) {
 		TopConfig config = convertProcessorConfig(scriptObject);
-		return new Top(getProcessorService(), config, name(), makeScheduledExecutor(config, false));
+		return new Top(getProcessorService(), config, name(), checkSchedulingInfo(config));
 	}
 
 }

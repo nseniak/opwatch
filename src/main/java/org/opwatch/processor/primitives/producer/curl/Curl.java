@@ -15,10 +15,10 @@
 package org.opwatch.processor.primitives.producer.curl;
 
 import jdk.nashorn.internal.runtime.ScriptRuntime;
+import org.opwatch.processor.common.SchedulingInfo;
 import org.opwatch.processor.config.ValueOrList;
 import org.opwatch.processor.payload.PayloadHeadersValue;
 import org.opwatch.processor.payload.PayloadPojoValue;
-import org.opwatch.processor.primitives.producer.ScheduledExecutor;
 import org.opwatch.processor.primitives.producer.ScheduledProducer;
 import org.opwatch.service.ProcessorService;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
@@ -58,7 +58,7 @@ public class Curl extends ScheduledProducer<CurlConfig> {
 	public Curl(ProcessorService processorService,
 							CurlConfig configuration,
 							String name,
-							ScheduledExecutor scheduledExecutor,
+							SchedulingInfo schedulingInfo,
 							URI uri,
 							HttpMethod method,
 							Map<String, ValueOrList<String>> headers,
@@ -68,7 +68,7 @@ public class Curl extends ScheduledProducer<CurlConfig> {
 							boolean insecure,
 							boolean followRedirects,
 							int maxRedirects) {
-		super(processorService, configuration, name, scheduledExecutor);
+		super(processorService, configuration, name, schedulingInfo);
 		this.uri = uri;
 		this.method = method;
 		this.headers = headers;

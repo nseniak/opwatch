@@ -14,10 +14,9 @@
 
 package org.opwatch.processor.primitives.control.pipe;
 
-import org.opwatch.processor.common.FactoryExecutionScope;
+import org.opwatch.documentation.ProcessorCategory;
 import org.opwatch.processor.common.Processor;
 import org.opwatch.processor.common.ProcessorFactory;
-import org.opwatch.processor.common.RuntimeError;
 import org.opwatch.service.ProcessorService;
 
 import java.util.List;
@@ -41,6 +40,11 @@ public class PipeFactory extends ProcessorFactory<PipeConfig, Pipe> {
 	@Override
 	public Class<Pipe> processorClass() {
 		return Pipe.class;
+	}
+
+	@Override
+	public ProcessorCategory processorCategory() {
+		return ProcessorCategory.control;
 	}
 
 	@Override

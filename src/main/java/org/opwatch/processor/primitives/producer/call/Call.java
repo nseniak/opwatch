@@ -17,10 +17,10 @@ package org.opwatch.processor.primitives.producer.call;
 import jdk.nashorn.internal.runtime.ScriptRuntime;
 import org.opwatch.processor.common.DataRequirement;
 import org.opwatch.processor.common.InferenceResult;
+import org.opwatch.processor.common.SchedulingInfo;
 import org.opwatch.processor.config.JavascriptConsumer;
 import org.opwatch.processor.config.JavascriptProducer;
 import org.opwatch.processor.payload.Payload;
-import org.opwatch.processor.primitives.producer.ScheduledExecutor;
 import org.opwatch.processor.primitives.producer.ScheduledProducer;
 import org.opwatch.service.ProcessorService;
 
@@ -31,9 +31,9 @@ public class Call extends ScheduledProducer<CallConfig> {
 	private JavascriptConsumer input;
 	private JavascriptProducer output;
 
-	public Call(ProcessorService processorService, CallConfig configuration, String name, ScheduledExecutor scheduledExecutor,
+	public Call(ProcessorService processorService, CallConfig configuration, String name, SchedulingInfo schedulingInfo,
 							JavascriptConsumer input, JavascriptProducer output) {
-		super(processorService, configuration, name, scheduledExecutor);
+		super(processorService, configuration, name, schedulingInfo);
 		this.input = input;
 		this.output = output;
 	}

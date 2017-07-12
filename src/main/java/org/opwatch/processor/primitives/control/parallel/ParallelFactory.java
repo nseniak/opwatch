@@ -14,6 +14,7 @@
 
 package org.opwatch.processor.primitives.control.parallel;
 
+import org.opwatch.documentation.ProcessorCategory;
 import org.opwatch.processor.common.Processor;
 import org.opwatch.processor.common.ProcessorFactory;
 import org.opwatch.service.ProcessorService;
@@ -39,6 +40,11 @@ public class ParallelFactory extends ProcessorFactory<ParallelConfig, Parallel> 
 	@Override
 	public Class<Parallel> processorClass() {
 		return Parallel.class;
+	}
+
+	@Override
+	public ProcessorCategory processorCategory() {
+		return ProcessorCategory.control;
 	}
 
 	@Override

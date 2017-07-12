@@ -14,6 +14,7 @@
 
 package org.opwatch.processor.primitives.filter.json;
 
+import org.opwatch.documentation.ProcessorCategory;
 import org.opwatch.processor.common.ActiveProcessorFactory;
 import org.opwatch.processor.common.ProcessorSignature;
 import org.opwatch.service.ProcessorService;
@@ -42,6 +43,11 @@ public class JsonFactory extends ActiveProcessorFactory<JsonConfig, Json> {
 	@Override
 	public ProcessorSignature staticSignature() {
 		return ProcessorSignature.makeFilter();
+	}
+
+	@Override
+	public ProcessorCategory processorCategory() {
+		return ProcessorCategory.filter;
 	}
 
 	@Override

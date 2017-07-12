@@ -14,6 +14,7 @@
 
 package org.opwatch.processor.primitives.filter.trail;
 
+import org.opwatch.documentation.ProcessorCategory;
 import org.opwatch.processor.common.ProcessorSignature;
 import org.opwatch.processor.primitives.producer.ScheduledExecutorFactory;
 import org.opwatch.service.ProcessorService;
@@ -45,10 +46,15 @@ public class TrailFactory extends ScheduledExecutorFactory<TrailConfig, Trail> {
 	}
 
 	@Override
+	public ProcessorCategory processorCategory() {
+		return ProcessorCategory.filter;
+	}
+
+	@Override
 	public Trail make(Object scriptObject) {
 		TrailConfig config = convertProcessorConfig(scriptObject);
 		long duration = checkPropertyValue("duration", config.getDuration()).value(this);
-		return new Trail(getProcessorService(), config, name(), makeScheduledExecutor(config, false), duration);
+		return new Trail(getProcessorService(), config, name(), checkSchedulingInfo(config), duration);
 	}
 
 }

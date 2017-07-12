@@ -14,6 +14,7 @@
 
 package org.opwatch.processor.primitives.consumer.send;
 
+import org.opwatch.documentation.ProcessorCategory;
 import org.opwatch.processor.common.ActiveProcessorFactory;
 import org.opwatch.processor.common.ProcessorSignature;
 import org.opwatch.service.ProcessorService;
@@ -44,6 +45,11 @@ public class SendFactory extends ActiveProcessorFactory<SendConfig, Send> {
 	@Override
 	public ProcessorSignature staticSignature() {
 		return ProcessorSignature.makeConsumer();
+	}
+
+	@Override
+	public ProcessorCategory processorCategory() {
+		return ProcessorCategory.consumer;
 	}
 
 	private static Pattern pathPattern = Pattern.compile("(?<hostname>[^:/]+)?(?::(?<port>[0-9]+))?(?<stack>/.*)");

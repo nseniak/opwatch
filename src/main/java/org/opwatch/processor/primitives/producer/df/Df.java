@@ -14,10 +14,10 @@
 
 package org.opwatch.processor.primitives.producer.df;
 
-import org.opwatch.processor.common.RuntimeError;
 import org.opwatch.processor.common.ProcessorVoidExecutionScope;
+import org.opwatch.processor.common.RuntimeError;
+import org.opwatch.processor.common.SchedulingInfo;
 import org.opwatch.processor.payload.PayloadPojoValue;
-import org.opwatch.processor.primitives.producer.ScheduledExecutor;
 import org.opwatch.processor.primitives.producer.ScheduledProducer;
 import org.opwatch.service.ProcessorService;
 
@@ -27,8 +27,8 @@ public class Df extends ScheduledProducer<DfConfig> {
 
 	private File file;
 
-	public Df(ProcessorService processorService, DfConfig configuration, String name, ScheduledExecutor scheduledExecutor, File file) {
-		super(processorService, configuration, name, scheduledExecutor);
+	public Df(ProcessorService processorService, DfConfig configuration, String name, SchedulingInfo schedulingInfo, File file) {
+		super(processorService, configuration, name, schedulingInfo);
 		this.file = file;
 	}
 

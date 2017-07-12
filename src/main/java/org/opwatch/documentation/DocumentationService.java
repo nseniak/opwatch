@@ -14,10 +14,12 @@
 
 package org.opwatch.documentation;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jdk.nashorn.internal.objects.NativeRegExp;
 import org.javatuples.Pair;
-import org.opwatch.processor.common.*;
+import org.opwatch.processor.common.DataRequirement;
+import org.opwatch.processor.common.Processor;
+import org.opwatch.processor.common.ProcessorFactory;
+import org.opwatch.processor.common.ProcessorSignature;
 import org.opwatch.processor.config.Duration;
 import org.opwatch.processor.config.JavascriptFunction;
 import org.opwatch.processor.config.ProcessorConfig;
@@ -27,13 +29,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -41,61 +38,8 @@ public class DocumentationService {
 
 	private static final Logger logger = LoggerFactory.getLogger(DocumentationService.class);
 
-	private ObjectMapper objectMapper = new ObjectMapper();
-
-	public <C extends ProcessorConfig, P extends Processor> ProcessorDoc documentation(ProcessorFactory<C, P> factory) {
-		Class<C> descClass = factory.configurationClass();
-		try {
-			BeanInfo info = Introspector.getBeanInfo(descClass);
-			PropertyDescriptor[] props = info.getPropertyDescriptors();
-			List<ProcessorDescFieldDoc> fieldDocList = new ArrayList<>();
-			for (PropertyDescriptor pd : props) {
-				String name = pd.getName();
-				Type type = pd.getReadMethod().getGenericReturnType();
-				String typeName = typeName(type);
-				fieldDocList.add(new ProcessorDescFieldDoc(name, typeName, null, "doc"));
-			}
-			return new ProcessorDoc(factory.name(), fieldDocList, "processor doc");
-		} catch (IntrospectionException e) {
-			throw new RuntimeError("error while generation documentation: " + descClass.getName() + ": " + e.getMessage(),
-					new GlobalExecutionScope(),
-					e);
-		}
-	}
-
-	public String processorCategoryName(ProcessorFactory<?, ?> factory) {
-		ProcessorSignature signature = factory.staticSignature();
-		if (signature == null) {
-			return "control";
-		}
-		DataRequirement inputRequirement = signature.getInputRequirement();
-		DataRequirement outputRequirement = signature.getOutputRequirement();
-		switch (inputRequirement) {
-			case NoData:
-				switch (outputRequirement) {
-					case Data:
-						return "producer";
-				}
-				break;
-			case Data:
-				switch (outputRequirement) {
-					case NoData:
-						return "consumer";
-					case Data:
-						return "filter";
-					case Any:
-						return "filter with ignorable output";
-				}
-				break;
-			case Any:
-				switch (outputRequirement) {
-					case Any:
-						return "wildcard";
-					case Data:
-						return "producer or filter, depending on the configuration";
-				}
-		}
-		return signatureDescriptor(signature);
+	public String processorCategoryDescription(ProcessorFactory<?, ?> factory) {
+		return factory.processorCategory().getDescription();
 	}
 
 	public String signatureDescriptor(ProcessorSignature signature) {

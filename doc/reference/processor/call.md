@@ -33,7 +33,7 @@ If the `input` callback is defined, then `call` accepts inputs and can be used a
 then invoked on any received input. If `input` is not defined, then `call` does not accept any input and should
 be used as a consumer. 
 
-See also: [`apply`](sh_f.md).
+See also: [`apply`](apply.md).
 
 ### Example
 

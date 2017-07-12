@@ -14,6 +14,7 @@
 
 package org.opwatch.processor.primitives.producer.df;
 
+import org.opwatch.documentation.ProcessorCategory;
 import org.opwatch.processor.common.ProcessorSignature;
 import org.opwatch.processor.primitives.producer.ScheduledExecutorFactory;
 import org.opwatch.service.ProcessorService;
@@ -45,10 +46,15 @@ public class DfFactory extends ScheduledExecutorFactory<DfConfig, Df> {
 	}
 
 	@Override
+	public ProcessorCategory processorCategory() {
+		return ProcessorCategory.producer;
+	}
+
+	@Override
 	public Df make(Object scriptObject) {
 		DfConfig config = convertProcessorConfig(scriptObject);
 		String file = checkPropertyValue("file", config.getFile());
-		return new Df(getProcessorService(), config, name(), makeScheduledExecutor(config, false), new java.io.File(file));
+		return new Df(getProcessorService(), config, name(), checkSchedulingInfo(config), new java.io.File(file));
 	}
 
 }

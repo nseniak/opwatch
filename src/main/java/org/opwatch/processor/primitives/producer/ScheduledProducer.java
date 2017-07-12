@@ -15,14 +15,15 @@
 package org.opwatch.processor.primitives.producer;
 
 import org.opwatch.processor.common.ScheduledProcessor;
+import org.opwatch.processor.common.SchedulingInfo;
 import org.opwatch.processor.config.ScheduledProcessorConfig;
 import org.opwatch.processor.payload.Payload;
 import org.opwatch.service.ProcessorService;
 
 public abstract class ScheduledProducer<D extends ScheduledProcessorConfig> extends ScheduledProcessor<D> {
 
-	public ScheduledProducer(ProcessorService processorService, D configuration, String name, ScheduledExecutor scheduledExecutor) {
-		super(processorService, configuration, name, scheduledExecutor);
+	public ScheduledProducer(ProcessorService processorService, D configuration, String name, SchedulingInfo schedulingInfo) {
+		super(processorService, configuration, name, schedulingInfo);
 	}
 
 	@Override

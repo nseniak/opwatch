@@ -15,8 +15,8 @@
 package org.opwatch.processor.primitives.producer.top;
 
 import com.sun.management.OperatingSystemMXBean;
+import org.opwatch.processor.common.SchedulingInfo;
 import org.opwatch.processor.payload.PayloadPojoValue;
-import org.opwatch.processor.primitives.producer.ScheduledExecutor;
 import org.opwatch.processor.primitives.producer.ScheduledProducer;
 import org.opwatch.service.ProcessorService;
 
@@ -24,8 +24,8 @@ import java.lang.management.ManagementFactory;
 
 public class Top extends ScheduledProducer<TopConfig> {
 
-	public Top(ProcessorService processorService, TopConfig configuration, String name, ScheduledExecutor scheduledExecutor) {
-		super(processorService, configuration, name, scheduledExecutor);
+	public Top(ProcessorService processorService, TopConfig configuration, String name, SchedulingInfo schedulingInfo) {
+		super(processorService, configuration, name, schedulingInfo);
 	}
 
 	@Override

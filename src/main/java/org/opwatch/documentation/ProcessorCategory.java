@@ -12,23 +12,26 @@
  * the specific language governing permissions and limitations under the License.
  */
 
-package org.opwatch.processor.primitives.filter.sh_f;
+package org.opwatch.documentation;
 
-import org.opwatch.processor.config.ActiveProcessorConfig;
-import org.opwatch.processor.config.ImplicitProperty;
-import org.opwatch.processor.primitives.producer.CommandExecutorDesc;
+public enum ProcessorCategory {
 
-public class ShFilterConfig extends ActiveProcessorConfig implements CommandExecutorDesc {
+	control("control"),
+	consumer("consumer"),
+	producer("producer"),
+	filter("filter"),
+	producer_or_filter("producer and filter"),
+	filter_ignorable("filter with ignorable output"),
+	any("producer, consumer and filter");
 
-	private String command;
+	private String description;
 
-	@ImplicitProperty
-	public String getCommand() {
-		return command;
+	ProcessorCategory(String description) {
+		this.description = description;
 	}
 
-	public void setCommand(String command) {
-		this.command = command;
+	public String getDescription() {
+		return description;
 	}
 
 }
