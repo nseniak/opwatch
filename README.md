@@ -47,7 +47,7 @@ The [Example list](doc/examples.md) points to other Opwatch usage examples.
 
 ### Prerequisites
 
-Opwatch requires at least Java 8. To install Java, we recommend that you use 
+Opwatch requires the Java JDK at least version 8. To install Java, we recommend that you use 
 [Oracle’s installation documentation](http://docs.oracle.com/javase/8/docs/technotes/guides/install/install_overview.html).
 
 ### Download and installation
