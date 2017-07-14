@@ -25,8 +25,8 @@ the example and see it in context.
 - [Centralize system load information from several servers and trigger an alert if the average CPU is too high](#centralize-system-load-information-from-several-servers-and-trigger-an-alert-if-the-average-cpu-is-too-high)
 - [Triggers an alert if the number of files in a directory is greater than 100](#triggers-an-alert-if-the-number-of-files-in-a-directory-is-greater-than-100)
 - [Trigger an alert if there's no `mongod` running process](#trigger-an-alert-if-theres-no-mongod-running-process)
-- [Trigger an alert if a certain remote host connects to the current one](#trigger-an-alert-if-a-certain-remote-host-connects-to-the-current-one)
-- [Use the `grep` unix command to filter payload](#use-the-grep-unix-command-to-filter-payload)
+- [Use the `netstat` Unix command to trigger an alert if a certain remote host connects to the current one](#use-the-netstat-unix-command-to-trigger-an-alert-if-a-certain-remote-host-connects-to-the-current-one)
+- [Use the `grep` Unix command to filter payload](#use-the-grep-unix-command-to-filter-payload)
 - [Trigger an alert when a file hasn't been updated since 10 minutes](#trigger-an-alert-when-a-file-hasnt-been-updated-since-10-minutes)
 - [Trigger an alert when the log file gets bigger than 100,000 lines](#trigger-an-alert-when-the-log-file-gets-bigger-than-100000-lines)
 - [Trigger an alert when the CPU is higher than 80%](#trigger-an-alert-when-the-cpu-is-higher-than-80)
@@ -445,7 +445,7 @@ pipe(
 ```
 
 ---
-#### [Trigger an alert if a certain remote host connects to the current one](reference/processor/sh.md#trigger-an-alert-if-a-certain-remote-host-connects-to-the-current-one)
+#### [Use the `netstat` Unix command to trigger an alert if a certain remote host connects to the current one](reference/processor/sh.md#use-the-netstat-unix-command-to-trigger-an-alert-if-a-certain-remote-host-connects-to-the-current-one)
 
 ```js
 pipe(
@@ -458,7 +458,7 @@ pipe(
 ```
 
 ---
-#### [Use the `grep` unix command to filter payload](reference/processor/sh.md#use-the-grep-unix-command-to-filter-payload)
+#### [Use the `grep` Unix command to filter payload](reference/processor/sh.md#use-the-grep-unix-command-to-filter-payload)
 
 ```js
 pipe(

@@ -170,13 +170,14 @@ public class ScriptService {
 
 	public void loadScript(String fileOrUrl) {
 		loadScript(() -> {
-			String scheme = null;
+			boolean urlSyntax = false;
 			try {
-				scheme = new URI(fileOrUrl).getScheme();
+				String scheme = new URI(fileOrUrl).getScheme();
+				urlSyntax = (scheme != null) && (scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https"));
 			} catch (URISyntaxException e) {
-				throw new RuntimeError("malformed file or url: " + e.getMessage());
+				// Not a URI syntax
 			}
-			if ((scheme != null) && (scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https"))) {
+			if (urlSyntax) {
 				try {
 					return new InputStreamReader(new URL(fileOrUrl).openStream());
 				} catch (MalformedURLException e) {

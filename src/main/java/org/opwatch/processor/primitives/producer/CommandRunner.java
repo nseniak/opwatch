@@ -39,7 +39,9 @@ public class CommandRunner {
 
 	public void startProcess(ActiveProcessor processor) {
 		try {
-			String[] cmdArray = {"/bin/sh", "-c", commandInfo.getCommand()};
+			String[] linuxCmdArray = {"/bin/sh", "-c", commandInfo.getCommand()};
+			String[] windowsCmdArray = {"cmd", "/c", commandInfo.getCommand()};
+			String[] cmdArray = isWindows() ? windowsCmdArray : linuxCmdArray;
 			process = Runtime.getRuntime().exec(cmdArray, null, commandInfo.getDirectory());
 		} catch (Exception e) {
 			throw new RuntimeError("cannot run command: " + e.getMessage(), new ProcessorVoidExecutionScope(processor), e);
@@ -50,6 +52,10 @@ public class CommandRunner {
 		if (process != null) {
 			process.destroyForcibly();
 		}
+	}
+
+	private boolean isWindows() {
+		return System.getProperty("os.name").toLowerCase().startsWith("windows");
 	}
 
 	public void consume(Processor processor, Payload payload) {
