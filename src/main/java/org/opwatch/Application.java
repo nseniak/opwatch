@@ -14,13 +14,12 @@
 
 package org.opwatch;
 
-import org.opwatch.common.ApplicationUtil;
-import org.opwatch.service.ProcessorService;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
+import org.opwatch.common.ApplicationUtil;
+import org.opwatch.service.ProcessorService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -30,38 +29,30 @@ import org.springframework.context.ApplicationContext;
 import java.io.IOException;
 
 @SpringBootApplication
-public class Application implements CommandLineRunner {
+public class Application {
 
 	public static final int DEFAULT_HTTP_PORT = 28018;
 
 	@Autowired
 	private ProcessorService processorService;
 
-	@Autowired
-	private ApplicationContext applicationContext;
-
-	private static CommandLineOptions options;
-
-	@Override
-	public void run(String... args) throws Exception {
-		if (options == null) {
-			throw new IllegalStateException("this method should only be called by main()");
-		}
-		boolean success = processorService.run(options);
-		SpringApplication.exit(applicationContext, () -> success ? 0 : 1);
+	public boolean run(CommandLineOptions options) throws Exception {
+		return processorService.run(options);
 	}
 
 	public static void main(String[] args) throws Exception {
 		try {
 			ApplicationUtil.checkProperty("app.log.dir", "logging directory");
 			ApplicationUtil.checkProperty("app.log.basename", "logfile basename");
-			options = parseOptions(args);
+			CommandLineOptions options = parseOptions(args);
 			if (options == null) {
 				System.exit(1);
 			}
 			int port = (options.getPort() != null) ? options.getPort() : DEFAULT_HTTP_PORT;
 			System.setProperty("server.port", Integer.toString(port));
-			new SpringApplicationBuilder(Application.class).web(!options.isNoServer()).run(args);
+			ApplicationContext context = new SpringApplicationBuilder(Application.class).web(!options.isNoServer()).run(args);
+			boolean success = context.getBean(Application.class).run(options);
+			SpringApplication.exit(context, () -> success ? 0 : 1);
 		} catch (ConnectorStartFailedException e) {
 			System.err.println("Cannot start the embedded HTTP server on port " + e.getPort());
 			System.err.println("The port may already be in use. To specify another port, use --port <port>");

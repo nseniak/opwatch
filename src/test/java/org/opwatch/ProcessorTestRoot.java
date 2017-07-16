@@ -29,7 +29,7 @@ import org.opwatch.service.ScriptService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.*;
@@ -51,7 +51,7 @@ import static org.opwatch.processor.common.Processor.PROCESSOR_STOPPED_MESSAGE;
 import static org.opwatch.service.ScriptService.setHomeDirectory;
 
 @RunWith(SpringRunner.class)
-@Import(Application.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class ProcessorTestRoot {
 
 	private static final Logger logger = LoggerFactory.getLogger(ProcessorTestRoot.class);
@@ -65,7 +65,8 @@ public class ProcessorTestRoot {
 	// Maximum time it should take for a processor to stop after being interrupted
 	protected static final long STOP_TIMEOUT = TimeUnit.SECONDS.toMillis(1);
 
-	protected static final int TEST_PORT = 28030;
+	// Default port used by Spring for tests
+	protected static final int TEST_PORT = 8080;
 
 	protected <T> Callable<T> withIO(InputStream inputStream, OutputStream outputStream, Callable<T> callable) {
 		return () -> {
@@ -121,6 +122,7 @@ public class ProcessorTestRoot {
 		options.setHostname("test_host");
 		options.setPort(TEST_PORT);
 		assertThat(processorService.initialize(options), is(true));
+		processorService.config().defaultPostPort(TEST_PORT);
 	}
 
 	protected <T> Future<T> future(Callable<T> callable) {

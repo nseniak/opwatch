@@ -1,0 +1,42 @@
+[
+  {
+    number: 0,
+    string: "string0"
+  },
+  {
+    number: 1,
+    string: "string1"
+  },
+  {
+    number: 2,
+    string: "string2"
+  },
+  {
+    number: 3,
+    string: "string3"
+  },
+  {
+    number: 4,
+    string: "string4"
+  },
+  {
+    number: 5,
+    string: "string5"
+  },
+  {
+    number: 6,
+    string: "string6"
+  },
+  {
+    number: 7,
+    string: "string7"
+  },
+  {
+    number: 8,
+    string: "string8"
+  },
+  {
+    number: 9,
+    string: "string9"
+  }
+]
