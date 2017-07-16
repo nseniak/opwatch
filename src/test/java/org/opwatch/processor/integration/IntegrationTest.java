@@ -12,31 +12,29 @@
  * the specific language governing permissions and limitations under the License.
  */
 
-package org.opwatch.processor.primitives.filter;
+package org.opwatch.processor.integration;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.opwatch.ProcessorTestRoot;
 
-import java.io.*;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Callable;
 
-public class TrailTest extends ProcessorTestRoot {
+import static org.opwatch.testutil.ResourceComparator.compareOutput;
 
-	private static long EXEC_TIME = TimeUnit.MILLISECONDS.toMillis(1000);
+public class IntegrationTest extends ProcessorTestRoot {
 
 	@Rule
 	public ErrorCollector collector = new ErrorCollector();
 
 	@Test
-	public void testTrail() throws Exception {
-		PipedOutputStream outputStream = new PipedOutputStream();
-		PipedInputStream inputStream = new PipedInputStream(outputStream);
-		long execTime = TimeUnit.MILLISECONDS.toMillis(2000);
-		List<String> lines = runWithOutputLines(EXEC_TIME, inputStream,
-				runExpressionCallable("pipe(stdin(), trail('1s'), stdout())"));
+	public void test() throws Exception {
+		compareOutput(collector, IntegrationTest.class, "*.js", "*-pretty.pretty",
+				(resourceName, processorExpression) -> {
+					Callable<Object> resultCallable = runExpressionCallable(processorExpression);
+					Object result = runExpression(processorExpression);
+					return scriptService.pretty(result);
+				});
 	}
-
 }

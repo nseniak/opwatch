@@ -15,6 +15,7 @@
 package org.opwatch.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import jdk.nashorn.internal.runtime.Undefined;
 import jline.console.ConsoleReader;
 import jline.console.UserInterruptException;
 import org.opwatch.Application;
@@ -50,6 +51,8 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import static jdk.nashorn.internal.runtime.ScriptRuntime.UNDEFINED;
+
 @Service
 public class ProcessorService implements InitializingBean, DisposableBean {
 
@@ -81,6 +84,7 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 	private String id;
 	private Config config;
 	private Thread runningProcessorThread;
+	private Object processorReturnValue = UNDEFINED;
 	private RestTemplate restTemplate = new RestTemplate();
 
 	private static String SCRIPT_EXCEPTION_MESSAGE_PREFIX = "javax.script.ScriptException: ";
@@ -158,8 +162,8 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		}
 	}
 
-	private void runExpression(CommandLineOptions options) {
-		scriptService.runExpression(options.getRunExpression());
+	private Object runExpression(CommandLineOptions options) {
+		return scriptService.runExpression(options.getRunExpression());
 	}
 
 	public void runRepl(CommandLineOptions options) {
@@ -212,6 +216,11 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 		for (String file : options.getScripts()) {
 			scriptService.loadScript(file);
 		}
+	}
+
+	public void stopWithReturnValue(Object value) {
+		processorReturnValue = value;
+		stopRunningProcessor();
 	}
 
 	public void stopRunningProcessor() {
@@ -369,6 +378,14 @@ public class ProcessorService implements InitializingBean, DisposableBean {
 
 	public void exit() {
 		SpringApplication.exit(applicationContext);
+	}
+
+	public Object getProcessorReturnValue() {
+		return processorReturnValue;
+	}
+
+	public void setProcessorReturnValue(Undefined processorReturnValue) {
+		this.processorReturnValue = processorReturnValue;
 	}
 
 	public HealthcheckInfo healthcheck() {

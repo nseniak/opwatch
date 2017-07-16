@@ -46,7 +46,7 @@ public class JstackTest extends ProcessorTestRoot {
 				(resourceName, resourceString) -> {
 					String options = jstackOptions.getOrDefault(resourceName, "");
 					List<String> lines = runWithOutputLines(EXEC_TIME, new ByteArrayInputStream(resourceString.getBytes()),
-							runExpression("pipe(stdin(), jstack(" + options + "), stdout())"));
+							runExpressionCallable("pipe(stdin(), jstack(" + options + "), stdout())"));
 					List<String> content = outputContent(lines);
 					StringJoiner joiner = new StringJoiner(",", "[", "]");
 					content.forEach(joiner::add);

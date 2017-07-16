@@ -38,10 +38,10 @@ public class ProcessorTest extends ProcessorTestRoot {
 	public void testRun() throws Exception {
 		PipedOutputStream outputStream = new PipedOutputStream();
 		PipedInputStream os = new PipedInputStream(outputStream);
-		Future<Void> future = future(
+		Future<Object> future = future(
 				withOutput(outputStream,
 						withTimeout(EXECUTION_TIMEOUT,
-								runExpression("pipe(top(), stdout())"))));
+								runExpressionCallable("pipe(top(), stdout())"))));
 		BufferedReader outputReader = new BufferedReader(new InputStreamReader(os));
 		List<String> lines = new ArrayList<>();
 		Future<Void> outputFuture = readLines(outputReader, lines);

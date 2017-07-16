@@ -90,12 +90,16 @@ public class ProcessorTestRoot {
 		return withTimeout(duration + STOP_TIMEOUT, callable);
 	}
 
-	protected Callable<Void> runExpression(String expression) {
+	protected Callable<Object> runExpressionCallable(String expression) {
 		return () -> {
 			initTestEnvironment();
-			scriptService.runExpression(expression);
-			return null;
+			return scriptService.runExpression(expression);
 		};
+	}
+
+	protected Object runExpression(String expression) {
+		initTestEnvironment();
+		return scriptService.runExpression(expression);
 	}
 
 	protected Object evalExpression(String expression) {
@@ -124,12 +128,12 @@ public class ProcessorTestRoot {
 		return es.submit(callable);
 	}
 
-	protected List<String> runWithOutputLines(long duration, InputStream inputStream, Callable<Void> callable) {
+	protected <T> List<String> runWithOutputLines(long duration, InputStream inputStream, Callable<T> callable) {
 		try {
 			PipedOutputStream outputStream = new PipedOutputStream();
 			BufferedReader outputReader = new BufferedReader(new InputStreamReader(new PipedInputStream(outputStream)));
 			List<String> outputLines = new ArrayList<>();
-			Future<Void> runFuture = future(withStop(duration, withIO(inputStream, outputStream, callable)));
+			Future<T> runFuture = future(withStop(duration, withIO(inputStream, outputStream, callable)));
 			Future<Void> outputFuture = readLines(outputReader, outputLines);
 			runFuture.get();
 			outputFuture.cancel(false);

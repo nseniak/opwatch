@@ -61,6 +61,7 @@ public abstract class Processor<C extends ProcessorConfig> {
 		processorService.signalSystemInfo(PROCESSOR_RUNNING_MESSAGE);
 		start();
 		processorService.setRunningProcessorThread(Thread.currentThread());
+		processorService.setProcessorReturnValue(UNDEFINED);
 		try {
 			while (true) {
 				Thread.sleep(TimeUnit.DAYS.toMillis(1));
@@ -72,7 +73,9 @@ public abstract class Processor<C extends ProcessorConfig> {
 		}
 		stop();
 		processorService.signalSystemInfo(PROCESSOR_STOPPED_MESSAGE);
-		return UNDEFINED;
+		Object returnValue = processorService.getProcessorReturnValue();
+		processorService.setProcessorReturnValue(UNDEFINED);
+		return returnValue;
 	}
 
 	/**

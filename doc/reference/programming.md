@@ -11,6 +11,7 @@
     + [The single reference rule](#the-single-reference-rule)
   * [Module system](#module-system)
   * [Opwatch built-in functions](#opwatch-built-in-functions)
+    + [`stop(result)`](#stopresult)
     + [`stats(data)`](#statsdata)
     + [`pretty(data)`](#prettydata)
     + [`help()`](#help)
@@ -162,6 +163,18 @@ Opwatch includes a module system based on the [npm module specification](https:/
 This module system uses the implementation provided by [jvm-npm](https://github.com/nodyn/jvm-npm).
 
 ## Opwatch built-in functions
+
+### `stop(result)`
+
+This function stops the currently running processor and make it return the passed value. 
+
+#### Arguments
+
+| Argument | Description | Type | Default |
+| :--- | :--- | :--- | :--- |
+| `result` | value to be returned by the running processor | any object or value | *Optional* |
+
+---
 
 ### `stats(data)`
 

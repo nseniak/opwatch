@@ -206,7 +206,7 @@ function stats(data) {
 	return __stats(__service, data);
 }
 
-function interrupt() {
-	__service.stopRunningProcessor();
+function stop(returnValue) {
+	__service.stopWithReturnValue(returnValue);
 	return undefined;
 }

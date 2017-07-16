@@ -215,13 +215,13 @@ public class ScriptService {
 
 	}
 
-	public void runExpression(String expression) {
+	public Object runExpression(String expression) {
 		ScriptContext context = scriptEngine.getContext();
 		try {
 			Object scriptObject = scriptEngine.eval(expression, context);
 			Processor processor = (Processor) convertScriptValue(ValueLocation.makeToplevel(), Processor.class, scriptObject,
 					RuntimeError::new);
-			processor.run();
+			return processor.run();
 		} catch (ScriptException e) {
 			throw new RuntimeError(e);
 		}
