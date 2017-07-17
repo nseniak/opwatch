@@ -25,8 +25,10 @@ call(configuration_object)
 
 ### Description
 
-The `sh` processor executes `command` using `sh -c <command>` on Linux and `cmd /c <command>` on Windows at a regular 
-interval. The command's output is sent to the processor's output. Each line produced by the command is treated as a 
+The `sh` processor executes `command` at a regular interval. On Linux, the command is executed using `sh -c <command>`.
+On Windows, it is executed using `cmd /c <command>`.
+
+The command's output is sent to the processor's output. Each line produced by the command is treated as a 
 separate output.
 
 Commands are executed in sequence: if a command takes longer than `delay` to execute, `sh` waits for its termination 
