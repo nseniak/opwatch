@@ -42,30 +42,6 @@ public class DocumentationService {
 		return factory.processorCategory().getDescription();
 	}
 
-	public String signatureDescriptor(ProcessorSignature signature) {
-		DataRequirement inputRequirement = signature.getInputRequirement();
-		DataRequirement outputRequirement = signature.getOutputRequirement();
-		StringBuilder builder = new StringBuilder();
-		builder.append("<input from processor: ");
-		builder.append(requirementName(inputRequirement));
-		builder.append("; output to processor: ");
-		builder.append(requirementName(outputRequirement));
-		builder.append(">");
-		return builder.toString();
-	}
-
-	private String requirementName(DataRequirement requirement) {
-		switch (requirement) {
-			case NoData:
-				return "forbidden";
-			case Data:
-				return "required";
-			case Any:
-				return "optional";
-		}
-		throw new IllegalStateException("unknown pipe requirement: " + requirement.name());
-	}
-
 	public String typeName(Type type) {
 		if (type instanceof Class) {
 			return simpleClassName((Class) type);
