@@ -16,10 +16,8 @@ package org.opwatch.documentation;
 
 import jdk.nashorn.internal.objects.NativeRegExp;
 import org.javatuples.Pair;
-import org.opwatch.processor.common.DataRequirement;
 import org.opwatch.processor.common.Processor;
 import org.opwatch.processor.common.ProcessorFactory;
-import org.opwatch.processor.common.ProcessorSignature;
 import org.opwatch.processor.config.Duration;
 import org.opwatch.processor.config.JavascriptFunction;
 import org.opwatch.processor.config.ProcessorConfig;
