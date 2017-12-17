@@ -32,9 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.StringWriter;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class SlackChannel extends ThrottledChannel<SlackConfiguration> {
@@ -91,7 +89,7 @@ public class SlackChannel extends ThrottledChannel<SlackConfiguration> {
 			}
 		}
 		attachment.setText(writer.toString());
-		attachment.setColor(levelColor(aggregate.getMaxLevel()));
+		attachment.setColor(levelColor(aggregate.getMaxLevel(), aggregate.getMessageTypes()));
 		payload.addAttachment(attachment);
 		client.post(payload);
 	}
@@ -135,7 +133,7 @@ public class SlackChannel extends ThrottledChannel<SlackConfiguration> {
 		Attachment attachment = new Attachment();
 		String title = displayTitle(message);
 		attachment.setText(title);
-		attachment.setColor(levelColor(message.getLevel()));
+		attachment.setColor(levelColor(message.getLevel(), new LinkedHashSet<>(Arrays.asList(message.getType()))));
 		String detailsString = detailsString(message);
 		if (detailsString != null) {
 			attachment.addField(new Field("Details", detailsString, false));
@@ -151,19 +149,23 @@ public class SlackChannel extends ThrottledChannel<SlackConfiguration> {
 		return (attachment.getTitle() == null) && (attachment.getText() == null) && attachment.getFields().isEmpty();
 	}
 
-	private Color levelColor(Message.Level level) {
-		switch (level) {
-			case lowest:
-			case low:
-				return Color.GOOD;
-			case medium:
-				return Color.WARNING;
-			case high:
-				return Color.DANGER;
-			case emergency:
-				return Color.DANGER;
+	private Color levelColor(Message.Level level, Set<Message.Type> messageTypes) {
+		if (messageTypes.contains(Message.Type.alert)
+				|| messageTypes.contains(Message.Type.alertOn)
+				|| messageTypes.contains(Message.Type.error)) {
+			switch (level) {
+				case high:
+				case emergency:
+					return Color.DANGER;
+				default:
+					return Color.WARNING;
+			}
+		} else if (messageTypes.contains(Message.Type.alertOff)) {
+			return Color.GOOD;
+		} else {
+			// Default color
+			return null;
 		}
-		throw new IllegalStateException("unknown level: " + level.name());
 	}
 
 }

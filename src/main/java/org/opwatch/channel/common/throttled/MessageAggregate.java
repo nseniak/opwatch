@@ -16,20 +16,19 @@ package org.opwatch.channel.common.throttled;
 
 import org.opwatch.processor.common.Message;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MessageAggregate {
 
 	private Map<String, AggregateMessagePart> messagePartMap = new LinkedHashMap<>();
 	private Message.Level maxLevel = Message.Level.lowest;
+	private Set<Message.Type> messageTypes = new LinkedHashSet<>();
 	private int total;
 
 	public void addMessage(String displayTitle, Message message) {
 		AggregateMessagePart part = messagePartMap.computeIfAbsent(displayTitle, s -> new AggregateMessagePart(displayTitle));
 		part.addMessage(message);
+		messageTypes.add(message.getType());
 		total = total + 1;
 		if (part.getMaxLevel().getRank() > maxLevel.getRank()) {
 			maxLevel = part.getMaxLevel();
@@ -76,6 +75,10 @@ public class MessageAggregate {
 			return count;
 		}
 
+	}
+
+	public Set<Message.Type> getMessageTypes() {
+		return messageTypes;
 	}
 
 	public Message.Level getMaxLevel() {
