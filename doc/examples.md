@@ -4,6 +4,8 @@ This page contains all the code examples provided in the documentation. Click a 
 the example and see it in context.
 
 <!-- example-index-begin -->
+- [Trigger an alert when a file hasn't been updated since 10 minutes](#trigger-an-alert-when-a-file-hasnt-been-updated-since-10-minutes)
+- [Trigger an alert if a json object log contains an error](#trigger-an-alert-if-a-json-object-log-contains-an-error)
 - [Display an alert if disk usage is > 80%; version 1](#display-an-alert-if-disk-usage-is--80-version-1)
 - [Display an alert if disk usage is > 80%; version 2](#display-an-alert-if-disk-usage-is--80-version-2)
 - [Display an alert if disk usage is > 80%; version 3](#display-an-alert-if-disk-usage-is--80-version-3)
@@ -11,31 +13,66 @@ the example and see it in context.
 - [Print non-empty log file lines](#print-nonempty-log-file-lines)
 - [Count seconds](#count-seconds)
 - [Every hour, publish the number of lines containing SIGNUP that were added to a log file](#every-hour-publish-the-number-of-lines-containing-signup-that-were-added-to-a-log-file)
-- [Trigger an alert if three consecutive http requests at a 30 second interval are unsuccessful](#trigger-an-alert-if-three-consecutive-http-requests-at-a-30-second-interval-are-unsuccessful)
-- [Trigger an alert if a Web site is down](#trigger-an-alert-if-a-web-site-is-down)
+- [Trigger an alert if the file `application.log` contains `ERROR` or `WARNING`](#trigger-an-alert-if-the-file-applicationlog-contains-error-or-warning)
+- [Trigger an alert if either `application1.log` or `application2.log` contains `ERROR`](#trigger-an-alert-if-either-application1log-or-application2log-contains-error)
+- [Trigger an alert every 10 seconds if a Web site is down](#trigger-an-alert-every-10-seconds-if-a-web-site-is-down)
 - [Trigger an alert if a Web site is found to be down for at least 2 of the 10 last requests](#trigger-an-alert-if-a-web-site-is-found-to-be-down-for-at-least-2-of-the-10-last-requests)
 - [Trigger an alert if a REST API returns a wrong value](#trigger-an-alert-if-a-rest-api-returns-a-wrong-value)
 - [Trigger an alert when a filesystem usage ratio is greater than 80%](#trigger-an-alert-when-a-filesystem-usage-ratio-is-greater-than-80)
+- [Trigger an alert when the log file gets bigger than 100,000 lines](#trigger-an-alert-when-the-log-file-gets-bigger-than-100000-lines)
+- [Trigger an alert if three consecutive http requests at a 30 second interval are unsuccessful](#trigger-an-alert-if-three-consecutive-http-requests-at-a-30-second-interval-are-unsuccessful)
 - [Trigger an alert for each line in a log file that contains `error` or `warning`](#trigger-an-alert-for-each-line-in-a-log-file-that-contains-error-or-warning)
 - [Trigger an alert for each line in a log file that does *not* contain `info`](#trigger-an-alert-for-each-line-in-a-log-file-that-does-not-contain-info)
-- [Trigger an alert if a json object log contains an error](#trigger-an-alert-if-a-json-object-log-contains-an-error)
-- [Trigger an alert if the file `application.log` contains `ERROR` or `WARNING`](#trigger-an-alert-if-the-file-applicationlog-contains-error-or-warning)
-- [Trigger an alert if either `application1.log` or `application2.log` contains `ERROR`](#trigger-an-alert-if-either-application1log-or-application2log-contains-error)
+- [Trigger an alert when a log file has more than 20 Java exception per second](#trigger-an-alert-when-a-log-file-has-more-than-20-java-exception-per-second)
+- [Trigger an alert when the disk usage increases by more than 20% in an hour](#trigger-an-alert-when-the-disk-usage-increases-by-more-than-20-in-an-hour)
+- [Trigger an alert when a log file remains silent for more than 10 minutes](#trigger-an-alert-when-a-log-file-remains-silent-for-more-than-10-minutes)
+- [Trigger an alert when the CPU is higher than 80%](#trigger-an-alert-when-the-cpu-is-higher-than-80)
 - [Centralize logs from several servers and trigger an alert if they contain too many errors overall](#centralize-logs-from-several-servers-and-trigger-an-alert-if-they-contain-too-many-errors-overall)
 - [Centralize system load information from several servers and trigger an alert if the average CPU is too high](#centralize-system-load-information-from-several-servers-and-trigger-an-alert-if-the-average-cpu-is-too-high)
 - [Triggers an alert if the number of files in a directory is greater than 100](#triggers-an-alert-if-the-number-of-files-in-a-directory-is-greater-than-100)
 - [Trigger an alert if there's no `mongod` running process](#trigger-an-alert-if-theres-no-mongod-running-process)
 - [Use the `netstat` Unix command to trigger an alert if a certain remote host connects to the current one](#use-the-netstat-unix-command-to-trigger-an-alert-if-a-certain-remote-host-connects-to-the-current-one)
 - [Use the `grep` Unix command to filter payload](#use-the-grep-unix-command-to-filter-payload)
-- [Trigger an alert when a file hasn't been updated since 10 minutes](#trigger-an-alert-when-a-file-hasnt-been-updated-since-10-minutes)
-- [Trigger an alert when the log file gets bigger than 100,000 lines](#trigger-an-alert-when-the-log-file-gets-bigger-than-100000-lines)
-- [Trigger an alert when the CPU is higher than 80%](#trigger-an-alert-when-the-cpu-is-higher-than-80)
-- [Trigger an alert when a log file has more than 20 Java exception per second](#trigger-an-alert-when-a-log-file-has-more-than-20-java-exception-per-second)
-- [Trigger an alert when the disk usage increases by more than 20% in an hour](#trigger-an-alert-when-the-disk-usage-increases-by-more-than-20-in-an-hour)
-- [Trigger an alert when a log file remains silent for more than 10 minutes](#trigger-an-alert-when-a-log-file-remains-silent-for-more-than-10-minutes)
 <!-- example-index-end -->
 
 <!-- example-list-begin -->
+---
+#### [Trigger an alert when a file hasn't been updated since 10 minutes](reference/processor/stat.md#trigger-an-alert-when-a-file-hasnt-been-updated-since-10-minutes)
+
+```js
+pipe(
+  stat("application.log"),
+  alert({
+    title: "Log file is inactive",
+    trigger: function (statOutput) {
+      if (!statOutput.exists) {
+        return false;
+      }
+      var now = (new Date()).getTime();
+      var minutes10 = 10 * 60 * 1000;
+      return (now - statOutput.lastModified) > minutes10;
+    },
+    toggle: true
+  })
+).run();
+```
+
+---
+#### [Trigger an alert if a json object log contains an error](reference/processor/json.md#trigger-an-alert-if-a-json-object-log-contains-an-error)
+
+This example assumes that an application appends Json objects to the structured log file `application.log.json`: 
+
+```js
+pipe(
+  tail("application.log.json"),
+  json(),
+  alert({
+    title: "error occurred in the log",
+    trigger: function (logObject) { return logObject.level === "ERROR"; }
+  })
+).run();
+```
+
 ---
 #### [Display an alert if disk usage is > 80%; version 1](reference/processor/alert.md#display-an-alert-if-disk-usage-is--80-version-1)
 
@@ -164,31 +201,37 @@ pipe(
 ```
 
 ---
-#### [Trigger an alert if three consecutive http requests at a 30 second interval are unsuccessful](reference/processor/collect.md#trigger-an-alert-if-three-consecutive-http-requests-at-a-30-second-interval-are-unsuccessful)
+#### [Trigger an alert if the file `application.log` contains `ERROR` or `WARNING`](reference/processor/parallel.md#trigger-an-alert-if-the-file-applicationlog-contains-error-or-warning)
 
 ```js
 pipe(
-    curl({ url: "http://www.mywebsite.com", period: "30s" }),
-    collect(3),
-    alert({
-      title: "Website is down",
-      trigger: function (curlOutputArray) {
-        return curlOutputArray.every(function (seriesObject) {
-          return seriesObject.value.status != 200;
-        });
-      },
-      toggle: true
-    })
+  tail("application.log"), 
+  parallel(grep(/ERROR/), grep(/WARNING/)), 
+  alert("Error or warning")
 ).run();
 ```
 
 ---
-#### [Trigger an alert if a Web site is down](reference/processor/curl.md#trigger-an-alert-if-a-web-site-is-down)
+#### [Trigger an alert if either `application1.log` or `application2.log` contains `ERROR`](reference/processor/parallel.md#trigger-an-alert-if-either-application1log-or-application2log-contains-error)
+
+```js
+pipe(
+  parallel(
+    tail("application1.log"),
+    tail("application2.log")
+  ),
+  grep(/ERROR/), 
+  alert("Error or warning")
+).run();
+```
+
+---
+#### [Trigger an alert every 10 seconds if a Web site is down](reference/processor/curl.md#trigger-an-alert-every-10-seconds-if-a-web-site-is-down)
 
 ```js
 pipe(
   curl("https://httpbin.org"), 
-  test(function (curlOutput) { return curlOutput.status != 200; }), 
+  apply(function (curlOutput) { if (curlOutput.status != 200) return curlOutput; }), 
   alert("Website is down")
 ).run();
 ```
@@ -258,6 +301,39 @@ pipe(
 ```
 
 ---
+#### [Trigger an alert when the log file gets bigger than 100,000 lines](reference/processor/tail.md#trigger-an-alert-when-the-log-file-gets-bigger-than-100000-lines)
+
+```js
+pipe(
+  tail("application.log"),
+  alert({
+    title: "Log file has too many lines",
+    trigger: function (trailOutput, trailPayload) { return trailPayload.metadata.line > 100000; },
+    toggle: true
+  })
+).run();
+```
+
+---
+#### [Trigger an alert if three consecutive http requests at a 30 second interval are unsuccessful](reference/processor/collect.md#trigger-an-alert-if-three-consecutive-http-requests-at-a-30-second-interval-are-unsuccessful)
+
+```js
+pipe(
+    curl({ url: "http://www.mywebsite.com", period: "30s" }),
+    collect(3),
+    alert({
+      title: "Website is down",
+      trigger: function (curlOutputArray) {
+        return curlOutputArray.every(function (seriesObject) {
+          return seriesObject.value.status != 200;
+        });
+      },
+      toggle: true
+    })
+).run();
+```
+
+---
 #### [Trigger an alert for each line in a log file that contains `error` or `warning`](reference/processor/grep.md#trigger-an-alert-for-each-line-in-a-log-file-that-contains-error-or-warning)
 
 ```js
@@ -280,43 +356,78 @@ pipe(
 ```
 
 ---
-#### [Trigger an alert if a json object log contains an error](reference/processor/json.md#trigger-an-alert-if-a-json-object-log-contains-an-error)
+#### [Trigger an alert when a log file has more than 20 Java exception per second](reference/processor/trail.md#trigger-an-alert-when-a-log-file-has-more-than-20-java-exception-per-second)
 
-This example assumes that an application appends Json objects to the structured log file `application.log.json`: 
+This alert is in toggle mode, thus it will stay up as long as the exception frequency stays high:
 
 ```js
 pipe(
-  tail("application.log.json"),
-  json(),
+  tail("application.log"),
+  jstack(),
+  trail("10s"),
   alert({
-    title: "error occurred in the log",
-    trigger: function (logObject) { return logObject.level === "ERROR"; }
+    title: "Too many exceptions",
+    trigger: function (trailOutput) { return trailOutput.length > 20; },
+    toggle: true
   })
 ).run();
 ```
 
 ---
-#### [Trigger an alert if the file `application.log` contains `ERROR` or `WARNING`](reference/processor/parallel.md#trigger-an-alert-if-the-file-applicationlog-contains-error-or-warning)
+#### [Trigger an alert when the disk usage increases by more than 20% in an hour](reference/processor/trail.md#trigger-an-alert-when-the-disk-usage-increases-by-more-than-20-in-an-hour)
 
 ```js
 pipe(
-  tail("application.log"), 
-  parallel(grep(/ERROR/), grep(/WARNING/)), 
-  alert("Error or warning")
+  df("/tmp"),
+  trail("1h"),
+  alert({
+    title: "/tmp usage grew by more than 20% during the last hour",
+    trigger: function (trail) { 
+      var len = trail.length;
+      return (len >= 2) && (trail[len - 1].usage / trail[0].usage) > 1.2; 
+    },
+    toggle: true
+  })
+).run();
+```
+
+Since `df` generates an output every second, the trail collected over an hour contains 3600
+elements. Since only the first and the last elements are actually used to compute the alert trigger, the generation
+period of `df` can be decreased, which will reduce Opwatch memory consumption:
+
+```js
+df({ file: "/tmp", period: "10m" })
+```
+
+---
+#### [Trigger an alert when a log file remains silent for more than 10 minutes](reference/processor/trail.md#trigger-an-alert-when-a-log-file-remains-silent-for-more-than-10-minutes)
+
+```js
+pipe(
+  tail("application.log"),
+  trail("10m"),
+  alert({
+    title: "Log file is silent",
+    trigger: function (trailOutput) { return trailOutput.length == 0; },
+    toggle: true
+  })
 ).run();
 ```
 
 ---
-#### [Trigger an alert if either `application1.log` or `application2.log` contains `ERROR`](reference/processor/parallel.md#trigger-an-alert-if-either-application1log-or-application2log-contains-error)
+#### [Trigger an alert when the CPU is higher than 80%](reference/processor/top.md#trigger-an-alert-when-the-cpu-is-higher-than-80)
 
 ```js
 pipe(
-  parallel(
-    tail("application1.log"),
-    tail("application2.log")
-  ),
-  grep(/ERROR/), 
-  alert("Error or warning")
+  top(),
+  alert({
+    title: "CPU is too high",
+    trigger: function (topOutput) {
+      var cpu = topOutput.loadAverage / topOutput.availableProcessors;
+      return cpu > 0.8;
+    },
+    toggle: true
+  })
 ).run();
 ```
 
@@ -474,116 +585,5 @@ The `--line-buffered` option forces `grep`'s output to be line buffered. By defa
 block buffered when standard output is not a terminal, which is the case here; without this option, the output 
 would be delayed until the buffer is full, which would also delay the alarm. In general, you should use
 shell commands with buffered output with care, as they might not yield to the natural behavior you would expected.
-
----
-#### [Trigger an alert when a file hasn't been updated since 10 minutes](reference/processor/stat.md#trigger-an-alert-when-a-file-hasnt-been-updated-since-10-minutes)
-
-```js
-pipe(
-  stat("application.log"),
-  alert({
-    title: "Log file is inactive",
-    trigger: function (statOutput) {
-      if (!statOutput.exists) {
-        return false;
-      }
-      var now = (new Date()).getTime();
-      var minutes10 = 10 * 60 * 1000;
-      return (now - statOutput.lastModified) > minutes10;
-    },
-    toggle: true
-  })
-).run();
-```
-
----
-#### [Trigger an alert when the log file gets bigger than 100,000 lines](reference/processor/tail.md#trigger-an-alert-when-the-log-file-gets-bigger-than-100000-lines)
-
-```js
-pipe(
-  tail("application.log"),
-  alert({
-    title: "Log file has too many lines",
-    trigger: function (trailOutput, trailPayload) { return trailPayload.metadata.line > 100000; },
-    toggle: true
-  })
-).run();
-```
-
----
-#### [Trigger an alert when the CPU is higher than 80%](reference/processor/top.md#trigger-an-alert-when-the-cpu-is-higher-than-80)
-
-```js
-pipe(
-  top(),
-  alert({
-    title: "CPU is too high",
-    trigger: function (topOutput) {
-      var cpu = topOutput.loadAverage / topOutput.availableProcessors;
-      return cpu > 0.8;
-    },
-    toggle: true
-  })
-).run();
-```
-
----
-#### [Trigger an alert when a log file has more than 20 Java exception per second](reference/processor/trail.md#trigger-an-alert-when-a-log-file-has-more-than-20-java-exception-per-second)
-
-This alert is in toggle mode, thus it will stay up as long as the exception frequency stays high:
-
-```js
-pipe(
-  tail("application.log"),
-  jstack(),
-  trail("10s"),
-  alert({
-    title: "Too many exceptions",
-    trigger: function (trailOutput) { return trailOutput.length > 20; },
-    toggle: true
-  })
-).run();
-```
-
----
-#### [Trigger an alert when the disk usage increases by more than 20% in an hour](reference/processor/trail.md#trigger-an-alert-when-the-disk-usage-increases-by-more-than-20-in-an-hour)
-
-```js
-pipe(
-  df("/tmp"),
-  trail("1h"),
-  alert({
-    title: "/tmp usage grew by more than 20% during the last hour",
-    trigger: function (trail) { 
-      var len = trail.length;
-      return (len >= 2) && (trail[len - 1].usage / trail[0].usage) > 1.2; 
-    },
-    toggle: true
-  })
-).run();
-```
-
-Since `df` generates an output every second, the trail collected over an hour contains 3600
-elements. Since only the first and the last elements are actually used to compute the alert trigger, the generation
-period of `df` can be decreased, which will reduce Opwatch memory consumption:
-
-```js
-df({ file: "/tmp", period: "10m" })
-```
-
----
-#### [Trigger an alert when a log file remains silent for more than 10 minutes](reference/processor/trail.md#trigger-an-alert-when-a-log-file-remains-silent-for-more-than-10-minutes)
-
-```js
-pipe(
-  tail("application.log"),
-  trail("10m"),
-  alert({
-    title: "Log file is silent",
-    trigger: function (trailOutput) { return trailOutput.length == 0; },
-    toggle: true
-  })
-).run();
-```
 
 <!-- example-list-end -->

@@ -71,12 +71,12 @@ a request is still pending when the following request is executed, and the latte
 ### Examples
 
 <!-- example-begin -->
-#### Trigger an alert if a Web site is down
+#### Trigger an alert every 10 seconds if a Web site is down
 
 ```js
 pipe(
   curl("https://httpbin.org"), 
-  test(function (curlOutput) { return curlOutput.status != 200; }), 
+  apply(function (curlOutput) { if (curlOutput.status != 200) return curlOutput; }), 
   alert("Website is down")
 ).run();
 ```
