@@ -68,7 +68,7 @@ public class FileTailingService implements DisposableBean {
 
 	public void tailFile(TailedFile tailedFile) {
 		try {
-			tailedFile.tail();
+			tailedFile.tail(processorService);
 		} catch (InterruptedException e) {
 			throw new ApplicationInterruptedException(ApplicationInterruptedException.INTERRUPTION);
 		} catch (ApplicationInterruptedException e) {

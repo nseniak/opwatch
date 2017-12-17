@@ -15,6 +15,7 @@
 package org.opwatch.ioservice;
 
 import org.opwatch.service.Config;
+import org.opwatch.service.ProcessorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,18 +38,20 @@ public class TailedFile {
 		this.handler = handler;
 	}
 
-	public void tail() throws InterruptedException, IOException {
+	private static final String MESSAGE_PREFIX = "Faile tailer: ";
+
+	public void tail(ProcessorService processorService) throws InterruptedException, IOException {
 		LineReader reader = null;
 		try {
 			while (true) {
 				int lineNumber = 0;
 				BasicFileAttributes currentAttributes;
 				if (((currentAttributes = fileAttributes(file)) == null) || ((reader = openFile(file)) == null)) {
-					logger.info("Waiting for file: " + file);
+					processorService.signalSystemInfo(MESSAGE_PREFIX + "Waiting for file: " + file);
 					while (((currentAttributes = fileAttributes(file)) == null) || ((reader = openFile(file)) == null)) {
 						Thread.sleep(config.tailedFileWatchingCheckDelay());
 					}
-					logger.info("File created: " + file);
+					processorService.signalSystemInfo(MESSAGE_PREFIX + "File found: " + file);
 				} else {
 					// File already exists. Go to the tail.
 					while (reader.readLine() != null) {
@@ -59,19 +62,19 @@ public class TailedFile {
 				while (true) {
 					BasicFileAttributes attrs = fileAttributes(file);
 					if (attrs == null) {
-						logger.info("File deleted: " + file);
+						processorService.signalSystemInfo(MESSAGE_PREFIX + "File deleted: " + file);
 						safeClose(reader);
 						break;
 					}
 					if (!attrs.fileKey().equals(currentAttributes.fileKey())) {
 						// File has changed
-						logger.info("File location has changed: " + file);
+						processorService.signalSystemInfo(MESSAGE_PREFIX + "File location has changed: " + file);
 						safeClose(reader);
 						break;
 					}
 					if (attrs.size() < currentAttributes.size()) {
 						// File has been truncated
-						logger.info("File truncated: " + file);
+						processorService.signalSystemInfo(MESSAGE_PREFIX + "File truncated: " + file);
 						safeClose(reader);
 						break;
 					}
