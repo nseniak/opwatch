@@ -38,7 +38,7 @@ public class TailedFile {
 		this.handler = handler;
 	}
 
-	private static final String MESSAGE_PREFIX = "Faile tailer: ";
+	private static final String MESSAGE_PREFIX = "File tailer: ";
 
 	public void tail(ProcessorService processorService) throws InterruptedException, IOException {
 		LineReader reader = null;
