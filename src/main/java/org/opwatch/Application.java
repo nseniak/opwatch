@@ -68,7 +68,7 @@ public class Application {
 	private static CommandLineOptions parseOptions(String[] argStrings) throws IOException {
 		OptionParser parser = new OptionParser();
 		OptionSpec<String> hostname = parser.accepts("hostname", "specify the current machine's hostname").withRequiredArg().ofType(String.class);
-		OptionSpec<String> configFile = parser.accepts("config", "specify the filename or url of the configuration script, lo be loaded startup instead of the default one (config.js)").withRequiredArg().ofType(String.class);
+		OptionSpec<String> configFile = parser.accepts("config", "specify the filename or url of the configuration script to be loaded startup instead of the default one (config.js)").withRequiredArg().ofType(String.class);
 		OptionSpec<Void> noConfig = parser.accepts("no-config", "do not load the configuration script at startup");
 		OptionSpec<String> runExpression = parser.accepts("run", "evaluate the given Javascript expression to a processor, and run it").withRequiredArg().ofType(String.class);
 		OptionSpec<Void> noServer = parser.accepts("no-server", "do not start the embedded HTTP server");
