@@ -70,8 +70,8 @@ public abstract class ChannelImpl implements Channel {
 		Object details = message.getDetails();
 		if (details == null) {
 			return null;
-		} else if (message.getType().isSystem()) {
-			return details.toString();
+		} else if (details instanceof String) {
+			return details;
 		} else {
 			return processorService.getScriptService().pretty(details);
 		}
