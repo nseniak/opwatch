@@ -127,6 +127,17 @@ public class Payload extends PayloadPojoValue {
 		return new Payload(System.currentTimeMillis(), processorService.hostName(), processorService.port(), producer.getId(), producer.getName(), previous, value);
 	}
 
+	public Object getSource() {
+		Payload current = this;
+		while (current != null) {
+			if (current.metadata instanceof DataSource) {
+				return ((DataSource) current.metadata).sourceDisplayString();
+			}
+			current = current.previous;
+		}
+		return jdk.nashorn.internal.runtime.ScriptRuntime.UNDEFINED;
+	}
+
 	public long getTimestamp() {
 		return timestamp;
 	}

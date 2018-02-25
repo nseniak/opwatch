@@ -14,9 +14,10 @@
 
 package org.opwatch.processor.primitives.producer.console;
 
+import org.opwatch.processor.payload.DataSource;
 import org.opwatch.processor.payload.PayloadPojoValue;
 
-public class StdinPayloadMetadata extends PayloadPojoValue {
+public class StdinPayloadMetadata extends PayloadPojoValue implements DataSource {
 
 	private int line;
 
@@ -25,6 +26,11 @@ public class StdinPayloadMetadata extends PayloadPojoValue {
 
 	public StdinPayloadMetadata(int line) {
 		this.line = line;
+	}
+
+	@Override
+	public String sourceDisplayString() {
+		return "stdin:" + line;
 	}
 
 	public int getLine() {

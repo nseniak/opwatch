@@ -15,7 +15,6 @@
 package org.opwatch.processor.payload;
 
 import jdk.nashorn.internal.runtime.ScriptRuntime;
-import org.opwatch.service.ScriptService;
 
 import java.util.List;
 import java.util.Objects;

@@ -14,9 +14,10 @@
 
 package org.opwatch.processor.primitives.producer.tail;
 
+import org.opwatch.processor.payload.DataSource;
 import org.opwatch.processor.payload.PayloadPojoValue;
 
-public class TailPayloadMetadata extends PayloadPojoValue {
+public class TailPayloadMetadata extends PayloadPojoValue implements DataSource {
 
 	private String file;
 	private int line;
@@ -27,6 +28,11 @@ public class TailPayloadMetadata extends PayloadPojoValue {
 	public TailPayloadMetadata(String file, int line) {
 		this.file = file;
 		this.line = line;
+	}
+
+	@Override
+	public String sourceDisplayString() {
+		return file + ":" + line;
 	}
 
 	public String getFile() {
