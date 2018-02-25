@@ -133,15 +133,19 @@ public class SlackChannel extends ThrottledChannel<SlackConfiguration> {
 		Attachment attachment = new Attachment();
 		String title = displayTitle(message);
 		attachment.setText(title);
-		attachment.setColor(levelColor(message.getLevel(), new LinkedHashSet<>(Arrays.asList(message.getType()))));
-		String detailsString = detailsString(message);
-		if (detailsString != null) {
-			attachment.addField(new Field("Details", detailsString, false));
-		}
+		Color color = levelColor(message.getLevel(), new LinkedHashSet<>(Collections.singletonList(message.getType())));
+		attachment.setColor(color);
 		attachment.addField(new Field("Level", message.getLevel().name(), true));
 		attachment.addField(new Field("Hostname", message.getContext().getHostname(), true));
 		if (!empty(attachment)) {
 			payload.addAttachment(attachment);
+		}
+		String detailsString = detailsString(message);
+		if (detailsString != null) {
+			Attachment detailsAttachment = new Attachment();
+			detailsAttachment.setColor(color);
+			detailsAttachment.setText("```\n" + detailsString + "\n```");
+			payload.addAttachment(detailsAttachment);
 		}
 	}
 

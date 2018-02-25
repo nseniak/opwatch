@@ -39,7 +39,7 @@ public abstract class ChannelImpl implements Channel {
 			}
 			case info: {
 				String suffix = (message.getLevel() == INFO_DEFAULT_MESSAGE_LEVEL) ? "" : levelSuffix;
-				return typeDesc  + suffix + ": " + message.getTitle();
+				return typeDesc + suffix + ": " + message.getTitle();
 			}
 			case alert:
 			case alertOn:
@@ -71,7 +71,7 @@ public abstract class ChannelImpl implements Channel {
 		if (details == null) {
 			return null;
 		} else if (details instanceof String) {
-			return details;
+			return (String) details;
 		} else {
 			return processorService.getScriptService().pretty(details);
 		}
