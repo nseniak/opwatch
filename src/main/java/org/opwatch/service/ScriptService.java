@@ -157,7 +157,7 @@ public class ScriptService {
 		loadScript(() -> new InputStreamReader(scriptResource.getInputStream()), scriptResource.toString());
 	}
 
-	private void loadConfigFile() throws ScriptException {
+	private void loadConfigFile() {
 		if (processorService.config().noInit()) {
 			return;
 		}
