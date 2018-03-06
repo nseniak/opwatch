@@ -39,7 +39,7 @@ public class SlackChannel extends ThrottledChannel<SlackConfiguration> {
 
 	private static final Logger logger = LoggerFactory.getLogger(SlackChannel.class);
 
-	private static final int MAX_ATTACHMENT_TEXT_SIZE = 7990;
+	private static final int MAX_ATTACHMENT_TEXT_SIZE = 7900;
 
 	private String name;
 	private SlackConfiguration config;
