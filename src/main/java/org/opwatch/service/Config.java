@@ -48,6 +48,8 @@ public class Config {
 	private long shCommandExitTimeout;
 	private long commandStartTimeout;
 	private long commandStartSleepTime;
+	private boolean tailedFileChangedAlert;
+	private long tailedFileMissingAlertDelay;
 
 	public Config(ProcessorService processorService, CommandLineOptions options) {
 		this.processorService = processorService;
@@ -70,6 +72,8 @@ public class Config {
 		this.shCommandExitTimeout = -1;
 		this.commandStartTimeout = TimeUnit.MINUTES.toMillis(1);
 		this.commandStartSleepTime = TimeUnit.MILLISECONDS.toMillis(200);
+		this.tailedFileChangedAlert = ApplicationUtil.property("opwatch.tail.changeAlerts", false);
+		this.tailedFileMissingAlertDelay = ApplicationUtil.property("opwatch.tail.missingFileAlertDelay", TimeUnit.SECONDS.toMillis(15));
 	}
 
 	public void channels(Object scriptObject) {
@@ -262,4 +266,11 @@ public class Config {
 		return "gz";
 	}
 
+    public boolean tailedFileFileChangeAlerts() {
+        return tailedFileChangedAlert;
+    }
+
+    public long tailedFileMissingAlertDelay() {
+        return tailedFileMissingAlertDelay;
+    }
 }
