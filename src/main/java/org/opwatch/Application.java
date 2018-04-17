@@ -44,6 +44,7 @@ public class Application {
 		try {
 			ApplicationUtil.checkProperty("app.log.dir", "logging directory");
 			ApplicationUtil.checkProperty("app.log.basename", "logfile basename");
+			ApplicationUtil.checkProperty("app.home", "opwatch home directory");
 			CommandLineOptions options = parseOptions(args);
 			if (options == null) {
 				System.exit(1);

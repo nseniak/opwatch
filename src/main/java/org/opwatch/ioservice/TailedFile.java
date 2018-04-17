@@ -26,111 +26,170 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 public class TailedFile {
 
-	private static final Logger logger = LoggerFactory.getLogger(TailedFile.class);
+    private static final Logger logger = LoggerFactory.getLogger(TailedFile.class);
 
-	private Path file;
-	private TailLineHandler handler;
-	private Config config;
+    private Path file;
+    private TailLineHandler handler;
+    private Config config;
 
-	public TailedFile(Config config, Path file, TailLineHandler handler) {
-		this.config = config;
-		this.file = file;
-		this.handler = handler;
-	}
+    public TailedFile(Config config, Path file, TailLineHandler handler) {
+        this.config = config;
+        this.file = file;
+        this.handler = handler;
+    }
 
-	private static final String MESSAGE_PREFIX = "File tailer: ";
+    private static final String MESSAGE_PREFIX = "File tailer: ";
 
-	public void tail(ProcessorService processorService) throws InterruptedException, IOException {
-		LineReader reader = null;
-		try {
-			while (true) {
-				int lineNumber = 0;
-				BasicFileAttributes currentAttributes;
-				if (((currentAttributes = fileAttributes(file)) == null) || ((reader = openFile(file)) == null)) {
-					processorService.signalSystemInfo(MESSAGE_PREFIX + "Waiting for file: " + file);
-					while (((currentAttributes = fileAttributes(file)) == null) || ((reader = openFile(file)) == null)) {
-						Thread.sleep(config.tailedFileWatchingCheckDelay());
-					}
-					processorService.signalSystemInfo(MESSAGE_PREFIX + "File found: " + file);
-				} else {
-					// File already exists. Go to the tail.
-					while (reader.readLine() != null) {
-						lineNumber = lineNumber + 1;
-						// Continue
-					}
-				}
-				while (true) {
-					BasicFileAttributes attrs = fileAttributes(file);
-					if (attrs == null) {
-						processorService.signalSystemInfo(MESSAGE_PREFIX + "File deleted: " + file);
-						safeClose(reader);
-						break;
-					}
-					if (!attrs.fileKey().equals(currentAttributes.fileKey())) {
-						// File has changed
-						processorService.signalSystemInfo(MESSAGE_PREFIX + "File location has changed: " + file);
-						safeClose(reader);
-						break;
-					}
-					if (attrs.size() < currentAttributes.size()) {
-						// File has been truncated
-						processorService.signalSystemInfo(MESSAGE_PREFIX + "File truncated: " + file);
-						safeClose(reader);
-						break;
-					}
-					currentAttributes = attrs;
-					String line = reader.readLine();
-					if (line == null) {
-						// end of file, start polling
-						Thread.sleep(config.tailPollInterval());
-					} else {
-						lineNumber = lineNumber + 1;
-						handler.handle(line, lineNumber);
-					}
-				}
-			}
-		} finally {
-			if (reader != null) {
-				safeClose(reader);
-			}
-		}
-	}
+    public void tail(ProcessorService processorService) throws InterruptedException, IOException {
+        TailedFileReader reader = null;
+        boolean initialIteration = true;
+        try {
+            while (true) {
+                reader = waitForFile(processorService);
+                if (initialIteration) {
+                    reader.skipToEnd();
+                    initialIteration = false;
+                }
+                while (true) {
+                    BasicFileAttributes attrs = fileAttributes(file);
+                    if (attrs == null) {
+                        if (config.tailedFileFileChangeAlerts()) {
+                            processorService.signalSystemInfo(MESSAGE_PREFIX + "File deleted: " + file);
+                        }
+                        reader.safeClose();
+                        break;
+                    }
+                    if (attrs.size() < reader.getAttributes().size()) {
+                        // File has been truncated
+                        if (config.tailedFileFileChangeAlerts()) {
+                            processorService.signalSystemInfo(MESSAGE_PREFIX + "File truncated: " + file);
+                        }
+                        reader.safeClose();
+                        break;
+                    }
+                    if (!attrs.fileKey().equals(reader.getAttributes().fileKey())) {
+                        // File has changed
+                        if (config.tailedFileFileChangeAlerts()) {
+                            processorService.signalSystemInfo(MESSAGE_PREFIX + "File has changed: " + file);
+                        }
+                        reader.safeClose();
+                    }
+                    reader.updateAttributes();
+                    String line = reader.readLine();
+                    if (line == null) {
+                        // Wait a bit
+                        Thread.sleep(config.tailPollInterval());
+                    } else {
+                        reader.incrLineNumber();
+                        handler.handle(line, reader.getLineNumber());
+                    }
+                }
+            }
+        } finally {
+            if (reader != null) {
+                reader.safeClose();
+            }
+        }
+    }
 
-	private BasicFileAttributes fileAttributes(Path path) {
-		try {
-			return Files.readAttributes(file, BasicFileAttributes.class);
-		} catch (IOException e) {
-			return null;
-		}
-	}
+    private class TailedFileReader {
 
-	private void safeClose(LineReader reader) {
-		try {
-			reader.close();
-		} catch (IOException e) {
-			// Do nothing
-		}
-	}
+        private Path file;
+        private LineReader reader;
+        private BasicFileAttributes attributes;
+        private int lineNumber;
 
-	private LineReader openFile(Path path) {
-		try {
-			InputStream in = Files.newInputStream(path);
-			return new LineReader(new BufferedInputStream(in), config.lineBufferSize(), false);
-		} catch (IOException e) {
-			return null;
-		}
-	}
+        public TailedFileReader(Path file, LineReader reader, BasicFileAttributes attributes) {
+            this.reader = reader;
+            this.attributes = attributes;
+            this.lineNumber = 0;
+        }
 
-	public Path getFile() {
-		return file;
-	}
+        String readLine() throws IOException, InterruptedException {
+            return reader.readLine();
+        }
 
-	public void setFile(Path file) {
-		this.file = file;
-	}
+        void updateAttributes() {
+            attributes = fileAttributes(file);
+        }
 
-	public TailLineHandler getHandler() {
-		return handler;
-	}
+        void skipToEnd() throws IOException, InterruptedException {
+            while (reader.readLine() != null) {
+                lineNumber += 1;
+            }
+        }
+
+        void safeClose() {
+            try {
+                reader.close();
+            } catch (IOException e) {
+                // Do nothing
+            }
+        }
+
+        LineReader getReader() {
+            return reader;
+        }
+
+        BasicFileAttributes getAttributes() {
+            return attributes;
+        }
+
+        int getLineNumber() {
+            return lineNumber;
+        }
+
+        void incrLineNumber() {
+            lineNumber += 1;
+        }
+    }
+
+    private TailedFileReader waitForFile(ProcessorService processorService) throws InterruptedException, IOException {
+        boolean waitSignaled = false;
+        BasicFileAttributes attributes;
+        LineReader reader;
+        long t0 = System.currentTimeMillis();
+        while (((attributes = fileAttributes(file)) == null) || ((reader = openFile(file)) == null)) {
+            long waitTime = System.currentTimeMillis() - t0;
+            if (!waitSignaled && (waitTime > config.tailedFileMissingAlertDelay())) {
+                processorService.signalSystemInfo(MESSAGE_PREFIX + "Waiting for file: " + file);
+                waitSignaled = true;
+            }
+            Thread.sleep(config.tailedFileWatchingCheckDelay());
+        }
+        if (waitSignaled) {
+            processorService.signalSystemInfo(MESSAGE_PREFIX + "File found: " + file);
+        }
+        return new TailedFileReader(file, reader, attributes);
+    }
+
+    private BasicFileAttributes fileAttributes(Path path) {
+        try {
+            return Files.readAttributes(file, BasicFileAttributes.class);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    private LineReader openFile(Path path) {
+        try {
+            InputStream in = Files.newInputStream(path);
+            return new LineReader(new BufferedInputStream(in), config.lineBufferSize(), false);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    public Path getFile() {
+        return file;
+    }
+
+    public void setFile(Path file) {
+        this.file = file;
+    }
+
+    public TailLineHandler getHandler() {
+        return handler;
+    }
 
 }

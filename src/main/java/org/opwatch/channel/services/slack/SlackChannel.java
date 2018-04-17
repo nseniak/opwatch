@@ -39,6 +39,8 @@ public class SlackChannel extends ThrottledChannel<SlackConfiguration> {
 
 	private static final Logger logger = LoggerFactory.getLogger(SlackChannel.class);
 
+	private static final int MAX_ATTACHMENT_TEXT_SIZE = 7900;
+
 	private String name;
 	private SlackConfiguration config;
 	private SlackMessageService service;
@@ -144,7 +146,7 @@ public class SlackChannel extends ThrottledChannel<SlackConfiguration> {
 		if (detailsString != null) {
 			Attachment detailsAttachment = new Attachment();
 			detailsAttachment.setColor(color);
-			detailsAttachment.setText("```\n" + detailsString + "\n```");
+			detailsAttachment.setText(mdQuote(detailsString));
 			payload.addAttachment(detailsAttachment);
 		}
 	}
@@ -152,6 +154,18 @@ public class SlackChannel extends ThrottledChannel<SlackConfiguration> {
 	private boolean empty(Attachment attachment) {
 		return (attachment.getTitle() == null) && (attachment.getText() == null) && attachment.getFields().isEmpty();
 	}
+
+	private String truncate(String str, int maxLen) {
+	    if (str.length() <= maxLen) {
+	        return str;
+        } else {
+	        return str.substring(0, maxLen - 3) + "...";
+        }
+    }
+
+    private String mdQuote(String str) {
+	    return "```" + truncate(str, MAX_ATTACHMENT_TEXT_SIZE - 8) + "```";
+    }
 
 	private Color levelColor(Message.Level level, Set<Message.Type> messageTypes) {
 		if (messageTypes.contains(Message.Type.alert)
